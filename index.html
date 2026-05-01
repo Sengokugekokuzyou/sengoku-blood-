@@ -3,36 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>戦国血統 - 乱世の覇者</title>
+<title>戦国血統シミュレーター FINAL</title>
 <style>
-:root{--gold:#ffd700;--blood:#c8102e}
-body{margin:0;background:linear-gradient(#0a0a0a,#1a0000);color:#0f0;font-family:"Yu Gothic",sans-serif;overflow:hidden}
+:root{--accent:#0f0}
+body{margin:0;background:#000;color:#0f0;font-family:sans-serif}
 #app{display:flex;flex-direction:column;height:100vh}
-#header{padding:12px;background:#111;text-align:center;font-size:18px;letter-spacing:2px;border-bottom:3px solid var(--blood);box-shadow:0 2px 10px rgba(200,16,46,0.6)}
-#main{flex:1;overflow:auto;padding:12px}
-#footer{display:flex;background:#111;border-top:3px solid var(--blood)}
-.button{flex:1;padding:14px;text-align:center;font-weight:bold}
-.card{
-  background:#111;
-  padding:12px;
-  margin:8px 0;
-  border-radius:12px;
-  border-left:6px solid var(--blood);
-  display:flex;
-  align-items:center;
-  gap:12px;
-  box-shadow:0 4px 12px rgba(200,16,46,0.3);
-}
-.card img{width:64px;height:64px;border-radius:8px;object-fit:cover;border:2px solid #ffd700}
-.sel{outline:3px solid #ffd700}
-#mixPanel{
-  position:fixed;bottom:0;left:0;right:0;background:#111;
-  border-top:4px solid #ffd700;padding:12px;
-  box-shadow:0 -6px 20px rgba(255,215,0,0.4);
-  z-index:100;
-  display:none;
-}
-.log{font-size:12px;opacity:0.85}
+#header{padding:10px;background:#111;text-align:center;border-bottom:2px solid var(--accent)}
+#main{flex:1;overflow:auto;padding:10px}
+#footer{display:flex;background:#111;border-top:2px solid var(--accent)}
+.button{flex:1;padding:12px;text-align:center}
+.card{background:#111;padding:10px;margin:6px 0;border-radius:8px;border-left:4px solid var(--accent)}
+.sel{outline:3px solid gold}
+#mixPanel{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:3px solid gold;padding:12px;z-index:100;display:none}
+.log{font-size:11px;opacity:0.8}
 </style>
 </head>
 <body>
@@ -40,49 +23,65 @@ body{margin:0;background:linear-gradient(#0a0a0a,#1a0000);color:#0f0;font-family
   <div id="header">天文二十三年　戦国血統 <span id="time"></span></div>
   <div id="main"></div>
   <div id="footer">
-    <div class="button" onclick="setView(0)">武将</div>
+    <div class="button" onclick="setView(0)">育成</div>
     <div class="button" onclick="setView(1)">家系</div>
     <div class="button" onclick="setView(2)">戦況</div>
   </div>
 </div>
-
 <div id="mixPanel"></div>
 
 <script>
-const BLOODS = {
-  oda: {name:"織田", color:"#c8102e"},
-  takeda: {name:"武田", color:"#d52b1e"},
-  tokugawa: {name:"徳川", color:"#1e3a8a"},
-  uesugi: {name:"上杉", color:"#1a3c34"},
-  hojo: {name:"北条", color:"#8b4513"},
-  oni: {name:"鬼", color:"#800080"}
+// ==================== CONFIG ====================
+const CONFIG = { MAX_UNITS: 450, BIRTH_RATE: 0.22, WAR_INTERVAL: 85 };
+
+// ==================== STATE ====================
+let state = {
+  time: 0,
+  units: [],
+  map: {oda:5,takeda:5,tokugawa:5,uesugi:5},
+  logs: []
 };
 
-let state = {time:0, units:[], map:{oda:6,takeda:5,tokugawa:4,uesugi:4}, logs:[]};
 let selectedParents = [];
 let view = 0;
+let globalTension = 0;
 
-function log(msg) {
-  state.logs.unshift(msg);
-  if(state.logs.length > 20) state.logs.pop();
-}
+// ==================== BLOODS ====================
+const BLOODS = {
+  oda: {name:"織田",color:"#c8102e"},
+  takeda: {name:"武田",color:"#d52b1e"},
+  tokugawa: {name:"徳川",color:"#1e3a8a"},
+  uesugi: {name:"上杉",color:"#1a3c34"},
+  hojo: {name:"北条",color:"#8b4513"},
+  oni: {name:"鬼",color:"#800080"}
+};
 
+// ==================== UTILS ====================
+const rand = () => Math.random();
+const randInt = n => Math.floor(rand()*n);
+
+// ==================== UNIT ====================
 function createUnit() {
   const keys = Object.keys(BLOODS);
-  const blood = keys[Math.floor(Math.random()*keys.length)];
   return {
-    id: Date.now() + Math.random(),
-    name: ["信長","信玄","家康","謙信","氏康","元就"][Math.floor(Math.random()*6)],
-    blood: blood,
-    power: 20 + Math.floor(Math.random()*70),
-    generation: 0
+    id: Date.now() + rand(),
+    name: "武将" + randInt(9999),
+    blood: keys[randInt(keys.length)],
+    power: 15 + randInt(55),
+    alive: true,
+    generation: 0,
+    destiny: []
   };
 }
 
+// ==================== MIX ====================
 function selectParent(id) {
-  if (selectedParents.includes(id)) selectedParents = selectedParents.filter(x => x !== id);
-  else if (selectedParents.length < 2) selectedParents.push(id);
-  render();
+  if (selectedParents.includes(id)) {
+    selectedParents = selectedParents.filter(x => x !== id);
+  } else if (selectedParents.length < 2) {
+    selectedParents.push(id);
+  }
+  renderMixPanel();
 }
 
 function manualMix() {
@@ -92,67 +91,155 @@ function manualMix() {
   if (!a || !b) return;
 
   const child = createUnit();
-  child.blood = Math.random() < 0.5 ? a.blood : b.blood;
-  child.power = Math.floor((a.power + b.power) / 2 + Math.random() * 18);
+  child.blood = rand() < 0.5 ? a.blood : b.blood;
+  child.power = Math.floor((a.power + b.power) / 2 + rand() * 15);
   child.generation = Math.max(a.generation, b.generation) + 1;
 
   state.units.push(child);
-  log(`🎉 ${a.name} × ${b.name} → ${child.name} 誕生`);
+  log(`🧬 ${a.name} × ${b.name} → ${child.name}誕生`);
+
   selectedParents = [];
+  renderMixPanel();
+}
+
+// ==================== EVENTS ====================
+function updateDestiny() {
+  state.units.forEach(u => {
+    if (!u.alive) return;
+    u.destiny.forEach(d => {
+      if (d.done) return;
+      const target = state.units.find(x => x.id === d.targetId);
+      if (target && target.alive && u.power > target.power) {
+        target.alive = false;
+        d.done = true;
+        log("💀 親殺し発生");
+      }
+    });
+  });
+}
+
+function godEvents() {
+  globalTension += 0.0008;
+  state.units.forEach(u => {
+    if (rand() < 0.008 + globalTension * 0.01) {
+      u.power = Math.min(100, u.power + 18);
+      log("🔥 覚醒");
+    }
+  });
+}
+
+function doWar() {
+  const keys = Object.keys(state.map);
+  const a = keys[randInt(keys.length)];
+  const b = keys[randInt(keys.length)];
+  if (a === b) return;
+
+  const win = rand() < 0.5 ? a : b;
+  const lose = win === a ? b : a;
+
+  state.map[win] = (state.map[win]||0) + 1;
+  state.map[lose] = Math.max(0, (state.map[lose]||0) - 1);
+
+  log(`⚔ ${a} vs ${b} → ${win}勝利`);
+}
+
+// ==================== LOG ====================
+function log(text) {
+  state.logs.unshift(`[${state.time}] ${text}`);
+  if (state.logs.length > 60) state.logs.pop();
+}
+
+// ==================== UI ====================
+function setView(v) {
+  view = v;
   render();
 }
 
-function setView(v) { view = v; render(); }
+function renderMixPanel() {
+  const panel = document.getElementById("mixPanel");
+  if (selectedParents.length !== 2) {
+    panel.style.display = "none";
+    return;
+  }
+  panel.style.display = "block";
+
+  const a = state.units.find(u => u.id === selectedParents[0]);
+  const b = state.units.find(u => u.id === selectedParents[1]);
+
+  panel.innerHTML = `
+    <div style="margin-bottom:8px">${a.name} × ${b.name}</div>
+    <div onclick="manualMix()" style="background:#0f0;color:#000;padding:12px;text-align:center;border-radius:8px;font-weight:bold">
+      配合する
+    </div>
+  `;
+}
 
 function render() {
   const main = document.getElementById("main");
-  const panel = document.getElementById("mixPanel");
   let html = "";
 
   if (view === 0) {
-    html = `<h3 style="color:#ffd700">現役武将 (${state.units.length})</h3>`;
-    html += state.units.slice(-20).reverse().map(u => `
-      <div class="card ${selectedParents.includes(u.id)?'sel':''}" onclick="selectParent(${u.id})">
-        <img src="https://picsum.photos/id/${Math.floor(u.id%50)+100}/64/64" alt="">
-        <div>
-          <b>${u.name}</b><br>
-          <span style="color:${BLOODS[u.blood].color}">[${BLOODS[u.blood].name}]</span> 力:${u.power}
-        </div>
-      </div>`).join("");
+    html = `<h3>現役武将 (${state.units.length})</h3>`;
+    html += state.units.slice(-30).map(u => {
+      const sel = selectedParents.includes(u.id) ? "sel" : "";
+      return `<div class="card \( {sel}" onclick="selectParent( \){u.id})">
+        <b>\( {u.name}</b> [ \){u.blood}]　力:${u.power}
+      </div>`;
+    }).join("");
   } else if (view === 1) {
-    html = `<h3>家系図</h3>` + state.units.slice(-20).map(u => `<div class="card">${u.name} [${BLOODS[u.blood].name}]</div>`).join("");
+    html = `<h3>家系図</h3>` + state.units.slice(-100).map(u => 
+      `<div class="card">\( {u.name} ( \){u.blood})</div>`
+    ).join("");
   } else if (view === 2) {
-    html = `<h3>戦況</h3>` + Object.keys(state.map).map(k => `<div class="card">${k} : ${state.map[k]}</div>`).join("");
+    html = `<h3>戦況</h3>` + Object.keys(state.map).map(k => 
+      `<div class="card">${k} : ${state.map[k]}</div>`
+    ).join("");
   }
 
-  html += `<h3 style="color:#ffd700;margin-top:20px">戦国ログ</h3>` + state.logs.map(l => `<div class="log">${l}</div>`).join("");
-  main.innerHTML = html;
-  document.getElementById("time").innerText = `第${state.time}年`;
+  html += `<h3>戦国ログ</h3>` + state.logs.slice(0,15).map(l => 
+    `<div class="log">${l}</div>`
+  ).join("");
 
-  if (selectedParents.length === 2) {
-    const p1 = state.units.find(u => u.id === selectedParents[0]);
-    const p2 = state.units.find(u => u.id === selectedParents[1]);
-    panel.style.display = "block";
-    panel.innerHTML = `
-      <div style="display:flex;justify-content:space-around;align-items:center;color:#fff">
-        <span>${p1.name}</span> <span>×</span> <span>${p2.name}</span>
-      </div>
-      <div onclick="manualMix()" style="margin-top:10px;background:#ffd700;color:#000;padding:12px;text-align:center;border-radius:8px;font-weight:bold">配合する</div>
-    `;
-  } else {
-    panel.style.display = "none";
+  main.innerHTML = html;
+  renderMixPanel();
+  document.getElementById("time").textContent = `第${state.time}年`;
+}
+
+// ==================== LOOP ====================
+function tick() {
+  state.time++;
+
+  if (rand() < CONFIG.BIRTH_RATE && state.units.length > 1) {
+    const a = state.units[randInt(state.units.length)];
+    const b = state.units[randInt(state.units.length)];
+    if (a && b && a.id !== b.id) mix(a, b);
+  }
+
+  updateDestiny();
+  godEvents();
+
+  if (state.time % CONFIG.WAR_INTERVAL === 0) doWar();
+
+  if (state.units.length > CONFIG.MAX_UNITS) {
+    state.units = state.units.slice(0, CONFIG.MAX_UNITS);
   }
 }
 
-setInterval(() => {
-  state.time++;
-  if(state.time % 10 === 0) log(`第${state.time}年：風雲急を告げる…`);
+function gameLoop() {
+  tick();
   render();
-}, 5000);
+  requestAnimationFrame(gameLoop);
+}
 
-for (let i = 0; i < 10; i++) state.units.push(createUnit());
-log("天文二十三年 乱世、始まる…");
-render();
+// ==================== START ====================
+function init() {
+  for (let i = 0; i < 20; i++) state.units.push(createUnit());
+  log("天文二十三年　戦国乱世、始まる");
+  render();
+  gameLoop();
+}
+
+init();
 </script>
 </body>
 </html>
