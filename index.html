@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>戦国血統 - 乱世の覇者</title>
+<style>
+:root{--gold:#ffd700;--blood:#c8102e}
+body{margin:0;background:linear-gradient(#0a0a0a,#1a0000);color:#0f0;font-family:"Yu Gothic",sans-serif;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+#header{padding:12px;background:#111;text-align:center;font-size:18px;letter-spacing:2px;border-bottom:3px solid var(--blood);box-shadow:0 2px 10px rgba(200,16,46,0.6)}
+#main{flex:1;overflow:auto;padding:12px}
+#footer{display:flex;background:#111;border-top:3px solid var(--blood)}
+.button{flex:1;padding:14px;text-align:center;font-weight:bold}
+.card{
+  background:#111;
+  padding:12px;
+  margin:8px 0;
+  border-radius:12px;
+  border-left:6px solid var(--blood);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 4px 12px rgba(200,16,46,0.3);
+}
+.card img{width:64px;height:64px;border-radius:8px;object-fit:cover;border:2px solid #ffd700}
+.sel{outline:3px solid #ffd700}
+#mixPanel{
+  position:fixed;bottom:0;left:0;right:0;background:#111;
+  border-top:4px solid #ffd700;padding:12px;
+  box-shadow:0 -6px 20px rgba(255,215,0,0.4);
+  z-index:100;
+  display:none;
+}
+.log{font-size:12px;opacity:0.85}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">天文二十三年　戦国血統 <span id="time"></span></div>
+  <div id="main"></div>
+  <div id="footer">
+    <div class="button" onclick="setView(0)">武将</div>
+    <div class="button" onclick="setView(1)">家系</div>
+    <div class="button" onclick="setView(2)">戦況</div>
+  </div>
+</div>
+
+<div id="mixPanel"></div>
+
+<script>
+const BLOODS = {
+  oda: {name:"織田", color:"#c8102e"},
+  takeda: {name:"武田", color:"#d52b1e"},
+  tokugawa: {name:"徳川", color:"#1e3a8a"},
+  uesugi: {name:"上杉", color:"#1a3c34"},
+  hojo: {name:"北条", color:"#8b4513"},
+  oni: {name:"鬼", color:"#800080"}
+};
+
+let state = {time:0, units:[], map:{oda:6,takeda:5,tokugawa:4,uesugi:4}, logs:[]};
+let selectedParents = [];
+let view = 0;
+
+function log(msg) {
+  state.logs.unshift(msg);
+  if(state.logs.length > 20) state.logs.pop();
+}
+
+function createUnit() {
+  const keys = Object.keys(BLOODS);
+  const blood = keys[Math.floor(Math.random()*keys.length)];
+  return {
+    id: Date.now() + Math.random(),
+    name: ["信長","信玄","家康","謙信","氏康","元就"][Math.floor(Math.random()*6)],
+    blood: blood,
+    power: 20 + Math.floor(Math.random()*70),
+    generation: 0
+  };
+}
+
+function selectParent(id) {
+  if (selectedParents.includes(id)) selectedParents = selectedParents.filter(x => x !== id);
+  else if (selectedParents.length < 2) selectedParents.push(id);
+  render();
+}
+
+function manualMix() {
+  if (selectedParents.length !== 2) return;
+  const a = state.units.find(u => u.id === selectedParents[0]);
+  const b = state.units.find(u => u.id === selectedParents[1]);
+  if (!a || !b) return;
+
+  const child = createUnit();
+  child.blood = Math.random() < 0.5 ? a.blood : b.blood;
+  child.power = Math.floor((a.power + b.power) / 2 + Math.random() * 18);
+  child.generation = Math.max(a.generation, b.generation) + 1;
+
+  state.units.push(child);
+  log(`🎉 ${a.name} × ${b.name} → ${child.name} 誕生`);
+  selectedParents = [];
+  render();
+}
+
+function setView(v) { view = v; render(); }
+
+function render() {
+  const main = document.getElementById("main");
+  const panel = document.getElementById("mixPanel");
+  let html = "";
+
+  if (view === 0) {
+    html = `<h3 style="color:#ffd700">現役武将 (${state.units.length})</h3>`;
+    html += state.units.slice(-20).reverse().map(u => `
+      <div class="card ${selectedParents.includes(u.id)?'sel':''}" onclick="selectParent(${u.id})">
+        <img src="https://picsum.photos/id/${Math.floor(u.id%50)+100}/64/64" alt="">
+        <div>
+          <b>${u.name}</b><br>
+          <span style="color:${BLOODS[u.blood].color}">[${BLOODS[u.blood].name}]</span> 力:${u.power}
+        </div>
+      </div>`).join("");
+  } else if (view === 1) {
+    html = `<h3>家系図</h3>` + state.units.slice(-20).map(u => `<div class="card">${u.name} [${BLOODS[u.blood].name}]</div>`).join("");
+  } else if (view === 2) {
+    html = `<h3>戦況</h3>` + Object.keys(state.map).map(k => `<div class="card">${k} : ${state.map[k]}</div>`).join("");
+  }
+
+  html += `<h3 style="color:#ffd700;margin-top:20px">戦国ログ</h3>` + state.logs.map(l => `<div class="log">${l}</div>`).join("");
+  main.innerHTML = html;
+  document.getElementById("time").innerText = `第${state.time}年`;
+
+  if (selectedParents.length === 2) {
+    const p1 = state.units.find(u => u.id === selectedParents[0]);
+    const p2 = state.units.find(u => u.id === selectedParents[1]);
+    panel.style.display = "block";
+    panel.innerHTML = `
+      <div style="display:flex;justify-content:space-around;align-items:center;color:#fff">
+        <span>${p1.name}</span> <span>×</span> <span>${p2.name}</span>
+      </div>
+      <div onclick="manualMix()" style="margin-top:10px;background:#ffd700;color:#000;padding:12px;text-align:center;border-radius:8px;font-weight:bold">配合する</div>
+    `;
+  } else {
+    panel.style.display = "none";
+  }
+}
+
+setInterval(() => {
+  state.time++;
+  if(state.time % 10 === 0) log(`第${state.time}年：風雲急を告げる…`);
+  render();
+}, 5000);
+
+for (let i = 0; i < 10; i++) state.units.push(createUnit());
+log("天文二十三年 乱世、始まる…");
+render();
+</script>
+</body>
+</html>
