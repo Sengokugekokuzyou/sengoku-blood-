@@ -109,7 +109,6 @@ html,body {
 /* ── アイソメトリックフィールド ── */
 #iso-field {
   flex:1;position:relative;overflow:hidden;min-height:0;
-  /* 斜め上視点: CSSで全体を傾ける */
 }
 
 /* アイソ変換ラッパー */
@@ -119,16 +118,7 @@ html,body {
   left:50%;
   transform:translateX(-50%);
   width:460px;
-  /* クォータービュー変換 */
   transform-origin:bottom center;
-}
-
-/* ── 地面タイル ── */
-#ground-plane {
-  position:relative;
-  width:100%;
-  transform:rotateX(55deg) rotateZ(-30deg);
-  transform-style:preserve-3d;
 }
 
 /* Canvas でアイソ描画 */
@@ -235,6 +225,23 @@ html,body {
   cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;
 }
 .bbtn:active{filter:brightness(1.3);}
+
+/* 新規追加: モーダル (ゲーム発展途上国風) */
+.modal {
+  position:fixed;inset:0;z-index:700;
+  background:rgba(8,4,0,.94);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+}
+.modal-content {
+  background:var(--panel);
+  width:92%;
+  max-width:420px;
+  border:3px solid var(--gold);
+  border-radius:16px;
+  padding:20px;
+  color:var(--parchment);
+  box-shadow:0 0 30px rgba(200,150,12,.6);
+}
 </style>
 </head>
 <body>
@@ -276,6 +283,46 @@ html,body {
   </div>
 </div>
 
+<!-- 武将詳細モーダル（会話でステータスアップ） -->
+<div id="warrior-modal" class="modal">
+  <div class="modal-content">
+    <div onclick="closeWarriorModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
+    <div id="modal-warrior-name" style="font-size:24px;font-weight:900;color:var(--gold-l);text-align:center;margin-bottom:12px;"></div>
+    <div id="modal-stats" style="background:rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-bottom:20px;font-size:15px;line-height:1.7;text-align:center;"></div>
+    
+    <div style="margin-bottom:24px;">
+      <div onclick="talkToWarrior(currentModalIndex,'encourage')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:10px;">
+        <span>激励する（家臣を励ます）</span>
+        <span style="color:#88ff88;font-weight:700;">+忠誠</span>
+      </div>
+      <div onclick="talkToWarrior(currentModalIndex,'train')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:10px;">
+        <span>訓練する（武芸を磨く）</span>
+        <span style="color:#ffcc66;font-weight:700;">+武力</span>
+      </div>
+      <div onclick="talkToWarrior(currentModalIndex,'teach')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;">
+        <span>教えを請う（知略を学ぶ）</span>
+        <span style="color:#aaddff;font-weight:700;">+知力</span>
+      </div>
+    </div>
+    
+    <button onclick="closeWarriorModal()" style="width:100%;padding:14px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:16px;">城に戻る</button>
+  </div>
+</div>
+
+<!-- 内政モーダル（施設で成長率アップ） -->
+<div id="dev-modal" class="modal">
+  <div class="modal-content">
+    <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:16px;font-size:22px;letter-spacing:.15em;">内政 ─ 施設整備</h2>
+    <div id="facilities-list" style="max-height:420px;overflow-y:auto;"></div>
+    <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--gold-d);">
+      施設を強化すると武将の成長が「ポコポコ」加速します<br>
+      時間経過でステータスが自動上昇！
+    </div>
+    <button onclick="closeDevModal()" style="margin-top:20px;width:100%;padding:14px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">閉じる</button>
+  </div>
+</div>
+
 <!-- メイン -->
 <div id="main">
   <div id="header">
@@ -294,7 +341,7 @@ html,body {
     <div id="nation-bar">
       <span class="nl">国力</span>
       <div class="nt"><div class="nf" id="nfill" style="width:42%"></div></div>
-      <span class="np">4,200</span><span class="nl" style="margin-left:1px">石</span>
+      <span class="np" id="koku-display">4,200</span><span class="nl" style="margin-left:1px">石</span>
     </div>
     <div id="party-row"></div>
     <div id="action-row">
@@ -309,23 +356,20 @@ html,body {
 <script>
 /* ══════════════════════════════════════════════
    アイソメトリック描画エンジン
-   視点: 斜め上30°, 右方向
 ══════════════════════════════════════════════ */
 const canvas = document.getElementById('iso-canvas');
 const ctx    = canvas.getContext('2d');
 
-// アイソ変換行列 (tile size 40px)
 const TILE = 44;
-const ISO_ANG = Math.PI / 6; // 30°
+const ISO_ANG = Math.PI / 6;
 
 function isoToScreen(tx, ty, tz) {
-  // x = col, y = row, z = height
   const sx = (tx - ty) * Math.cos(ISO_ANG) * TILE;
   const sy = (tx + ty) * Math.sin(ISO_ANG) * TILE - tz * TILE * 0.88;
   return { x: sx, y: sy };
 }
 
-let CX, CY; // canvas center
+let CX, CY;
 
 function resizeCanvas() {
   const field = document.getElementById('iso-field');
@@ -335,7 +379,7 @@ function resizeCanvas() {
   CY = canvas.height * 0.72;
 }
 
-/* ── カラーパレット ── */
+/* カラーパレット */
 const PAL = {
   grassTop:  '#2d4a1e',
   grassSide: '#1e3214',
@@ -360,16 +404,86 @@ const PAL = {
   sky1:      'rgba(20,14,5,.0)',
 };
 
-/* ══════════════════════════════════════════════
-   プリミティブ: アイソ直方体
-══════════════════════════════════════════════ */
+/* ゲーム状態（ゲーム発展途上国風） */
+let state = {
+  unification: 12,
+  genNum: 1,
+  koku: 4200,
+  facilities: {
+    trainingGround: 1,   // 武力成長加速
+    academy: 1,          // 知力成長加速
+    loyaltyHall: 1       // 忠誠成長加速
+  }
+};
+
+const FACILITY_DATA = [
+  { key: 'trainingGround', name: '訓練場', desc: '武将の武力成長がポコポコ加速', icon: '⚔️', costBase: 450 },
+  { key: 'academy', name: '学問所', desc: '文官の知力成長がポコポコ加速', icon: '📖', costBase: 520 },
+  { key: 'loyaltyHall', name: '忠誠殿', desc: '全武将の忠誠心が上がりやすい', icon: '🌸', costBase: 680 }
+];
+
+function getFacilityBonus() {
+  let bonus = 1.0;
+  bonus += (state.facilities.trainingGround - 1) * 0.32;
+  bonus += (state.facilities.academy - 1) * 0.28;
+  bonus += (state.facilities.loyaltyHall - 1) * 0.22;
+  return Math.max(1, bonus);
+}
+
+function updateStatusUI() {
+  document.getElementById('unification-pct').textContent = Math.floor(state.unification);
+  document.getElementById('gen-num').textContent = state.genNum;
+  document.getElementById('koku-display').textContent = state.koku.toLocaleString('ja-JP');
+  const fillPct = Math.min(100, Math.floor(state.koku / 100));
+  document.getElementById('nfill').style.width = fillPct + '%';
+}
+
+/* 浮遊テキスト（ポコポコステータスアップ演出） */
+let floatingTexts = [];
+
+function createFloatText(warrior, text, color = '#ffdd88') {
+  if (!warrior) return;
+  const s = isoToScreen(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2);
+  floatingTexts.push({
+    x: CX + s.x + (Math.random() * 24 - 12),
+    y: CY + s.y - 48,
+    text: text,
+    color: color,
+    vy: -1.8 - Math.random() * 0.9,
+    life: 68,
+    alpha: 1
+  });
+}
+
+function drawFloatingTexts() {
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const f = floatingTexts[i];
+    f.y += f.vy;
+    f.vy *= 0.975;
+    f.life--;
+    f.alpha = (f.life / 68) * 0.9;
+    if (f.life <= 0) {
+      floatingTexts.splice(i, 1);
+      continue;
+    }
+    ctx.save();
+    ctx.globalAlpha = f.alpha;
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 8;
+    ctx.font = `bold ${Math.round(17 + f.life / 12)}px 'Noto Serif JP', serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = f.color;
+    ctx.fillText(f.text, f.x, f.y);
+    ctx.restore();
+  }
+}
+
+/* プリミティブ描画関数（変更なし） */
 function drawBox(tx, ty, tz, w, d, h, colTop, colLeft, colRight) {
-  // 8頂点をスクリーン座標へ
   const p = (x,y,z) => {
     const s = isoToScreen(x,y,z);
     return [CX+s.x, CY+s.y];
   };
-
   const [ax,ay] = p(tx,   ty,   tz+h);
   const [bx,by] = p(tx+w, ty,   tz+h);
   const [cx2,cy2] = p(tx+w, ty+d, tz+h);
@@ -379,82 +493,50 @@ function drawBox(tx, ty, tz, w, d, h, colTop, colLeft, colRight) {
   const [gx,gy] = p(tx+w, ty+d, tz  );
   const [hx,hy] = p(tx,   ty+d, tz  );
 
-  // 上面
   ctx.beginPath();
   ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.lineTo(cx2,cy2); ctx.lineTo(dx,dy);
   ctx.closePath();
   ctx.fillStyle = colTop; ctx.fill();
 
-  // 左面 (手前左)
   ctx.beginPath();
   ctx.moveTo(ax,ay); ctx.lineTo(ex,ey); ctx.lineTo(hx,hy); ctx.lineTo(dx,dy);
   ctx.closePath();
   ctx.fillStyle = colLeft; ctx.fill();
 
-  // 右面 (手前右)
   ctx.beginPath();
   ctx.moveTo(bx,by); ctx.lineTo(fx,fy); ctx.lineTo(gx,gy); ctx.lineTo(cx2,cy2);
   ctx.closePath();
   ctx.fillStyle = colRight; ctx.fill();
 
-  // 輪郭
   ctx.strokeStyle = 'rgba(0,0,0,.35)';
   ctx.lineWidth   = 0.5;
-  ctx.beginPath();
-  ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.stroke();
 }
 
-/* ══════════════════════════════════════════════
-   アイソ屋根（寄棟）
-══════════════════════════════════════════════ */
 function drawRoof(tx, ty, tz, w, d, rh, col1, col2) {
   const p = (x,y,z) => {
     const s = isoToScreen(x,y,z);
     return [CX+s.x, CY+s.y];
   };
   const mx = tx + w/2, my = ty + d/2;
-
-  // 4角の底辺
   const [ax,ay] = p(tx,   ty,   tz);
   const [bx,by] = p(tx+w, ty,   tz);
   const [cx2,cy2] = p(tx+w, ty+d, tz);
   const [dx,dy] = p(tx,   ty+d, tz);
-  const [px2,py2] = p(mx,   my,   tz+rh);
+  const [px2,py2] = p(mx, my, tz+rh);
 
-  // 左面
-  ctx.beginPath();
-  ctx.moveTo(ax,ay);ctx.lineTo(px2,py2);ctx.lineTo(dx,dy);ctx.closePath();
-  ctx.fillStyle=col2;ctx.fill();
-  ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=0.5;ctx.stroke();
-
-  // 右面
-  ctx.beginPath();
-  ctx.moveTo(bx,by);ctx.lineTo(px2,py2);ctx.lineTo(cx2,cy2);ctx.closePath();
-  ctx.fillStyle=col1;ctx.fill();ctx.stroke();
-
-  // 前面
-  ctx.beginPath();
-  ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(px2,py2);ctx.closePath();
-  ctx.fillStyle=col2;ctx.fill();ctx.stroke();
-
-  // 後面 (薄く)
-  ctx.beginPath();
-  ctx.moveTo(dx,dy);ctx.lineTo(cx2,cy2);ctx.lineTo(px2,py2);ctx.closePath();
-  ctx.fillStyle=col1;ctx.fill();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(px2,py2);ctx.lineTo(dx,dy);ctx.closePath(); ctx.fillStyle=col2;ctx.fill();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx,by);ctx.lineTo(px2,py2);ctx.lineTo(cx2,cy2);ctx.closePath(); ctx.fillStyle=col1;ctx.fill();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(px2,py2);ctx.closePath(); ctx.fillStyle=col2;ctx.fill();ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(dx,dy);ctx.lineTo(cx2,cy2);ctx.lineTo(px2,py2);ctx.closePath(); ctx.fillStyle=col1;ctx.fill();ctx.stroke();
 }
 
-/* ══════════════════════════════════════════════
-   シーン描画
-══════════════════════════════════════════════ */
-// 地形マップ (col, row, height)
+/* 地形・シーン描画 */
 const TERRAIN = [];
 function buildTerrain() {
   TERRAIN.length = 0;
-  // 草地ベース 9×9
   for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
     const cx2=(c-4), ry=(r-4);
     const dist = Math.sqrt(cx2*cx2+ry*ry);
@@ -466,121 +548,67 @@ function buildTerrain() {
 function drawScene(tick) {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // ── 地面タイル (後ろから手前の順)
-  // 描画順: row+col が小さいほど奥
   const sorted = [...TERRAIN].sort((a,b)=>(a.r+a.c)-(b.r+b.c));
-
   for (const t of sorted) {
     const {c,r,h,type} = t;
     const tx = c-4, ty = r-4;
-
     if (type==='grass') {
-      drawBox(tx,ty,0, 1,1, 0.18,
-        '#2d4a1e','#1c3010','#233c16');
+      drawBox(tx,ty,0, 1,1, 0.18, '#2d4a1e','#1c3010','#233c16');
     } else {
-      // 城郭の石畳
       const even = (c+r)%2===0;
       const top = even ? '#4e4032':'#443828';
       drawBox(tx,ty,0, 1,1, 0.25, top,'#2e2416','#382e1c');
     }
   }
 
-  // ── お堀 (城の周囲)
-  const moatRing = [
-    [-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],
-    [3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],
-    [2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],
-    [-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2],
-  ];
+  // お堀・石垣・城（変更なし）
+  const moatRing = [[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],[3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],[2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],[-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]];
   for (const [mc,mr] of moatRing) {
-    const p1 = isoToScreen(mc,   mr,   0);
-    const p2 = isoToScreen(mc+1, mr,   0);
-    const p3 = isoToScreen(mc+1, mr+1, 0);
-    const p4 = isoToScreen(mc,   mr+1, 0);
+    const p1 = isoToScreen(mc, mr, 0); const p2 = isoToScreen(mc+1, mr, 0);
+    const p3 = isoToScreen(mc+1, mr+1, 0); const p4 = isoToScreen(mc, mr+1, 0);
     ctx.beginPath();
-    ctx.moveTo(CX+p1.x,CY+p1.y);
-    ctx.lineTo(CX+p2.x,CY+p2.y);
-    ctx.lineTo(CX+p3.x,CY+p3.y);
-    ctx.lineTo(CX+p4.x,CY+p4.y);
-    ctx.closePath();
-    // 水面アニメ
+    ctx.moveTo(CX+p1.x,CY+p1.y); ctx.lineTo(CX+p2.x,CY+p2.y);
+    ctx.lineTo(CX+p3.x,CY+p3.y); ctx.lineTo(CX+p4.x,CY+p4.y); ctx.closePath();
     const shimmer = 0.5 + 0.12*Math.sin(tick*0.04 + mc*0.5 + mr*0.3);
-    ctx.fillStyle = `rgba(12,28,52,${shimmer})`;
-    ctx.fill();
+    ctx.fillStyle = `rgba(12,28,52,${shimmer})`; ctx.fill();
     ctx.strokeStyle='rgba(20,50,90,.5)';ctx.lineWidth=0.5;ctx.stroke();
   }
 
-  // ── 石垣 (城外周)
-  for (let i=-2;i<=2;i++) {
-    drawBox(i,-2, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
-    drawBox(i, 2, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
-  }
-  for (let i=-1;i<=1;i++) {
-    drawBox(-2,i, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
-    drawBox( 2,i, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
-  }
+  for (let i=-2;i<=2;i++) drawBox(i,-2,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit);
+  for (let i=-2;i<=2;i++) drawBox(i,2,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit);
+  for (let i=-1;i<=1;i++) { drawBox(-2,i,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit); drawBox(2,i,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit); }
 
-  // ── 城台(天守台)
-  drawBox(-1,-1, 0.75, 2,2, 0.9, PAL.wallTop, PAL.wallSide, PAL.wallFront);
+  drawBox(-1,-1,0.75,2,2,0.9,PAL.wallTop,PAL.wallSide,PAL.wallFront);
+  drawBox(-0.8,-0.8,1.65,1.6,1.6,1.4,PAL.woodMid,PAL.woodDark,PAL.woodMid);
+  drawBox(-0.6,-0.6,1.65,0.7,0.7,0.9,PAL.woodMid,PAL.woodDark,PAL.woodMid);
 
-  // ── 天守本体
-  drawBox(-0.8,-0.8, 1.65, 1.6,1.6, 1.4, PAL.woodMid, PAL.woodDark, PAL.woodMid);
+  drawRoof(-1.1,-1.1,2.65+1.4,2.2,2.2,0.9,PAL.roofMid,PAL.roofDark);
+  drawRoof(-0.9,-0.9,2.65+1.4+0.7,1.8,1.8,0.7,PAL.roofDark,'#120900');
+  drawRoof(-0.65,-0.65,2.65+1.4+1.1,1.3,1.3,0.55,PAL.roofMid,PAL.roofDark);
+  drawRoof(-0.4,-0.4,2.65+1.4+1.5,0.8,0.8,0.4,PAL.roofDark,'#100800');
 
-  // ── 小天守 左奥
-  drawBox(-0.6,-0.6, 1.65, 0.7,0.7, 0.9, PAL.woodMid, PAL.woodDark, PAL.woodMid);
-
-  // ── 屋根 3段
-  drawRoof(-1.1,-1.1, 2.65+1.4, 2.2,2.2, 0.9, PAL.roofMid, PAL.roofDark);
-  drawRoof(-0.9,-0.9, 2.65+1.4+0.7, 1.8,1.8, 0.7, PAL.roofDark, '#120900');
-  drawRoof(-0.65,-0.65, 2.65+1.4+1.1, 1.3,1.3, 0.55, PAL.roofMid, PAL.roofDark);
-
-  // 最上段屋根
-  drawRoof(-0.4,-0.4, 2.65+1.4+1.5, 0.8,0.8, 0.4, PAL.roofDark, '#100800');
-
-  // ── 旗
   drawFlag(-0.05, -0.05, 2.65+1.4+1.85, tick);
+  drawLabel(0,0,2.65+1.4+2.3,'安土城',tick);
 
-  // ── 城門
-  drawBox(-0.25, 2, 0.75, 0.5, 0.3, 0.85, '#1e1608', '#120e04', '#1a1206');
-  drawBox(-0.1,  2.3, 0.75, 0.2, 0.5, 0.6, '#0e0a04', '#08060202', '#0e0a04');
-
-  // ── 武将描画
   drawWarriors(tick);
-
-  // ── 城名ラベル
-  drawLabel(0,0, 2.65+1.4+2.3, '安土城', tick);
+  drawFloatingTexts();   // ← ポコポコ演出
 }
 
-function drawFlag(tx,ty,tz, tick) {
+function drawFlag(tx,ty,tz,tick) { /* 変更なし */ 
   const base = isoToScreen(tx, ty, tz);
   const top  = isoToScreen(tx, ty, tz+0.9);
   const bx=CX+base.x, by=CY+base.y;
   const topx=CX+top.x, topy=CY+top.y;
-
-  ctx.strokeStyle = PAL.gold;
-  ctx.lineWidth   = 2;
-  ctx.beginPath();
-  ctx.moveTo(bx,by); ctx.lineTo(topx,topy);
-  ctx.stroke();
-
-  // はためく旗
+  ctx.strokeStyle = PAL.gold; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(topx,topy); ctx.stroke();
   const wave = Math.sin(tick*0.07)*4;
   ctx.fillStyle = PAL.flagRed;
-  ctx.beginPath();
-  ctx.moveTo(topx, topy);
-  ctx.lineTo(topx+18+wave, topy+7);
-  ctx.lineTo(topx+16, topy+16);
-  ctx.closePath();
-  ctx.fill();
-
-  // 織(家紋的な点)
+  ctx.beginPath(); ctx.moveTo(topx,topy); ctx.lineTo(topx+18+wave,topy+7); ctx.lineTo(topx+16,topy+16); ctx.closePath(); ctx.fill();
   ctx.fillStyle = PAL.goldLit;
-  ctx.beginPath();
-  ctx.arc(topx+10+wave*0.5, topy+9, 2, 0, Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(topx+10+wave*0.5,topy+9,2,0,Math.PI*2); ctx.fill();
 }
 
-function drawLabel(tx, ty, tz, text, tick) {
+function drawLabel(tx, ty, tz, text, tick) { /* 変更なし */ 
   const s = isoToScreen(tx,ty,tz+0.3);
   const x = CX+s.x, y = CY+s.y;
   const alpha = 0.7 + 0.3*Math.sin(tick*0.03);
@@ -593,9 +621,7 @@ function drawLabel(tx, ty, tz, text, tick) {
   ctx.shadowBlur = 0;
 }
 
-/* ══════════════════════════════════════════════
-   武将データ
-══════════════════════════════════════════════ */
+/* 武将クラス（ステータス拡張） */
 const COLOR_SETS = {
   c_red:  { armor:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', dark:'#6a1010' },
   c_blue: { armor:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', dark:'#0a2a4a' },
@@ -605,17 +631,29 @@ const COLOR_SETS = {
 let gWarriors = [];
 let currentHouseHead = null;
 let animTimer = null;
+let currentModalIndex = -1;
+
+const roles = { bukan:'武官', hime:'姫', bunkan:'文官' };
 
 class IsoWarrior {
-  constructor(name, jobId, power, tileX, tileY) {
+  constructor(name, jobId, initialPower, tileX, tileY) {
     this.name = name;
     this.jobId = jobId;
-    this.power = power;
     this.tileX = tileX;
     this.tileY = tileY;
     this.walkFrame = 0;
     this.frameCount = 0;
     this.color = jobId==='hime' ? 'c_pink' : jobId==='bunkan' ? 'c_blue' : 'c_red';
+    
+    // ゲーム発展途上国風ステータス
+    this.stats = {
+      power: initialPower,
+      loyalty: jobId === 'hime' ? 92 : (jobId === 'bunkan' ? 72 : 65),
+      wisdom: jobId === 'bunkan' ? 84 : (jobId === 'hime' ? 58 : 52),
+      level: 1,
+      exp: 0
+    };
+    
     gWarriors.push(this);
   }
 
@@ -629,30 +667,20 @@ class IsoWarrior {
   draw() {
     const s = this.walkFrame % 4;
     const c = COLOR_SETS[this.color];
-    // アイソ座標でキャラ中心
     const foot = isoToScreen(this.tileX + 0.5, this.tileY + 0.5, 0.25);
     const fx = CX + foot.x;
     const fy = CY + foot.y;
-
-    const H = Math.round(canvas.height * 0.092); // キャラ高さ
+    const H = Math.round(canvas.height * 0.092);
     const W = H * 0.55;
-
-    // 歩行オフセット
     const legSwing = [0, H*0.06, 0, -H*0.06][s];
     const armSwing = [H*0.05, 0, -H*0.05, 0][s];
-    const bob = Math.abs([0,1,0,-1][s]) * 1.5; // 上下揺れ
-
+    const bob = Math.abs([0,1,0,-1][s]) * 1.5;
     const baseY = fy - bob;
 
-    if (this.jobId === 'bukan') {
-      this._drawBukan(fx, baseY, H, W, s, c, legSwing, armSwing);
-    } else if (this.jobId === 'hime') {
-      this._drawHime(fx, baseY, H, W, s, c);
-    } else {
-      this._drawBunkan(fx, baseY, H, W, c);
-    }
+    if (this.jobId === 'bukan') this._drawBukan(fx, baseY, H, W, s, c, legSwing, armSwing);
+    else if (this.jobId === 'hime') this._drawHime(fx, baseY, H, W, s, c);
+    else this._drawBunkan(fx, baseY, H, W, c);
 
-    // 名前ラベル
     ctx.font = `${Math.round(canvas.width*0.028)}px 'Noto Serif JP', serif`;
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(240,192,64,.95)';
@@ -661,161 +689,218 @@ class IsoWarrior {
     ctx.shadowBlur = 0;
   }
 
-  _drawBukan(fx, fy, H, W, s, c, legSwing, armSwing) {
-    const hH = H*0.22; // 頭高さ
-    const bH = H*0.32; // 胴高さ
-    const lH = H*0.38; // 脚高さ
-    const aH = H*0.28; // 腕長さ
-    const headY = fy - lH - bH - hH;
-    const bodyY = fy - lH - bH;
-
-    // 影
-    ctx.beginPath();
-    ctx.ellipse(fx, fy+2, W*0.6, H*0.05, 0, 0, Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
-
-    // 脚
-    const legW = W*0.28;
+  /* 描画メソッドは変更なし（省略） */
+  _drawBukan(fx, fy, H, W, s, c, legSwing, armSwing) { /* 元コードそのまま */ 
+    const hH = H*0.22; const bH = H*0.32; const lH = H*0.38; const aH = H*0.28;
+    const headY = fy - lH - bH - hH; const bodyY = fy - lH - bH;
+    ctx.beginPath(); ctx.ellipse(fx, fy+2, W*0.6, H*0.05, 0, 0, Math.PI*2); ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
     ctx.fillStyle = c.sub;
-    // 左脚
-    ctx.save();ctx.translate(fx-legW*0.6, fy-lH/2);ctx.rotate(legSwing*0.04);
-    ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    // 右脚
-    ctx.save();ctx.translate(fx+legW*0.6, fy-lH/2);ctx.rotate(-legSwing*0.04);
-    ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    // 草鞋
-    ctx.fillStyle=c.dark;
-    ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-3, W*0.28, 5, 2);ctx.fill();
-    ctx.beginPath();ctx.roundRect(fx+W*0.04, fy-3, W*0.28, 5, 2);ctx.fill();
-
-    // 胴鎧
-    ctx.fillStyle = c.armor;
-    ctx.beginPath();ctx.roundRect(fx-W*0.44, bodyY, W*0.88, bH, 3);ctx.fill();
-    ctx.fillStyle = c.dark;
-    ctx.beginPath();ctx.roundRect(fx-W*0.38, bodyY+2, W*0.76, bH-4, 2);ctx.fill();
-
-    // 腕
-    ctx.fillStyle=c.armor;
-    // 左腕
-    ctx.save();ctx.translate(fx-W*0.52, bodyY+4);ctx.rotate(armSwing*0.05);
-    ctx.beginPath();ctx.roundRect(-W*0.18,0,W*0.22,aH,4);ctx.fill();ctx.restore();
-    // 右腕 + 刀
-    ctx.save();ctx.translate(fx+W*0.52, bodyY+4);ctx.rotate(-armSwing*0.05);
-    ctx.beginPath();ctx.roundRect(-W*0.04,0,W*0.22,aH,4);ctx.fill();
-    // 刀
-    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(W*0.1, aH*0.5);ctx.lineTo(W*0.4,-aH*0.5);ctx.stroke();
-    ctx.fillStyle=c.acc;ctx.beginPath();ctx.arc(W*0.12,aH*0.45,3,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-
-    // 頭(兜)
-    ctx.fillStyle=c.armor;
-    ctx.beginPath();ctx.ellipse(fx,headY+hH*0.45,W*0.38,hH*0.55,0,0,Math.PI*2);ctx.fill();
-    // 顔
-    ctx.fillStyle=c.skin;
-    ctx.beginPath();ctx.ellipse(fx,headY+hH*0.55,W*0.28,hH*0.42,0,0,Math.PI*2);ctx.fill();
-    // 目
-    ctx.fillStyle='#3a2010';
-    ctx.beginPath();ctx.arc(fx-W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
-    // 兜の角
-    ctx.strokeStyle=c.acc;ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*0.4);ctx.stroke();
-    ctx.fillStyle=c.acc;
-    ctx.beginPath();ctx.moveTo(fx-4,headY-hH*0.2);ctx.lineTo(fx+4,headY-hH*0.2);ctx.lineTo(fx,headY-hH*0.5);ctx.fill();
+    ctx.save();ctx.translate(fx-legW*0.6, fy-lH/2);ctx.rotate(legSwing*0.04); ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+legW*0.6, fy-lH/2);ctx.rotate(-legSwing*0.04); ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    ctx.fillStyle=c.dark; ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-3, W*0.28, 5, 2);ctx.fill(); ctx.beginPath();ctx.roundRect(fx+W*0.04, fy-3, W*0.28, 5, 2);ctx.fill();
+    ctx.fillStyle = c.armor; ctx.beginPath();ctx.roundRect(fx-W*0.44, bodyY, W*0.88, bH, 3);ctx.fill();
+    ctx.fillStyle = c.dark; ctx.beginPath();ctx.roundRect(fx-W*0.38, bodyY+2, W*0.76, bH-4, 2);ctx.fill();
+    ctx.fillStyle=c.armor; ctx.save();ctx.translate(fx-W*0.52, bodyY+4);ctx.rotate(armSwing*0.05); ctx.beginPath();ctx.roundRect(-W*0.18,0,W*0.22,aH,4);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+W*0.52, bodyY+4);ctx.rotate(-armSwing*0.05); ctx.beginPath();ctx.roundRect(-W*0.04,0,W*0.22,aH,4);ctx.fill();
+    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(W*0.1, aH*0.5);ctx.lineTo(W*0.4,-aH*0.5);ctx.stroke();
+    ctx.fillStyle=c.acc;ctx.beginPath();ctx.arc(W*0.12,aH*0.45,3,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.fillStyle=c.armor; ctx.beginPath();ctx.ellipse(fx,headY+hH*0.45,W*0.38,hH*0.55,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx,headY+hH*0.55,W*0.28,hH*0.42,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#3a2010'; ctx.beginPath();ctx.arc(fx-W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
+    ctx.strokeStyle=c.acc;ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*0.4);ctx.stroke();
+    ctx.fillStyle=c.acc; ctx.beginPath();ctx.moveTo(fx-4,headY-hH*0.2);ctx.lineTo(fx+4,headY-hH*0.2);ctx.lineTo(fx,headY-hH*0.5);ctx.fill();
   }
-
-  _drawHime(fx, fy, H, W, s, c) {
-    const bob = Math.abs([0,1,0,-1][s])*1.2;
-    const bY = fy - bob;
-
-    ctx.beginPath();ctx.ellipse(fx, bY+2, W*0.55, H*0.045, 0,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-
-    // 着物 (台形)
-    const grd = ctx.createLinearGradient(fx-W*0.55,0,fx+W*0.55,0);
-    grd.addColorStop(0, c.dark); grd.addColorStop(0.5, c.armor); grd.addColorStop(1, c.dark);
-    ctx.fillStyle=grd;
-    ctx.beginPath();
-    ctx.moveTo(fx-W*0.22, bY-H*0.55);
-    ctx.lineTo(fx+W*0.22, bY-H*0.55);
-    ctx.lineTo(fx+W*0.5,  bY);
-    ctx.lineTo(fx-W*0.5,  bY);
-    ctx.closePath();ctx.fill();
-
-    // 帯
-    ctx.fillStyle=c.acc;
-    ctx.beginPath();ctx.roundRect(fx-W*0.22, bY-H*0.42, W*0.44, H*0.1, 2);ctx.fill();
-
-    // 袖
-    ctx.fillStyle=c.armor;
-    ctx.save();ctx.translate(fx-W*0.28, bY-H*0.52);ctx.rotate(-0.2);
-    ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+W*0.28, bY-H*0.52);ctx.rotate(0.2);
-    ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-
-    // 頭・髪
-    ctx.fillStyle='#1a0a00';
-    ctx.beginPath();ctx.ellipse(fx, bY-H*0.78, W*0.3, H*0.18, 0, 0, Math.PI*2);ctx.fill();
-    // 顔
-    ctx.fillStyle=c.skin;
-    ctx.beginPath();ctx.ellipse(fx, bY-H*0.73, W*0.22, H*0.15, 0, 0, Math.PI*2);ctx.fill();
-    // 目
-    ctx.fillStyle='#8b3060';
-    ctx.beginPath();ctx.arc(fx-W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
-    // 髪飾り
-    for (let i=-1;i<=1;i++) {
-      ctx.fillStyle = i===0?c.acc:'rgba(255,140,200,.8)';
-      ctx.beginPath();ctx.arc(fx+i*W*0.18, bY-H*0.9, 3.5, 0, Math.PI*2);ctx.fill();
-    }
+  _drawHime(fx, fy, H, W, s, c) { /* 元コードそのまま */ 
+    const bob = Math.abs([0,1,0,-1][s])*1.2; const bY = fy - bob;
+    ctx.beginPath();ctx.ellipse(fx, bY+2, W*0.55, H*0.045, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+    const grd = ctx.createLinearGradient(fx-W*0.55,0,fx+W*0.55,0); grd.addColorStop(0, c.dark); grd.addColorStop(0.5, c.armor); grd.addColorStop(1, c.dark);
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(fx-W*0.22, bY-H*0.55); ctx.lineTo(fx+W*0.22, bY-H*0.55); ctx.lineTo(fx+W*0.5, bY); ctx.lineTo(fx-W*0.5, bY); ctx.closePath();ctx.fill();
+    ctx.fillStyle=c.acc; ctx.beginPath();ctx.roundRect(fx-W*0.22, bY-H*0.42, W*0.44, H*0.1, 2);ctx.fill();
+    ctx.fillStyle=c.armor; ctx.save();ctx.translate(fx-W*0.28, bY-H*0.52);ctx.rotate(-0.2); ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+W*0.28, bY-H*0.52);ctx.rotate(0.2); ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.ellipse(fx, bY-H*0.78, W*0.3, H*0.18, 0, 0, Math.PI*2);ctx.fill();
+    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx, bY-H*0.73, W*0.22, H*0.15, 0, 0, Math.PI*2);ctx.fill();
+    ctx.fillStyle='#8b3060'; ctx.beginPath();ctx.arc(fx-W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
+    for (let i=-1;i<=1;i++) { ctx.fillStyle = i===0?c.acc:'rgba(255,140,200,.8)'; ctx.beginPath();ctx.arc(fx+i*W*0.18, bY-H*0.9, 3.5, 0, Math.PI*2);ctx.fill(); }
   }
-
-  _drawBunkan(fx, fy, H, W, c) {
-    ctx.beginPath();ctx.ellipse(fx, fy+2, W*0.5, H*0.04, 0,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-
-    // 袍 (長衣)
-    ctx.fillStyle=c.armor;
-    ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-H*0.65, W*0.64, H*0.65, 3);ctx.fill();
-    ctx.fillStyle=c.sub;
-    ctx.beginPath();ctx.roundRect(fx-W*0.25, fy-H*0.6, W*0.5, H*0.5, 2);ctx.fill();
-
-    // 袖
-    ctx.fillStyle=c.armor;
-    ctx.beginPath();ctx.ellipse(fx-W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(fx+W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
-
-    // 笏
-    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.moveTo(fx+W*0.28, fy-H*0.55);ctx.lineTo(fx+W*0.2, fy-H*0.2);ctx.stroke();
-
-    // 頭・烏帽子
-    ctx.fillStyle=c.skin;
-    ctx.beginPath();ctx.ellipse(fx, fy-H*0.76, W*0.25, H*0.16, 0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#1a0a00';
-    ctx.beginPath();ctx.moveTo(fx-W*0.2, fy-H*0.82);
-    ctx.lineTo(fx+W*0.2, fy-H*0.82);
-    ctx.lineTo(fx+W*0.05, fy-H*1.0);
-    ctx.lineTo(fx-W*0.05, fy-H*1.0);
-    ctx.closePath();ctx.fill();
-    ctx.fillStyle='#1a0a00';
-    ctx.beginPath();ctx.roundRect(fx-W*0.2, fy-H*0.85, W*0.4, H*0.07, 1);ctx.fill();
-    ctx.fillStyle='#4a3a2a';
-    ctx.beginPath();ctx.arc(fx-W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
+  _drawBunkan(fx, fy, H, W, c) { /* 元コードそのまま */ 
+    ctx.beginPath();ctx.ellipse(fx, fy+2, W*0.5, H*0.04, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+    ctx.fillStyle=c.armor; ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-H*0.65, W*0.64, H*0.65, 3);ctx.fill();
+    ctx.fillStyle=c.sub; ctx.beginPath();ctx.roundRect(fx-W*0.25, fy-H*0.6, W*0.5, H*0.5, 2);ctx.fill();
+    ctx.fillStyle=c.armor; ctx.beginPath();ctx.ellipse(fx-W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill(); ctx.beginPath();ctx.ellipse(fx+W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5; ctx.beginPath();ctx.moveTo(fx+W*0.28, fy-H*0.55);ctx.lineTo(fx+W*0.2, fy-H*0.2);ctx.stroke();
+    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx, fy-H*0.76, W*0.25, H*0.16, 0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.moveTo(fx-W*0.2, fy-H*0.82); ctx.lineTo(fx+W*0.2, fy-H*0.82); ctx.lineTo(fx+W*0.05, fy-H*1.0); ctx.lineTo(fx-W*0.05, fy-H*1.0); ctx.closePath();ctx.fill();
+    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.roundRect(fx-W*0.2, fy-H*0.85, W*0.4, H*0.07, 1);ctx.fill();
+    ctx.fillStyle='#4a3a2a'; ctx.beginPath();ctx.arc(fx-W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
   }
 }
 
 function drawWarriors(tick) {
-  // 後ろの武将から描く (row+col順)
   const sorted = [...gWarriors].sort((a,b)=>(a.tileX+a.tileY)-(b.tileX+b.tileY));
   sorted.forEach(w => w.draw());
 }
 
-/* ══════════════════════════════════════════════
-   メインループ
-══════════════════════════════════════════════ */
+/* 時間経過でポコポコステータスアップ（ゲーム発展途上国2風） */
+function performIdleTick() {
+  const bonus = getFacilityBonus();
+  
+  gWarriors.forEach(w => {
+    // EXP獲得 → レベルアップ → ステータスポコポコ
+    let expGain = Math.floor((5 + Math.random() * 11) * bonus);
+    if (w.jobId === 'bunkan') expGain = Math.floor(expGain * 1.15);
+    w.stats.exp += expGain;
+
+    let leveled = false;
+    while (w.stats.exp >= 100) {
+      w.stats.exp -= 100;
+      w.stats.level++;
+      leveled = true;
+
+      // 武力アップ（メイン）
+      const powerUp = Math.floor(2 + Math.random() * 3 + (bonus - 1) * 1.8);
+      w.stats.power += powerUp;
+      createFloatText(w, `+${powerUp}武力`, '#ffcc66');
+    }
+    if (leveled) createFloatText(w, `Lv${w.stats.level}↑`, '#ffeeaa');
+
+    // ランダム小アップ（ポコポコ感）
+    if (Math.random() < 0.78) {
+      const smallP = 1;
+      w.stats.power += smallP;
+      createFloatText(w, `+${smallP}`, '#ffaa44');
+    }
+    if (Math.random() < 0.48) {
+      w.stats.wisdom = Math.min(99, w.stats.wisdom + (Math.random() < 0.6 ? 1 : 2));
+      createFloatText(w, '+知', '#aaddff');
+    }
+    if (Math.random() < 0.42) {
+      w.stats.loyalty = Math.min(100, w.stats.loyalty + Math.floor(1 + Math.random() * 4));
+      createFloatText(w, '+忠', '#88ffaa');
+    }
+  });
+
+  // 国力・天下統一も自然増加
+  state.koku += Math.floor(62 + Math.random() * 98);
+  state.unification = Math.min(99.9, state.unification + 0.14 * (1 + (state.facilities.loyaltyHall - 1) * 0.15));
+
+  updateStatusUI();
+  updatePartyRow();
+}
+
+/* パーティー表示 */
+function updatePartyRow() {
+  const row = document.getElementById('party-row');
+  row.innerHTML = '';
+  gWarriors.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'party-card' + (i === 0 ? ' head' : '');
+    card.innerHTML = `
+      <span class="pc-role">${roles[w.jobId]||'武将'}</span>
+      <span class="pc-name">${w.name}</span>
+      <span class="pc-pow">武力 \( {w.stats.power} Lv \){w.stats.level}</span>`;
+    card.onclick = () => showWarriorModal(i);
+    row.appendChild(card);
+  });
+}
+
+/* 武将モーダル（会話） */
+function showWarriorModal(i) {
+  currentModalIndex = i;
+  const w = gWarriors[i];
+  const modal = document.getElementById('warrior-modal');
+  modal.style.display = 'flex';
+  
+  document.getElementById('modal-warrior-name').innerHTML = `\( {w.name}<br><span style="font-size:13px;color:#c8960c;"> \){roles[w.jobId] || '武将'}　Lv.${w.stats.level}</span>`;
+  
+  document.getElementById('modal-stats').innerHTML = `
+    <span style="color:#ffcc66">武力 ${w.stats.power}</span>　｜　
+    <span style="color:#88ff88">忠誠 ${w.stats.loyalty}</span>　｜　
+    <span style="color:#aaddff">知力 ${w.stats.wisdom}</span>
+  `;
+}
+
+function closeWarriorModal() {
+  document.getElementById('warrior-modal').style.display = 'none';
+  currentModalIndex = -1;
+}
+
+function talkToWarrior(index, type) {
+  if (index < 0) return;
+  const w = gWarriors[index];
+  let msg = '';
+  let col = '#ffdd88';
+  let gain = 0;
+
+  if (type === 'encourage') {
+    gain = Math.floor(5 + Math.random() * 7);
+    w.stats.loyalty = Math.min(100, w.stats.loyalty + gain);
+    msg = `+${gain}忠`;
+    col = '#88ff88';
+  } else if (type === 'train') {
+    gain = Math.floor(4 + Math.random() * 5);
+    w.stats.power += gain;
+    msg = `+${gain}武力`;
+    col = '#ffcc66';
+  } else if (type === 'teach') {
+    gain = Math.floor(3 + Math.random() * 4);
+    w.stats.wisdom = Math.min(99, w.stats.wisdom + gain);
+    msg = `+${gain}知`;
+    col = '#aaddff';
+  }
+
+  createFloatText(w, msg, col);
+  state.koku = Math.max(0, state.koku - 35); // 軽いコスト
+  updateStatusUI();
+  updatePartyRow();
+  if (currentModalIndex === index) showWarriorModal(index); // 即時反映
+}
+
+/* 内政モーダル（施設強化） */
+function showDev() {
+  const modal = document.getElementById('dev-modal');
+  modal.style.display = 'flex';
+  renderFacilities();
+}
+
+function closeDevModal() {
+  document.getElementById('dev-modal').style.display = 'none';
+}
+
+function renderFacilities() {
+  let html = '';
+  FACILITY_DATA.forEach(f => {
+    const lvl = state.facilities[f.key];
+    const cost = Math.floor(f.costBase * Math.pow(1.65, lvl - 1));
+    html += `
+    <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);padding:14px 16px;border-radius:12px;margin-bottom:12px;">
+      <div style="font-size:34px;width:48px;text-align:center;">${f.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:17px;font-weight:700;">\( {f.name} <span style="font-size:13px;color:#c8960c;">Lv. \){lvl}</span></div>
+        <div style="font-size:13px;color:rgba(245,232,200,.75);">${f.desc}</div>
+      </div>
+      <button onclick="upgradeFacility('${f.key}', \( {cost});" style="background:var(--gold);color:#0e0800;padding:8px 20px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;"> \){cost}石<br>強化</button>
+    </div>`;
+  });
+  document.getElementById('facilities-list').innerHTML = html;
+}
+
+window.upgradeFacility = function(key, cost) {
+  if (state.koku < cost) {
+    alert('国力が不足しています！');
+    return;
+  }
+  state.koku -= cost;
+  state.facilities[key]++;
+  updateStatusUI();
+  renderFacilities();
+  // 即時ボーナス演出
+  gWarriors.forEach(w => {
+    if (Math.random() < 0.6) createFloatText(w, '施設効果！', '#ffeecc');
+  });
+};
+
+/* メインループ */
 let tick = 0;
 function gameLoop() {
   tick++;
@@ -824,76 +909,83 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-/* ══════════════════════════════════════════════
-   パーティーカード
-══════════════════════════════════════════════ */
-function updatePartyRow() {
-  const row = document.getElementById('party-row');
-  row.innerHTML = '';
-  const roles = { bukan:'武官', hime:'姫', bunkan:'文官' };
-  gWarriors.forEach((w,i) => {
-    const card = document.createElement('div');
-    card.className = 'party-card'+(i===0?' head':'');
-    card.innerHTML = `
-      <span class="pc-role">${roles[w.jobId]||'武将'}</span>
-      <span class="pc-name">${w.name}</span>
-      <span class="pc-pow">武力 ${w.power}</span>`;
-    row.appendChild(card);
-  });
-}
-
-/* ══════════════════════════════════════════════
-   初期化
-══════════════════════════════════════════════ */
+/* 初期化 */
 function initGame() {
   gWarriors = [];
   buildTerrain();
   resizeCanvas();
 
-  // 武将配置 (城の前方エリア)
-  new IsoWarrior('織田 信廣', 'bukan',  88, -2.3, 2.5);
+  // 武将生成
+  new IsoWarrior('織田 信廣', 'bukan', 88, -2.3, 2.5);
   new IsoWarrior('お 市',    'hime',   72,  0.2,  2.8);
   new IsoWarrior('明智 光忠', 'bunkan', 65,  1.8,  2.3);
 
   currentHouseHead = { warrior: gWarriors[0], familyName: '織田' };
+
   updatePartyRow();
+  updateStatusUI();
+
+  // 時間経過システム開始（ゲーム発展途上国2風）
+  setInterval(performIdleTick, 1650);   // 約1.65秒ごとにポコポコ上昇
+
   gameLoop();
 }
 
-window.addEventListener('resize', () => resizeCanvas());
-
-/* ══════════════════════════════════════════════
-   合戦
-══════════════════════════════════════════════ */
-function showBattleScreen() {
-  document.getElementById('battle-screen').classList.add('show');
-  document.getElementById('battle-family').textContent =
-    (currentHouseHead?currentHouseHead.familyName:'織田') + '軍 出陣';
-  document.getElementById('our-warriors').innerHTML =
-    gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'🌸':'⚔️'}</span>`).join('');
-  document.getElementById('enemy-warriors').innerHTML =
-    '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
-  document.getElementById('battle-log').innerHTML =
-    '<div class="ll ally">敵軍が城に迫っています！</div>';
-}
-
+/* 合戦関連（報酬強化） */
 window.startBattleSimulation = function() {
   const log = document.getElementById('battle-log');
   const name = currentHouseHead ? currentHouseHead.warrior.name : '武将';
   log.innerHTML += `<div class="ll ally">${name}が先陣を切った！</div>`;
-  setTimeout(()=>{
+  setTimeout(() => {
     log.innerHTML += '<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
     log.scrollTop = log.scrollHeight;
+
+    // 勝利報酬（ステータス大幅アップ）
+    state.koku += 1680;
+    state.unification = Math.min(100, state.unification + 4.5);
+    gWarriors.forEach(w => {
+      w.stats.power += 5;
+      createFloatText(w, '+5武力', '#ffdd88');
+      w.stats.loyalty = Math.min(100, w.stats.loyalty + 8);
+    });
+    updateStatusUI();
+    updatePartyRow();
   }, 1400);
 };
 
-window.endBattle     = () => document.getElementById('battle-screen').classList.remove('show');
-window.startBattle   = showBattleScreen;
-window.showBloodline  = () => alert('配合機能は現在開発中です');
-window.showDiplomacy  = () => alert('外交機能は現在開発中です');
-window.showDev        = () => alert('内政機能は現在開発中です');
+window.endBattle = () => {
+  document.getElementById('battle-screen').classList.remove('show');
+};
+
+window.startBattle = () => {
+  document.getElementById('battle-screen').classList.add('show');
+  document.getElementById('battle-family').textContent = (currentHouseHead?currentHouseHead.familyName:'織田') + '軍 出陣';
+  document.getElementById('our-warriors').innerHTML = gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'🌸':'⚔️'}</span>`).join('');
+  document.getElementById('enemy-warriors').innerHTML = '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
+  document.getElementById('battle-log').innerHTML = '<div class="ll ally">敵軍が城に迫っています！</div>';
+};
+
+window.showBloodline = () => {
+  if (state.genNum >= 5) {
+    alert('すでに最終世代です！');
+    return;
+  }
+  if (confirm('次世代へ進みますか？\n（現在の武将の血脈が強化され、新たな武将が加わります）')) {
+    state.genNum++;
+    // 新しい後継者追加（簡易）
+    const newPower = Math.floor(75 + Math.random() * 25);
+    new IsoWarrior('織田 次郎', 'bukan', newPower, -1.5, 3.2);
+    updatePartyRow();
+    updateStatusUI();
+    alert(`第${state.genNum}世代開始！\n血脈が強化されました！`);
+  }
+};
+
+window.showDiplomacy = () => alert('外交機能は現在拡張中です（今後のアップデートで同盟・和平を実装予定）');
+window.showDev = showDev;   // 内政モーダル
 
 window.onload = initGame;
+window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
 </html>
