@@ -989,3 +989,142 @@ window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
 </html>
+
+<script>
+// ===============================
+// カイロソフト完全ループ
+// ===============================
+
+let gameTime = {
+  year: 1,
+  month: 1,
+  day: 1
+};
+
+let gameLog = [];
+
+// UI追加（既存に干渉しない）
+const timeDisplay = document.createElement("div");
+timeDisplay.style.position = "absolute";
+timeDisplay.style.top = "8px";
+timeDisplay.style.left = "12px";
+timeDisplay.style.fontSize = "11px";
+timeDisplay.style.color = "#c8960c";
+timeDisplay.style.opacity = "0.8";
+document.body.appendChild(timeDisplay);
+
+function updateTime() {
+  gameTime.day++;
+
+  if (gameTime.day > 30) {
+    gameTime.day = 1;
+    gameTime.month++;
+  }
+
+  if (gameTime.month > 12) {
+    gameTime.month = 1;
+    gameTime.year++;
+  }
+
+  timeDisplay.innerText =
+    `第${gameTime.year}年 ${gameTime.month}月 ${gameTime.day}日`;
+}
+
+// ===============================
+// イベントシステム（核）
+// ===============================
+
+function triggerEvent() {
+  if (Math.random() > 0.35) return;
+
+  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
+  if (!w) return;
+
+  const roll = Math.random();
+
+  // 覚醒（激アツ）
+  if (roll < 0.15) {
+    const up = 10 + Math.floor(Math.random() * 10);
+    w.stats.power += up;
+    createFloatText(w, `覚醒 +${up}`, "#ff4444");
+    addLog(`${w.name}が覚醒した！`);
+  }
+
+  // 裏切り（緊張）
+  else if (roll < 0.25) {
+    w.stats.loyalty -= 30;
+    createFloatText(w, "裏切り兆候", "#ff0000");
+    addLog(`${w.name}に不穏な動き…`);
+  }
+
+  // 大成功（快感）
+  else if (roll < 0.5) {
+    const gain = 500 + Math.floor(Math.random() * 500);
+    state.koku += gain;
+    addLog(`内政成功！ +${gain}石`);
+  }
+
+  // 通常イベント
+  else {
+    const stat = ["power", "wisdom", "loyalty"];
+    const s = stat[Math.floor(Math.random() * 3)];
+    w.stats[s] += 3;
+    createFloatText(w, "+3", "#ffdd88");
+    addLog(`${w.name}が成長した`);
+  }
+
+  updateStatusUI();
+  updatePartyRow();
+}
+
+// ===============================
+// ログシステム
+// ===============================
+
+function addLog(text) {
+  gameLog.push(text);
+  if (gameLog.length > 20) gameLog.shift();
+
+  // 軽量表示（コンソール）
+  console.log("LOG:", text);
+}
+
+// ===============================
+// メインループ統合
+// ===============================
+
+setInterval(() => {
+  updateTime();
+  triggerEvent();
+}, 2200);
+
+// ===============================
+// 中毒補助（クリック報酬）
+// ===============================
+
+canvas.addEventListener("click", () => {
+  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
+  if (!w) return;
+
+  const gain = 1 + Math.floor(Math.random() * 3);
+  w.stats.power += gain;
+
+  createFloatText(w, `+${gain}`, "#ffaa44");
+  addLog(`${w.name}を強化`);
+
+  updatePartyRow();
+});
+
+// ===============================
+// 放置復帰ブースト
+// ===============================
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    for (let i = 0; i < 5; i++) {
+      performIdleTick();
+    }
+    addLog("放置ボーナス発生");
+  }
+});
+</script>
