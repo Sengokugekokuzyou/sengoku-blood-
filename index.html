@@ -1267,3 +1267,255 @@ window.upgradeFacility = function(key, cost) {
   updatePartyRow();
   renderFacilities();
 };
+
+const FACILITY_POS = {
+  training: { x:-2, y:-2 },
+  academy:  { x: 2, y:-2 },
+  loyalty:  { x: 2, y: 2 },
+  garden:   { x:-2, y: 2 },
+  tea:      { x: 0, y: 2 },
+  forge:    { x: 0, y:-2 }
+};
+
+this.target = null;
+this.state  = 'idle'; // idle / moving / acting
+this.wait   = 0;
+decideNextAction() {
+  const r = Math.random();
+
+  if (this.jobId === 'bukan') {
+    this.target = r < 0.6 ? 'training' : 'forge';
+  } else if (this.jobId === 'bunkan') {
+    this.target = r < 0.7 ? 'academy' : 'tea';
+  } else if (this.jobId === 'hime') {
+    this.target = r < 0.5 ? 'garden' : 'tea';
+  }
+
+  this.state = 'moving';
+}
+
+
+updateAI() {
+  if (this.state === 'idle') {
+    if (Math.random() < 0.02) this.decideNextAction();
+  }
+
+  else if (this.state === 'moving') {
+    const t = FACILITY_POS[this.target];
+    const dx = t.x - this.tileX;
+    const dy = t.y - this.tileY;
+
+    const speed = 0.02;
+    this.tileX += Math.sign(dx) * speed;
+    this.tileY += Math.sign(dy) * speed;
+
+    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+      this.state = 'acting';
+      this.wait = 60 + Math.random()*120;
+      enterFacility(this, this.target);
+    }
+  }
+
+  else if (this.state === 'acting') {
+    if (--this.wait <= 0) {
+      this.state = 'idle';
+    }
+  }
+}
+
+this.updateAI();
+
+
+function enterFacility(w, type) {
+  if (type === 'training') {
+    const gain = 2 + Math.floor(Math.random()*3);
+    w.stats.power += gain;
+    createFloatText(w, `+${gain}武`, '#ffcc66');
+  }
+
+  else if (type === 'academy') {
+    const gain = 2 + Math.floor(Math.random()*3);
+    w.stats.wisdom += gain;
+    createFloatText(w, `+${gain}知`, '#aaddff');
+  }
+
+  else if (type === 'loyalty') {
+    const gain = 3 + Math.floor(Math.random()*4);
+    w.stats.loyalty = Math.min(100, w.stats.loyalty + gain);
+    createFloatText(w, `+${gain}忠`, '#88ff88');
+  }
+
+  else if (type === 'garden') {
+    createFloatText(w, '癒し', '#aaffcc');
+  }
+
+  else if (type === 'tea') {
+    triggerConversationNearby(w);
+  }
+
+  else if (type === 'forge') {
+    const gain = 4 + Math.floor(Math.random()*4);
+    w.stats.power += gain;
+    createFloatText(w, `鍛+${gain}`, '#ffaa44');
+  }
+}
+
+function triggerConversationNearby(w) {
+  const other = gWarriors.find(o =>
+    o !== w &&
+    Math.abs(o.tileX - w.tileX) < 0.8 &&
+    Math.abs(o.tileY - w.tileY) < 0.8
+  );
+
+  if (!other) return;
+
+  const lines = [
+    "最近どうだ？",
+    "強くなったな…",
+    "あの戦は見事だった",
+    "少し休むか…"
+  ];
+
+  const line = lines[Math.floor(Math.random()*lines.length)];
+
+  createFloatText(w, line, '#ffffff');
+  createFloatText(other, "……", '#cccccc');
+
+  // 仲良くなる
+  if (Math.random() < 0.3) {
+    w.stats.loyalty += 2;
+    other.stats.loyalty += 2;
+  }
+}
+
+function randomMonologue(w) {
+  if (Math.random() > 0.01) return;
+
+  let text = "……";
+
+  if (w.stats.loyalty < 40) text = "ここにいる意味あるか…";
+  else if (w.stats.power > 100) text = "俺が最強だ";
+  else if (w.stats.wisdom > 80) text = "戦は情報だ…";
+
+  createFloatText(w, text, '#bbbbbb');
+}
+
+randomMonologue(this);
+
+
+if (countInFacility(type) > 2) return; // 混雑
+
+w.relations[other.name] += 1;
+
+const FACILITIES = {
+  training: { name:'訓練場', type:'power' },
+  forge:    { name:'鍛冶場', type:'power' },
+  academy:  { name:'学問所', type:'wisdom' },
+  council:  { name:'軍議所', type:'strategy' },
+  loyalty:  { name:'忠誠殿', type:'loyalty' },
+  tea:      { name:'茶室', type:'social' },
+  garden:   { name:'庭園', type:'heal' },
+  market:   { name:'市場', type:'money' },
+  farm:     { name:'農地', type:'money' }
+};
+
+[訓練場]　[鍛冶場]
+
+　[茶室]　　🏯天守　　[学問所]
+
+　　　[庭園]　[忠誠殿]
+
+this.anim = {
+  type: null,   // 'enter' / 'exit'
+  t: 0
+};
+this.visible = true;
+
+const FACILITY_ENTRANCE = {
+  training: { x:-2, y:-2.4 },
+  academy:  { x: 2, y:-2.4 },
+  loyalty:  { x: 2, y: 2.4 },
+  garden:   { x:-2, y: 2.4 },
+  tea:      { x: 0, y: 2.4 },
+  forge:    { x: 0, y:-2.4 }
+};
+
+if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+  this.state = 'entering';
+  this.anim.type = 'enter';
+  this.anim.t = 0;
+}
+
+else if (this.state === 'entering') {
+  this.anim.t += 0.05;
+
+  if (this.anim.t >= 1) {
+    this.visible = false;
+    this.state = 'acting';
+    this.wait = 80 + Math.random()*120;
+
+    enterFacility(this, this.target);
+  }
+}
+
+else if (this.state === 'acting') {
+  if (--this.wait <= 0) {
+    this.state = 'exiting';
+    this.anim.type = 'exit';
+    this.anim.t = 0;
+    this.visible = true;
+
+    // 出口位置（入口と同じ）
+    const e = FACILITY_ENTRANCE[this.target];
+    this.tileX = e.x;
+    this.tileY = e.y;
+  }
+}
+
+else if (this.state === 'exiting') {
+  this.anim.t += 0.05;
+
+  if (this.anim.t >= 1) {
+    this.state = 'idle';
+  }
+}
+
+
+let scale = 1;
+let alpha = 1;
+
+if (this.state === 'entering') {
+  scale = 1 - this.anim.t;
+  alpha = 1 - this.anim.t;
+}
+if (this.state === 'exiting') {
+  scale = this.anim.t;
+  alpha = this.anim.t;
+}
+if (!this.visible && this.state !== 'exiting') return;
+
+ctx.save();
+ctx.globalAlpha = alpha;
+ctx.translate(fx, fy);
+ctx.scale(scale, scale);
+ctx.translate(-fx, -fy);
+
+ctx.restore();
+
+if (this.anim.type === 'enter' && Math.random() < 0.3) {
+  createFloatText(this, "…", "#888");
+}
+
+function drawEntranceEffect(x, y, t) {
+  const s = isoToScreen(x, y, 0.3);
+  const sx = CX + s.x;
+  const sy = CY + s.y;
+
+  ctx.save();
+  ctx.globalAlpha = 0.4 * (1 - t);
+  ctx.beginPath();
+  ctx.arc(sx, sy, 20 * (1 + t), 0, Math.PI * 2);
+  ctx.strokeStyle = '#ffd700';
+  ctx.stroke();
+  ctx.restore();
+}
