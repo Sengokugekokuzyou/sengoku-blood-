@@ -2,416 +2,896 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>戦国血脈 〜覇道の系譜〜</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
 
-  :root {
-    --ink: #1a0f00;
-    --parchment: #f5e8c8;
-    --crimson: #8b0000;
-    --gold: #c8960c;
-    --gold-light: #f0c040;
-  }
+:root {
+  --gold:      #c8960c;
+  --gold-l:    #f0c040;
+  --gold-d:    rgba(200,150,12,.4);
+  --parchment: #f5e8c8;
+  --ink:       #0e0800;
+  --panel:     rgba(8,4,0,.85);
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*,*::before,*::after { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
 
-  body {
-    background: var(--ink);
-    font-family: 'Noto Serif JP', serif;
-    overflow: hidden;
-    height: 100vh; width: 100vw;
-    user-select: none;
-  }
+html,body {
+  width:100%;height:100%;
+  background:var(--ink);
+  font-family:'Noto Serif JP',serif;
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+}
 
-  #bg { position: fixed; inset: 0; background: linear-gradient(180deg, #2a1a08 0%, #1a0f00 40%, #0d0800 100%); }
+/* ════════════════════════════
+   背景
+════════════════════════════ */
+#sky {
+  position:fixed;inset:0;z-index:0;
+  background:linear-gradient(175deg,
+    #0a0500 0%,
+    #18100a 35%,
+    #251808 65%,
+    #1a1005 100%);
+}
 
-  .mist-layer {
-    position: fixed; left: -20%; width: 140%; height: 80px;
-    background: linear-gradient(90deg, transparent, rgba(245,232,200,0.05), rgba(245,232,200,0.08), rgba(245,232,200,0.04), transparent);
-    border-radius: 50%; animation: drift linear infinite;
-  }
-  .mist-layer:nth-child(1) { top: 35%; animation-duration: 28s; }
-  .mist-layer:nth-child(2) { top: 55%; animation-duration: 22s; animation-delay: -8s; opacity: 0.7; }
-  .mist-layer:nth-child(3) { top: 45%; animation-duration: 35s; animation-delay: -15s; opacity: 0.5; }
-  @keyframes drift {
-    0% { transform: translateX(-10%) scaleY(1); } 50% { transform: translateX(5%) scaleY(1.3); } 100% { transform: translateX(-10%) scaleY(1); }
-  }
+/* 星 */
+.star {
+  position:fixed;border-radius:50%;background:#fff;opacity:0;
+  animation:twinkle ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
 
-  .petal {
-    position: fixed;
-    background: radial-gradient(ellipse, rgba(255,200,200,0.9) 0%, rgba(255,150,150,0.4) 100%);
-    border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-20px) rotate(0deg) translateX(0px); opacity: 0; }
-    10% { opacity: 0.8; } 90% { opacity: 0.6; }
-    100% { transform: translateY(100vh) rotate(720deg) translateX(60px); opacity: 0; }
-  }
+/* 霞レイヤー */
+.mist {
+  position:fixed;left:-20%;width:140%;
+  background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);
+  border-radius:50%;animation:drift linear infinite;
+  pointer-events:none;
+}
+.mist:nth-child(1){height:55px;top:30%;animation-duration:32s;}
+.mist:nth-child(2){height:70px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
+.mist:nth-child(3){height:45px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
+@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
 
-  #main { position: relative; z-index: 10; width: 100%; height: 100vh; display: flex; flex-direction: column; }
+/* 花びら */
+.petal{
+  position:fixed;border-radius:50% 0 50% 0;
+  background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);
+  animation:petalFall linear infinite;pointer-events:none;
+}
+@keyframes petalFall{
+  0%  {transform:translateY(-10px) rotate(0deg)   translateX(0);opacity:0}
+  7%  {opacity:.9}
+  93% {opacity:.5}
+  100%{transform:translateY(102vh)  rotate(760deg) translateX(45px);opacity:0}
+}
 
-  #titlebar { padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
-  #game-title { color: var(--gold); font-size: 13px; font-weight: 700; letter-spacing: 4px; text-shadow: 0 0 20px rgba(200,150,12,0.6); line-height: 1.8; }
-  #game-title span { display: block; font-size: 9px; letter-spacing: 6px; color: rgba(200,150,12,0.6); font-weight: 400; }
-  #stats-bar { text-align: right; color: rgba(245,232,200,0.7); font-size: 10px; letter-spacing: 2px; line-height: 2; }
-  #stats-bar strong { color: var(--gold-light); font-size: 13px; }
+/* ════════════════════════════
+   メインレイアウト
+════════════════════════════ */
+#main {
+  position:relative;z-index:10;
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+}
 
-  #castle-field { flex: 1; position: relative; overflow: hidden; padding: 10px 0 0; }
+/* ── ヘッダー ── */
+#header {
+  flex-shrink:0;
+  padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
+}
+#game-title {
+  color:var(--gold);
+  font-size:clamp(15px,4.8vw,20px);
+  font-weight:900;letter-spacing:.3em;
+  text-shadow:0 0 20px rgba(200,150,12,.75);
+  line-height:1.5;
+}
+#game-title .sub {
+  display:block;font-size:clamp(8px,2vw,10px);
+  letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;
+}
+#status-panel{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.stat-chip{
+  display:flex;align-items:center;gap:5px;
+  background:var(--panel);border:1px solid var(--gold-d);
+  border-radius:20px;padding:4px 11px;
+}
+.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}
+.sv{font-size:14px;font-weight:700;color:var(--gold-l);}
+.su{font-size:9px;color:var(--gold-d);}
 
-  #castle-base {
-    position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%);
-    text-align: center; animation: castleFloat 6s ease-in-out infinite; pointer-events: none;
-  }
-  #castle-name {
-    color: var(--gold); font-size: 12px; letter-spacing: 4px;
-    text-shadow: 0 0 12px rgba(200,150,12,0.8);
-  }
-  @keyframes castleFloat { 0%,100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-4px); } }
+/* ── アイソメトリックフィールド ── */
+#iso-field {
+  flex:1;position:relative;overflow:hidden;min-height:0;
+  /* 斜め上視点: CSSで全体を傾ける */
+}
 
-  .warrior {
-    position: absolute; bottom: 100px; cursor: pointer; z-index: 15;
-    transition: filter 0.2s;
-    text-align: center;
-  }
-  .warrior:hover { filter: brightness(1.3); }
-  .warrior-name {
-    font-size: 11px; color: var(--gold-light); margin-top: 4px;
-    text-shadow: 0 1px 4px #000;
-  }
+/* アイソ変換ラッパー */
+#iso-world {
+  position:absolute;
+  bottom:-8%;
+  left:50%;
+  transform:translateX(-50%);
+  width:460px;
+  /* クォータービュー変換 */
+  transform-origin:bottom center;
+}
 
-  /* 合戦画面 */
-  #battle-screen {
-    position: fixed; inset: 0; z-index: 500;
-    background: linear-gradient(#0a0500, #1a0f00);
-    display: none; flex-direction: column;
-    color: var(--parchment);
-  }
-  #battle-screen.show { display: flex; }
+/* ── 地面タイル ── */
+#ground-plane {
+  position:relative;
+  width:100%;
+  transform:rotateX(55deg) rotateZ(-30deg);
+  transform-style:preserve-3d;
+}
 
-  .battle-header {
-    padding: 12px 20px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .battle-title { font-size: 18px; letter-spacing: 3px; color: var(--gold-light); }
+/* Canvas でアイソ描画 */
+#iso-canvas {
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+}
 
-  .battle-field {
-    flex: 1; position: relative; overflow: hidden;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7));
-    display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 80px;
-  }
+/* ── ボトムUI ── */
+#bottom-ui {
+  flex-shrink:0;
+  padding:0 12px max(env(safe-area-inset-bottom,0px),12px);
+  background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);
+}
+#nation-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 4px 5px;
+  border-bottom:1px solid rgba(200,150,12,.15);
+}
+.nl{font-size:9px;color:var(--gold-d);letter-spacing:.2em;white-space:nowrap;}
+.nt{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
+.nf{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
+.np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
 
-  .army { text-align: center; width: 42%; }
-  .army-title { font-size: 14px; margin-bottom: 12px; letter-spacing: 2px; }
-  .our-army .army-title { color: #ffdd88; }
-  .enemy-army .army-title { color: #ff8888; }
+#party-row{
+  display:flex;gap:7px;padding:6px 0 5px;
+  overflow-x:auto;scrollbar-width:none;
+}
+#party-row::-webkit-scrollbar{display:none;}
+.party-card{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(200,150,12,.2);
+  border-radius:8px;padding:5px 10px;min-width:56px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
+.party-card:active{background:rgba(200,150,12,.15);}
+.pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}
+.pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
+.pc-pow {font-size:9px;color:#ffaa44;}
 
-  .warrior-icon { font-size: 48px; margin: 8px 4px; display: inline-block; filter: drop-shadow(0 4px 12px #000); }
+#action-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:7px;padding:5px 0 3px;
+}
+.act-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:var(--panel);border:1px solid var(--gold-d);
+  border-radius:10px;padding:10px 4px 8px;
+  cursor:pointer;transition:background .15s,border-color .15s,transform .1s;
+  color:var(--parchment);font-family:inherit;
+}
+.act-btn:active{transform:scale(.92);background:rgba(200,150,12,.14);border-color:var(--gold);}
+.act-btn .ico{font-size:21px;line-height:1;}
+.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
+.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.4);}
+.act-btn.primary .lbl{color:var(--gold-l);}
 
-  .battle-log {
-    height: 190px; background: rgba(10,6,0,0.95); border-top: 2px solid var(--gold);
-    padding: 12px; overflow-y: auto; font-size: 13.5px; line-height: 1.6;
-  }
-  .log-line { margin: 4px 0; }
-  .log-line.ally { color: #bbffbb; }
-
-  .battle-footer {
-    padding: 12px; background: rgba(0,0,0,0.85); display: flex; gap: 10px;
-  }
-  .battle-btn {
-    flex: 1; padding: 14px; font-size: 15px; font-weight: 700;
-    background: linear-gradient(#5a2a0a, #2a1800);
-    border: 1px solid var(--gold); color: var(--parchment);
-    cursor: pointer; border-radius: 4px;
-  }
+/* ════════════════════════════
+   合戦画面
+════════════════════════════ */
+#battle-screen{
+  position:fixed;inset:0;z-index:500;
+  background:linear-gradient(#060200,#180f00);
+  display:none;flex-direction:column;color:var(--parchment);
+}
+#battle-screen.show{display:flex;}
+.bh{
+  flex-shrink:0;
+  padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;
+  background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}
+.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
+.bf{
+  flex:1;min-height:0;
+  background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));
+  display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;
+}
+.army{text-align:center;width:42%;}
+.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
+.our-army .army-title{color:#ffdd88;}
+.enemy-army .army-title{color:#ff8888;}
+.wi{font-size:clamp(34px,10vw,50px);margin:5px 4px;display:inline-block;filter:drop-shadow(0 4px 12px #000);}
+.blog{
+  flex-shrink:0;height:165px;
+  background:rgba(6,3,0,.97);border-top:2px solid var(--gold);
+  padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;
+}
+.ll{margin:3px 0;}.ll.ally{color:#bbffbb;}
+.bfooter{
+  flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);
+  background:rgba(0,0,0,.9);display:flex;gap:10px;
+}
+.bbtn{
+  flex:1;padding:15px 8px;font-size:15px;font-weight:700;
+  background:linear-gradient(#5a2a0a,#2a1800);
+  border:1px solid var(--gold);color:var(--parchment);
+  cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;
+}
+.bbtn:active{filter:brightness(1.3);}
 </style>
 </head>
 <body>
 
-<div id="bg"></div>
-<div class="mist-layer"></div><div class="mist-layer"></div><div class="mist-layer"></div>
-<div class="petal" style="left:5%;width:6px;height:6px;animation-duration:8s;"></div>
-<div class="petal" style="left:15%;width:8px;height:8px;animation-duration:11s;animation-delay:-3s;"></div>
-<div class="petal" style="left:30%;width:5px;height:5px;animation-duration:9s;animation-delay:-6s;"></div>
-<div class="petal" style="left:50%;width:8px;height:8px;animation-duration:13s;animation-delay:-1s;"></div>
-<div class="petal" style="left:65%;width:7px;height:7px;animation-duration:10s;animation-delay:-4s;"></div>
-<div class="petal" style="left:80%;width:5px;height:5px;animation-duration:12s;animation-delay:-7s;"></div>
+<div id="sky"></div>
+
+<!-- 星 -->
+<div class="star" style="left:6%;  top:4%; width:2px;height:2px;animation-duration:3.1s;"></div>
+<div class="star" style="left:19%; top:8%; width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
+<div class="star" style="left:33%; top:3%; width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
+<div class="star" style="left:52%; top:6%; width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
+<div class="star" style="left:68%; top:2%; width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
+<div class="star" style="left:82%; top:7%; width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
+<div class="star" style="left:91%; top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
+<div class="mist"></div><div class="mist"></div><div class="mist"></div>
+<div class="petal" style="left:3%; width:7px;height:7px;animation-duration:8.2s;"></div>
+<div class="petal" style="left:14%;width:5px;height:5px;animation-duration:10.5s;animation-delay:-2.8s;"></div>
+<div class="petal" style="left:28%;width:8px;height:8px;animation-duration:9.1s;animation-delay:-5.5s;"></div>
+<div class="petal" style="left:47%;width:6px;height:6px;animation-duration:13.2s;animation-delay:-1.2s;"></div>
+<div class="petal" style="left:61%;width:5px;height:5px;animation-duration:10.8s;animation-delay:-4.2s;"></div>
+<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;  animation-delay:-7.1s;"></div>
+<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s; animation-delay:-2.4s;"></div>
 
 <!-- 合戦画面 -->
 <div id="battle-screen">
-  <div class="battle-header">
-    <div class="battle-title" id="battle-family">織田軍 出陣</div>
-    <div onclick="endBattle()" style="cursor:pointer;font-size:22px;color:#ffaaaa;">✕</div>
+  <div class="bh">
+    <div class="bt" id="battle-family">織田軍 出陣</div>
+    <div class="bc" onclick="endBattle()">✕</div>
   </div>
-  <div class="battle-field">
-    <div class="army our-army">
-      <div class="army-title">我が軍</div>
-      <div id="our-warriors"></div>
-    </div>
-    <div style="font-size:42px;color:var(--gold);align-self:center;margin-top:-40px;">VS</div>
-    <div class="army enemy-army">
-      <div class="army-title">敵軍</div>
-      <div id="enemy-warriors"></div>
-    </div>
+  <div class="bf">
+    <div class="army our-army"><div class="army-title">我が軍</div><div id="our-warriors"></div></div>
+    <div style="font-size:clamp(30px,9vw,42px);color:var(--gold);align-self:center;margin-top:-40px;font-weight:900;">VS</div>
+    <div class="army enemy-army"><div class="army-title">敵軍</div><div id="enemy-warriors"></div></div>
   </div>
-  <div class="battle-log" id="battle-log"></div>
-  <div class="battle-footer">
-    <button class="battle-btn" onclick="startBattleSimulation()">戦闘開始</button>
-    <button class="battle-btn" onclick="endBattle()" style="background:#3a1a1a;">撤退</button>
+  <div class="blog" id="battle-log"></div>
+  <div class="bfooter">
+    <button class="bbtn" onclick="startBattleSimulation()">⚔ 戦闘開始</button>
+    <button class="bbtn" onclick="endBattle()" style="background:linear-gradient(#4a1010,#180606);">撤退</button>
   </div>
 </div>
 
+<!-- メイン -->
 <div id="main">
-  <div id="titlebar">
-    <div id="game-title">戦国血脈<span>〜 覇道の系譜 〜</span></div>
-    <div id="stats-bar">
-      <span>天下統一率</span><br>
-      <strong id="unification-pct">12</strong><span style="font-size:9px">%</span><br>
-      <span style="font-size:9px;color:rgba(200,150,12,0.5)">第 <strong id="gen-num">1</strong> 世代</span>
+  <div id="header">
+    <div id="game-title">戦国血脈<span class="sub">〜 覇道の系譜 〜</span></div>
+    <div id="status-panel">
+      <div class="stat-chip"><span class="sl">天下統一</span><span class="sv" id="unification-pct">12</span><span class="su">%</span></div>
+      <div class="stat-chip"><span class="sl">第</span><span class="sv" id="gen-num">1</span><span class="su">世代</span></div>
     </div>
   </div>
 
-  <div id="castle-field">
-    <!-- warriors injected here by JS -->
-    <div id="castle-base">
-      <svg width="160" height="120" viewBox="0 0 160 120">
-        <!-- 石垣 -->
-        <rect x="20" y="80" width="120" height="40" rx="2" fill="#4a3a28"/>
-        <rect x="30" y="70" width="100" height="15" rx="1" fill="#5a4a35"/>
-        <!-- 天守台 -->
-        <rect x="45" y="40" width="70" height="35" fill="#3a2a18"/>
-        <!-- 屋根1 -->
-        <polygon points="40,42 80,10 120,42" fill="#2a1a08"/>
-        <polygon points="42,42 80,14 118,42" fill="#1a0d04"/>
-        <!-- 屋根2 -->
-        <polygon points="50,48 80,28 110,48" fill="#2a1a08"/>
-        <!-- 窓 -->
-        <rect x="68" y="50" width="10" height="14" rx="1" fill="#8b6914" opacity="0.8"/>
-        <rect x="82" y="50" width="10" height="14" rx="1" fill="#8b6914" opacity="0.8"/>
-        <!-- 旗 -->
-        <line x1="80" y1="10" x2="80" y2="0" stroke="#c8960c" stroke-width="1.5"/>
-        <polygon points="80,0 94,5 80,10" fill="#8b0000"/>
-      </svg>
-      <div id="castle-name">安土城</div>
-    </div>
+  <div id="iso-field">
+    <canvas id="iso-canvas"></canvas>
   </div>
 
-  <div style="padding:12px 20px 20px;background:linear-gradient(0deg,rgba(10,6,0,0.95),transparent);display:flex;gap:12px;justify-content:center;">
-    <button onclick="showBloodline()" style="padding:12px 28px;background:#2a1a08;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;font-family:inherit;font-size:14px;cursor:pointer;">配合</button>
-    <button onclick="startBattle()" style="padding:12px 28px;background:#4a1a1a;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;font-family:inherit;font-size:14px;cursor:pointer;">合戦</button>
+  <div id="bottom-ui">
+    <div id="nation-bar">
+      <span class="nl">国力</span>
+      <div class="nt"><div class="nf" id="nfill" style="width:42%"></div></div>
+      <span class="np">4,200</span><span class="nl" style="margin-left:1px">石</span>
+    </div>
+    <div id="party-row"></div>
+    <div id="action-row">
+      <button class="act-btn primary" onclick="startBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
+      <button class="act-btn" onclick="showBloodline()"><span class="ico">🌸</span><span class="lbl">配合</span></button>
+      <button class="act-btn" onclick="showDiplomacy()"><span class="ico">📜</span><span class="lbl">外交</span></button>
+      <button class="act-btn" onclick="showDev()"><span class="ico">🏯</span><span class="lbl">内政</span></button>
+    </div>
   </div>
 </div>
 
 <script>
-// ─── カラー定義 ───────────────────────────────────────────
-const COLOR_SETS = {
-  c_red:  { main:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', armor:'#6a1010' },
-  c_blue: { main:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', armor:'#0a2a4a' },
-  c_pink: { main:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', armor:'#6a1050' }
+/* ══════════════════════════════════════════════
+   アイソメトリック描画エンジン
+   視点: 斜め上30°, 右方向
+══════════════════════════════════════════════ */
+const canvas = document.getElementById('iso-canvas');
+const ctx    = canvas.getContext('2d');
+
+// アイソ変換行列 (tile size 40px)
+const TILE = 44;
+const ISO_ANG = Math.PI / 6; // 30°
+
+function isoToScreen(tx, ty, tz) {
+  // x = col, y = row, z = height
+  const sx = (tx - ty) * Math.cos(ISO_ANG) * TILE;
+  const sy = (tx + ty) * Math.sin(ISO_ANG) * TILE - tz * TILE * 0.88;
+  return { x: sx, y: sy };
+}
+
+let CX, CY; // canvas center
+
+function resizeCanvas() {
+  const field = document.getElementById('iso-field');
+  canvas.width  = field.clientWidth;
+  canvas.height = field.clientHeight;
+  CX = canvas.width  / 2;
+  CY = canvas.height * 0.72;
+}
+
+/* ── カラーパレット ── */
+const PAL = {
+  grassTop:  '#2d4a1e',
+  grassSide: '#1e3214',
+  dirtTop:   '#5a3a1a',
+  dirtSide:  '#3a2010',
+  stoneTop:  '#4a3a28',
+  stoneSide: '#322514',
+  stoneLit:  '#5c4a34',
+  moatTop:   '#0a1a2e',
+  moatDark:  '#060e1a',
+  wallTop:   '#5a4a35',
+  wallFront: '#4a3a25',
+  wallSide:  '#3a2c1a',
+  roofDark:  '#1a0e04',
+  roofMid:   '#241608',
+  roofLit:   '#2e1c0a',
+  woodDark:  '#3a2a18',
+  woodMid:   '#4a3826',
+  flagRed:   '#8b0000',
+  gold:      '#c8960c',
+  goldLit:   '#f0c040',
+  sky1:      'rgba(20,14,5,.0)',
 };
 
-// ─── SVG武将生成 ──────────────────────────────────────────
-function makeSVG(jobId, colorKey, walkStep) {
-  const c = COLOR_SETS[colorKey] || COLOR_SETS['c_red'];
-  const s = walkStep % 4;
+/* ══════════════════════════════════════════════
+   プリミティブ: アイソ直方体
+══════════════════════════════════════════════ */
+function drawBox(tx, ty, tz, w, d, h, colTop, colLeft, colRight) {
+  // 8頂点をスクリーン座標へ
+  const p = (x,y,z) => {
+    const s = isoToScreen(x,y,z);
+    return [CX+s.x, CY+s.y];
+  };
 
-  if (jobId === 'bukan') {
-    // 武官（武士）: 歩行アニメ付き
-    const legLAngle = ['-18', '-6', '18', '6'][s];
-    const legRAngle = [' 18', '  6', '-18', '-6'][s];
-    const armLAngle = [' 20', '  6', '-20', '-6'][s];
-    const armRAngle = ['-20', ' -6', ' 20', '  6'][s];
+  const [ax,ay] = p(tx,   ty,   tz+h);
+  const [bx,by] = p(tx+w, ty,   tz+h);
+  const [cx2,cy2] = p(tx+w, ty+d, tz+h);
+  const [dx,dy] = p(tx,   ty+d, tz+h);
+  const [ex,ey] = p(tx,   ty,   tz  );
+  const [fx,fy] = p(tx+w, ty,   tz  );
+  const [gx,gy] = p(tx+w, ty+d, tz  );
+  const [hx,hy] = p(tx,   ty+d, tz  );
 
-    return `<svg width="36" height="72" viewBox="0 0 36 72" xmlns="http://www.w3.org/2000/svg">
-      <!-- 兜 -->
-      <ellipse cx="18" cy="11" rx="10" ry="8" fill="${c.main}"/>
-      <rect x="10" y="10" width="16" height="5" rx="1" fill="${c.armor}"/>
-      <line x1="18" y1="3" x2="18" y2="0" stroke="${c.acc}" stroke-width="2"/>
-      <polygon points="18,0 23,5 13,5" fill="${c.acc}" opacity="0.9"/>
-      <!-- 顔 -->
-      <ellipse cx="18" cy="22" rx="8" ry="9" fill="${c.skin}"/>
-      <circle cx="14" cy="21" r="1.5" fill="#5a3a1a"/>
-      <circle cx="22" cy="21" r="1.5" fill="#5a3a1a"/>
-      <!-- 胴鎧 -->
-      <rect x="10" y="30" width="16" height="20" rx="2" fill="${c.main}"/>
-      <rect x="11" y="32" width="14" height="16" rx="1" fill="${c.armor}" opacity="0.6"/>
-      <!-- 左腕 -->
-      <g transform="rotate(${armLAngle}, 8, 32)">
-        <rect x="4" y="30" width="6" height="15" rx="3" fill="${c.main}"/>
-        <rect x="5" y="43" width="4" height="5" rx="2" fill="${c.skin}"/>
-      </g>
-      <!-- 右腕 -->
-      <g transform="rotate(${armRAngle}, 28, 32)">
-        <rect x="26" y="30" width="6" height="15" rx="3" fill="${c.main}"/>
-        <rect x="27" y="43" width="4" height="5" rx="2" fill="${c.skin}"/>
-        <!-- 刀 -->
-        <line x1="30" y1="38" x2="36" y2="22" stroke="#c8c8c8" stroke-width="1.5"/>
-        <rect x="29" y="37" width="3" height="4" rx="1" fill="${c.acc}"/>
-      </g>
-      <!-- 左脚 -->
-      <g transform="rotate(${legLAngle}, 14, 50)">
-        <rect x="11" y="49" width="7" height="18" rx="3" fill="${c.sub}"/>
-        <rect x="11" y="65" width="8" height="5" rx="2" fill="${c.main}"/>
-      </g>
-      <!-- 右脚 -->
-      <g transform="rotate(${legRAngle}, 22, 50)">
-        <rect x="18" y="49" width="7" height="18" rx="3" fill="${c.sub}"/>
-        <rect x="17" y="65" width="8" height="5" rx="2" fill="${c.main}"/>
-      </g>
-    </svg>`;
+  // 上面
+  ctx.beginPath();
+  ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.lineTo(cx2,cy2); ctx.lineTo(dx,dy);
+  ctx.closePath();
+  ctx.fillStyle = colTop; ctx.fill();
 
-  } else if (jobId === 'hime') {
-    // 姫: 優雅な歩行
-    const bodyShift = [0, 1, 0, -1][s];
-    return `<svg width="34" height="72" viewBox="0 0 34 72" xmlns="http://www.w3.org/2000/svg">
-      <!-- 髪飾り -->
-      <circle cx="12" cy="10" r="3" fill="${c.acc}" opacity="0.9"/>
-      <circle cx="17" cy="7"  r="3" fill="${c.acc}" opacity="0.9"/>
-      <circle cx="22" cy="10" r="3" fill="${c.acc}" opacity="0.9"/>
-      <!-- 髪 -->
-      <ellipse cx="17" cy="14" rx="9" ry="8" fill="#1a0a00"/>
-      <rect x="13" y="18" width="4" height="20" rx="2" fill="#1a0a00"/>
-      <rect x="17" y="18" width="4" height="20" rx="2" fill="#1a0a00"/>
-      <!-- 顔 -->
-      <ellipse cx="17" cy="20" rx="7" ry="8" fill="${c.skin}"/>
-      <circle cx="14" cy="19" r="1.2" fill="#8b3060"/>
-      <circle cx="20" cy="19" r="1.2" fill="#8b3060"/>
-      <ellipse cx="17" cy="24" rx="2.5" ry="1.2" fill="#ff9090" opacity="0.7"/>
-      <!-- 着物 -->
-      <g transform="translate(0,${bodyShift})">
-        <polygon points="8,28 26,28 30,72 4,72" fill="${c.main}"/>
-        <polygon points="11,28 23,28 24,50 10,50" fill="${c.sub}" opacity="0.7"/>
-        <!-- 袖 -->
-        <ellipse cx="6"  cy="36" rx="5" ry="10" fill="${c.main}" transform="rotate(-15,6,36)"/>
-        <ellipse cx="28" cy="36" rx="5" ry="10" fill="${c.main}" transform="rotate(15,28,36)"/>
-        <!-- 帯 -->
-        <rect x="9" y="40" width="16" height="8" rx="1" fill="${c.acc}" opacity="0.8"/>
-      </g>
-    </svg>`;
+  // 左面 (手前左)
+  ctx.beginPath();
+  ctx.moveTo(ax,ay); ctx.lineTo(ex,ey); ctx.lineTo(hx,hy); ctx.lineTo(dx,dy);
+  ctx.closePath();
+  ctx.fillStyle = colLeft; ctx.fill();
 
-  } else {
-    // 文官
-    return `<svg width="34" height="72" viewBox="0 0 34 72" xmlns="http://www.w3.org/2000/svg">
-      <!-- 烏帽子 -->
-      <polygon points="17,2 22,18 12,18" fill="#2a1a08"/>
-      <rect x="10" y="16" width="14" height="4" rx="1" fill="#1a0a00"/>
-      <!-- 顔 -->
-      <ellipse cx="17" cy="26" rx="8" ry="9" fill="${c.skin}"/>
-      <!-- 束帯 -->
-      <rect x="9" y="34" width="16" height="30" rx="2" fill="${c.main}"/>
-      <rect x="10" y="36" width="14" height="8"  rx="1" fill="${c.sub}" opacity="0.7"/>
-      <rect x="12" y="46" width="10" height="16" rx="1" fill="${c.sub}" opacity="0.5"/>
-      <!-- 笏 -->
-      <rect x="24" y="32" width="3" height="20" rx="1" fill="#c8a850"/>
-      <!-- 袖 -->
-      <ellipse cx="6"  cy="42" rx="5" ry="10" fill="${c.main}"/>
-      <ellipse cx="28" cy="42" rx="5" ry="10" fill="${c.main}"/>
-    </svg>`;
+  // 右面 (手前右)
+  ctx.beginPath();
+  ctx.moveTo(bx,by); ctx.lineTo(fx,fy); ctx.lineTo(gx,gy); ctx.lineTo(cx2,cy2);
+  ctx.closePath();
+  ctx.fillStyle = colRight; ctx.fill();
+
+  // 輪郭
+  ctx.strokeStyle = 'rgba(0,0,0,.35)';
+  ctx.lineWidth   = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.stroke();
+}
+
+/* ══════════════════════════════════════════════
+   アイソ屋根（寄棟）
+══════════════════════════════════════════════ */
+function drawRoof(tx, ty, tz, w, d, rh, col1, col2) {
+  const p = (x,y,z) => {
+    const s = isoToScreen(x,y,z);
+    return [CX+s.x, CY+s.y];
+  };
+  const mx = tx + w/2, my = ty + d/2;
+
+  // 4角の底辺
+  const [ax,ay] = p(tx,   ty,   tz);
+  const [bx,by] = p(tx+w, ty,   tz);
+  const [cx2,cy2] = p(tx+w, ty+d, tz);
+  const [dx,dy] = p(tx,   ty+d, tz);
+  const [px2,py2] = p(mx,   my,   tz+rh);
+
+  // 左面
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);ctx.lineTo(px2,py2);ctx.lineTo(dx,dy);ctx.closePath();
+  ctx.fillStyle=col2;ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.3)';ctx.lineWidth=0.5;ctx.stroke();
+
+  // 右面
+  ctx.beginPath();
+  ctx.moveTo(bx,by);ctx.lineTo(px2,py2);ctx.lineTo(cx2,cy2);ctx.closePath();
+  ctx.fillStyle=col1;ctx.fill();ctx.stroke();
+
+  // 前面
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(px2,py2);ctx.closePath();
+  ctx.fillStyle=col2;ctx.fill();ctx.stroke();
+
+  // 後面 (薄く)
+  ctx.beginPath();
+  ctx.moveTo(dx,dy);ctx.lineTo(cx2,cy2);ctx.lineTo(px2,py2);ctx.closePath();
+  ctx.fillStyle=col1;ctx.fill();ctx.stroke();
+}
+
+/* ══════════════════════════════════════════════
+   シーン描画
+══════════════════════════════════════════════ */
+// 地形マップ (col, row, height)
+const TERRAIN = [];
+function buildTerrain() {
+  TERRAIN.length = 0;
+  // 草地ベース 9×9
+  for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
+    const cx2=(c-4), ry=(r-4);
+    const dist = Math.sqrt(cx2*cx2+ry*ry);
+    const h = dist < 3.5 ? 1 : 0;
+    TERRAIN.push({c,r,h, type: dist<3.5?'stone':'grass'});
   }
 }
 
-// ─── ゲーム状態 ───────────────────────────────────────────
-let warriors = [];
+function drawScene(tick) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // ── 地面タイル (後ろから手前の順)
+  // 描画順: row+col が小さいほど奥
+  const sorted = [...TERRAIN].sort((a,b)=>(a.r+a.c)-(b.r+b.c));
+
+  for (const t of sorted) {
+    const {c,r,h,type} = t;
+    const tx = c-4, ty = r-4;
+
+    if (type==='grass') {
+      drawBox(tx,ty,0, 1,1, 0.18,
+        '#2d4a1e','#1c3010','#233c16');
+    } else {
+      // 城郭の石畳
+      const even = (c+r)%2===0;
+      const top = even ? '#4e4032':'#443828';
+      drawBox(tx,ty,0, 1,1, 0.25, top,'#2e2416','#382e1c');
+    }
+  }
+
+  // ── お堀 (城の周囲)
+  const moatRing = [
+    [-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],
+    [3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],
+    [2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],
+    [-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2],
+  ];
+  for (const [mc,mr] of moatRing) {
+    const p1 = isoToScreen(mc,   mr,   0);
+    const p2 = isoToScreen(mc+1, mr,   0);
+    const p3 = isoToScreen(mc+1, mr+1, 0);
+    const p4 = isoToScreen(mc,   mr+1, 0);
+    ctx.beginPath();
+    ctx.moveTo(CX+p1.x,CY+p1.y);
+    ctx.lineTo(CX+p2.x,CY+p2.y);
+    ctx.lineTo(CX+p3.x,CY+p3.y);
+    ctx.lineTo(CX+p4.x,CY+p4.y);
+    ctx.closePath();
+    // 水面アニメ
+    const shimmer = 0.5 + 0.12*Math.sin(tick*0.04 + mc*0.5 + mr*0.3);
+    ctx.fillStyle = `rgba(12,28,52,${shimmer})`;
+    ctx.fill();
+    ctx.strokeStyle='rgba(20,50,90,.5)';ctx.lineWidth=0.5;ctx.stroke();
+  }
+
+  // ── 石垣 (城外周)
+  for (let i=-2;i<=2;i++) {
+    drawBox(i,-2, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
+    drawBox(i, 2, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
+  }
+  for (let i=-1;i<=1;i++) {
+    drawBox(-2,i, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
+    drawBox( 2,i, 0.25, 1,1, 0.5, PAL.stoneTop, PAL.stoneSide, PAL.stoneLit);
+  }
+
+  // ── 城台(天守台)
+  drawBox(-1,-1, 0.75, 2,2, 0.9, PAL.wallTop, PAL.wallSide, PAL.wallFront);
+
+  // ── 天守本体
+  drawBox(-0.8,-0.8, 1.65, 1.6,1.6, 1.4, PAL.woodMid, PAL.woodDark, PAL.woodMid);
+
+  // ── 小天守 左奥
+  drawBox(-0.6,-0.6, 1.65, 0.7,0.7, 0.9, PAL.woodMid, PAL.woodDark, PAL.woodMid);
+
+  // ── 屋根 3段
+  drawRoof(-1.1,-1.1, 2.65+1.4, 2.2,2.2, 0.9, PAL.roofMid, PAL.roofDark);
+  drawRoof(-0.9,-0.9, 2.65+1.4+0.7, 1.8,1.8, 0.7, PAL.roofDark, '#120900');
+  drawRoof(-0.65,-0.65, 2.65+1.4+1.1, 1.3,1.3, 0.55, PAL.roofMid, PAL.roofDark);
+
+  // 最上段屋根
+  drawRoof(-0.4,-0.4, 2.65+1.4+1.5, 0.8,0.8, 0.4, PAL.roofDark, '#100800');
+
+  // ── 旗
+  drawFlag(-0.05, -0.05, 2.65+1.4+1.85, tick);
+
+  // ── 城門
+  drawBox(-0.25, 2, 0.75, 0.5, 0.3, 0.85, '#1e1608', '#120e04', '#1a1206');
+  drawBox(-0.1,  2.3, 0.75, 0.2, 0.5, 0.6, '#0e0a04', '#08060202', '#0e0a04');
+
+  // ── 武将描画
+  drawWarriors(tick);
+
+  // ── 城名ラベル
+  drawLabel(0,0, 2.65+1.4+2.3, '安土城', tick);
+}
+
+function drawFlag(tx,ty,tz, tick) {
+  const base = isoToScreen(tx, ty, tz);
+  const top  = isoToScreen(tx, ty, tz+0.9);
+  const bx=CX+base.x, by=CY+base.y;
+  const topx=CX+top.x, topy=CY+top.y;
+
+  ctx.strokeStyle = PAL.gold;
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(bx,by); ctx.lineTo(topx,topy);
+  ctx.stroke();
+
+  // はためく旗
+  const wave = Math.sin(tick*0.07)*4;
+  ctx.fillStyle = PAL.flagRed;
+  ctx.beginPath();
+  ctx.moveTo(topx, topy);
+  ctx.lineTo(topx+18+wave, topy+7);
+  ctx.lineTo(topx+16, topy+16);
+  ctx.closePath();
+  ctx.fill();
+
+  // 織(家紋的な点)
+  ctx.fillStyle = PAL.goldLit;
+  ctx.beginPath();
+  ctx.arc(topx+10+wave*0.5, topy+9, 2, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawLabel(tx, ty, tz, text, tick) {
+  const s = isoToScreen(tx,ty,tz+0.3);
+  const x = CX+s.x, y = CY+s.y;
+  const alpha = 0.7 + 0.3*Math.sin(tick*0.03);
+  ctx.font = `bold ${Math.round(canvas.width*0.036)}px 'Noto Serif JP', serif`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = `rgba(240,192,64,${alpha})`;
+  ctx.shadowColor = 'rgba(200,150,12,.8)';
+  ctx.shadowBlur  = 10;
+  ctx.fillText(text, x, y);
+  ctx.shadowBlur = 0;
+}
+
+/* ══════════════════════════════════════════════
+   武将データ
+══════════════════════════════════════════════ */
+const COLOR_SETS = {
+  c_red:  { armor:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', dark:'#6a1010' },
+  c_blue: { armor:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', dark:'#0a2a4a' },
+  c_pink: { armor:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', dark:'#6a1050' },
+};
+
+let gWarriors = [];
 let currentHouseHead = null;
 let animTimer = null;
 
-class Warrior {
-  constructor(name, jobId, power, leftPx) {
-    this.def = {
-      name, jobId, power,
-      color: jobId === 'hime' ? 'c_pink' : jobId === 'bunkan' ? 'c_blue' : 'c_red'
-    };
+class IsoWarrior {
+  constructor(name, jobId, power, tileX, tileY) {
+    this.name = name;
+    this.jobId = jobId;
+    this.power = power;
+    this.tileX = tileX;
+    this.tileY = tileY;
     this.walkFrame = 0;
     this.frameCount = 0;
-
-    this.el = document.createElement('div');
-    this.el.className = 'warrior';
-    this.el.style.left = leftPx + 'px';
-
-    this.svgEl = document.createElement('div');
-    this.nameEl = document.createElement('div');
-    this.nameEl.className = 'warrior-name';
-    this.nameEl.textContent = name;
-
-    this.el.appendChild(this.svgEl);
-    this.el.appendChild(this.nameEl);
-    document.getElementById('castle-field').appendChild(this.el);
-
-    warriors.push(this);
-    this.render();
-  }
-
-  render() {
-    this.svgEl.innerHTML = makeSVG(this.def.jobId, this.def.color, this.walkFrame);
+    this.color = jobId==='hime' ? 'c_pink' : jobId==='bunkan' ? 'c_blue' : 'c_red';
+    gWarriors.push(this);
   }
 
   tick() {
-    this.frameCount++;
-    if (this.frameCount >= 10) {
+    if (++this.frameCount >= 12) {
       this.frameCount = 0;
-      this.walkFrame = (this.walkFrame + 1) % 4;
-      this.render();
+      this.walkFrame = (this.walkFrame+1)%4;
     }
+  }
+
+  draw() {
+    const s = this.walkFrame % 4;
+    const c = COLOR_SETS[this.color];
+    // アイソ座標でキャラ中心
+    const foot = isoToScreen(this.tileX + 0.5, this.tileY + 0.5, 0.25);
+    const fx = CX + foot.x;
+    const fy = CY + foot.y;
+
+    const H = Math.round(canvas.height * 0.092); // キャラ高さ
+    const W = H * 0.55;
+
+    // 歩行オフセット
+    const legSwing = [0, H*0.06, 0, -H*0.06][s];
+    const armSwing = [H*0.05, 0, -H*0.05, 0][s];
+    const bob = Math.abs([0,1,0,-1][s]) * 1.5; // 上下揺れ
+
+    const baseY = fy - bob;
+
+    if (this.jobId === 'bukan') {
+      this._drawBukan(fx, baseY, H, W, s, c, legSwing, armSwing);
+    } else if (this.jobId === 'hime') {
+      this._drawHime(fx, baseY, H, W, s, c);
+    } else {
+      this._drawBunkan(fx, baseY, H, W, c);
+    }
+
+    // 名前ラベル
+    ctx.font = `${Math.round(canvas.width*0.028)}px 'Noto Serif JP', serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(240,192,64,.95)';
+    ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+    ctx.fillText(this.name, fx, baseY - H*0.12);
+    ctx.shadowBlur = 0;
+  }
+
+  _drawBukan(fx, fy, H, W, s, c, legSwing, armSwing) {
+    const hH = H*0.22; // 頭高さ
+    const bH = H*0.32; // 胴高さ
+    const lH = H*0.38; // 脚高さ
+    const aH = H*0.28; // 腕長さ
+    const headY = fy - lH - bH - hH;
+    const bodyY = fy - lH - bH;
+
+    // 影
+    ctx.beginPath();
+    ctx.ellipse(fx, fy+2, W*0.6, H*0.05, 0, 0, Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
+
+    // 脚
+    const legW = W*0.28;
+    ctx.fillStyle = c.sub;
+    // 左脚
+    ctx.save();ctx.translate(fx-legW*0.6, fy-lH/2);ctx.rotate(legSwing*0.04);
+    ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    // 右脚
+    ctx.save();ctx.translate(fx+legW*0.6, fy-lH/2);ctx.rotate(-legSwing*0.04);
+    ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    // 草鞋
+    ctx.fillStyle=c.dark;
+    ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-3, W*0.28, 5, 2);ctx.fill();
+    ctx.beginPath();ctx.roundRect(fx+W*0.04, fy-3, W*0.28, 5, 2);ctx.fill();
+
+    // 胴鎧
+    ctx.fillStyle = c.armor;
+    ctx.beginPath();ctx.roundRect(fx-W*0.44, bodyY, W*0.88, bH, 3);ctx.fill();
+    ctx.fillStyle = c.dark;
+    ctx.beginPath();ctx.roundRect(fx-W*0.38, bodyY+2, W*0.76, bH-4, 2);ctx.fill();
+
+    // 腕
+    ctx.fillStyle=c.armor;
+    // 左腕
+    ctx.save();ctx.translate(fx-W*0.52, bodyY+4);ctx.rotate(armSwing*0.05);
+    ctx.beginPath();ctx.roundRect(-W*0.18,0,W*0.22,aH,4);ctx.fill();ctx.restore();
+    // 右腕 + 刀
+    ctx.save();ctx.translate(fx+W*0.52, bodyY+4);ctx.rotate(-armSwing*0.05);
+    ctx.beginPath();ctx.roundRect(-W*0.04,0,W*0.22,aH,4);ctx.fill();
+    // 刀
+    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(W*0.1, aH*0.5);ctx.lineTo(W*0.4,-aH*0.5);ctx.stroke();
+    ctx.fillStyle=c.acc;ctx.beginPath();ctx.arc(W*0.12,aH*0.45,3,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+
+    // 頭(兜)
+    ctx.fillStyle=c.armor;
+    ctx.beginPath();ctx.ellipse(fx,headY+hH*0.45,W*0.38,hH*0.55,0,0,Math.PI*2);ctx.fill();
+    // 顔
+    ctx.fillStyle=c.skin;
+    ctx.beginPath();ctx.ellipse(fx,headY+hH*0.55,W*0.28,hH*0.42,0,0,Math.PI*2);ctx.fill();
+    // 目
+    ctx.fillStyle='#3a2010';
+    ctx.beginPath();ctx.arc(fx-W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
+    // 兜の角
+    ctx.strokeStyle=c.acc;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*0.4);ctx.stroke();
+    ctx.fillStyle=c.acc;
+    ctx.beginPath();ctx.moveTo(fx-4,headY-hH*0.2);ctx.lineTo(fx+4,headY-hH*0.2);ctx.lineTo(fx,headY-hH*0.5);ctx.fill();
+  }
+
+  _drawHime(fx, fy, H, W, s, c) {
+    const bob = Math.abs([0,1,0,-1][s])*1.2;
+    const bY = fy - bob;
+
+    ctx.beginPath();ctx.ellipse(fx, bY+2, W*0.55, H*0.045, 0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+
+    // 着物 (台形)
+    const grd = ctx.createLinearGradient(fx-W*0.55,0,fx+W*0.55,0);
+    grd.addColorStop(0, c.dark); grd.addColorStop(0.5, c.armor); grd.addColorStop(1, c.dark);
+    ctx.fillStyle=grd;
+    ctx.beginPath();
+    ctx.moveTo(fx-W*0.22, bY-H*0.55);
+    ctx.lineTo(fx+W*0.22, bY-H*0.55);
+    ctx.lineTo(fx+W*0.5,  bY);
+    ctx.lineTo(fx-W*0.5,  bY);
+    ctx.closePath();ctx.fill();
+
+    // 帯
+    ctx.fillStyle=c.acc;
+    ctx.beginPath();ctx.roundRect(fx-W*0.22, bY-H*0.42, W*0.44, H*0.1, 2);ctx.fill();
+
+    // 袖
+    ctx.fillStyle=c.armor;
+    ctx.save();ctx.translate(fx-W*0.28, bY-H*0.52);ctx.rotate(-0.2);
+    ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+W*0.28, bY-H*0.52);ctx.rotate(0.2);
+    ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+
+    // 頭・髪
+    ctx.fillStyle='#1a0a00';
+    ctx.beginPath();ctx.ellipse(fx, bY-H*0.78, W*0.3, H*0.18, 0, 0, Math.PI*2);ctx.fill();
+    // 顔
+    ctx.fillStyle=c.skin;
+    ctx.beginPath();ctx.ellipse(fx, bY-H*0.73, W*0.22, H*0.15, 0, 0, Math.PI*2);ctx.fill();
+    // 目
+    ctx.fillStyle='#8b3060';
+    ctx.beginPath();ctx.arc(fx-W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
+    // 髪飾り
+    for (let i=-1;i<=1;i++) {
+      ctx.fillStyle = i===0?c.acc:'rgba(255,140,200,.8)';
+      ctx.beginPath();ctx.arc(fx+i*W*0.18, bY-H*0.9, 3.5, 0, Math.PI*2);ctx.fill();
+    }
+  }
+
+  _drawBunkan(fx, fy, H, W, c) {
+    ctx.beginPath();ctx.ellipse(fx, fy+2, W*0.5, H*0.04, 0,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+
+    // 袍 (長衣)
+    ctx.fillStyle=c.armor;
+    ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-H*0.65, W*0.64, H*0.65, 3);ctx.fill();
+    ctx.fillStyle=c.sub;
+    ctx.beginPath();ctx.roundRect(fx-W*0.25, fy-H*0.6, W*0.5, H*0.5, 2);ctx.fill();
+
+    // 袖
+    ctx.fillStyle=c.armor;
+    ctx.beginPath();ctx.ellipse(fx-W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(fx+W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
+
+    // 笏
+    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(fx+W*0.28, fy-H*0.55);ctx.lineTo(fx+W*0.2, fy-H*0.2);ctx.stroke();
+
+    // 頭・烏帽子
+    ctx.fillStyle=c.skin;
+    ctx.beginPath();ctx.ellipse(fx, fy-H*0.76, W*0.25, H*0.16, 0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1a0a00';
+    ctx.beginPath();ctx.moveTo(fx-W*0.2, fy-H*0.82);
+    ctx.lineTo(fx+W*0.2, fy-H*0.82);
+    ctx.lineTo(fx+W*0.05, fy-H*1.0);
+    ctx.lineTo(fx-W*0.05, fy-H*1.0);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#1a0a00';
+    ctx.beginPath();ctx.roundRect(fx-W*0.2, fy-H*0.85, W*0.4, H*0.07, 1);ctx.fill();
+    ctx.fillStyle='#4a3a2a';
+    ctx.beginPath();ctx.arc(fx-W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
   }
 }
 
-// ─── 初期化 ───────────────────────────────────────────────
-function initGame() {
-  // 既存の武将を除去
-  warriors.forEach(w => w.el.remove());
-  warriors = [];
-  if (animTimer) clearInterval(animTimer);
-
-  new Warrior('織田 信廣', 'bukan',   88, 60);
-  new Warrior('お 市',    'hime',    72, 180);
-  new Warrior('明智 光忠', 'bunkan',  65, 300);
-
-  currentHouseHead = { warrior: warriors[0], familyName: '織田' };
-
-  // アニメーションループ (60fps相当)
-  animTimer = setInterval(() => {
-    warriors.forEach(w => w.tick());
-  }, 60);
+function drawWarriors(tick) {
+  // 後ろの武将から描く (row+col順)
+  const sorted = [...gWarriors].sort((a,b)=>(a.tileX+a.tileY)-(b.tileX+b.tileY));
+  sorted.forEach(w => w.draw());
 }
 
-// ─── 合戦 ─────────────────────────────────────────────────
+/* ══════════════════════════════════════════════
+   メインループ
+══════════════════════════════════════════════ */
+let tick = 0;
+function gameLoop() {
+  tick++;
+  gWarriors.forEach(w => w.tick());
+  drawScene(tick);
+  requestAnimationFrame(gameLoop);
+}
+
+/* ══════════════════════════════════════════════
+   パーティーカード
+══════════════════════════════════════════════ */
+function updatePartyRow() {
+  const row = document.getElementById('party-row');
+  row.innerHTML = '';
+  const roles = { bukan:'武官', hime:'姫', bunkan:'文官' };
+  gWarriors.forEach((w,i) => {
+    const card = document.createElement('div');
+    card.className = 'party-card'+(i===0?' head':'');
+    card.innerHTML = `
+      <span class="pc-role">${roles[w.jobId]||'武将'}</span>
+      <span class="pc-name">${w.name}</span>
+      <span class="pc-pow">武力 ${w.power}</span>`;
+    row.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════════
+   初期化
+══════════════════════════════════════════════ */
+function initGame() {
+  gWarriors = [];
+  buildTerrain();
+  resizeCanvas();
+
+  // 武将配置 (城の前方エリア)
+  new IsoWarrior('織田 信廣', 'bukan',  88, -2.3, 2.5);
+  new IsoWarrior('お 市',    'hime',   72,  0.2,  2.8);
+  new IsoWarrior('明智 光忠', 'bunkan', 65,  1.8,  2.3);
+
+  currentHouseHead = { warrior: gWarriors[0], familyName: '織田' };
+  updatePartyRow();
+  gameLoop();
+}
+
+window.addEventListener('resize', () => resizeCanvas());
+
+/* ══════════════════════════════════════════════
+   合戦
+══════════════════════════════════════════════ */
 function showBattleScreen() {
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-family').textContent =
-    (currentHouseHead ? currentHouseHead.familyName : '織田') + '軍 出陣';
-
+    (currentHouseHead?currentHouseHead.familyName:'織田') + '軍 出陣';
   document.getElementById('our-warriors').innerHTML =
-    warriors.map(w => `<span class="warrior-icon">${w.def.jobId === 'hime' ? '🌸' : '⚔️'}</span>`).join('');
-
+    gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'🌸':'⚔️'}</span>`).join('');
   document.getElementById('enemy-warriors').innerHTML =
-    '<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>';
-
+    '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
   document.getElementById('battle-log').innerHTML =
-    '<div class="log-line ally">敵軍が城に迫っています！</div>';
+    '<div class="ll ally">敵軍が城に迫っています！</div>';
 }
 
 window.startBattleSimulation = function() {
   const log = document.getElementById('battle-log');
-  const name = currentHouseHead ? currentHouseHead.warrior.def.name : '武将';
-  log.innerHTML += `<div class="log-line ally">${name}が先陣を切った！</div>`;
-  setTimeout(() => {
-    log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
+  const name = currentHouseHead ? currentHouseHead.warrior.name : '武将';
+  log.innerHTML += `<div class="ll ally">${name}が先陣を切った！</div>`;
+  setTimeout(()=>{
+    log.innerHTML += '<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
     log.scrollTop = log.scrollHeight;
   }, 1400);
 };
 
-window.endBattle = function() {
-  document.getElementById('battle-screen').classList.remove('show');
-};
-
-window.startBattle = function() {
-  showBattleScreen();
-};
-
-window.showBloodline = function() {
-  alert('配合機能は現在開発中です');
-};
+window.endBattle     = () => document.getElementById('battle-screen').classList.remove('show');
+window.startBattle   = showBattleScreen;
+window.showBloodline  = () => alert('配合機能は現在開発中です');
+window.showDiplomacy  = () => alert('外交機能は現在開発中です');
+window.showDev        = () => alert('内政機能は現在開発中です');
 
 window.onload = initGame;
 </script>
