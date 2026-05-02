@@ -26,7 +26,6 @@
   }
 
   #bg { position: fixed; inset: 0; background: linear-gradient(180deg, #2a1a08 0%, #1a0f00 40%, #0d0800 100%); }
-  #mountains { position: fixed; bottom: 0; left: 0; right: 0; height: 45%; opacity: 0.22; }
 
   .mist-layer {
     position: fixed; left: -20%; width: 140%; height: 80px;
@@ -65,11 +64,21 @@
     position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%);
     text-align: center; animation: castleFloat 6s ease-in-out infinite; pointer-events: none;
   }
+  #castle-name {
+    color: var(--gold); font-size: 12px; letter-spacing: 4px;
+    text-shadow: 0 0 12px rgba(200,150,12,0.8);
+  }
   @keyframes castleFloat { 0%,100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-4px); } }
 
-  .warrior { 
-    position: absolute; bottom: 86px; cursor: pointer; z-index: 15; 
-    transition: filter 0.2s; 
+  .warrior {
+    position: absolute; bottom: 100px; cursor: pointer; z-index: 15;
+    transition: filter 0.2s;
+    text-align: center;
+  }
+  .warrior:hover { filter: brightness(1.3); }
+  .warrior-name {
+    font-size: 11px; color: var(--gold-light); margin-top: 4px;
+    text-shadow: 0 1px 4px #000;
   }
 
   /* 合戦画面 */
@@ -89,7 +98,7 @@
 
   .battle-field {
     flex: 1; position: relative; overflow: hidden;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://picsum.photos/id/1015/1200/600') center/cover;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7));
     display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 80px;
   }
 
@@ -164,117 +173,232 @@
   </div>
 
   <div id="castle-field">
+    <!-- warriors injected here by JS -->
     <div id="castle-base">
+      <svg width="160" height="120" viewBox="0 0 160 120">
+        <!-- 石垣 -->
+        <rect x="20" y="80" width="120" height="40" rx="2" fill="#4a3a28"/>
+        <rect x="30" y="70" width="100" height="15" rx="1" fill="#5a4a35"/>
+        <!-- 天守台 -->
+        <rect x="45" y="40" width="70" height="35" fill="#3a2a18"/>
+        <!-- 屋根1 -->
+        <polygon points="40,42 80,10 120,42" fill="#2a1a08"/>
+        <polygon points="42,42 80,14 118,42" fill="#1a0d04"/>
+        <!-- 屋根2 -->
+        <polygon points="50,48 80,28 110,48" fill="#2a1a08"/>
+        <!-- 窓 -->
+        <rect x="68" y="50" width="10" height="14" rx="1" fill="#8b6914" opacity="0.8"/>
+        <rect x="82" y="50" width="10" height="14" rx="1" fill="#8b6914" opacity="0.8"/>
+        <!-- 旗 -->
+        <line x1="80" y1="10" x2="80" y2="0" stroke="#c8960c" stroke-width="1.5"/>
+        <polygon points="80,0 94,5 80,10" fill="#8b0000"/>
+      </svg>
       <div id="castle-name">安土城</div>
     </div>
   </div>
 
   <div style="padding:12px 20px 20px;background:linear-gradient(0deg,rgba(10,6,0,0.95),transparent);display:flex;gap:12px;justify-content:center;">
-    <button onclick="showBloodline()" style="padding:12px 28px;background:#2a1a08;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;">配合</button>
-    <button onclick="startBattle(event)" style="padding:12px 28px;background:#4a1a1a;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;">合戦</button>
+    <button onclick="showBloodline()" style="padding:12px 28px;background:#2a1a08;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;font-family:inherit;font-size:14px;cursor:pointer;">配合</button>
+    <button onclick="startBattle()" style="padding:12px 28px;background:#4a1a1a;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;font-family:inherit;font-size:14px;cursor:pointer;">合戦</button>
   </div>
 </div>
 
 <script>
-// 色設定
+// ─── カラー定義 ───────────────────────────────────────────
 const COLOR_SETS = {
-  c_red:    { main:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444' },
-  c_blue:   { main:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc' },
-  c_pink:   { main:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc' }
+  c_red:  { main:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', armor:'#6a1010' },
+  c_blue: { main:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', armor:'#0a2a4a' },
+  c_pink: { main:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', armor:'#6a1050' }
 };
 
-// 本格SVG + 歩行アニメ
+// ─── SVG武将生成 ──────────────────────────────────────────
 function makeSVG(jobId, colorKey, walkStep) {
   const c = COLOR_SETS[colorKey] || COLOR_SETS['c_red'];
   const s = walkStep % 4;
-  let legL = 0, legR = 0, armL = 0, armR = 0;
 
   if (jobId === 'bukan') {
-    legL = s===0 ? -18 : s===1 ? -6 : s===2 ? 18 : 6;
-    legR = -legL;
-    armL = s===0 ? 20 : s===1 ? 6 : s===2 ? -20 : -6;
-    armR = -armL;
-    return `<svg width="34" height="70" viewBox="0 0 34 70">
-      <ellipse cx="17" cy="12" rx="9" ry="7" fill="${c.main}"/>
-      <ellipse cx="17" cy="22" rx="8" ry="9" fill="${c.skin}"/>
-      <rect x="9" y="30" width="16" height="18" rx="2" fill="${c.main}"/>
-      <rect x="3" y="31" width="6" height="14" rx="3" fill="\( {c.main}" transform="rotate( \){armL},6,31)"/>
-      <rect x="25" y="31" width="6" height="14" rx="3" fill="\( {c.main}" transform="rotate( \){armR},28,31)"/>
-      <rect x="10" y="50" width="7" height="16" rx="3" fill="\( {c.sub}" transform="rotate( \){legL},13,50)"/>
-      <rect x="17" y="50" width="7" height="16" rx="3" fill="\( {c.sub}" transform="rotate( \){legR},20,50)"/>
+    // 武官（武士）: 歩行アニメ付き
+    const legLAngle = ['-18', '-6', '18', '6'][s];
+    const legRAngle = [' 18', '  6', '-18', '-6'][s];
+    const armLAngle = [' 20', '  6', '-20', '-6'][s];
+    const armRAngle = ['-20', ' -6', ' 20', '  6'][s];
+
+    return `<svg width="36" height="72" viewBox="0 0 36 72" xmlns="http://www.w3.org/2000/svg">
+      <!-- 兜 -->
+      <ellipse cx="18" cy="11" rx="10" ry="8" fill="${c.main}"/>
+      <rect x="10" y="10" width="16" height="5" rx="1" fill="${c.armor}"/>
+      <line x1="18" y1="3" x2="18" y2="0" stroke="${c.acc}" stroke-width="2"/>
+      <polygon points="18,0 23,5 13,5" fill="${c.acc}" opacity="0.9"/>
+      <!-- 顔 -->
+      <ellipse cx="18" cy="22" rx="8" ry="9" fill="${c.skin}"/>
+      <circle cx="14" cy="21" r="1.5" fill="#5a3a1a"/>
+      <circle cx="22" cy="21" r="1.5" fill="#5a3a1a"/>
+      <!-- 胴鎧 -->
+      <rect x="10" y="30" width="16" height="20" rx="2" fill="${c.main}"/>
+      <rect x="11" y="32" width="14" height="16" rx="1" fill="${c.armor}" opacity="0.6"/>
+      <!-- 左腕 -->
+      <g transform="rotate(${armLAngle}, 8, 32)">
+        <rect x="4" y="30" width="6" height="15" rx="3" fill="${c.main}"/>
+        <rect x="5" y="43" width="4" height="5" rx="2" fill="${c.skin}"/>
+      </g>
+      <!-- 右腕 -->
+      <g transform="rotate(${armRAngle}, 28, 32)">
+        <rect x="26" y="30" width="6" height="15" rx="3" fill="${c.main}"/>
+        <rect x="27" y="43" width="4" height="5" rx="2" fill="${c.skin}"/>
+        <!-- 刀 -->
+        <line x1="30" y1="38" x2="36" y2="22" stroke="#c8c8c8" stroke-width="1.5"/>
+        <rect x="29" y="37" width="3" height="4" rx="1" fill="${c.acc}"/>
+      </g>
+      <!-- 左脚 -->
+      <g transform="rotate(${legLAngle}, 14, 50)">
+        <rect x="11" y="49" width="7" height="18" rx="3" fill="${c.sub}"/>
+        <rect x="11" y="65" width="8" height="5" rx="2" fill="${c.main}"/>
+      </g>
+      <!-- 右脚 -->
+      <g transform="rotate(${legRAngle}, 22, 50)">
+        <rect x="18" y="49" width="7" height="18" rx="3" fill="${c.sub}"/>
+        <rect x="17" y="65" width="8" height="5" rx="2" fill="${c.main}"/>
+      </g>
+    </svg>`;
+
+  } else if (jobId === 'hime') {
+    // 姫: 優雅な歩行
+    const bodyShift = [0, 1, 0, -1][s];
+    return `<svg width="34" height="72" viewBox="0 0 34 72" xmlns="http://www.w3.org/2000/svg">
+      <!-- 髪飾り -->
+      <circle cx="12" cy="10" r="3" fill="${c.acc}" opacity="0.9"/>
+      <circle cx="17" cy="7"  r="3" fill="${c.acc}" opacity="0.9"/>
+      <circle cx="22" cy="10" r="3" fill="${c.acc}" opacity="0.9"/>
+      <!-- 髪 -->
+      <ellipse cx="17" cy="14" rx="9" ry="8" fill="#1a0a00"/>
+      <rect x="13" y="18" width="4" height="20" rx="2" fill="#1a0a00"/>
+      <rect x="17" y="18" width="4" height="20" rx="2" fill="#1a0a00"/>
+      <!-- 顔 -->
+      <ellipse cx="17" cy="20" rx="7" ry="8" fill="${c.skin}"/>
+      <circle cx="14" cy="19" r="1.2" fill="#8b3060"/>
+      <circle cx="20" cy="19" r="1.2" fill="#8b3060"/>
+      <ellipse cx="17" cy="24" rx="2.5" ry="1.2" fill="#ff9090" opacity="0.7"/>
+      <!-- 着物 -->
+      <g transform="translate(0,${bodyShift})">
+        <polygon points="8,28 26,28 30,72 4,72" fill="${c.main}"/>
+        <polygon points="11,28 23,28 24,50 10,50" fill="${c.sub}" opacity="0.7"/>
+        <!-- 袖 -->
+        <ellipse cx="6"  cy="36" rx="5" ry="10" fill="${c.main}" transform="rotate(-15,6,36)"/>
+        <ellipse cx="28" cy="36" rx="5" ry="10" fill="${c.main}" transform="rotate(15,28,36)"/>
+        <!-- 帯 -->
+        <rect x="9" y="40" width="16" height="8" rx="1" fill="${c.acc}" opacity="0.8"/>
+      </g>
+    </svg>`;
+
+  } else {
+    // 文官
+    return `<svg width="34" height="72" viewBox="0 0 34 72" xmlns="http://www.w3.org/2000/svg">
+      <!-- 烏帽子 -->
+      <polygon points="17,2 22,18 12,18" fill="#2a1a08"/>
+      <rect x="10" y="16" width="14" height="4" rx="1" fill="#1a0a00"/>
+      <!-- 顔 -->
+      <ellipse cx="17" cy="26" rx="8" ry="9" fill="${c.skin}"/>
+      <!-- 束帯 -->
+      <rect x="9" y="34" width="16" height="30" rx="2" fill="${c.main}"/>
+      <rect x="10" y="36" width="14" height="8"  rx="1" fill="${c.sub}" opacity="0.7"/>
+      <rect x="12" y="46" width="10" height="16" rx="1" fill="${c.sub}" opacity="0.5"/>
+      <!-- 笏 -->
+      <rect x="24" y="32" width="3" height="20" rx="1" fill="#c8a850"/>
+      <!-- 袖 -->
+      <ellipse cx="6"  cy="42" rx="5" ry="10" fill="${c.main}"/>
+      <ellipse cx="28" cy="42" rx="5" ry="10" fill="${c.main}"/>
     </svg>`;
   }
-  return `<svg width="34" height="70" viewBox="0 0 34 70"><ellipse cx="17" cy="22" rx="8" ry="9" fill="\( {c.skin}"/><rect x="9" y="30" width="16" height="18" rx="2" fill=" \){c.main}"/></svg>`;
 }
 
+// ─── ゲーム状態 ───────────────────────────────────────────
 let warriors = [];
 let currentHouseHead = null;
+let animTimer = null;
 
 class Warrior {
-  constructor(name, jobId, power, left) {
-    this.def = { name, jobId, power, color: jobId === 'hime' ? 'c_pink' : 'c_red' };
+  constructor(name, jobId, power, leftPx) {
+    this.def = {
+      name, jobId, power,
+      color: jobId === 'hime' ? 'c_pink' : jobId === 'bunkan' ? 'c_blue' : 'c_red'
+    };
+    this.walkFrame = 0;
+    this.frameCount = 0;
+
     this.el = document.createElement('div');
     this.el.className = 'warrior';
-    this.el.style.left = left + 'px';
-    this.walkFrame = 0;
-    this.frameTimer = 0;
-    this.state = 'idle';
-    this.updateSVG();
+    this.el.style.left = leftPx + 'px';
+
+    this.svgEl = document.createElement('div');
+    this.nameEl = document.createElement('div');
+    this.nameEl.className = 'warrior-name';
+    this.nameEl.textContent = name;
+
+    this.el.appendChild(this.svgEl);
+    this.el.appendChild(this.nameEl);
     document.getElementById('castle-field').appendChild(this.el);
+
     warriors.push(this);
+    this.render();
   }
 
-  updateSVG() {
-    this.el.innerHTML = `
-      <div>${makeSVG(this.def.jobId, this.def.color, this.walkFrame)}</div>
-      <div style="font-size:11px;color:var(--gold-light);margin-top:4px;">${this.def.name}</div>
-    `;
+  render() {
+    this.svgEl.innerHTML = makeSVG(this.def.jobId, this.def.color, this.walkFrame);
   }
 
-  update() {
-    this.frameTimer++;
-    if (this.frameTimer > 8) {
-      this.frameTimer = 0;
+  tick() {
+    this.frameCount++;
+    if (this.frameCount >= 10) {
+      this.frameCount = 0;
       this.walkFrame = (this.walkFrame + 1) % 4;
-      this.updateSVG();
+      this.render();
     }
   }
 }
 
+// ─── 初期化 ───────────────────────────────────────────────
 function initGame() {
+  // 既存の武将を除去
+  warriors.forEach(w => w.el.remove());
   warriors = [];
-  const field = document.getElementById('castle-field');
-  field.innerHTML = `<div id="castle-base"><div id="castle-name">安土城</div></div>`;
+  if (animTimer) clearInterval(animTimer);
 
-  new Warrior('織田 信廣', 'bukan', 88, 80);
-  new Warrior('お 市', 'hime', 72, 210);
-  new Warrior('明智 光忠', 'bunkan', 65, 340);
+  new Warrior('織田 信廣', 'bukan',   88, 60);
+  new Warrior('お 市',    'hime',    72, 180);
+  new Warrior('明智 光忠', 'bunkan',  65, 300);
 
   currentHouseHead = { warrior: warriors[0], familyName: '織田' };
 
-  // アニメーションループ
-  setInterval(() => {
-    warriors.forEach(w => w.update());
+  // アニメーションループ (60fps相当)
+  animTimer = setInterval(() => {
+    warriors.forEach(w => w.tick());
   }, 60);
 }
 
-// 合戦画面（変更なし）
+// ─── 合戦 ─────────────────────────────────────────────────
 function showBattleScreen() {
   document.getElementById('battle-screen').classList.add('show');
-  document.getElementById('battle-family').textContent = `${currentHouseHead.familyName}軍`;
+  document.getElementById('battle-family').textContent =
+    (currentHouseHead ? currentHouseHead.familyName : '織田') + '軍 出陣';
 
-  document.getElementById('our-warriors').innerHTML = warriors.map(w => 
-    `<span class="warrior-icon">${w.def.jobId === 'bukan' ? '⚔️' : '🌸'}</span>`
-  ).join('');
+  document.getElementById('our-warriors').innerHTML =
+    warriors.map(w => `<span class="warrior-icon">${w.def.jobId === 'hime' ? '🌸' : '⚔️'}</span>`).join('');
 
-  document.getElementById('enemy-warriors').innerHTML = `<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>`;
-  document.getElementById('battle-log').innerHTML = '<div class="log-line ally">敵軍が城に迫っています！</div>';
+  document.getElementById('enemy-warriors').innerHTML =
+    '<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>';
+
+  document.getElementById('battle-log').innerHTML =
+    '<div class="log-line ally">敵軍が城に迫っています！</div>';
 }
 
 window.startBattleSimulation = function() {
   const log = document.getElementById('battle-log');
-  log.innerHTML += '<div class="log-line ally">織田信廣が先陣を切った！</div>';
-  setTimeout(() => log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！</div>', 1400);
+  const name = currentHouseHead ? currentHouseHead.warrior.def.name : '武将';
+  log.innerHTML += `<div class="log-line ally">${name}が先陣を切った！</div>`;
+  setTimeout(() => {
+    log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
+    log.scrollTop = log.scrollHeight;
+  }, 1400);
 };
 
 window.endBattle = function() {
@@ -286,7 +410,7 @@ window.startBattle = function() {
 };
 
 window.showBloodline = function() {
-  alert("配合機能は現在開発中です");
+  alert('配合機能は現在開発中です');
 };
 
 window.onload = initGame;
