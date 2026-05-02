@@ -1151,3 +1151,119 @@ window.showHistory = function() {
 
   alert(text);
 };
+
+<div id="history-modal" class="modal">
+  <div class="modal-content" style="max-height:80%;overflow:hidden;display:flex;flex-direction:column;">
+    
+    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
+    
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;">戦国記録</h2>
+
+    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;"></div>
+
+    <button onclick="closeHistory()" style="margin-top:10px;padding:12px;background:var(--gold);border:none;border-radius:10px;font-weight:700;">
+      閉じる
+    </button>
+  </div>
+</div>
+
+// =====================
+// 歴史システム強化
+// =====================
+
+function addLog(text, type = "normal") {
+  gameLog.push({
+    text,
+    type,
+    time: `${gameTime.year}年${gameTime.month}月`
+  });
+
+  if (gameLog.length > 50) gameLog.shift();
+}
+
+// 表示
+window.showHistory = function() {
+  const modal = document.getElementById("history-modal");
+  const list = document.getElementById("history-list");
+
+  if (!gameLog.length) {
+    list.innerHTML = "<div>まだ歴史は刻まれていない…</div>";
+  } else {
+    list.innerHTML = gameLog.slice().reverse().map(log => {
+      let color = "#ddd";
+      if (log.type === "awakening") color = "#ff6666";
+      if (log.type === "betrayal") color = "#ff2222";
+      if (log.type === "success") color = "#ffcc66";
+
+      return `<div style="margin-bottom:6px;color:${color}">
+        【${log.time}】 ${log.text}
+      </div>`;
+    }).join("");
+  }
+
+  modal.style.display = "flex";
+};
+
+function closeHistory() {
+  document.getElementById("history-modal").style.display = "none";
+}
+
+function triggerEvent() {
+  if (Math.random() > 0.35) return;
+
+  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
+  if (!w) return;
+
+  const roll = Math.random();
+
+  if (roll < 0.15) {
+    const up = 10 + Math.floor(Math.random() * 10);
+    w.stats.power += up;
+    createFloatText(w, `覚醒 +${up}`, "#ff4444");
+    addLog(`${w.name}が覚醒した！`, "awakening");
+  }
+
+  else if (roll < 0.25) {
+    w.stats.loyalty -= 30;
+    createFloatText(w, "裏切り兆候", "#ff0000");
+    addLog(`${w.name}に裏切りの兆し…`, "betrayal");
+  }
+
+  else if (roll < 0.5) {
+    const gain = 500 + Math.floor(Math.random() * 500);
+    state.koku += gain;
+    addLog(`内政大成功！ +${gain}石`, "success");
+  }
+
+  else {
+    w.stats.power += 3;
+    createFloatText(w, "+3", "#ffdd88");
+    addLog(`${w.name}が成長した`);
+  }
+
+  updateStatusUI();
+  updatePartyRow();
+}
+
+window.upgradeFacility = function(key, cost) {
+  if (state.koku < cost) {
+    alert('国力が不足しています！');
+    return;
+  }
+
+  state.koku -= cost;
+  state.facilities[key]++;
+
+  // 爆発的演出
+  gWarriors.forEach(w => {
+    const boost = Math.floor(2 + Math.random() * 4);
+    w.stats.power += boost;
+    createFloatText(w, `施設+${boost}`, "#ffdd88");
+  });
+
+  addLog("施設が発展した！", "success");
+
+  updateStatusUI();
+  updatePartyRow();
+  renderFacilities();
+};
