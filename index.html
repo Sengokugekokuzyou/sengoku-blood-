@@ -1,1401 +1,193 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>æˆ¦å›½è¡€è„ˆ ã€œè¦‡é“ã®ç³»è­œã€œ</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
-:root{--gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);--parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.85);}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
-#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
-.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
-@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
-.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none;}
-.mist:nth-child(1){height:55px;top:30%;animation-duration:32s;}
-.mist:nth-child(2){height:70px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
-.mist:nth-child(3){height:45px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
-@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
-.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
-@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
-#main{position:relative;z-index:10;width:100%;height:100%;display:flex;flex-direction:column;}
-#header{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-#game-title{color:var(--gold);font-size:clamp(15px,4.8vw,20px);font-weight:900;letter-spacing:.3em;text-shadow:0 0 20px rgba(200,150,12,.75);line-height:1.5;}
-#game-title .sub{display:block;font-size:clamp(8px,2vw,10px);letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;}
-#status-panel{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-.stat-chip{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--gold-d);border-radius:20px;padding:4px 11px;}
-.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}.sv{font-size:14px;font-weight:700;color:var(--gold-l);}.su{font-size:9px;color:var(--gold-d);}
-#time-display{position:absolute;top:max(env(safe-area-inset-top,0px),8px);left:12px;font-size:11px;color:var(--gold);opacity:.8;z-index:20;pointer-events:none;}
-#iso-field{flex:1;position:relative;overflow:hidden;min-height:0;}
-#iso-canvas{position:absolute;bottom:0;left:50%;transform:translateX(-50%);}
-#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
-.facility-activity{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;color:#ffdd88;pointer-events:none;text-shadow:0 1px 4px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop 0.3s ease-out;}
-@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
-.relation-label{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;pointer-events:none;text-shadow:0 1px 4px #000;animation:fadeInOut 2.5s ease-in-out forwards;}
-@keyframes fadeInOut{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
-#bottom-ui{flex-shrink:0;padding:0 12px max(env(safe-area-inset-bottom,0px),12px);background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);}
-#nation-bar{display:flex;align-items:center;gap:8px;padding:8px 4px 5px;border-bottom:1px solid rgba(200,150,12,.15);}
-.nl{font-size:9px;color:var(--gold-d);letter-spacing:.2em;white-space:nowrap;}
-.nt{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
-.nf{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
-.np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
-#party-row{display:flex;gap:7px;padding:6px 0 5px;overflow-x:auto;scrollbar-width:none;}
-#party-row::-webkit-scrollbar{display:none;}
-.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:56px;cursor:pointer;transition:border-color .2s,background .2s;}
-.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
-.party-card:active{background:rgba(200,150,12,.15);}
-.pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}.pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
-.pc-pow{font-size:9px;color:#ffaa44;}.pc-loc{font-size:8px;color:#aaddff;margin-top:1px;}.pc-rel{font-size:8px;color:#88ffaa;}
-#action-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:5px 0 3px;}
-.act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;padding:10px 4px 8px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;}
-.act-btn:active{transform:scale(.92);background:rgba(200,150,12,.14);border-color:var(--gold);}
-.act-btn .ico{font-size:21px;line-height:1;}.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
-.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.4);}.act-btn.primary .lbl{color:var(--gold-l);}
-#battle-screen{position:fixed;inset:0;z-index:500;background:linear-gradient(#060200,#180f00);display:none;flex-direction:column;color:var(--parchment);}
-#battle-screen.show{display:flex;}
-.bh{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;}
-.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
-.bf{flex:1;min-height:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;}
-.army{text-align:center;width:42%;}.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
-.our-army .army-title{color:#ffdd88;}.enemy-army .army-title{color:#ff8888;}
-.wi{font-size:clamp(34px,10vw,50px);margin:5px 4px;display:inline-block;filter:drop-shadow(0 4px 12px #000);}
-.blog{flex-shrink:0;height:165px;background:rgba(6,3,0,.97);border-top:2px solid var(--gold);padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;}
-.ll{margin:3px 0;}.ll.ally{color:#bbffbb;}
-.bfooter{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);background:rgba(0,0,0,.9);display:flex;gap:10px;}
-.bbtn{flex:1;padding:15px 8px;font-size:15px;font-weight:700;background:linear-gradient(#5a2a0a,#2a1800);border:1px solid var(--gold);color:var(--parchment);cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;}
-.bbtn:active{filter:brightness(1.3);}
-.modal{position:fixed;inset:0;z-index:700;background:rgba(8,4,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;}
-.modal-content{position:relative;background:var(--panel);width:92%;max-width:420px;border:3px solid var(--gold);border-radius:16px;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6);}
-.bl-badge{display:inline-block;font-size:9px;padding:1px 5px;border-radius:10px;font-weight:700;vertical-align:middle;margin-left:3px;}
-.bl-pure{background:rgba(255,100,100,.25);color:#ffaaaa;border:1px solid rgba(255,100,100,.4);}
-.bl-mix {background:rgba(100,180,255,.2);color:#aaddff;border:1px solid rgba(100,180,255,.35);}
-.bl-deep{background:rgba(200,150,12,.25);color:var(--gold-l);border:1px solid var(--gold-d);}
-.bt-node{text-align:center;padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.5;min-width:80px;}
-.bt-node.gen1{background:rgba(200,150,12,.18);border:2px solid var(--gold);}
-.bt-node.gen2{background:rgba(255,255,255,.07);border:1px solid rgba(200,150,12,.3);}
-.bt-node.gen3{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.15);font-size:10px;}
-.bt-node .bn{font-weight:700;color:var(--parchment);}
-.bt-node .bc-name{font-size:9px;color:var(--gold-d);}
-.bt-bonus-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.bt-bonus{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戦国血脈 - 武将詳細</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #d1b891; /* ゴールド系の文字 */
+            font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .busho-detail-popup {
+            background-color: #111; /* 黒に近い背景 */
+            border: 3px solid #ffcc00; /* 派手なゴールド枠 */
+            border-radius: 15px;
+            width: 340px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #ffcc00;
+            cursor: pointer;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .busho-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .busho-meta {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .status-block {
+            background-color: #222; /* 濃いグレー背景 */
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .status-item {
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .skill-block, .relationship-block, .bloodline-block {
+            border: 1px solid #444; /* 薄い枠 */
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .skill-list {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .skill-item {
+            margin: 0 5px;
+        }
+
+        .bloodline-pair {
+            font-size: 18px;
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .pedigree-btn {
+            background-color: #ffcc00;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
+
+        .relationship-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #eee;
+        }
+
+        .relationship-value {
+            color: #44ee44; /* 緑の文字 */
+        }
+
+        .back-btn {
+            background-color: #ffcc00; /* ゴールド背景 */
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
+
+    </style>
 </head>
 <body>
-<div id="sky"></div>
-<div class="star" style="left:6%;top:4%;width:2px;height:2px;animation-duration:3.1s;"></div>
-<div class="star" style="left:19%;top:8%;width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
-<div class="star" style="left:33%;top:3%;width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
-<div class="star" style="left:52%;top:6%;width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
-<div class="star" style="left:68%;top:2%;width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
-<div class="star" style="left:82%;top:7%;width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
-<div class="star" style="left:91%;top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
-<div class="mist"></div><div class="mist"></div><div class="mist"></div>
-<div class="petal" style="left:3%;width:7px;height:7px;animation-duration:8.2s;"></div>
-<div class="petal" style="left:14%;width:5px;height:5px;animation-duration:10.5s;animation-delay:-2.8s;"></div>
-<div class="petal" style="left:28%;width:8px;height:8px;animation-duration:9.1s;animation-delay:-5.5s;"></div>
-<div class="petal" style="left:47%;width:6px;height:6px;animation-duration:13.2s;animation-delay:-1.2s;"></div>
-<div class="petal" style="left:61%;width:5px;height:5px;animation-duration:10.8s;animation-delay:-4.2s;"></div>
-<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;animation-delay:-7.1s;"></div>
-<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s;animation-delay:-2.4s;"></div>
-<div id="time-display">ç¬¬1å¹´ 1æœˆ 1æ—¥</div>
 
-<!-- åˆæˆ¦ç”»é¢ -->
-<div id="battle-screen">
-  <div class="bh"><div class="bt" id="battle-family">ç¹”ç”°è» å‡ºé™£</div><div class="bc" onclick="endBattle()">âœ•</div></div>
-  <div class="bf">
-    <div class="army our-army"><div class="army-title">æˆ‘ãŒè»</div><div id="our-warriors"></div></div>
-    <div style="font-size:clamp(30px,9vw,42px);color:var(--gold);align-self:center;margin-top:-40px;font-weight:900;">VS</div>
-    <div class="army enemy-army"><div class="army-title">æ•µè»</div><div id="enemy-warriors"></div></div>
-  </div>
-  <div class="blog" id="battle-log"></div>
-  <div class="bfooter">
-    <button class="bbtn" onclick="startBattleSimulation()">âš” æˆ¦é—˜é–‹å§‹</button>
-    <button class="bbtn" onclick="endBattle()" style="background:linear-gradient(#4a1010,#180606);">æ’¤é€€</button>
-  </div>
-</div>
+<div class="busho-detail-popup">
+    <div class="close-btn">×</div>
+    
+    <div class="header">
+        <div class="busho-name">明智 光忠</div>
+        <div class="busho-meta">文官 Lv.15 | 〇〇歳</div>
+    </div>
 
-<!-- è¡€çµ±ãƒ¢ãƒ¼ãƒ€ãƒ« -->
-<div id="bloodline-modal" class="modal">
-  <div class="modal-content" style="max-height:88vh;overflow:hidden;display:flex;flex-direction:column;max-width:460px;">
-    <div onclick="closeBloodlineModal()" style="position:absolute;top:14px;right:20px;font-size:28px;cursor:pointer;color:var(--gold);z-index:1;">âœ•</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:4px;font-size:19px;letter-spacing:.15em;">è¡€è„ˆ â”€ ç¸çµ„</h2>
-    <div id="bl-tabs" style="display:flex;gap:6px;margin-bottom:12px;">
-      <button id="bl-tab-tree"  onclick="blTab('tree')"  style="flex:1;padding:7px;border:1px solid var(--gold);background:rgba(200,150,12,.2);color:var(--gold-l);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">ðŸŒ³ è¡€çµ±ãƒ„ãƒªãƒ¼</button>
-      <button id="bl-tab-marry" onclick="blTab('marry')" style="flex:1;padding:7px;border:1px solid rgba(200,150,12,.3);background:transparent;color:var(--parchment);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">ðŸŒ¸ ç¸çµ„ã‚’çµã¶</button>
+    <div class="status-block">
+        <div class="status-item">武力 257</div>
+        <div class="status-item">知力 99</div>
+        <div class="status-item">統率 180</div>
     </div>
-    <div id="bl-panel-tree" style="flex:1;overflow-y:auto;">
-      <div id="bl-warrior-select" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
-      <div id="bl-tree-view"></div>
-    </div>
-    <div id="bl-panel-marry" style="flex:1;overflow-y:auto;display:none;">
-      <div style="font-size:12px;color:rgba(245,232,200,.6);margin-bottom:10px;text-align:center;">çˆ¶æ–¹ãƒ»æ¯æ–¹ã‚’é¸ã‚“ã§æ¬¡ä¸–ä»£ã‚’èª•ç”Ÿã•ã›ã¾ã™</div>
-      <div style="display:flex;gap:10px;margin-bottom:12px;">
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">çˆ¶ï¼ˆæ­¦å®˜ï¼‰</div>
-          <div id="father-select"></div>
+
+    <div class="section-title">所持スキル</div>
+    <div class="skill-block">
+        <div class="skill-list">
+            <span class="skill-item">・外交術</span>
+            <span class="skill-item">・和歌</span>
+            <span class="skill-item">・建築</span>
         </div>
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">æ¯ï¼ˆå§«ï¼‰</div>
-          <div id="mother-select"></div>
+    </div>
+
+    <div class="section-title">血統 (父 × 母)</div>
+    <div class="bloodline-block">
+        <div class="bloodline-pair">
+            織田信長 × 濃姫(齋藤)
         </div>
-      </div>
-      <div id="bl-preview" style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:12px;margin-bottom:12px;min-height:60px;"></div>
-      <button onclick="doMarriage()" style="width:100%;padding:13px;background:linear-gradient(#8b0000,#5a0000);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">ç¸ã‚’çµã¶ ã€œ èª•ç”Ÿ</button>
+        <button class="pedigree-btn">家系図の系譜を表示</button>
     </div>
-    <button onclick="closeBloodlineModal()" style="margin-top:10px;padding:10px;background:rgba(100,60,0,.4);color:var(--parchment);border:1px solid var(--gold-d);border-radius:10px;font-size:13px;cursor:pointer;">é–‰ã˜ã‚‹</button>
-  </div>
-</div>
 
-<!-- æ­¦å°†ãƒ¢ãƒ¼ãƒ€ãƒ« -->
-<div id="warrior-modal" class="modal">
-  <div class="modal-content">
-    <div onclick="closeWarriorModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">âœ•</div>
-    <div id="modal-warrior-name" style="font-size:22px;font-weight:900;color:var(--gold-l);text-align:center;margin-bottom:10px;"></div>
-    <div id="modal-stats" style="background:rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;font-size:14px;line-height:1.7;text-align:center;"></div>
-    <div id="modal-relations" style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.8;"></div>
-    <div style="margin-bottom:20px;">
-      <div onclick="talkToWarrior(currentModalIndex,'encourage')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:8px;"><span>æ¿€åŠ±ã™ã‚‹</span><span style="color:#88ff88;font-weight:700;">+å¿ èª </span></div>
-      <div onclick="talkToWarrior(currentModalIndex,'train')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:8px;"><span>è¨“ç·´ã™ã‚‹</span><span style="color:#ffcc66;font-weight:700;">+æ­¦åŠ›</span></div>
-      <div onclick="talkToWarrior(currentModalIndex,'teach')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;"><span>æ•™ãˆã‚’è«‹ã†</span><span style="color:#aaddff;font-weight:700;">+çŸ¥åŠ›</span></div>
-    </div>
-    <button onclick="closeWarriorModal()" style="width:100%;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:15px;">åŸŽã«æˆ»ã‚‹</button>
-  </div>
-</div>
-
-<!-- å†…æ”¿ãƒ¢ãƒ¼ãƒ€ãƒ« -->
-<div id="dev-modal" class="modal">
-  <div class="modal-content">
-    <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">âœ•</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:14px;font-size:20px;letter-spacing:.15em;">å†…æ”¿ â”€ æ–½è¨­æ•´å‚™</h2>
-    <div id="facilities-list" style="max-height:360px;overflow-y:auto;"></div>
-    <button onclick="closeDevModal()" style="margin-top:16px;width:100%;padding:12px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">é–‰ã˜ã‚‹</button>
-  </div>
-</div>
-
-<!-- æ­´å²ãƒ¢ãƒ¼ãƒ€ãƒ« -->
-<div id="history-modal" class="modal">
-  <div class="modal-content" style="max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">
-    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">âœ•</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;font-size:20px;letter-spacing:.15em;">æˆ¦å›½è¨˜éŒ²</h2>
-    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;padding-right:4px;"></div>
-    <button onclick="closeHistory()" style="margin-top:14px;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:14px;cursor:pointer;">é–‰ã˜ã‚‹</button>
-  </div>
-</div>
-
-<div id="main">
-  <div id="header">
-    <div id="game-title">æˆ¦å›½è¡€è„ˆ<span class="sub">ã€œ è¦‡é“ã®ç³»è­œ ã€œ</span></div>
-    <div id="status-panel">
-      <div class="stat-chip"><span class="sl">å¤©ä¸‹çµ±ä¸€</span><span class="sv" id="unification-pct">12</span><span class="su">%</span></div>
-      <div class="stat-chip"><span class="sl">ç¬¬</span><span class="sv" id="gen-num">1</span><span class="su">ä¸–ä»£</span></div>
-    </div>
-  </div>
-  <div id="iso-field">
-    <canvas id="iso-canvas"></canvas>
-    <div id="bubble-layer"></div>
-  </div>
-  <div id="bottom-ui">
-    <div id="nation-bar">
-      <span class="nl">å›½åŠ›</span>
-      <div class="nt"><div class="nf" id="nfill" style="width:42%"></div></div>
-      <span class="np" id="koku-display">4,200</span><span class="nl" style="margin-left:1px">çŸ³</span>
-    </div>
-    <div id="party-row"></div>
-    <div id="action-row">
-      <button class="act-btn primary" onclick="startBattle()"><span class="ico">âš”ï¸</span><span class="lbl">åˆæˆ¦</span></button>
-      <button class="act-btn" onclick="showBloodline()"><span class="ico">ðŸŒ¸</span><span class="lbl">é…åˆ</span></button>
-      <button class="act-btn" onclick="showHistory()"><span class="ico">ðŸ“œ</span><span class="lbl">æ­´å²</span></button>
-      <button class="act-btn" onclick="showDev()"><span class="ico">ðŸ¯</span><span class="lbl">å†…æ”¿</span></button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Canvas ã‚¨ãƒ³ã‚¸ãƒ³
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const canvas = document.getElementById('iso-canvas');
-const ctx    = canvas.getContext('2d');
-const TILE   = 44, ISO_ANG = Math.PI / 6;
-let CX, CY;
-
-function isoToScreen(tx,ty,tz){
-  return { x:(tx-ty)*Math.cos(ISO_ANG)*TILE, y:(tx+ty)*Math.sin(ISO_ANG)*TILE-tz*TILE*0.88 };
-}
-function toSX(tx,ty,tz){ const s=isoToScreen(tx,ty,tz); return CX+s.x; }
-function toSY(tx,ty,tz){ const s=isoToScreen(tx,ty,tz); return CY+s.y; }
-
-function resizeCanvas(){
-  const f=document.getElementById('iso-field');
-  canvas.width=f.clientWidth; canvas.height=f.clientHeight;
-  CX=canvas.width/2; CY=canvas.height*0.72;
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Canvas å¹ãå‡ºã—
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let canvasBubbles = [];
-
-function addCanvasBubble(warrior, text, duration=150){
-  canvasBubbles = canvasBubbles.filter(b => b.warrior !== warrior);
-  canvasBubbles.push({ warrior, text, life: duration, maxLife: duration, popT: 0 });
-}
-
-function tickCanvasBubbles(){
-  for(let i=canvasBubbles.length-1; i>=0; i--){
-    const b = canvasBubbles[i];
-    b.life--;
-    b.popT = Math.min(1, b.popT + 0.12);
-    if(b.life <= 0) canvasBubbles.splice(i,1);
-  }
-}
-
-function drawCanvasBubbles(){
-  for(const b of canvasBubbles){
-    const w = b.warrior;
-    if(!w.visible && w.state !== 'exiting') continue;
-    const H   = Math.round(canvas.height * 0.09);
-    const sx  = toSX(w.tileX+0.5, w.tileY+0.5, 0.25);
-    const sy  = toSY(w.tileX+0.5, w.tileY+0.5, 0.25);
-    const fadeRatio = b.life / b.maxLife;
-    const alpha = Math.min(1, fadeRatio * 3) * b.popT;
-    if(alpha <= 0) continue;
-    const scale = 0.6 + 0.4 * b.popT;
-    const bx  = sx;
-    const by  = sy - H * 1.55;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(bx, by);
-    ctx.scale(scale, scale);
-    ctx.translate(-bx, -by);
-    ctx.font = `bold 12px 'Noto Serif JP', serif`;
-    const tw  = ctx.measureText(b.text).width;
-    const pad = 8;
-    const bw  = tw + pad*2;
-    const bh  = 22;
-    const br  = 6;
-    const rx  = bx - bw/2;
-    const ry  = by - bh/2;
-    ctx.beginPath();
-    ctx.roundRect(rx, ry, bw, bh, br);
-    ctx.fillStyle   = 'rgba(245,232,178,0.96)';
-    ctx.fill();
-    ctx.strokeStyle = '#c8960c';
-    ctx.lineWidth   = 1.5;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(bx-5, ry+bh);
-    ctx.lineTo(bx+5, ry+bh);
-    ctx.lineTo(bx,   ry+bh+7);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(245,232,178,0.96)';
-    ctx.fill();
-    ctx.strokeStyle = '#c8960c';
-    ctx.lineWidth   = 1.5;
-    ctx.stroke();
-    ctx.fillStyle = '#2a1800';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(b.text, bx, by);
-    ctx.restore();
-  }
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æ–½è¨­ã‚¢ã‚¯ãƒ†ã‚£ãƒ“ãƒ†ã‚£ï¼ˆHTML overlayï¼‰
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const bubbleLayer = document.getElementById('bubble-layer');
-
-function showFacilityActivity(facKey, text, color){
-  const f = FACILITY_MAP[facKey];
-  const sx = toSX(f.x+0.5, f.y+0.5, 1.4);
-  const sy = toSY(f.x+0.5, f.y+0.5, 1.4);
-  const fR = document.getElementById('iso-field').getBoundingClientRect();
-  const cR = canvas.getBoundingClientRect();
-  const ox = cR.left-fR.left, oy = cR.top-fR.top;
-  const el = document.createElement('div');
-  el.className   = 'facility-activity';
-  el.textContent = text;
-  el.style.left  = (ox+sx)+'px';
-  el.style.top   = (oy+sy)+'px';
-  el.style.color = color||'#ffdd88';
-  bubbleLayer.appendChild(el);
-  setTimeout(()=>{
-    el.style.transition='opacity .5s,transform .5s';
-    el.style.opacity='0';
-    el.style.transform='translateX(-50%) translateY(-18px)';
-    setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},520);
-  },1800);
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æ–½è¨­ãƒ‡ãƒ¼ã‚¿
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const FACILITY_MAP = {
-  training:{ name:'è¨“ç·´å ´', icon:'âš”',  x:-3.8, y:-3.2, level:1, type:'power'   },
-  forge:   { name:'é›å†¶å ´', icon:'ðŸ”¥', x:-0.5, y:-3.8, level:1, type:'power'   },
-  academy: { name:'å­¦å•æ‰€', icon:'ðŸ“–', x: 2.8, y:-3.2, level:1, type:'wisdom'  },
-  tea:     { name:'èŒ¶å®¤',   icon:'ðŸµ', x:-3.8, y: 0.2, level:1, type:'social'  },
-  garden:  { name:'åº­åœ’',   icon:'ðŸŒ¸', x:-0.5, y: 2.8, level:1, type:'heal'    },
-  loyalty: { name:'å¿ èª æ®¿', icon:'ðŸŒŸ', x: 2.8, y: 2.8, level:1, type:'loyalty' },
-};
-const FACILITY_ENTRANCE = {
-  training:{ x:-3.2, y:-2.8 }, forge:  { x:-0.2, y:-3.2 }, academy:{ x: 2.5, y:-2.8 },
-  tea:     { x:-3.2, y: 0.4 }, garden: { x:-0.2, y: 2.5 }, loyalty:{ x: 2.5, y: 2.5 },
-};
-const FACILITY_EFFECT = {
-  training:{ stat:'power',   label:'æ­¦åŠ›', color:'#ffcc44', range:[4,9]  },
-  forge:   { stat:'power',   label:'æ­¦åŠ›', color:'#ffaa44', range:[3,7]  },
-  academy: { stat:'wisdom',  label:'çŸ¥åŠ›', color:'#aaddff', range:[4,8]  },
-  tea:     { stat:'loyalty', label:'å¿ èª ', color:'#88ffaa', range:[5,10] },
-  garden:  { stat:'loyalty', label:'å›žå¾©', color:'#ff88cc', range:[3,6]  },
-  loyalty: { stat:'loyalty', label:'å¿ èª ', color:'#ffdd88', range:[6,12] },
-};
-const FACILITY_SPEECH = {
-  training:['ã†ã‚Šã‚ƒãƒ¼ã£ï¼','ã‚‚ã£ã¨å¼·ãï¼','åƒæœ¬ç´ æŒ¯ã‚Šï¼','æ°—åˆã ï¼'],
-  forge:   ['ã„ã„åˆƒã â€¦','ç†±ã„â€¦','æ¥­ç‰©ã«ãªã‚‹ãž','æ‰“ã¡ç›´ã™ã‹'],
-  academy: ['ãµã‚€ãµã‚€â€¦','ãªã‚‹ã»ã©ï¼','å…µæ³•æ›¸ã‹','ã“ã‚Œã¯æ·±ã„'],
-  tea:     ['å¿ƒãŒå®‰ã‚‰ãâ€¦','ä¸€æœã©ã†ãž','é™ã‹ã˜ã‚ƒ','ã‚ˆã„èŒ¶ã '],
-  garden:  ['ç¾Žã—ã„â€¦','å¿ƒæ´—ã‚ã‚Œã‚‹','èŠ±ãŒå’²ã„ãŸ','è‹±æ°—ã‚’é¤Šã†'],
-  loyalty: ['ãŠé¤¨æ§˜ã®å¾¡ç‚ºã«ï¼','å‘½ã‚’æ§ã’ã‚“','å¿ ç¾©ã‚’å°½ãã™'],
-};
-const COST_BASE = { training:450, forge:380, academy:520, tea:310, garden:280, loyalty:680 };
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ã‚²ãƒ¼ãƒ çŠ¶æ…‹
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let state = { unification:12, genNum:1, koku:4200 };
-let gameTime = { year:1, month:1, day:1 };
-function updateTime(){
-  if(++gameTime.day>30){gameTime.day=1;gameTime.month++;}
-  if(gameTime.month>12){gameTime.month=1;gameTime.year++;}
-  document.getElementById('time-display').textContent=`ç¬¬${gameTime.year}å¹´ ${gameTime.month}æœˆ ${gameTime.day}æ—¥`;
-}
-let gameLog=[];
-function addLog(text,type='normal'){
-  gameLog.push({text,type,time:`${gameTime.year}å¹´${gameTime.month}æœˆ`});
-  if(gameLog.length>60)gameLog.shift();
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   é–¢ä¿‚ã‚·ã‚¹ãƒ†ãƒ 
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let relations={};
-function initRelations(ws){
-  relations={};
-  ws.forEach((_,i)=>ws.forEach((_,j)=>{
-    if(i===j)return;
-    const k=relKey(i,j);
-    if(relations[k]===undefined) relations[k]=Math.floor(-20+Math.random()*60);
-  }));
-}
-function relKey(i,j){return i<j?`${i}_${j}`:`${j}_${i}`;}
-function getRel(i,j){return relations[relKey(i,j)]??0;}
-function changeRel(i,j,d){const k=relKey(i,j);relations[k]=(relations[k]??0);relations[k]=Math.max(-100,Math.min(100,relations[k]+d));}
-function relLabel(v){if(v>=70)return'èŽ«é€†ã®å‹';if(v>=40)return'å‹å¥½';if(v>=10)return'æ™®é€š';if(v>=-20)return'ã‚„ã‚„å¯¾ç«‹';if(v>=-50)return'åç›®';return'å®¿æ•µ';}
-function relColor(v){if(v>=40)return'#88ffaa';if(v>=10)return'#aaddff';if(v>=-20)return'#ffdd88';return'#ff8888';}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ã‚»ãƒªãƒ•
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const SPEECHES={
-  bukan:{idle:['å‚ã‚Œï¼','ã†ã¬â€¦','å¤©ä¸‹ä¸€ï¼','é›ãˆã­ã°'],train:['æ­¦ã‚’ç£¨ãï¼','è¨“ç·´ã ï¼'],highLoyalty:['ã“ã®å‘½ã€æ®¿ã«ï¼'],lowLoyalty:['ã†ã¬â€¦','ä¸æº€ã˜ã‚ƒ'],friendly:['é ¼ã‚‚ã—ã„å¥´ã '],rival:['é‚ªé­”ã™ã‚‹ãªï¼'],levelUp:['æˆé•·ã—ãŸãžï¼']},
-  hime: {idle:['æ¡œã‚ˆæ•£ã‚Œ','é¢¨ãŒå„ªã—ã„','æœˆãŒç¶ºéº—'],train:['å¿ƒã‚’éŽ®ã‚ã‚ˆã†'],highLoyalty:['ãšã£ã¨ãã°ã«'],lowLoyalty:['æ‚²ã—ã„â€¦'],friendly:['ä»²è‰¯ãã—ã¾ã—ã‚‡'],rival:['å›°ã£ãŸæ–¹ã­â€¦'],levelUp:['ã¾ãŸå¼·ããªã£ãŸâ™ª']},
-  bunkan:{idle:['è¬€ç•¥ãŒè¦ã‚‹','ç®—æ®µé€šã‚Š'],train:['æ›¸ã‚’èª­ã¾ã­ã°'],highLoyalty:['æ®¿ã®å¾¡ç‚ºã«'],lowLoyalty:['å†è€ƒã®ä½™åœ°ã‚ã‚Š'],friendly:['è‰¯ã„åˆ¤æ–­ã '],rival:['æµ…æ…®ãªè¼©ã‚'],levelUp:['çŸ¥ã‚’æ¥µã‚ãŸ']},
-};
-function getSpeech(w,sit){const p=SPEECHES[w.jobId]||SPEECHES.bukan;const a=p[sit]||p.idle;return a[Math.floor(Math.random()*a.length)];}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æµ®éŠãƒ†ã‚­ã‚¹ãƒˆï¼ˆcanvasï¼‰
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let floatingTexts=[];
-function createFloatText(warrior,text,color){
-  if(!warrior)return;
-  floatingTexts.push({
-    sx: toSX(warrior.tileX+0.5,warrior.tileY+0.5,1.2)+(Math.random()*24-12),
-    sy: toSY(warrior.tileX+0.5,warrior.tileY+0.5,1.2)-20,
-    text, color:color||'#ffdd88', vy:-1.4-Math.random()*0.7, life:60, alpha:1
-  });
-}
-function drawFloatingTexts(){
-  for(let i=floatingTexts.length-1;i>=0;i--){
-    const f=floatingTexts[i];
-    f.sy+=f.vy; f.vy*=0.975; f.life--; f.alpha=(f.life/60)*0.9;
-    if(f.life<=0){floatingTexts.splice(i,1);continue;}
-    ctx.save();
-    ctx.globalAlpha=f.alpha;
-    ctx.shadowColor='#000';ctx.shadowBlur=8;
-    ctx.font=`bold ${Math.round(16+f.life/10)}px 'Noto Serif JP',serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle=f.color;
-    ctx.fillText(f.text,f.sx,f.sy);
-    ctx.restore();
-  }
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æç”»ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function drawBox(tx,ty,tz,w,d,h,cT,cL,cR2){
-  const p=(x,y,z)=>[toSX(x,y,z),toSY(x,y,z)];
-  const[ax,ay]=p(tx,ty,tz+h),  [bx,by]=p(tx+w,ty,tz+h);
-  const[cx2,cy2]=p(tx+w,ty+d,tz+h),[dx,dy]=p(tx,ty+d,tz+h);
-  const[ex,ey]=p(tx,ty,tz),    [fx,fy]=p(tx+w,ty,tz);
-  const[gx,gy]=p(tx+w,ty+d,tz),[hx,hy]=p(tx,ty+d,tz);
-  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.fillStyle=cT;ctx.fill();
-  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.fillStyle=cL;ctx.fill();
-  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle=cR2;ctx.fill();
-  ctx.strokeStyle='rgba(0,0,0,.32)';ctx.lineWidth=0.5;
-  [[[ax,ay],[bx,by],[cx2,cy2],[dx,dy]],[[ax,ay],[ex,ey],[hx,hy],[dx,dy]],[[bx,by],[fx,fy],[gx,gy],[cx2,cy2]]].forEach(pts=>{
-    ctx.beginPath();pts.forEach(([px,py],i)=>i?ctx.lineTo(px,py):ctx.moveTo(px,py));ctx.closePath();ctx.stroke();
-  });
-}
-function drawRoof(tx,ty,tz,w,d,rh,c1,c2){
-  const p=(x,y,z)=>[toSX(x,y,z),toSY(x,y,z)];
-  const mx=tx+w/2,my=ty+d/2;
-  const[ax,ay]=p(tx,ty,tz),   [bx,by]=p(tx+w,ty,tz);
-  const[cx2,cy2]=p(tx+w,ty+d,tz),[dx,dy]=p(tx,ty+d,tz);
-  const[px2,py2]=p(mx,my,tz+rh);
-  [[ax,ay,px2,py2,dx,dy,c2],[bx,by,px2,py2,cx2,cy2,c1],[ax,ay,bx,by,px2,py2,c2],[dx,dy,cx2,cy2,px2,py2,c1]].forEach(([x1,y1,x2,y2,x3,y3,c])=>{
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x3,y3);ctx.closePath();ctx.fillStyle=c;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.32)';ctx.lineWidth=0.5;ctx.stroke();
-  });
-}
-function drawFlag(tx,ty,tz,t){
-  const bx=toSX(tx,ty,tz),by=toSY(tx,ty,tz),tx2=toSX(tx,ty,tz+0.9),ty2=toSY(tx,ty,tz+0.9);
-  ctx.strokeStyle='#c8960c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx2,ty2);ctx.stroke();
-  const wave=Math.sin(t*0.07)*4;
-  ctx.fillStyle='#8b0000';ctx.beginPath();ctx.moveTo(tx2,ty2);ctx.lineTo(tx2+14+wave,ty2+6);ctx.lineTo(tx2+12,ty2+13);ctx.closePath();ctx.fill();
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æ–½è¨­æç”»
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function drawFacilities(tick){
-  Object.entries(FACILITY_MAP).forEach(([key,f])=>{
-    drawFacility(key,f,tick);
-    if(gWarriors.some(w=>w.insideFacility===key)) drawGlow(f.x+0.5,f.y+0.5,tick);
-  });
-}
-function drawGlow(cx,cy,tick){
-  const r=10+4*Math.sin(tick*0.1);
-  ctx.save();ctx.globalAlpha=0.35+0.12*Math.sin(tick*0.1);
-  ctx.beginPath();ctx.arc(toSX(cx,cy,0.4),toSY(cx,cy,0.4),r,0,Math.PI*2);
-  ctx.fillStyle='#ffd700';ctx.fill();ctx.restore();
-}
-function drawFacility(key,f,tick){
-  const{x,y,level:lv}=f;
-  if(key==='training'){
-    drawBox(x-.45,y-.45,.25,.9,.9,.6+lv*.15,'#7a3a1e','#4a2010','#5a2e12');
-    drawRoof(x-.55,y-.55,.85+lv*.15,1.1,1.1,.38,'#2a1208','#100600');
-    if(lv>=2)drawFlag(x,y,.85+lv*.15+.35,tick);
-  }
-  if(key==='forge'){
-    drawBox(x-.38,y-.38,.25,.76,.76,.65,'#505040','#303028','#404038');
-    drawRoof(x-.45,y-.45,.9,.9,.9,.28,'#252520','#121210');
-    for(let i=0;i<lv+1;i++){
-      const t=((tick*.02+i*.7)%1);
-      ctx.save();ctx.globalAlpha=.22*(1-t);
-      ctx.beginPath();ctx.arc(toSX(x+.3,y+.3,.95+t*.6),toSY(x+.3,y+.3,.95+t*.6),4+t*8,0,Math.PI*2);
-      ctx.fillStyle='#cccccc';ctx.fill();ctx.restore();
-    }
-  }
-  if(key==='academy'){
-    drawBox(x-.45,y-.45,.25,.9,.9,.75,'#3a3a5a','#202040','#2a2a48');
-    drawRoof(x-.55,y-.55,1,1.1,1.1,.38,'#1a1a30','#0a0a1a');
-    if(lv>=2){ctx.fillStyle='#ffddaa';ctx.beginPath();ctx.roundRect(toSX(x+.5,y+.5,1.1)-7,toSY(x+.5,y+.5,1.1),14,4,1);ctx.fill();}
-  }
-  if(key==='tea'){
-    drawBox(x-.38,y-.38,.2,.76,.76,.38,'#7a5030','#4a3018','#5a3c20');
-    drawRoof(x-.45,y-.45,.58,.9,.9,.28,'#3a2010','#1a0e08');
-    for(let i=0;i<2;i++){
-      const t=((tick*.018+i*.5)%1);
-      ctx.save();ctx.globalAlpha=.18*(1-t);
-      ctx.beginPath();ctx.arc(toSX(x+.3+i*.2,y+.3,.75+t*.5),toSY(x+.3+i*.2,y+.3,.75+t*.5),3+t*6,0,Math.PI*2);
-      ctx.fillStyle='#ffffff';ctx.fill();ctx.restore();
-    }
-  }
-  if(key==='garden'){
-    drawBox(x-.45,y-.45,.2,.9,.9,.1,'#2a5a1a','#183a10','#204a14');
-    [{ox:-.15,oy:-.1},{ox:.3,oy:.1},{ox:0,oy:.3}].slice(0,Math.min(lv+1,3)).forEach((t,i)=>{
-      const sw=Math.sin(tick*.015+i*1.2)*.012;
-      drawBox(x+t.ox+sw,y+t.oy,.3,.2,.2,.35,'#3a6a22','#244a14','#2e5a1a');
-    });
-  }
-  if(key==='loyalty'){
-    drawBox(x-.45,y-.45,.25,.9,.9,.65,'#8a2828','#501818','#6a2020');
-    drawRoof(x-.55,y-.55,.9,1.1,1.1,.38,'#400808','#1e0404');
-    const pulse=.2+.12*Math.sin(tick*.06);
-    ctx.save();ctx.globalAlpha=pulse;
-    ctx.beginPath();ctx.arc(toSX(x+.5,y+.5,1.1),toSY(x+.5,y+.5,1.1),10+lv*3,0,Math.PI*2);
-    ctx.fillStyle='#ffcc44';ctx.fill();ctx.restore();
-  }
-  ctx.font=`bold ${Math.round(canvas.width*.023)}px 'Noto Serif JP',serif`;
-  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillStyle='rgba(240,192,64,.82)'; ctx.shadowColor='#000'; ctx.shadowBlur=5;
-  ctx.fillText(f.name+' Lv'+lv, toSX(x+.5,y+.5,1.15), toSY(x+.5,y+.5,1.15));
-  ctx.shadowBlur=0;
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   åœ°å½¢
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const TERRAIN=[];
-function buildTerrain(){
-  TERRAIN.length=0;
-  for(let r=0;r<10;r++) for(let c=0;c<10;c++){
-    const cx2=c-4.5,ry=r-4.5,dist=Math.sqrt(cx2*cx2+ry*ry);
-    TERRAIN.push({c,r,type:dist<4?'stone':'grass'});
-  }
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   è¡€çµ±ã‚·ã‚¹ãƒ†ãƒ ï¼ˆClan / Bushoï¼‰
-   Pythonç‰ˆã‚’ç§»æ¤ï¼‹calcBonus / _collectClans è¿½åŠ 
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-class Clan {
-  constructor(name){ this.name = name; }
-}
-
-class Busho {
-  constructor(name, clan, father=null, mother=null){
-    this.name   = name;
-    this.clan   = clan;
-    this.father = father;
-    this.mother = mother;
-  }
-
-  /**
-   * ä¸‰ä»£è¡€çµ±ã‚’å†å¸°ã§è¿”ã™ï¼ˆPythonç‰ˆ get_bloodline ã¨åŒä»•æ§˜ï¼‰
-   * generation: 1=æœ¬äºº, 2=çˆ¶æ¯, 3=ç¥–çˆ¶æ¯
-   */
-  getBloodline(generation=1){
-    if(generation > 3) return null;
-    const info = { name: this.name, clan: this.clan.name };
-    if(this.father || this.mother){
-      info.father = this.father ? this.father.getBloodline(generation+1) : null;
-      info.mother = this.mother ? this.mother.getBloodline(generation+1) : null;
-    }
-    return info;
-  }
-
-  /**
-   * ä¸‰ä»£ã«ç™»å ´ã™ã‚‹å…¨å®¶åã‚’å†å¸°ã§åŽé›†
-   * Pythonç‰ˆ _collect_clans ã«ç›¸å½“
-   */
-  _collectClans(node, out=[]){
-    if(!node) return out;
-    out.push(node.clan);
-    if(node.father) this._collectClans(node.father, out);
-    if(node.mother) this._collectClans(node.mother, out);
-    return out;
-  }
-
-  /**
-   * ç´”è¡€åº¦ï¼ˆ0ã€œ1ï¼‰: å…¨å…ˆç¥–ã®å®¶åã®ä¸­ã§æœ€å¤šå®¶åã®å‰²åˆ
-   * Pythonç‰ˆ pure_score ã«ç›¸å½“
-   */
-  pureScore(){
-    const bl    = this.getBloodline();
-    const clans = this._collectClans(bl);
-    if(clans.length === 0) return 0;
-    const freq  = {};
-    clans.forEach(c=>{ freq[c]=(freq[c]||0)+1; });
-    const maxCount = Math.max(...Object.values(freq));
-    return maxCount / clans.length;
-  }
-
-  /**
-   * æ··è¡€åº¦ï¼ˆ0ã€œ1ï¼‰: å®¶åã®å¤šæ§˜æ€§
-   * Pythonç‰ˆ mix_score ã«ç›¸å½“
-   */
-  mixScore(){
-    const bl    = this.getBloodline();
-    const clans = this._collectClans(bl);
-    if(clans.length === 0) return 0;
-    const unique = new Set(clans).size;
-    return Math.min(1, (unique-1) / Math.max(1, clans.length-1));
-  }
-
-  /**
-   * ãƒœãƒ¼ãƒŠã‚¹ç®—å‡ºï¼ˆå…¨é …ç›®ï¼‰
-   * Pythonç‰ˆ calc_bonus ã«ç›¸å½“
-   *   ç´”è¡€ â†’ æ­¦åŠ›ãƒ»å¿ èª ãƒœãƒ¼ãƒŠã‚¹
-   *   æ··è¡€ â†’ çŸ¥åŠ›ãƒ»æ–½è¨­åŠ¹æžœãƒœãƒ¼ãƒŠã‚¹
-   *   ä¸‰ä»£æƒã„ â†’ åˆæˆ¦å‹çŽ‡ãƒœãƒ¼ãƒŠã‚¹
-   */
-  calcBonus(){
-    const pure = this.pureScore();
-    const mix  = this.mixScore();
-    return {
-      pure,
-      mix,
-      power:    Math.floor(pure * 18),        // æ­¦åŠ›ãƒœãƒ¼ãƒŠã‚¹
-      loyalty:  Math.floor(pure * 12),        // å¿ èª ãƒœãƒ¼ãƒŠã‚¹
-      wisdom:   Math.floor(mix  * 16),        // çŸ¥åŠ›ãƒœãƒ¼ãƒŠã‚¹
-      facility: Math.floor(mix  * 0.3 * 100) / 100, // æ–½è¨­åŠ¹æžœå€çŽ‡+
-      battle:   Math.floor((pure*0.6 + mix*0.4) * 20), // åˆæˆ¦å‹çŽ‡ãƒœãƒ¼ãƒŠã‚¹
-      type: pure >= 0.75 ? 'ç´”è¡€' : mix >= 0.5 ? 'æ··è¡€' : 'æ¨™æº–',
-    };
-  }
-}
-
-/* å®¶åå®šç¾© */
-const CLANS = {
-  oda:    new Clan('ç¹”ç”°å®¶'),
-  saito:  new Clan('é½‹è—¤å®¶'),
-  azai:   new Clan('æµ…äº•å®¶'),
-  takeda: new Clan('æ­¦ç”°å®¶'),
-  uesugi: new Clan('ä¸Šæ‰å®¶'),
-  mouri:  new Clan('æ¯›åˆ©å®¶'),
-  tokugawa: new Clan('å¾³å·å®¶'),
-};
-
-const warriorBushoMap = new WeakMap();
-function getBusho(warrior){ return warriorBushoMap.get(warrior) || null; }
-function setBusho(warrior, busho){ warriorBushoMap.set(warrior, busho); }
-
-/* è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹ã‚’ warrior.stats ã«é©ç”¨ï¼ˆèª•ç”Ÿæ™‚ï¼‰ */
-function applyBloodlineBonus(warrior){
-  const busho = getBusho(warrior);
-  if(!busho) return;
-  const bonus = busho.calcBonus();
-  warrior.bloodlineBonus = bonus;
-  if(!warrior._bloodlineApplied){
-    warrior._bloodlineApplied = true;
-    warrior.stats.power   += bonus.power;
-    warrior.stats.loyalty  = Math.min(100, warrior.stats.loyalty + bonus.loyalty);
-    warrior.stats.wisdom   = Math.min(99,  warrior.stats.wisdom  + bonus.wisdom);
-    if(bonus.power>0||bonus.wisdom>0||bonus.loyalty>0){
-      createFloatText(warrior, `è¡€çµ± +${bonus.power+bonus.wisdom+bonus.loyalty}`, '#ffcc88');
-      addLog(`${warrior.name}ã®è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹ç™ºå‹•ï¼ï¼ˆ${bonus.type}ï¼‰`, 'success');
-    }
-  }
-}
-
-/* æ–½è¨­åŠ¹æžœã«è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹ã‚’æŽ›ã‘ã‚‹ */
-function bloodlineFacilityMul(warrior){
-  const b = warrior.bloodlineBonus;
-  return b ? 1 + b.facility : 1;
-}
-
-/* åˆæˆ¦å‹çŽ‡ãƒœãƒ¼ãƒŠã‚¹ï¼ˆå…¨æ­¦å°†åˆè¨ˆï¼‰ */
-function bloodlineBattleBonus(){
-  return gWarriors.reduce((s,w)=>{
-    const b=w.bloodlineBonus; return s+(b?b.battle:0);
-  }, 0);
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   è¡€çµ±ãƒ¢ãƒ¼ãƒ€ãƒ« UI
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let blSelectedWarrior = null;
-let blFatherIdx = 0, blMotherIdx = -1;
-
-window.showBloodline = function(){
-  document.getElementById('bloodline-modal').style.display='flex';
-  blTab('tree');
-};
-window.closeBloodlineModal = function(){
-  document.getElementById('bloodline-modal').style.display='none';
-};
-
-window.blTab = function(tab){
-  document.getElementById('bl-panel-tree').style.display  = tab==='tree'  ? '' : 'none';
-  document.getElementById('bl-panel-marry').style.display = tab==='marry' ? '' : 'none';
-  document.getElementById('bl-tab-tree').style.background  = tab==='tree'  ? 'rgba(200,150,12,.2)' : 'transparent';
-  document.getElementById('bl-tab-marry').style.background = tab==='marry' ? 'rgba(200,150,12,.2)' : 'transparent';
-  document.getElementById('bl-tab-tree').style.color  = tab==='tree'  ? 'var(--gold-l)' : 'var(--parchment)';
-  document.getElementById('bl-tab-marry').style.color = tab==='marry' ? 'var(--gold-l)' : 'var(--parchment)';
-  if(tab==='tree')  renderBloodlineTree();
-  if(tab==='marry') renderMarriagePanel();
-};
-
-function renderBloodlineTree(){
-  const sel = document.getElementById('bl-warrior-select');
-  sel.innerHTML = gWarriors.map((w,i)=>`
-    <button onclick="blSelectWarrior(${i})"
-      style="padding:5px 10px;border-radius:6px;border:1px solid ${blSelectedWarrior===w?'var(--gold)':'rgba(200,150,12,.3)'};
-             background:${blSelectedWarrior===w?'rgba(200,150,12,.2)':'transparent'};
-             color:var(--parchment);cursor:pointer;font-family:inherit;font-size:11px;">
-      ${w.name}
-    </button>`).join('');
-  if(!blSelectedWarrior) blSelectedWarrior = gWarriors[0];
-  renderTreeView(blSelectedWarrior);
-}
-
-window.blSelectWarrior = function(i){
-  blSelectedWarrior = gWarriors[i];
-  renderBloodlineTree();
-};
-
-function renderTreeView(warrior){
-  const busho  = getBusho(warrior);
-  const view   = document.getElementById('bl-tree-view');
-  if(!busho){ view.innerHTML='<div style="color:rgba(245,232,200,.4);text-align:center;padding:20px;">è¡€çµ±æƒ…å ±ãªã—</div>'; return; }
-
-  const bl    = busho.getBloodline();
-  const bonus = busho.calcBonus();
-
-  const badgeColor = bonus.type==='ç´”è¡€' ? '#ffaaaa' : bonus.type==='æ··è¡€' ? '#aaddff' : '#ffdd88';
-  const badgeBg    = bonus.type==='ç´”è¡€' ? 'rgba(255,80,80,.2)' : bonus.type==='æ··è¡€' ? 'rgba(80,160,255,.2)' : 'rgba(200,150,12,.2)';
-
-  view.innerHTML = `
-    <div style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span style="font-size:14px;font-weight:700;">${warrior.name}</span>
-        <span style="background:${badgeBg};color:${badgeColor};border:1px solid ${badgeColor};border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">${bonus.type}</span>
-        <span style="font-size:10px;color:var(--gold-d);">ç´”è¡€${Math.round(bonus.pure*100)}% / æ··è¡€${Math.round(bonus.mix*100)}%</span>
-      </div>
-      <div class="bt-bonus-row">
-        <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">âš” æ­¦åŠ›+${bonus.power}</span>
-        <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">ðŸŒ¸ å¿ èª +${bonus.loyalty}</span>
-        <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">ðŸ“– çŸ¥åŠ›+${bonus.wisdom}</span>
-        <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">ðŸ¯ æ–½è¨­Ã—${(1+bonus.facility).toFixed(2)}</span>
-        <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">âš”åˆæˆ¦+${bonus.battle}%</span>
-      </div>
-    </div>
-    ${renderTreeNode(bl, 1)}
-  `;
-}
-
-function renderTreeNode(node, gen){
-  if(!node) return `<div class="bt-node gen${Math.min(gen,3)}" style="opacity:.35;"><span class="bn">ä¸æ˜Ž</span></div>`;
-  const clanColor = clanToColor(node.clan);
-  return `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-      <div class="bt-node gen${Math.min(gen,3)}" style="border-color:${clanColor}40;">
-        <div class="bn">${node.name}</div>
-        <div class="bc-name" style="color:${clanColor};">${node.clan}</div>
-      </div>
-      ${(node.father||node.mother) && gen<3 ? `
-        <div style="width:1px;height:10px;background:rgba(200,150,12,.3);"></div>
-        <div style="display:flex;gap:16px;align-items:flex-start;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div style="font-size:9px;color:var(--gold-d);">çˆ¶</div>
-            ${renderTreeNode(node.father, gen+1)}
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div style="font-size:9px;color:var(--gold-d);">æ¯</div>
-            ${renderTreeNode(node.mother, gen+1)}
-          </div>
+    <div class="section-title">人間関係</div>
+    <div class="relationship-block">
+        <div class="relationship-item">
+            <span>織田 信廣</span>
+            <span class="relationship-value">やや対立 (+3)</span>
         </div>
-      ` : ''}
-    </div>`;
-}
-
-function clanToColor(clanName){
-  const map = {'ç¹”ç”°å®¶':'#ff8888','é½‹è—¤å®¶':'#88aaff','æµ…äº•å®¶':'#88ffaa','æ­¦ç”°å®¶':'#ffaa44','ä¸Šæ‰å®¶':'#dd88ff','æ¯›åˆ©å®¶':'#44dddd','å¾³å·å®¶':'#ffdd44'};
-  return map[clanName] || '#ffcc88';
-}
-
-function renderMarriagePanel(){
-  const fathers = gWarriors.filter(w=>w.jobId!=='hime');
-  const mothers = gWarriors.filter(w=>w.jobId==='hime');
-  const extFathers = [
-    {name:'æ­¦ç”° ä¿¡çŽ„', clan:CLANS.takeda, jobId:'bukan'},
-    {name:'ä¸Šæ‰ è¬™ä¿¡', clan:CLANS.uesugi, jobId:'bukan'},
-    {name:'æ¯›åˆ© å…ƒå°±', clan:CLANS.mouri,  jobId:'bukan'},
-  ];
-  const extMothers = [
-    {name:'æ¿ƒå§«',    clan:CLANS.saito,    jobId:'hime'},
-    {name:'ãŠæ±Ÿ',   clan:CLANS.azai,     jobId:'hime'},
-    {name:'ç¯‰å±±æ®¿', clan:CLANS.tokugawa, jobId:'hime'},
-  ];
-  const allFathers = [...fathers.map(w=>({w, ext:false})), ...extFathers.map(w=>({w, ext:true}))];
-  const allMothers = [...mothers.map(w=>({w, ext:false})), ...extMothers.map(w=>({w, ext:true}))];
-
-  document.getElementById('father-select').innerHTML = allFathers.map((item,i)=>{
-    const n = item.w.name;
-    const c = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name||'ç¹”ç”°å®¶');
-    return `<div onclick="blPickFather(${i})" data-fi="${i}"
-      style="padding:7px 10px;border-radius:7px;border:1px solid ${blFatherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
-             background:${blFatherIdx===i?'rgba(200,150,12,.12)':'transparent'};
-             cursor:pointer;margin-bottom:5px;font-size:12px;">
-      <span style="font-weight:700;">${n}</span>
-      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${c}</span>
-      ${item.ext?'<span style="font-size:9px;color:#ffaa44;margin-left:4px;">å¤–</span>':''}
-    </div>`;
-  }).join('');
-
-  document.getElementById('mother-select').innerHTML = allMothers.map((item,i)=>{
-    const n = item.w.name;
-    const c = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name||'é½‹è—¤å®¶');
-    return `<div onclick="blPickMother(${i})" data-mi="${i}"
-      style="padding:7px 10px;border-radius:7px;border:1px solid ${blMotherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
-             background:${blMotherIdx===i?'rgba(200,150,12,.12)':'transparent'};
-             cursor:pointer;margin-bottom:5px;font-size:12px;">
-      <span style="font-weight:700;">${n}</span>
-      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${c}</span>
-      ${item.ext?'<span style="font-size:9px;color:#ffaa44;margin-left:4px;">å¤–</span>':''}
-    </div>`;
-  }).join('');
-
-  window._allFathers = allFathers;
-  window._allMothers = allMothers;
-  updateMarriagePreview();
-}
-
-window.blPickFather = function(i){ blFatherIdx=i; renderMarriagePanel(); };
-window.blPickMother = function(i){ blMotherIdx=i; renderMarriagePanel(); };
-
-function updateMarriagePreview(){
-  const prev = document.getElementById('bl-preview');
-  const fa   = window._allFathers?.[blFatherIdx];
-  const mo   = window._allMothers?.[blMotherIdx];
-  if(!fa){ prev.innerHTML='<div style="color:rgba(245,232,200,.4);text-align:center;">çˆ¶ã‚’é¸ã‚“ã§ãã ã•ã„</div>'; return; }
-  if(!mo){ prev.innerHTML='<div style="color:rgba(245,232,200,.4);text-align:center;">æ¯ã‚’é¸ã‚“ã§ãã ã•ã„</div>'; return; }
-
-  // ä»® Busho ã§ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ï¼ˆcalcBonus ã‚’ä½¿ç”¨ï¼‰
-  const fClan  = fa.ext ? fa.w.clan : (getBusho(fa.w)?.clan || CLANS.oda);
-  const mClan  = mo.ext ? mo.w.clan : (getBusho(mo.w)?.clan || CLANS.saito);
-  const fBusho = fa.ext ? new Busho(fa.w.name, fa.w.clan) : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
-  const mBusho = mo.ext ? new Busho(mo.w.name, mo.w.clan) : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
-
-  const childClan  = fClan;
-  const childBusho = new Busho('ï¼ˆç”Ÿã¾ã‚Œã‚‹å­ï¼‰', childClan, fBusho, mBusho);
-  const bonus      = childBusho.calcBonus();   // â† calcBonus() ä½¿ç”¨
-  const badgeColor = bonus.type==='ç´”è¡€' ? '#ffaaaa' : bonus.type==='æ··è¡€' ? '#aaddff' : '#ffdd88';
-
-  prev.innerHTML = `
-    <div style="font-size:12px;margin-bottom:6px;color:var(--gold-l);">
-      ${fa.w.name} Ã— ${mo.w.name} ã®å­
-      <span style="color:${badgeColor};margin-left:6px;font-size:10px;">${bonus.type}ã®è¡€è„ˆ</span>
+        <div class="relationship-item">
+            <span>お 市</span>
+            <span class="relationship-value">普通 (+24)</span>
+        </div>
+        <div class="relationship-item">
+            <span>(空き)</span>
+            <span></span>
+        </div>
     </div>
-    <div style="font-size:10px;color:rgba(245,232,200,.55);margin-bottom:6px;">
-      ç´”è¡€åº¦ ${Math.round(bonus.pure*100)}% ï¼ æ··è¡€åº¦ ${Math.round(bonus.mix*100)}%
-    </div>
-    <div class="bt-bonus-row">
-      <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">âš” æ­¦åŠ›+${bonus.power}</span>
-      <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">ðŸŒ¸ å¿ èª +${bonus.loyalty}</span>
-      <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">ðŸ“– çŸ¥åŠ›+${bonus.wisdom}</span>
-      <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">ðŸ¯ æ–½è¨­Ã—${(1+bonus.facility).toFixed(2)}</span>
-      <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">âš”åˆæˆ¦+${bonus.battle}%</span>
-    </div>`;
-}
 
-window.doMarriage = function(){
-  const fa = window._allFathers?.[blFatherIdx];
-  const mo = window._allMothers?.[blMotherIdx];
-  if(!fa||!mo){ alert('çˆ¶ã¨æ¯ã‚’é¸ã‚“ã§ãã ã•ã„'); return; }
-  if(state.genNum >= 5){ alert('ã™ã§ã«æœ€çµ‚ä¸–ä»£ã§ã™ï¼'); return; }
-  if(state.koku < 800){ alert('ç¸çµ„ã«ã¯ 800çŸ³ å¿…è¦ã§ã™ï¼'); return; }
+    <button class="back-btn">城に戻る</button>
+</div>
 
-  const fClan  = fa.ext ? fa.w.clan  : (getBusho(fa.w)?.clan || CLANS.oda);
-  const mClan  = mo.ext ? mo.w.clan  : (getBusho(mo.w)?.clan || CLANS.saito);
-  const fBusho = fa.ext ? new Busho(fa.w.name, fa.w.clan)
-                        : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
-  const mBusho = mo.ext ? new Busho(mo.w.name, mo.w.clan)
-                        : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
-
-  const childClan  = fClan;
-  const childName  = fClan.name.replace('å®¶','') + ' ' + ['å¤ªéƒŽ','æ¬¡éƒŽ','ä¸‰éƒŽ','å››éƒŽ','äº”éƒŽ'][Math.floor(Math.random()*5)];
-  const childJob   = Math.random()<0.15 ? 'bunkan' : 'bukan';
-  const childBusho = new Busho(childName, childClan, fBusho, mBusho);
-  const bonus      = childBusho.calcBonus();   // â† calcBonus() ä½¿ç”¨
-  const basePow    = 60 + Math.floor(Math.random()*30);
-
-  state.koku  -= 800;
-  state.genNum = Math.min(5, state.genNum + 1);
-
-  const nw = new IsoWarrior(childName, childJob, basePow, Math.random()*4-2, 3.5);
-  setBusho(nw, childBusho);
-  applyBloodlineBonus(nw);
-
-  const ni = gWarriors.length-1;
-  gWarriors.forEach((_,i)=>{ if(i!==ni) changeRel(i,ni,Math.floor(5+Math.random()*20)); });
-
-  addLog(`${fa.w.name}Ã—${mo.w.name}ã®ç¸çµ„ï¼${childName}ãŒèª•ç”Ÿï¼ˆ${bonus.type}ã®è¡€è„ˆï¼‰`, 'success');
-  addCanvasBubble(nw, 'å‚ä¸Šï¼', 160);
-  updatePartyRow(); updateStatusUI();
-  closeBloodlineModal();
-};
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   æ­¦å°†ã‚¯ãƒ©ã‚¹
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const COLOR_SETS={
-  c_red: {armor:'#8b0000',sub:'#4a0000',skin:'#d4a574',acc:'#ff4444',dark:'#6a1010'},
-  c_blue:{armor:'#1a3a5c',sub:'#0a1e30',skin:'#c8a87a',acc:'#4488cc',dark:'#0a2a4a'},
-  c_pink:{armor:'#8b3060',sub:'#5a1040',skin:'#e8c0a0',acc:'#ff88cc',dark:'#6a1050'},
-};
-let gWarriors=[], currentHouseHead=null, currentModalIndex=-1;
-const roles={bukan:'æ­¦å®˜',hime:'å§«',bunkan:'æ–‡å®˜'};
-
-class IsoWarrior{
-  constructor(name,jobId,power,tx,ty){
-    this.name=name; this.jobId=jobId;
-    this.tileX=tx; this.tileY=ty;
-    this.color=jobId==='hime'?'c_pink':jobId==='bunkan'?'c_blue':'c_red';
-    this.stats={power,loyalty:jobId==='hime'?92:jobId==='bunkan'?72:65,
-                wisdom:jobId==='bunkan'?84:jobId==='hime'?58:52,level:1,exp:0};
-    this.destX=tx; this.destY=ty;
-    this.moving=false;
-    this.moveSpeed=0.013+Math.random()*0.005;
-    this.idleTicks=Math.floor(Math.random()*120);
-    this.idleMax=120+Math.floor(Math.random()*140);
-    this.walkFrame=0; this.frameCount=0;
-    this.state='idle';
-    this.target=null; this.insideFacility=null; this.wait=0;
-    this.anim={type:null,t:0}; this.visible=true;
-    this.speechTimer=Math.floor(Math.random()*200);
-    this.bloodlineBonus=null;
-    this._bloodlineApplied=false;
-    gWarriors.push(this);
-  }
-
-  tick(myIdx){
-    this._moveTick();
-    this._aiTick(myIdx);
-  }
-
-  _moveTick(){
-    if(this.state==='idle'){
-      if(++this.idleTicks>this.idleMax){
-        this.idleTicks=0; this.idleMax=120+Math.floor(Math.random()*140);
-        this._pickDest();
-      }
-    }
-    else if(this.state==='moving'){
-      const dx=this.destX-this.tileX, dy=this.destY-this.tileY;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<0.07){
-        this.tileX=this.destX; this.tileY=this.destY;
-        if(this.target){ this.state='entering'; this.anim={type:'enter',t:0};
-          const sp=FACILITY_SPEECH[this.target]||['â€¦'];
-          addCanvasBubble(this, sp[Math.floor(Math.random()*sp.length)], 130);
-        } else { this.state='idle'; }
-      } else {
-        this.tileX+=dx/dist*this.moveSpeed;
-        this.tileY+=dy/dist*this.moveSpeed;
-        if(++this.frameCount>=10){this.frameCount=0;this.walkFrame=(this.walkFrame+1)%4;}
-      }
-    }
-    else if(this.state==='entering'){
-      this.anim.t+=0.04;
-      if(this.anim.t>=1){this.visible=false;this.state='acting';this.insideFacility=this.target;this.wait=110+Math.random()*130;this._applyEffect(this.target,true);}
-    }
-    else if(this.state==='acting'){
-      if(Math.random()<0.035) this._applyEffect(this.insideFacility,false);
-      if(--this.wait<=0){
-        this.state='exiting'; this.anim={type:'exit',t:0}; this.visible=true;
-        const e=FACILITY_ENTRANCE[this.insideFacility];
-        this.tileX=e.x; this.tileY=e.y;
-        this.insideFacility=null; this.target=null;
-      }
-    }
-    else if(this.state==='exiting'){
-      this.anim.t+=0.04;
-      if(this.anim.t>=1){this.state='idle';this.anim={type:null,t:0};}
-    }
-  }
-
-  _pickDest(){
-    if(Math.random()<0.5){
-      const keys=Object.keys(FACILITY_ENTRANCE);
-      const key=keys[Math.floor(Math.random()*keys.length)];
-      const e=FACILITY_ENTRANCE[key];
-      this.destX=e.x+(Math.random()*.3-.15); this.destY=e.y+(Math.random()*.3-.15);
-      this.target=key; this.state='moving';
-    } else {
-      const others=gWarriors.filter(w=>w!==this);
-      if(others.length&&Math.random()<0.5){
-        const t=others[Math.floor(Math.random()*others.length)];
-        this.destX=t.tileX+(Math.random()*1-.5); this.destY=t.tileY+(Math.random()*1-.5);
-      } else {
-        this.destX=Math.random()*6-3; this.destY=Math.random()*6-3;
-      }
-      this.target=null; this.state='moving';
-    }
-  }
-
-  _applyEffect(key,isEntry){
-    const eff=FACILITY_EFFECT[key]; if(!eff)return;
-    const[lo,hi]=eff.range;
-    // æ–½è¨­åŠ¹æžœã«è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹ï¼ˆæ··è¡€åº¦ï¼‰ã‚’æŽ›ã‘ã‚‹
-    const mul = bloodlineFacilityMul(this);
-    const gain=Math.floor((isEntry?Math.floor(lo+Math.random()*(hi-lo)):Math.floor(1+Math.random()*2)) * mul);
-    if(eff.stat==='power')   this.stats.power+=gain;
-    if(eff.stat==='wisdom')  this.stats.wisdom=Math.min(99,this.stats.wisdom+gain);
-    if(eff.stat==='loyalty') this.stats.loyalty=Math.min(100,this.stats.loyalty+gain);
-    if(gain>0){
-      createFloatText(this,`+${gain}${eff.label}`,eff.color);
-      if(isEntry){showFacilityActivity(key,`${this.name}ãŒ${FACILITY_MAP[key].name}ã§é›ç·´ï¼`,eff.color);addLog(`${this.name}ãŒ${FACILITY_MAP[key].name}ã§${eff.label}+${gain}`);}
-    }
-    updatePartyRow(); updateStatusUI();
-  }
-
-  _aiTick(myIdx){
-    this.speechTimer=Math.max(0,this.speechTimer-1);
-    if(this.speechTimer===0&&Math.random()<0.005){
-      let sit='idle';
-      if(this.stats.loyalty>80&&Math.random()<.3)sit='highLoyalty';
-      else if(this.stats.loyalty<35&&Math.random()<.4)sit='lowLoyalty';
-      addCanvasBubble(this,getSpeech(this,sit));
-      this.speechTimer=200+Math.floor(Math.random()*280);
-    }
-    if(this.state!=='acting'&&Math.random()<0.004){
-      gWarriors.forEach((other,j)=>{
-        if(j===myIdx)return;
-        const dx=this.tileX-other.tileX,dy=this.tileY-other.tileY;
-        if(Math.sqrt(dx*dx+dy*dy)<1.6) this._interact(myIdx,j,other);
-      });
-    }
-  }
-
-  _interact(mi,oi,other){
-    const rel=getRel(mi,oi);
-    let delta,sitA,sitB;
-    if(rel>=20&&Math.random()<.65){delta=Math.floor(3+Math.random()*8);sitA=sitB='friendly';}
-    else if(rel<-20&&Math.random()<.55){delta=-Math.floor(3+Math.random()*8);sitA=sitB='rival';}
-    else{delta=Math.floor(-4+Math.random()*9);sitA=sitB=delta>=0?'friendly':'rival';}
-    changeRel(mi,oi,delta);
-    const nv=getRel(mi,oi);
-    addCanvasBubble(this, getSpeech(this,sitA), 130);
-    setTimeout(()=>addCanvasBubble(other, getSpeech(other,sitB), 130), 700);
-    if(Math.abs(delta)>=5){
-      const sign=delta>0?'â–²':'â–¼';
-      const midX=(this.tileX+other.tileX)/2+0.5, midY=(this.tileY+other.tileY)/2+0.5;
-      const fR=document.getElementById('iso-field').getBoundingClientRect();
-      const cR=canvas.getBoundingClientRect();
-      const el=document.createElement('div');
-      el.className='relation-label';
-      el.style.left=(cR.left-fR.left+toSX(midX,midY,1))+'px';
-      el.style.top=(cR.top-fR.top+toSY(midX,midY,1)-30)+'px';
-      el.style.color=relColor(nv);
-      el.textContent=`${sign} ${relLabel(nv)}`;
-      bubbleLayer.appendChild(el);
-      setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},2800);
-      if(Math.abs(delta)>=8)addLog(`${this.name}ã¨${other.name}ã®ä»²ãŒ${delta>0?'æ·±ã¾ã£ãŸ':'é™ºæ‚ªã«ãªã£ãŸ'}ï¼ˆ${relLabel(nv)}ï¼‰`,delta>0?'success':'betrayal');
-    }
-    updatePartyRow();
-  }
-
-  draw(){
-    if(!this.visible&&this.state!=='exiting')return;
-    const c=COLOR_SETS[this.color];
-    const fx=toSX(this.tileX+.5,this.tileY+.5,.25);
-    const fy=toSY(this.tileX+.5,this.tileY+.5,.25);
-    const H=Math.round(canvas.height*.09), W=H*.55;
-    const s=this.walkFrame%4;
-    let scale=1,alpha=1;
-    if(this.state==='entering'){scale=1-this.anim.t;alpha=1-this.anim.t;}
-    if(this.state==='exiting') {scale=this.anim.t;  alpha=this.anim.t;}
-    if(scale<=0||alpha<=0)return;
-    ctx.save();ctx.globalAlpha=alpha;
-    ctx.translate(fx,fy);ctx.scale(scale,scale);ctx.translate(-fx,-fy);
-    if(this.jobId==='bukan')      this._drawBukan(fx,fy,H,W,s,c);
-    else if(this.jobId==='hime')  this._drawHime(fx,fy,H,W,s,c);
-    else                           this._drawBunkan(fx,fy,H,W,c);
-    ctx.font=`${Math.round(canvas.width*.026)}px 'Noto Serif JP',serif`;
-    ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    ctx.fillStyle='rgba(240,192,64,.95)';ctx.shadowColor='#000';ctx.shadowBlur=5;
-    ctx.fillText(this.name,fx,fy-H*1.22);ctx.shadowBlur=0;
-    if(this.state==='moving'&&this.target){
-      ctx.font=`${Math.round(canvas.width*.02)}px 'Noto Serif JP',serif`;
-      ctx.fillStyle='rgba(180,200,255,.8)';
-      ctx.fillText('â†’'+FACILITY_MAP[this.target].name,fx,fy-H*1.44);
-    }
-    if(this.state==='entering'){
-      ctx.save();ctx.globalAlpha=.4*(1-this.anim.t);
-      ctx.beginPath();ctx.arc(fx,fy,22*(1+this.anim.t),0,Math.PI*2);
-      ctx.strokeStyle='#ffd700';ctx.lineWidth=2;ctx.stroke();ctx.restore();
-    }
-    ctx.restore();
-  }
-
-  _drawBukan(fx,fy,H,W,s,c){
-    const legW=W*.28,legSw=[0,H*.06,0,-H*.06][s],armSw=[H*.05,0,-H*.05,0][s];
-    const bob=Math.abs([0,1,0,-1][s])*1.5,bY=fy-bob;
-    const hH=H*.22,bH=H*.32,lH=H*.38,aH=H*.28,headY=bY-lH-bH-hH,bodyY=bY-lH-bH;
-    ctx.beginPath();ctx.ellipse(fx,bY+2,W*.6,H*.05,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
-    ctx.fillStyle=c.sub;
-    ctx.save();ctx.translate(fx-legW*.6,bY-lH/2);ctx.rotate(legSw*.04);ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+legW*.6,bY-lH/2);ctx.rotate(-legSw*.04);ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    ctx.fillStyle=c.dark;
-    ctx.beginPath();ctx.roundRect(fx-W*.32,bY-3,W*.28,5,2);ctx.fill();
-    ctx.beginPath();ctx.roundRect(fx+W*.04,bY-3,W*.28,5,2);ctx.fill();
-    ctx.fillStyle=c.armor;ctx.beginPath();ctx.roundRect(fx-W*.44,bodyY,W*.88,bH,3);ctx.fill();
-    ctx.fillStyle=c.dark;ctx.beginPath();ctx.roundRect(fx-W*.38,bodyY+2,W*.76,bH-4,2);ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.save();ctx.translate(fx-W*.52,bodyY+4);ctx.rotate(armSw*.05);ctx.beginPath();ctx.roundRect(-W*.18,0,W*.22,aH,4);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+W*.52,bodyY+4);ctx.rotate(-armSw*.05);ctx.beginPath();ctx.roundRect(-W*.04,0,W*.22,aH,4);ctx.fill();
-    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*.1,aH*.5);ctx.lineTo(W*.4,-aH*.5);ctx.stroke();
-    ctx.fillStyle=c.acc;ctx.beginPath();ctx.arc(W*.12,aH*.45,3,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.fillStyle=c.armor;ctx.beginPath();ctx.ellipse(fx,headY+hH*.45,W*.38,hH*.55,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,headY+hH*.55,W*.28,hH*.42,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#3a2010';
-    ctx.beginPath();ctx.arc(fx-W*.1,headY+hH*.5,1.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*.1,headY+hH*.5,1.5,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=c.acc;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*.4);ctx.stroke();
-    ctx.fillStyle=c.acc;ctx.beginPath();ctx.moveTo(fx-4,headY-hH*.2);ctx.lineTo(fx+4,headY-hH*.2);ctx.lineTo(fx,headY-hH*.5);ctx.fill();
-  }
-  _drawHime(fx,fy,H,W,s,c){
-    const bob=Math.abs([0,1,0,-1][s])*1.2,bY=fy-bob;
-    ctx.beginPath();ctx.ellipse(fx,bY+2,W*.55,H*.045,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-    const grd=ctx.createLinearGradient(fx-W*.55,0,fx+W*.55,0);
-    grd.addColorStop(0,c.dark);grd.addColorStop(.5,c.armor);grd.addColorStop(1,c.dark);
-    ctx.fillStyle=grd;ctx.beginPath();ctx.moveTo(fx-W*.22,bY-H*.55);ctx.lineTo(fx+W*.22,bY-H*.55);ctx.lineTo(fx+W*.5,bY);ctx.lineTo(fx-W*.5,bY);ctx.closePath();ctx.fill();
-    ctx.fillStyle=c.acc;ctx.beginPath();ctx.roundRect(fx-W*.22,bY-H*.42,W*.44,H*.1,2);ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.save();ctx.translate(fx-W*.28,bY-H*.52);ctx.rotate(-.2);ctx.beginPath();ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+W*.28,bY-H*.52);ctx.rotate(.2);ctx.beginPath();ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.fillStyle='#1a0a00';ctx.beginPath();ctx.ellipse(fx,bY-H*.78,W*.3,H*.18,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,bY-H*.73,W*.22,H*.15,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#8b3060';
-    ctx.beginPath();ctx.arc(fx-W*.09,bY-H*.74,1.4,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*.09,bY-H*.74,1.4,0,Math.PI*2);ctx.fill();
-    for(let i=-1;i<=1;i++){ctx.fillStyle=i===0?c.acc:'rgba(255,140,200,.8)';ctx.beginPath();ctx.arc(fx+i*W*.18,bY-H*.9,3.5,0,Math.PI*2);ctx.fill();}
-  }
-  _drawBunkan(fx,fy,H,W,c){
-    ctx.beginPath();ctx.ellipse(fx,fy+2,W*.5,H*.04,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-    ctx.fillStyle=c.armor;ctx.beginPath();ctx.roundRect(fx-W*.32,fy-H*.65,W*.64,H*.65,3);ctx.fill();
-    ctx.fillStyle=c.sub;ctx.beginPath();ctx.roundRect(fx-W*.25,fy-H*.6,W*.5,H*.5,2);ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.beginPath();ctx.ellipse(fx-W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(fx+W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(fx+W*.28,fy-H*.55);ctx.lineTo(fx+W*.2,fy-H*.2);ctx.stroke();
-    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,fy-H*.76,W*.25,H*.16,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#1a0a00';
-    ctx.beginPath();ctx.moveTo(fx-W*.2,fy-H*.82);ctx.lineTo(fx+W*.2,fy-H*.82);ctx.lineTo(fx+W*.05,fy-H*1);ctx.lineTo(fx-W*.05,fy-H*1);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.roundRect(fx-W*.2,fy-H*.85,W*.4,H*.07,1);ctx.fill();
-    ctx.fillStyle='#4a3a2a';
-    ctx.beginPath();ctx.arc(fx-W*.07,fy-H*.77,1.3,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+W*.07,fy-H*.77,1.3,0,Math.PI*2);ctx.fill();
-  }
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ã‚·ãƒ¼ãƒ³æç”»
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function drawScene(tick){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  [...TERRAIN].sort((a,b)=>(a.r+a.c)-(b.r+b.c)).forEach(t=>{
-    const tx=t.c-4.5,ty=t.r-4.5;
-    if(t.type==='grass')drawBox(tx,ty,0,1,1,.18,'#2d4a1e','#1c3010','#233c16');
-    else{const e=(t.c+t.r)%2;drawBox(tx,ty,0,1,1,.25,e?'#4e4032':'#443828','#2e2416','#382e1c');}
-  });
-  [[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],[3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],[2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],[-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]].forEach(([mc,mr])=>{
-    ctx.beginPath();
-    [[mc,mr],[mc+1,mr],[mc+1,mr+1],[mc,mr+1]].forEach(([x,y],i)=>i?ctx.lineTo(toSX(x,y,0),toSY(x,y,0)):ctx.moveTo(toSX(x,y,0),toSY(x,y,0)));
-    ctx.closePath();
-    ctx.fillStyle=`rgba(12,28,52,${.5+.12*Math.sin(tick*.04+mc*.5+mr*.3)})`;ctx.fill();
-    ctx.strokeStyle='rgba(20,50,90,.5)';ctx.lineWidth=.5;ctx.stroke();
-  });
-  for(let i=-2;i<=2;i++){drawBox(i,-2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');drawBox(i,2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');}
-  for(let i=-1;i<=1;i++){drawBox(-2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');drawBox(2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');}
-  drawFacilities(tick);
-  drawBox(-1,-1,.75,2,2,.9,'#5a4a35','#3a2c1a','#4a3a25');
-  drawBox(-.8,-.8,1.65,1.6,1.6,1.4,'#4a3826','#3a2a18','#4a3826');
-  drawBox(-.6,-.6,1.65,.7,.7,.9,'#4a3826','#3a2a18','#4a3826');
-  drawRoof(-1.1,-1.1,2.65+1.4,2.2,2.2,.9,'#241608','#1a0e04');
-  drawRoof(-.9,-.9,2.65+1.4+.7,1.8,1.8,.7,'#1a0e04','#120900');
-  drawRoof(-.65,-.65,2.65+1.4+1.1,1.3,1.3,.55,'#241608','#1a0e04');
-  drawRoof(-.4,-.4,2.65+1.4+1.5,.8,.8,.4,'#1a0e04','#100800');
-  drawFlag(-.05,-.05,2.65+1.4+1.85,tick);
-  ctx.font=`bold ${Math.round(canvas.width*.036)}px 'Noto Serif JP',serif`;
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillStyle=`rgba(240,192,64,${.7+.3*Math.sin(tick*.03)})`;
-  ctx.shadowColor='rgba(200,150,12,.8)';ctx.shadowBlur=10;
-  ctx.fillText('å®‰åœŸåŸŽ',toSX(0,0,2.65+1.4+2.3),toSY(0,0,2.65+1.4+2.3));
-  ctx.shadowBlur=0;
-  [...gWarriors].sort((a,b)=>(a.tileX+a.tileY)-(b.tileX+b.tileY)).forEach(w=>w.draw());
-  drawCanvasBubbles();
-  drawFloatingTexts();
-}
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   UI
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function updateStatusUI(){
-  document.getElementById('unification-pct').textContent=Math.floor(state.unification);
-  document.getElementById('gen-num').textContent=state.genNum;
-  document.getElementById('koku-display').textContent=state.koku.toLocaleString('ja-JP');
-  document.getElementById('nfill').style.width=Math.min(100,Math.floor(state.koku/100))+'%';
-}
-function locationLabel(w){
-  if(w.insideFacility)return FACILITY_MAP[w.insideFacility].name+'ã§é›ç·´ä¸­';
-  if(w.target&&w.state==='moving')return FACILITY_MAP[w.target]?.name+'ã¸å‘ã‹ã†ä¸­';
-  return 'åŸŽå†…';
-}
-function updatePartyRow(){
-  const row=document.getElementById('party-row');row.innerHTML='';
-  gWarriors.forEach((w,i)=>{
-    const card=document.createElement('div');
-    card.className='party-card'+(i===0?' head':'');
-    let relText='';
-    gWarriors.forEach((_,j)=>{if(j===i)return;const rv=getRel(i,j);if(!relText||Math.abs(rv)>30)relText=(gWarriors[j].name.split(' ')[1]||gWarriors[j].name)+'ï¼š'+relLabel(rv);});
-    card.innerHTML=`<span class="pc-role">${roles[w.jobId]||'æ­¦å°†'}</span><span class="pc-name">${w.name}</span><span class="pc-pow">æ­¦åŠ› ${w.stats.power} Lv${w.stats.level}</span><span class="pc-loc">${locationLabel(w)}</span>${relText?`<span class="pc-rel">${relText}</span>`:''}`;
-    card.onclick=()=>showWarriorModal(i);row.appendChild(card);
-  });
-}
-
-function showWarriorModal(i){
-  currentModalIndex=i;const w=gWarriors[i];
-  document.getElementById('warrior-modal').style.display='flex';
-  document.getElementById('modal-warrior-name').innerHTML=`${w.name}<br><span style="font-size:13px;color:#c8960c;">${roles[w.jobId]||'æ­¦å°†'}ã€€Lv.${w.stats.level}</span>`;
-  document.getElementById('modal-stats').innerHTML=`<span style="color:#ffcc66">æ­¦åŠ› ${w.stats.power}</span>ã€€ï½œã€€<span style="color:#88ff88">å¿ èª  ${w.stats.loyalty}</span>ã€€ï½œã€€<span style="color:#aaddff">çŸ¥åŠ› ${w.stats.wisdom}</span>`;
-  let relHtml='<div style="color:var(--gold-d);font-size:11px;margin-bottom:4px;letter-spacing:.1em;">â”€ äººé–“é–¢ä¿‚ â”€</div>';
-  gWarriors.forEach((other,j)=>{if(j===i)return;const rv=getRel(i,j);relHtml+=`<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${other.name}</span><span style="color:${relColor(rv)};">${relLabel(rv)}ï¼ˆ${rv>=0?'+':''}${rv}ï¼‰</span></div>`;});
-  document.getElementById('modal-relations').innerHTML=relHtml;
-}
-function closeWarriorModal(){document.getElementById('warrior-modal').style.display='none';currentModalIndex=-1;}
-
-function talkToWarrior(index,type){
-  if(index<0||index>=gWarriors.length)return;
-  const w=gWarriors[index];let msg='',col='#ffdd88',gain=0,sit='';
-  if(type==='encourage'){gain=Math.floor(5+Math.random()*7);w.stats.loyalty=Math.min(100,w.stats.loyalty+gain);msg=`+${gain}å¿ `;col='#88ff88';sit='highLoyalty';}
-  else if(type==='train'){gain=Math.floor(4+Math.random()*5);w.stats.power+=gain;msg=`+${gain}æ­¦åŠ›`;col='#ffcc66';sit='train';}
-  else if(type==='teach'){gain=Math.floor(3+Math.random()*4);w.stats.wisdom=Math.min(99,w.stats.wisdom+gain);msg=`+${gain}çŸ¥`;col='#aaddff';sit='train';}
-  createFloatText(w,msg,col);
-  addCanvasBubble(w,getSpeech(w,sit),120);
-  state.koku=Math.max(0,state.koku-35);
-  updateStatusUI();updatePartyRow();
-  if(currentModalIndex===index)showWarriorModal(index);
-}
-
-function showDev(){document.getElementById('dev-modal').style.display='flex';renderFacilities();}
-function closeDevModal(){document.getElementById('dev-modal').style.display='none';}
-function renderFacilities(){
-  let html='';
-  Object.entries(FACILITY_MAP).forEach(([key,f])=>{
-    const cost=Math.floor((COST_BASE[key]||400)*Math.pow(1.65,f.level-1));
-    html+=`<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);padding:12px 14px;border-radius:12px;margin-bottom:10px;">
-      <div style="font-size:28px;width:40px;text-align:center;">${f.icon}</div>
-      <div style="flex:1;"><div style="font-size:16px;font-weight:700;">${f.name} <span style="font-size:12px;color:#c8960c;">Lv.${f.level}</span></div>
-      <div style="font-size:11px;color:rgba(245,232,200,.7);">${FACILITY_EFFECT[key]?.label||''}ãŒå¼·åŒ–ã•ã‚Œã‚‹æ–½è¨­</div></div>
-      <button onclick="upgradeFacility('${key}',${cost})" style="background:var(--gold);color:#0e0800;padding:7px 13px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;cursor:pointer;font-size:12px;">${cost}çŸ³<br>å¼·åŒ–</button>
-    </div>`;
-  });
-  document.getElementById('facilities-list').innerHTML=html;
-}
-window.upgradeFacility=function(key,cost){
-  if(state.koku<cost){alert('å›½åŠ›ãŒä¸è¶³ã—ã¦ã„ã¾ã™ï¼');return;}
-  state.koku-=cost; FACILITY_MAP[key].level++;
-  gWarriors.forEach(w=>{const b=Math.floor(2+Math.random()*4);w.stats.power+=b;createFloatText(w,`æ–½è¨­+${b}`,'#ffdd88');addCanvasBubble(w,getSpeech(w,'train'),120);});
-  addLog(`${FACILITY_MAP[key].name}ãŒå¼·åŒ–ã•ã‚ŒãŸï¼`,'success');
-  updateStatusUI();updatePartyRow();renderFacilities();
-};
-
-window.showHistory=function(){
-  document.getElementById('history-list').innerHTML=gameLog.length
-    ?gameLog.slice().reverse().map(l=>{let col='#ddd';if(l.type==='awakening')col='#ff6666';if(l.type==='betrayal')col='#ff3333';if(l.type==='success')col='#ffcc66';return`<div style="margin-bottom:6px;color:${col};border-bottom:1px solid rgba(200,150,12,.1);padding-bottom:4px;"><span style="color:var(--gold-d);font-size:11px;">ã€${l.time}ã€‘</span> ${l.text}</div>`;}).join('')
-    :'<div style="color:rgba(245,232,200,.5);text-align:center;padding:20px;">ã¾ã æ­´å²ã¯åˆ»ã¾ã‚Œã¦ã„ãªã„â€¦</div>';
-  document.getElementById('history-modal').style.display='flex';
-};
-window.closeHistory=function(){document.getElementById('history-modal').style.display='none';};
-
-function performIdleTick(){
-  gWarriors.forEach(w=>{
-    w.stats.exp+=Math.floor(5+Math.random()*11);let lv=false;
-    while(w.stats.exp>=100){w.stats.exp-=100;w.stats.level++;lv=true;const pu=Math.floor(2+Math.random()*3);w.stats.power+=pu;createFloatText(w,`+${pu}æ­¦åŠ›`,'#ffcc66');}
-    if(lv){createFloatText(w,`Lv${w.stats.level}â†‘`,'#ffeeaa');addCanvasBubble(w,getSpeech(w,'levelUp'),140);addLog(`${w.name}ãŒLv${w.stats.level}ã«ï¼`);}
-    if(Math.random()<.6)w.stats.power++;
-    if(Math.random()<.35)w.stats.wisdom=Math.min(99,w.stats.wisdom+1);
-    if(Math.random()<.3) w.stats.loyalty=Math.min(100,w.stats.loyalty+Math.floor(1+Math.random()*3));
-  });
-  state.koku+=Math.floor(62+Math.random()*98);
-  state.unification=Math.min(99.9,state.unification+.12);
-  updateStatusUI();updatePartyRow();
-}
-
-function triggerEvent(){
-  if(Math.random()>.35)return;
-  const w=gWarriors[Math.floor(Math.random()*gWarriors.length)];if(!w)return;
-  const roll=Math.random();
-  if(roll<.15){const up=10+Math.floor(Math.random()*10);w.stats.power+=up;createFloatText(w,`è¦šé†’ +${up}`,'#ff4444');addCanvasBubble(w,'ç›®è¦šã‚ãŸâ€¦ï¼',140);addLog(`${w.name}ãŒè¦šé†’ã—ãŸï¼`,'awakening');}
-  else if(roll<.25){w.stats.loyalty=Math.max(0,w.stats.loyalty-30);createFloatText(w,'è£åˆ‡ã‚Šå…†å€™','#ff0000');addCanvasBubble(w,getSpeech(w,'lowLoyalty'),140);addLog(`${w.name}ã«è£åˆ‡ã‚Šã®å…†ã—â€¦`,'betrayal');}
-  else if(roll<.5){const g=500+Math.floor(Math.random()*500);state.koku+=g;addLog(`å†…æ”¿å¤§æˆåŠŸï¼ +${g}çŸ³`,'success');}
-  else{w.stats.power+=3;createFloatText(w,'+3','#ffdd88');addLog(`${w.name}ãŒæˆé•·ã—ãŸ`);}
-  updateStatusUI();updatePartyRow();
-}
-
-window.startBattle=()=>{
-  document.getElementById('battle-screen').classList.add('show');
-  document.getElementById('battle-family').textContent=(currentHouseHead?currentHouseHead.familyName:'ç¹”ç”°')+'è» å‡ºé™£';
-  document.getElementById('our-warriors').innerHTML=gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'ðŸŒ¸':'âš”ï¸'}</span>`).join('');
-  document.getElementById('enemy-warriors').innerHTML='<span class="wi">âš”ï¸</span><span class="wi">âš”ï¸</span><span class="wi">âš”ï¸</span>';
-  document.getElementById('battle-log').innerHTML='<div class="ll ally">æ•µè»ãŒåŸŽã«è¿«ã£ã¦ã„ã¾ã™ï¼</div>';
-};
-window.startBattleSimulation=function(){
-  const log=document.getElementById('battle-log');
-  log.innerHTML+=`<div class="ll ally">${gWarriors[0]?.name||'æ­¦å°†'}ãŒå…ˆé™£ã‚’åˆ‡ã£ãŸï¼</div>`;
-  // è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹ã‚’åˆæˆ¦çµæžœã«åæ˜ 
-  const battleBonus = bloodlineBattleBonus();
-  const winChance   = Math.min(0.95, 0.65 + battleBonus * 0.005);
-  const isWin       = Math.random() < winChance;
-  setTimeout(()=>{
-    if(isWin){
-      log.innerHTML+=`<div class="ll ally" style="color:#ffdd88">å¤§å‹åˆ©ï¼å¤©ä¸‹ã«åã‚’è½Ÿã‹ã›ãŸï¼${battleBonus>0?`ï¼ˆè¡€çµ±ãƒœãƒ¼ãƒŠã‚¹+${battleBonus}%ï¼‰`:''}</div>`;
-      state.koku+=1680;state.unification=Math.min(100,state.unification+4.5);
-      gWarriors.forEach((w,i)=>{w.stats.power+=5;createFloatText(w,'+5æ­¦åŠ›','#ffdd88');w.stats.loyalty=Math.min(100,w.stats.loyalty+8);addCanvasBubble(w,getSpeech(w,'highLoyalty'),140);gWarriors.forEach((_,j)=>{if(i!==j)changeRel(i,j,Math.floor(3+Math.random()*5));});});
-      addLog('åˆæˆ¦å¤§å‹åˆ©ï¼','success');
-    } else {
-      log.innerHTML+='<div class="ll ally" style="color:#ff8888">æƒœã—ãã‚‚æ•—æˆ¦â€¦æ¬¡ã“ãé›ªè¾±ã‚’ï¼</div>';
-      state.koku=Math.max(0,state.koku-500);
-      gWarriors.forEach(w=>{w.stats.loyalty=Math.max(0,w.stats.loyalty-5);});
-      addLog('åˆæˆ¦æ•—åŒ—â€¦','betrayal');
-    }
-    log.scrollTop=log.scrollHeight;
-    updateStatusUI();updatePartyRow();
-  },1400);
-};
-window.endBattle=()=>document.getElementById('battle-screen').classList.remove('show');
-
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-let tick=0;
-function gameLoop(){
-  tick++;
-  gWarriors.forEach((w,i)=>w.tick(i));
-  tickCanvasBubbles();
-  drawScene(tick);
-  requestAnimationFrame(gameLoop);
-}
-
-function initGame(){
-  gWarriors=[];buildTerrain();resizeCanvas();
-
-  // åˆæœŸæ­¦å°†ã‚’ç”Ÿæˆã—ã€è¡€çµ±ï¼ˆBushoï¼‰ã‚’è¨­å®š
-  const w0 = new IsoWarrior('ç¹”ç”° ä¿¡å»£','bukan', 88,  0.2, 3.5);
-  const w1 = new IsoWarrior('ãŠ å¸‚',    'hime',  72, -1.8, 3.2);
-  const w2 = new IsoWarrior('æ˜Žæ™º å…‰å¿ ','bunkan',65,  1.8, 3.0);
-
-  // å„æ­¦å°†ã® Busho ã‚’è¨­å®šï¼ˆPythonç‰ˆã¨åŒä»•æ§˜ã®ä¸‰ä»£è¡€çµ±ï¼‰
-  const busho0 = new Busho('ç¹”ç”° ä¿¡å»£', CLANS.oda);
-  const busho1 = new Busho('ãŠ å¸‚',     CLANS.oda);
-  const busho2 = new Busho('æ˜Žæ™º å…‰å¿ ', CLANS.azai);
-  setBusho(w0, busho0);
-  setBusho(w1, busho1);
-  setBusho(w2, busho2);
-  // è¡€çµ±ãƒœãƒ¼ãƒŠã‚¹é©ç”¨ï¼ˆèª•ç”Ÿæ™‚ã¨åŒã˜æ‰±ã„ï¼‰
-  applyBloodlineBonus(w0);
-  applyBloodlineBonus(w1);
-  applyBloodlineBonus(w2);
-
-  currentHouseHead={warrior:w0,familyName:'ç¹”ç”°'};
-  initRelations(gWarriors);
-
-  setTimeout(()=>addCanvasBubble(gWarriors[0],'å¤©ä¸‹ã‚’å–ã‚‹ãžï¼',180),1200);
-  setTimeout(()=>addCanvasBubble(gWarriors[1],'æ¡œãŒç¶ºéº—ã§ã™ã­â€¦',180),2200);
-  setTimeout(()=>addCanvasBubble(gWarriors[2],'è¬€ç•¥ãŒè¦ã‚Šã¾ã™ãª',180),3100);
-  updatePartyRow();updateStatusUI();
-
-  canvas.style.pointerEvents='auto';
-  canvas.addEventListener('click',()=>{
-    const w=gWarriors[Math.floor(Math.random()*gWarriors.length)];if(!w)return;
-    const g=1+Math.floor(Math.random()*3);w.stats.power+=g;
-    createFloatText(w,`+${g}`,'#ffaa44');addCanvasBubble(w,getSpeech(w,'train'),120);
-    addLog(`${w.name}ã‚’å¼·åŒ–`);updatePartyRow();
-  });
-  setInterval(performIdleTick,1800);
-  setInterval(()=>{updateTime();triggerEvent();},2200);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden){for(let i=0;i<5;i++)performIdleTick();addLog('æ”¾ç½®ãƒœãƒ¼ãƒŠã‚¹ç™ºç”Ÿï¼','success');}});
-  gameLoop();
-}
-window.onload=initGame;
-window.addEventListener('resize',resizeCanvas);
-</script>
 </body>
 </html>
