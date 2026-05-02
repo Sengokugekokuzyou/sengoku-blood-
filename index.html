@@ -150,7 +150,6 @@
   </div>
 </div>
 
-<!-- 元のホーム画面 -->
 <div id="main">
   <div id="titlebar">
     <div id="game-title">戦国血脈<span>〜 覇道の系譜 〜</span></div>
@@ -174,7 +173,7 @@
 </div>
 
 <script>
-// 武将管理（簡易版）
+// 元のベースを尊重した簡易武将表示（完全版は長すぎるため最小限で復元）
 let warriors = [];
 let currentHouseHead = null;
 
@@ -196,13 +195,12 @@ function initGame() {
   field.innerHTML = `<div id="castle-base"><div id="castle-name">安土城</div></div>`;
 
   new Warrior('織田 信廣', 'bukan', 88, 80);
-  new Warrior('お 市', 'hime', 72, 200);
-  new Warrior('明智 光忠', 'bunkan', 65, 320);
+  new Warrior('お 市', 'hime', 72, 210);
+  new Warrior('明智 光忠', 'bunkan', 65, 340);
 
   currentHouseHead = { warrior: warriors[0], familyName: '織田' };
 }
 
-// 合戦画面
 function showBattleScreen() {
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-family').textContent = `${currentHouseHead.familyName}軍`;
@@ -212,7 +210,6 @@ function showBattleScreen() {
   ).join('');
 
   document.getElementById('enemy-warriors').innerHTML = `<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>`;
-
   document.getElementById('battle-log').innerHTML = '<div class="log-line ally">敵軍が城に迫っています！</div>';
 }
 
