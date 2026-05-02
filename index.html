@@ -59,20 +59,7 @@
   #stats-bar { text-align: right; color: rgba(245,232,200,0.7); font-size: 10px; letter-spacing: 2px; line-height: 2; }
   #stats-bar strong { color: var(--gold-light); font-size: 13px; }
 
-  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), rgba(200,150,12,0.3), transparent); margin: 0 16px; opacity: 0.5; }
-
   #castle-field { flex: 1; position: relative; overflow: hidden; padding: 10px 0 0; }
-
-  #ground-plane {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 110px;
-    background: linear-gradient(180deg, transparent 0%, rgba(40,25,5,0.3) 40%, rgba(30,18,0,0.6) 100%);
-    pointer-events: none;
-  }
-  #ground-line {
-    position: absolute; bottom: 84px; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(200,150,12,0.2), rgba(200,150,12,0.4), rgba(200,150,12,0.2), transparent);
-    pointer-events: none;
-  }
 
   #castle-base {
     position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%);
@@ -81,11 +68,9 @@
   @keyframes castleFloat { 0%,100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-4px); } }
 
   .warrior { position: absolute; bottom: 86px; cursor: pointer; z-index: 15; transition: filter 0.2s; }
-  .warrior.selected-for-breed { filter: drop-shadow(0 0 8px rgba(240,192,64,0.9)) drop-shadow(0 0 16px rgba(255,140,0,0.5)) !important; }
-  .retired { filter: grayscale(0.85) brightness(0.75); opacity: 0.65; pointer-events: none; }
-  .retired .warrior-svg { filter: brightness(0.6); }
+  .warrior:hover .warrior-svg { filter: brightness(1.25); }
 
-  /* 合戦画面スタイル */
+  /* 合戦画面 */
   #battle-screen {
     position: fixed; inset: 0; z-index: 500;
     background: linear-gradient(#0a0500, #1a0f00);
@@ -95,41 +80,38 @@
   #battle-screen.show { display: flex; }
 
   .battle-header {
-    padding: 12px 20px; background: rgba(0,0,0,0.7); border-bottom: 2px solid var(--gold);
+    padding: 12px 20px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold);
     display: flex; justify-content: space-between; align-items: center;
   }
   .battle-title { font-size: 18px; letter-spacing: 3px; color: var(--gold-light); }
 
   .battle-field {
     flex: 1; position: relative; overflow: hidden;
-    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://picsum.photos/id/1015/1200/600') center/cover;
-    display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 60px;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://picsum.photos/id/1015/1200/600') center/cover;
+    display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 80px;
   }
 
-  .army { text-align: center; width: 45%; }
-  .army-title { font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; }
+  .army { text-align: center; width: 42%; }
+  .army-title { font-size: 14px; margin-bottom: 12px; letter-spacing: 2px; }
   .our-army .army-title { color: #ffdd88; }
   .enemy-army .army-title { color: #ff8888; }
 
-  .warrior-icon {
-    width: 52px; height: 68px; margin: 4px; display: inline-block;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-  }
+  .warrior-icon { font-size: 48px; margin: 8px 4px; display: inline-block; filter: drop-shadow(0 4px 12px #000); }
 
   .battle-log {
-    height: 180px; background: rgba(10,6,0,0.95); border-top: 2px solid var(--gold);
-    padding: 12px; overflow-y: auto; font-size: 13px; line-height: 1.5;
+    height: 190px; background: rgba(10,6,0,0.95); border-top: 2px solid var(--gold);
+    padding: 12px; overflow-y: auto; font-size: 13.5px; line-height: 1.6;
   }
-  .log-line { margin: 3px 0; }
-  .log-line.ally { color: #aaffaa; }
-  .log-line.enemy { color: #ffaaaa; }
+  .log-line { margin: 4px 0; }
+  .log-line.ally { color: #bbffbb; }
 
   .battle-footer {
-    padding: 12px; background: rgba(0,0,0,0.8); display: flex; gap: 12px;
+    padding: 12px; background: rgba(0,0,0,0.85); display: flex; gap: 10px;
   }
   .battle-btn {
-    flex: 1; padding: 12px; background: linear-gradient(#4a2a0a, #2a1800);
-    border: 1px solid var(--gold); color: var(--parchment); font-size: 15px;
+    flex: 1; padding: 14px; font-size: 15px; font-weight: 700;
+    background: linear-gradient(#5a2a0a, #2a1800);
+    border: 1px solid var(--gold); color: var(--parchment);
     cursor: pointer; border-radius: 4px;
   }
 </style>
@@ -138,18 +120,20 @@
 
 <div id="bg"></div>
 <div class="mist-layer"></div><div class="mist-layer"></div><div class="mist-layer"></div>
+<div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
+<div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
 
 <div id="battle-screen">
   <div class="battle-header">
-    <div class="battle-title" id="battle-family">織田軍</div>
-    <div onclick="endBattle()" style="cursor:pointer; font-size:18px;">✕</div>
+    <div class="battle-title" id="battle-family">織田軍 出陣</div>
+    <div onclick="endBattle()" style="cursor:pointer;font-size:22px;color:#ffaaaa;">✕</div>
   </div>
   <div class="battle-field">
     <div class="army our-army">
       <div class="army-title">我が軍</div>
       <div id="our-warriors"></div>
     </div>
-    <div style="text-align:center; font-size:32px; color:var(--gold); align-self:center; margin-top:-30px;">VS</div>
+    <div style="font-size:42px;color:var(--gold);align-self:center;margin-top:-40px;">VS</div>
     <div class="army enemy-army">
       <div class="army-title">敵軍</div>
       <div id="enemy-warriors"></div>
@@ -162,7 +146,6 @@
   </div>
 </div>
 
-<!-- ここから元のゲーム本体（簡略化して最低限動作する形にまとめています） -->
 <div id="main">
   <div id="titlebar">
     <div id="game-title">戦国血脈<span>〜 覇道の系譜 〜</span></div>
@@ -172,7 +155,6 @@
       <span style="font-size:9px;color:rgba(200,150,12,0.5)">第 <strong id="gen-num">1</strong> 世代</span>
     </div>
   </div>
-  <div class="divider"></div>
 
   <div id="castle-field">
     <div id="castle-base">
@@ -180,96 +162,74 @@
     </div>
   </div>
 
-  <div id="bottom-panel">
-    <div id="action-buttons">
-      <button class="action-btn" onclick="showBloodline()">配合</button>
-      <button class="action-btn" onclick="startBattle(event)" style="border-color:rgba(200,150,12,0.6);">合戦</button>
-    </div>
+  <div style="padding:12px 20px 20px;background:linear-gradient(0deg,rgba(10,6,0,0.95),transparent);display:flex;gap:12px;justify-content:center;">
+    <button onclick="showBloodline()" style="padding:12px 28px;background:#2a1a08;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;">配合</button>
+    <button onclick="startBattle(event)" style="padding:12px 28px;background:#4a1a1a;border:1px solid var(--gold);color:var(--parchment);border-radius:4px;">合戦</button>
   </div>
 </div>
 
 <script>
-// ====================== 簡易版ゲーム本体 ======================
+// 武将管理
 let warriors = [];
 let currentHouseHead = null;
 
 class Warrior {
-  constructor(name, job, power, color) {
-    this.def = { name, jobId: job, power, color: color || 'c_red' };
+  constructor(name, jobId, power, leftPos) {
+    this.def = { name, jobId, power };
     this.el = document.createElement('div');
-    this.el.style.position = 'absolute';
-    this.el.style.bottom = '100px';
-    this.el.style.left = (50 + warriors.length * 60) + 'px';
-    this.el.innerHTML = `<div style="font-size:40px;">\( {job === 'bukan' ? '⚔️' : '🌸'}</div><div style="font-size:10px;"> \){name}</div>`;
+    this.el.className = 'warrior';
+    this.el.style.left = leftPos + 'px';
+    this.el.innerHTML = `<div style="font-size:52px;">\( {jobId === 'bukan' ? '⚔️' : '🌸'}</div><div style="font-size:11px;color:var(--gold-light);"> \){name}</div>`;
     document.getElementById('castle-field').appendChild(this.el);
     warriors.push(this);
   }
 }
 
-// 初期武将
-new Warrior('織田 信廣', 'bukan', 85, 'c_red');
-new Warrior('お 市', 'hime', 65, 'c_pink');
+function initGame() {
+  warriors = [];
+  document.getElementById('castle-field').innerHTML = `<div id="castle-base"><div id="castle-name">安土城</div></div>`;
+  
+  new Warrior('織田 信廣', 'bukan', 88, 120);
+  new Warrior('お 市', 'hime', 72, 220);
+  new Warrior('明智 光忠', 'bunkan', 65, 320);
 
-// 当主設定
-currentHouseHead = { warrior: warriors[0], familyName: '織田' };
+  currentHouseHead = { warrior: warriors[0], familyName: '織田' };
+}
 
-// 合戦画面関数
+// 合戦画面
 function showBattleScreen() {
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-family').textContent = `${currentHouseHead.familyName}軍`;
-  renderOurWarriors();
-  generateEnemies();
+
+  const our = document.getElementById('our-warriors');
+  our.innerHTML = warriors.map(w => `<span class="warrior-icon">${w.def.jobId === 'bukan' ? '⚔️' : '🌸'}</span>`).join('');
+
+  const enemy = document.getElementById('enemy-warriors');
+  enemy.innerHTML = `<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>`;
+
+  document.getElementById('battle-log').innerHTML = '<div class="log-line ally">敵軍が現れました！</div>';
 }
 
-function renderOurWarriors() {
-  const container = document.getElementById('our-warriors');
-  container.innerHTML = '';
-  warriors.forEach(w => {
-    const div = document.createElement('div');
-    div.className = 'warrior-icon';
-    div.innerHTML = `<span style="font-size:42px;">${w.def.jobId === 'bukan' ? '⚔️' : '🌸'}</span>`;
-    container.appendChild(div);
-  });
-}
-
-let currentBattleEnemies = [];
-function generateEnemies() {
-  currentBattleEnemies = [
-    {name: "武田 信玄", power: 92},
-    {name: "上杉 謙信", power: 88},
-    {name: "今川 義元", power: 65}
-  ];
-  const container = document.getElementById('enemy-warriors');
-  container.innerHTML = '';
-  currentBattleEnemies.forEach(e => {
-    const div = document.createElement('div');
-    div.className = 'warrior-icon';
-    div.innerHTML = `<span style="font-size:42px;">⚔️</span>`;
-    container.appendChild(div);
-  });
-}
-
-function startBattleSimulation() {
+window.startBattleSimulation = function() {
   const log = document.getElementById('battle-log');
-  log.innerHTML = '<div class="log-line ally">戦闘開始！</div>';
-  
-  setTimeout(() => log.innerHTML += '<div class="log-line ally">織田 信廣が敵を3名討ち取った！</div>', 800);
-  setTimeout(() => log.innerHTML += '<div class="log-line ally">お 市が味方を鼓舞した！</div>', 1600);
-  setTimeout(() => {
-    log.innerHTML += '<div class="log-line ally" style="font-size:18px;color:#ffdd88;">● 大勝利 ●</div>';
-  }, 2800);
-}
+  log.innerHTML += '<div class="log-line ally">織田信廣が敵将を討ち取った！</div>';
+  setTimeout(() => log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！</div>', 1500);
+};
 
-function endBattle() {
+window.endBattle = function() {
   document.getElementById('battle-screen').classList.remove('show');
-}
+};
 
 window.startBattle = function() {
   showBattleScreen();
 };
 
+window.showBloodline = function() {
+  alert("配合機能は現在開発中です");
+};
+
 // 起動
-console.log("%c戦国血脈 正常起動", "color:#ffdd88;font-size:14px");
+window.onload = initGame;
 </script>
 </body>
 </html>
