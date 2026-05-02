@@ -2177,3 +2177,96 @@ window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
 </html>
+<div class="engumi-container">
+    <div class="main-busho-card">
+        <div class="busho-header">
+            <span class="busho-name">織田 信廣</span>
+            <span class="blood-type">純血 100%</span>
+        </div>
+        <div class="parent-info">父：織田信長 × 母：お市</div>
+    </div>
+
+    <div class="list-label">縁組候補（相手を選んでください）</div>
+
+    <div class="candidate-list">
+        <div class="candidate-row selected">
+            <div class="candidate-name">濃姫 <span class="clan-tag">齋藤家</span></div>
+            <div class="nicks-mark">◎</div>
+            <div class="bonus-preview">武力++ / 知力+++</div>
+        </div>
+        <div class="candidate-row">
+            <div class="candidate-name">まつ <span class="clan-tag">前田家</span></div>
+            <div class="nicks-mark">○</div>
+            <div class="bonus-preview">統率++ / 内政+</div>
+        </div>
+        </div>
+
+    <div class="engumi-footer">
+        <button class="execute-btn">縁組を結ぶ</button>
+        <button class="close-btn">閉じる</button>
+    </div>
+</div>
+
+<style>
+    .engumi-container {
+        background-color: #1a1a1a;
+        color: #d1b891;
+        padding: 15px;
+        border: 2px solid #8b7355;
+        font-family: 'Hiragino Mincho ProN', serif;
+    }
+
+    .main-busho-card {
+        background: linear-gradient(to bottom, #332b21, #1a1510);
+        padding: 10px;
+        border-bottom: 2px solid #ffcc00;
+        margin-bottom: 15px;
+    }
+
+    .candidate-list {
+        height: 200px;
+        overflow-y: auto;
+        background-color: #000;
+        border: 1px solid #444;
+    }
+
+    .candidate-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #222;
+        cursor: pointer;
+    }
+
+    .candidate-row.selected {
+        background-color: #3d3311;
+        border-left: 4px solid #ffcc00;
+    }
+
+    .nicks-mark {
+        color: #ff3300;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .execute-btn {
+        background-color: #800000; /* 深い赤：祝儀と決断 */
+        color: #fff;
+        width: 100%;
+        padding: 15px;
+        margin-top: 10px;
+        font-weight: bold;
+        border: none;
+        box-shadow: 0 4px 0 #500000;
+    }
+
+    .close-btn {
+        background: none;
+        color: #aaa;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        text-decoration: underline;
+    }
+</style>
