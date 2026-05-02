@@ -1128,3 +1128,26 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 </script>
+
+<button class="act-btn" onclick="showDev()">
+  <span class="ico">🏯</span>
+  <span class="lbl">施設</span>
+</button>
+
+<button class="act-btn" onclick="showHistory()">
+  <span class="ico">📜</span>
+  <span class="lbl">歴史</span>
+</button>
+window.showHistory = function() {
+  if (!gameLog || gameLog.length === 0) {
+    alert("まだ歴史は刻まれていない...");
+    return;
+  }
+
+  let text = "【戦国記録】\n\n";
+  gameLog.slice().reverse().forEach(log => {
+    text += "・" + log + "\n";
+  });
+
+  alert(text);
+};
