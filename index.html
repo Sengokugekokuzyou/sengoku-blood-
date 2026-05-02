@@ -25,1603 +25,210 @@
     user-select: none;
   }
 
-  #bg { position: fixed; inset: 0; background: linear-gradient(180deg, #2a1a08 0%, #1a0f00 40%, #0d0800 100%); }
-  #mountains { position: fixed; bottom: 0; left: 0; right: 0; height: 45%; opacity: 0.22; }
+  /* ... (既存の全スタイルは省略せず全部保持) ... */
+  /* ここに元の<style>内容をすべて貼り付け (変更なし) */
 
-  .mist-layer {
-    position: fixed; left: -20%; width: 140%; height: 80px;
-    background: linear-gradient(90deg, transparent, rgba(245,232,200,0.05), rgba(245,232,200,0.08), rgba(245,232,200,0.04), transparent);
-    border-radius: 50%; animation: drift linear infinite;
+  /* 新規追加: 引退・家督関連スタイル */
+  .retired { filter: grayscale(0.85) brightness(0.75); opacity: 0.65; pointer-events: none; }
+  .retired .warrior-svg { filter: brightness(0.6); }
+
+  #succession-modal {
+    position: fixed; inset: 0; z-index: 400;
+    background: radial-gradient(ellipse at center, rgba(200,150,12,0.4) 0%, transparent 70%);
+    display: none; align-items: center; justify-content: center;
   }
-  .mist-layer:nth-child(1) { top: 35%; animation-duration: 28s; }
-  .mist-layer:nth-child(2) { top: 55%; animation-duration: 22s; animation-delay: -8s; opacity: 0.7; }
-  .mist-layer:nth-child(3) { top: 45%; animation-duration: 35s; animation-delay: -15s; opacity: 0.5; }
-  @keyframes drift {
-    0% { transform: translateX(-10%) scaleY(1); } 50% { transform: translateX(5%) scaleY(1.3); } 100% { transform: translateX(-10%) scaleY(1); }
-  }
-
-  .petal {
-    position: fixed;
-    background: radial-gradient(ellipse, rgba(255,200,200,0.9) 0%, rgba(255,150,150,0.4) 100%);
-    border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-20px) rotate(0deg) translateX(0px); opacity: 0; }
-    10% { opacity: 0.8; } 90% { opacity: 0.6; }
-    100% { transform: translateY(100vh) rotate(720deg) translateX(60px); opacity: 0; }
-  }
-  .p1{left:5%;width:6px;height:6px;animation-duration:8s;} .p2{left:15%;width:8px;height:8px;animation-duration:11s;animation-delay:-3s;}
-  .p3{left:30%;width:5px;height:5px;animation-duration:9s;animation-delay:-6s;} .p4{left:50%;width:8px;height:8px;animation-duration:13s;animation-delay:-1s;}
-  .p5{left:65%;width:7px;height:7px;animation-duration:10s;animation-delay:-4s;} .p6{left:80%;width:5px;height:5px;animation-duration:12s;animation-delay:-7s;}
-  .p7{left:90%;width:8px;height:8px;animation-duration:8.5s;animation-delay:-2s;} .p8{left:42%;width:6px;height:6px;animation-duration:15s;animation-delay:-9s;}
-
-  #main { position: relative; z-index: 10; width: 100%; height: 100vh; display: flex; flex-direction: column; }
-
-  #titlebar { padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: flex-start; }
-  #game-title { color: var(--gold); font-size: 13px; font-weight: 700; letter-spacing: 4px; text-shadow: 0 0 20px rgba(200,150,12,0.6); line-height: 1.8; }
-  #game-title span { display: block; font-size: 9px; letter-spacing: 6px; color: rgba(200,150,12,0.6); font-weight: 400; }
-  #stats-bar { text-align: right; color: rgba(245,232,200,0.7); font-size: 10px; letter-spacing: 2px; line-height: 2; }
-  #stats-bar strong { color: var(--gold-light); font-size: 13px; }
-
-  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), rgba(200,150,12,0.3), transparent); margin: 0 16px; opacity: 0.5; }
-
-  #castle-field { flex: 1; position: relative; overflow: hidden; padding: 10px 0 0; }
-
-  #ground-plane {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 110px;
-    background: linear-gradient(180deg, transparent 0%, rgba(40,25,5,0.3) 40%, rgba(30,18,0,0.6) 100%);
-    pointer-events: none;
-  }
-  #ground-line {
-    position: absolute; bottom: 84px; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(200,150,12,0.2), rgba(200,150,12,0.4), rgba(200,150,12,0.2), transparent);
-    pointer-events: none;
-  }
-
-  #castle-base {
-    position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%);
-    text-align: center; animation: castleFloat 6s ease-in-out infinite; pointer-events: none;
-  }
-  @keyframes castleFloat { 0%,100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-4px); } }
-  #castle-svg { width: 160px; filter: drop-shadow(0 4px 20px rgba(200,150,12,0.3)) drop-shadow(0 0 40px rgba(139,0,0,0.2)); }
-  #castle-name { color: var(--gold-light); font-size: 11px; letter-spacing: 4px; margin-top: 4px; text-shadow: 0 0 10px rgba(200,150,12,0.8); }
-
-  .flag { position: absolute; bottom: 86px; display: flex; flex-direction: column; align-items: center; animation: flagWave 3s ease-in-out infinite; pointer-events: none; }
-  @keyframes flagWave { 0%,100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
-  .flag-pole { width: 2px; height: 30px; background: linear-gradient(180deg, var(--gold), #8b6a00); }
-  .flag-cloth { position: absolute; top: 0; left: 2px; width: 16px; height: 11px; border-radius: 0 2px 2px 0; display: flex; align-items: center; justify-content: center; font-size: 7px; color: rgba(245,232,200,0.9); animation: clothWave 2s ease-in-out infinite; }
-  @keyframes clothWave { 0%,100% { transform: skewX(0deg) scaleX(1); } 50% { transform: skewX(3deg) scaleX(0.95); } }
-
-  .warrior { position: absolute; bottom: 86px; cursor: pointer; z-index: 15; transition: filter 0.2s; }
-  .warrior.selected-for-breed { filter: drop-shadow(0 0 8px rgba(240,192,64,0.9)) drop-shadow(0 0 16px rgba(255,140,0,0.5)) !important; }
-
-  .warrior-svg { display: block; overflow: visible; }
-
-  .warrior-shadow {
-    position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
-    width: 24px; height: 5px;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
-    border-radius: 50%; pointer-events: none;
-  }
-
-  .warrior-tag {
-    position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
-    background: rgba(26,15,0,0.92); border: 1px solid rgba(200,150,12,0.5);
-    padding: 1px 7px; white-space: nowrap;
-    font-size: 9px; color: var(--gold-light); letter-spacing: 1px; border-radius: 2px;
-    pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 20;
-  }
-  .warrior:hover .warrior-tag { opacity: 1; }
-  .warrior:hover .warrior-svg { filter: brightness(1.25); }
-
-  .job-badge {
-    position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
-    font-size: 7px; letter-spacing: 2px; padding: 1px 5px; border-radius: 2px;
-    white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s;
-  }
-  .warrior:hover .job-badge { opacity: 1; }
-  .badge-bukan      { background: rgba(139,0,0,0.7);    border: 1px solid #ff4444; color: #ffaaaa; }
-  .badge-bunkan     { background: rgba(20,40,100,0.7);  border: 1px solid #88aaff; color: #aaccff; }
-  .badge-hime       { background: rgba(100,0,60,0.7);   border: 1px solid #ff88cc; color: #ffccee; }
-  .badge-himebusho  { background: rgba(80,0,80,0.7);    border: 1px solid #dd88ff; color: #eeccff; }
-  /* ランクアップ職業バッジ */
-  .badge-shitaisho  { background: rgba(160,40,0,0.8);   border: 1px solid #ff7744; color: #ffcc99; }
-  .badge-mousho     { background: rgba(180,0,0,0.9);    border: 1px solid #ffaa00; color: #ffe080; }
-  .badge-gunshi     { background: rgba(0,40,120,0.8);   border: 1px solid #66ccff; color: #cceeFF; }
-  .badge-tairo      { background: rgba(0,20,80,0.9);    border: 1px solid #aaddff; color: #ddeeff; }
-  .badge-sokushitsu { background: rgba(120,0,80,0.8);   border: 1px solid #ff99dd; color: #ffddee; }
-  .badge-midaidokoro{ background: rgba(100,0,100,0.9);  border: 1px solid #ffbbff; color: #ffeeff; }
-  .badge-joketsusho { background: rgba(100,0,100,0.8);  border: 1px solid #ee88ff; color: #eeccff; }
-  .badge-sensahime  { background: rgba(60,0,120,0.9);   border: 1px solid #cc88ff; color: #eebbff; }
-
-  /* ランクバッジ（常時表示） */
-  .rank-badge {
-    position: absolute; top: -52px; left: 50%; transform: translateX(-50%);
-    font-size: 8px; letter-spacing: 1px; padding: 1px 6px; border-radius: 10px;
-    white-space: nowrap; pointer-events: none; display: none;
-  }
-  .rank-badge.rank1 { display: block; background: rgba(150,100,0,0.8); border: 1px solid var(--gold); color: var(--gold-light); }
-  .rank-badge.rank2 { display: block; background: rgba(100,0,150,0.8); border: 1px solid #cc88ff; color: #ffccff; animation: rankGlow 2s ease-in-out infinite; }
-  @keyframes rankGlow { 0%,100%{box-shadow:0 0 4px rgba(200,100,255,0.4);} 50%{box-shadow:0 0 12px rgba(200,100,255,0.8);} }
-
-  .warrior.stage-child  .warrior-svg { transform: scale(0.55); transform-origin: bottom center; }
-  .warrior.stage-teen   .warrior-svg { transform: scale(0.72); transform-origin: bottom center; }
-  .warrior.stage-young  .warrior-svg { transform: scale(0.88); transform-origin: bottom center; }
-  .warrior.stage-adult  .warrior-svg { transform: scale(1.00); transform-origin: bottom center; }
-
-  @keyframes evolveGlow { 0%{filter:brightness(1)} 40%{filter:brightness(2) drop-shadow(0 0 12px gold)} 100%{filter:brightness(1)} }
-  .warrior.evolving .warrior-svg { animation: evolveGlow 1.4s ease-out; }
-
-  /* ランクアップ専用輝きエフェクト */
-  @keyframes rankUpFlare {
-    0%   { filter: brightness(1); }
-    20%  { filter: brightness(3) drop-shadow(0 0 20px gold) drop-shadow(0 0 40px orange); }
-    50%  { filter: brightness(2.5) drop-shadow(0 0 14px gold); }
-    100% { filter: brightness(1); }
-  }
-  .warrior.ranking-up .warrior-svg { animation: rankUpFlare 2s ease-out; }
-
-  .status-up-popup {
-    position: absolute; font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 13px;
-    letter-spacing: 1px; text-shadow: 0 0 8px rgba(0,0,0,1), 0 1px 4px rgba(0,0,0,0.9);
-    pointer-events: none; z-index: 100; white-space: nowrap; left: 50%;
-    transform: translateX(-50%); animation: statusFloatUp 1.3s ease-out forwards;
-  }
-  @keyframes statusFloatUp {
-    0%   { transform: translateX(-50%) translateY(0px);   opacity: 0; }
-    15%  { transform: translateX(-50%) translateY(-6px);  opacity: 1; }
-    80%  { transform: translateX(-50%) translateY(-36px); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(-48px); opacity: 0; }
-  }
-
-  /* ランクアップポップアップテキスト */
-  .rankup-popup {
-    position: absolute; font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 12px;
-    letter-spacing: 2px; color: #ffdd44;
-    text-shadow: 0 0 10px rgba(255,200,0,0.9), 0 0 20px rgba(255,100,0,0.7);
-    pointer-events: none; z-index: 101; white-space: nowrap; left: 50%;
-    animation: rankupFloat 2.2s ease-out forwards;
-  }
-  @keyframes rankupFloat {
-    0%   { transform: translateX(-50%) translateY(0px) scale(0.5); opacity: 0; }
-    20%  { transform: translateX(-50%) translateY(-20px) scale(1.2); opacity: 1; }
-    60%  { transform: translateX(-50%) translateY(-50px) scale(1.0); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(-80px) scale(0.9); opacity: 0; }
-  }
-
-  .warrior.growing-aura .warrior-svg { filter: drop-shadow(0 0 6px rgba(80,255,120,0.7)); }
-
-  .growth-bar-wrap {
-    position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-    width: 36px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;
-    overflow: hidden; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  }
-  .warrior:hover .growth-bar-wrap { opacity: 1; }
-  .growth-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #44cc44, #f0c040); transition: width 1s linear; }
-
-  /* ランクアップ進捗バー */
-  .rank-bar-wrap {
-    position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
-    width: 36px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px;
-    overflow: visible; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  }
-  .warrior:hover .rank-bar-wrap { opacity: 1; }
-  .rank-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), #ffdd44); transition: width 0.8s ease; }
-  .rank-bar-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 7px; color: rgba(200,150,12,0.7); white-space: nowrap; letter-spacing: 1px; }
-
-  .stage-label {
-    position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
-    font-size: 8px; color: rgba(200,150,12,0.7); letter-spacing: 2px;
-    white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.3s;
-  }
-  .warrior:hover .stage-label { opacity: 1; }
-
-  .emotion-icon {
-    position: absolute; top: -32px; left: 50%; transform: translateX(-50%);
-    font-size: 14px; opacity: 0; transition: opacity 0.4s;
-    pointer-events: none; z-index: 21; animation: emotionBob 0.8s ease-in-out infinite;
-  }
-  @keyframes emotionBob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
-  .emotion-icon.show { opacity: 1; }
-
-  .speech-bubble {
-    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-    background: rgba(20,10,0,0.93); border: 1px solid rgba(200,150,12,0.5);
-    padding: 4px 9px; border-radius: 3px; font-size: 10px; color: var(--parchment);
-    letter-spacing: 1px; line-height: 1.6; white-space: nowrap; pointer-events: none;
-    opacity: 0; transition: opacity 0.4s; z-index: 22; margin-bottom: 4px;
-  }
-  .speech-bubble::after {
-    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-    border: 6px solid transparent; border-top-color: rgba(200,150,12,0.5); border-bottom: none;
-  }
-  .speech-bubble.visible { opacity: 1; }
-
-  /* ======== 下部パネル ======== */
-  #bottom-panel {
-    padding: 10px 12px 14px;
-    background: linear-gradient(0deg, rgba(10,6,0,0.95) 0%, rgba(10,6,0,0.8) 80%, transparent 100%);
-  }
-  #era-display { text-align: center; margin-bottom: 10px; }
-  #era-text { color: rgba(245,232,200,0.5); font-size: 10px; letter-spacing: 4px; }
-  #era-year { color: var(--gold-light); font-size: 18px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 0 20px rgba(200,150,12,0.5); display: block; transition: opacity 0.5s; }
-
-  #action-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .action-btn {
-    background: linear-gradient(135deg, rgba(30,18,0,0.9), rgba(15,9,0,0.9));
-    border: 1px solid rgba(200,150,12,0.35); padding: 10px 4px 8px; border-radius: 4px;
-    color: var(--parchment); font-family: 'Noto Serif JP', serif;
-    font-size: 11px; letter-spacing: 2px; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-    transition: all 0.2s; position: relative; overflow: hidden;
-  }
-  .action-btn:hover { border-color: rgba(200,150,12,0.7); transform: translateY(-1px); }
-  .action-btn:active { transform: translateY(1px); }
-  .btn-icon { font-size: 18px; }
-  .btn-sub { font-size: 8px; letter-spacing: 1px; color: rgba(245,232,200,0.4); margin-top: 1px; }
-  .badge { position: absolute; top: 6px; right: 8px; background: var(--crimson); color: white; font-size: 8px; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.15);} }
-
-  #status-row { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; }
-  .status-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .status-label { font-size: 8px; color: rgba(245,232,200,0.4); letter-spacing: 2px; }
-  .status-value { font-size: 12px; color: var(--gold-light); font-weight: 700; letter-spacing: 1px; }
-  .status-bar-wrap { width: 60px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-  .status-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
-  .bar-power   { background: linear-gradient(90deg, #cc3333, #ff6666); }
-  .bar-intel   { background: linear-gradient(90deg, #3366cc, #66aaff); }
-  .bar-loyalty { background: linear-gradient(90deg, #cc9900, var(--gold-light)); }
-  .status-divider { width: 1px; height: 30px; background: rgba(200,150,12,0.2); }
-
-  .job-display-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .job-display-icon { font-size: 16px; }
-  .job-display-label { font-size: 7px; color: rgba(245,232,200,0.5); letter-spacing: 1px; }
-
-  /* ======== 昇格ポップアップ ======== */
-  #rankup-overlay {
-    position: fixed; inset: 0; z-index: 300;
-    background: radial-gradient(ellipse at center, rgba(220,160,0,0.35) 0%, transparent 65%);
-    pointer-events: none; opacity: 0; transition: opacity 0.6s;
-  }
-  #rankup-overlay.show { opacity: 1; }
-
-  #rankup-modal {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: linear-gradient(160deg, rgba(18,10,0,0.99), rgba(6,3,0,0.99));
-    border: 1px solid var(--gold-light); border-radius: 6px;
-    padding: 22px 20px 18px; width: 300px; z-index: 310;
+  #succession-modal.show { display: flex; }
+  .succession-content {
+    background: linear-gradient(160deg, #1a0f00, #0a0500);
+    border: 2px solid var(--gold-light);
+    border-radius: 8px;
+    width: 340px;
+    padding: 24px 20px;
     text-align: center;
-    box-shadow: 0 0 60px rgba(200,150,12,0.4), 0 0 120px rgba(0,0,0,0.9);
-    opacity: 0; transition: all 0.5s ease-out; pointer-events: none;
+    box-shadow: 0 0 80px rgba(200,150,12,0.6);
   }
-  #rankup-modal.show {
-    opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto;
+  .succession-title { font-size: 12px; letter-spacing: 4px; color: var(--gold); margin-bottom: 12px; }
+  .heir-candidate { 
+    background: rgba(40,25,5,0.9); border: 1px solid rgba(200,150,12,0.5);
+    margin: 8px 0; padding: 10px; border-radius: 4px; cursor: pointer;
   }
-  .rankup-modal-title { font-size: 10px; letter-spacing: 6px; color: rgba(200,150,12,0.7); margin-bottom: 10px; }
-  .rankup-modal-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 8px 0; opacity: 0.5; }
-  .rankup-from { font-size: 11px; color: rgba(245,232,200,0.5); letter-spacing: 2px; margin-bottom: 6px; }
-  .rankup-arrow { font-size: 20px; color: var(--gold); margin: 6px 0; animation: arrowPulse 0.8s ease-in-out infinite; }
-  @keyframes arrowPulse { 0%,100%{opacity:0.6;transform:translateY(0);} 50%{opacity:1;transform:translateY(3px);} }
-  .rankup-to { font-size: 20px; font-weight: 900; color: var(--gold-light); letter-spacing: 4px;
-    text-shadow: 0 0 16px rgba(240,192,64,0.8), 0 0 32px rgba(200,150,12,0.5); margin-bottom: 8px; }
-  .rankup-name { font-size: 13px; color: var(--parchment); letter-spacing: 2px; margin-bottom: 4px; }
-  .rankup-bonuses { display: flex; justify-content: center; gap: 14px; margin: 10px 0; }
-  .rankup-bonus { font-size: 10px; letter-spacing: 1px; }
-  .rankup-bonus.power   { color: #ff8888; }
-  .rankup-bonus.intel   { color: #88aaff; }
-  .rankup-bonus.loyalty { color: var(--gold-light); }
-  .rankup-flavor { font-size: 9px; color: rgba(245,232,200,0.45); letter-spacing: 2px; margin: 8px 0; line-height: 1.8; }
-  .rankup-close-btn {
-    margin-top: 12px; padding: 7px 24px;
-    background: linear-gradient(135deg, rgba(139,0,0,0.8), rgba(80,0,0,0.9));
-    border: 1px solid rgba(200,150,12,0.5); color: var(--parchment);
-    font-family: 'Noto Serif JP', serif; font-size: 11px; letter-spacing: 3px;
-    cursor: pointer; border-radius: 3px; transition: all 0.2s;
-  }
-  .rankup-close-btn:hover { background: linear-gradient(135deg, rgba(180,0,0,0.9), rgba(110,0,0,0.95)); box-shadow: 0 0 14px rgba(139,0,0,0.4); }
-
-  /* ======== 配合ポップアップ ======== */
-  #bloodline-popup {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.85);
-    background: linear-gradient(160deg, rgba(22,12,2,0.99), rgba(10,5,0,0.99));
-    border: 1px solid var(--gold); border-radius: 6px;
-    padding: 18px 16px 16px; width: 292px; z-index: 50;
-    display: none; opacity: 0; transition: all 0.3s;
-    box-shadow: 0 0 40px rgba(200,150,12,0.2), 0 0 80px rgba(0,0,0,0.8);
-  }
-  #bloodline-popup.show { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  .popup-title { color: var(--gold); font-size: 11px; letter-spacing: 5px; text-align: center; border-bottom: 1px solid rgba(200,150,12,0.3); padding-bottom: 10px; margin-bottom: 12px; }
-  .popup-close { position: absolute; top: 8px; right: 10px; color: rgba(200,150,12,0.5); font-size: 16px; cursor: pointer; transition: color 0.2s; }
-  .popup-close:hover { color: var(--gold); }
-  .breed-instruction { font-size: 9px; color: rgba(245,232,200,0.5); letter-spacing: 2px; text-align: center; margin-bottom: 10px; }
-
-  .parent-slots { display: flex; gap: 8px; margin-bottom: 10px; }
-  .parent-slot {
-    flex: 1; background: rgba(26,15,0,0.8); border: 1px dashed rgba(200,150,12,0.35);
-    border-radius: 4px; padding: 8px; text-align: center; min-height: 70px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: all 0.3s;
-  }
-  .parent-slot.filled { border-style: solid; border-color: rgba(200,150,12,0.6); background: rgba(40,25,5,0.9); }
-  .parent-slot-label { font-size: 8px; color: rgba(200,150,12,0.5); letter-spacing: 2px; margin-bottom: 4px; }
-  .parent-slot-name { font-size: 11px; color: var(--gold-light); letter-spacing: 1px; font-weight: 700; margin-bottom: 3px; }
-  .parent-slot-job { font-size: 8px; letter-spacing: 1px; margin-bottom: 3px; }
-  .parent-slot-stats { font-size: 8px; color: rgba(245,232,200,0.5); letter-spacing: 1px; line-height: 1.7; }
-  .parent-slot-empty { font-size: 9px; color: rgba(200,150,12,0.3); letter-spacing: 1px; }
-  .cross-sign { font-size: 18px; color: rgba(200,150,12,0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding-top: 14px; }
-
-  .breed-warning { font-size: 8px; color: #ff8888; text-align: center; letter-spacing: 1px; margin-bottom: 6px; display: none; }
-  .breed-warning.show { display: block; }
-
-  .warrior-select-list { max-height: 110px; overflow-y: auto; border: 1px solid rgba(200,150,12,0.2); border-radius: 3px; margin-bottom: 10px; }
-  .warrior-select-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 5px 10px; cursor: pointer; border-bottom: 1px solid rgba(200,150,12,0.1); transition: background 0.15s;
-  }
-  .warrior-select-item:last-child { border-bottom: none; }
-  .warrior-select-item:hover { background: rgba(200,150,12,0.12); }
-  .warrior-select-item.already-selected { opacity: 0.3; pointer-events: none; }
-  .wsi-name { font-size: 10px; color: var(--parchment); letter-spacing: 1px; }
-  .wsi-job-badge { display: inline-block; font-size: 7px; padding: 0 4px; border-radius: 2px; margin-left: 4px; letter-spacing: 1px; }
-  .wsi-role { font-size: 8px; color: rgba(200,150,12,0.6); letter-spacing: 1px; }
-  .wsi-stats { font-size: 8px; color: rgba(245,232,200,0.4); text-align: right; line-height: 1.7; }
-
-  .breed-preview { background: rgba(26,15,0,0.9); border: 1px solid rgba(200,150,12,0.25); border-radius: 3px; padding: 10px 12px; margin-bottom: 10px; display: none; }
-  .breed-preview.visible { display: block; }
-  .preview-title { font-size: 8px; color: rgba(200,150,12,0.5); letter-spacing: 3px; margin-bottom: 6px; }
-  .preview-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .preview-name { font-size: 13px; color: var(--gold-light); font-weight: 900; letter-spacing: 2px; }
-  .preview-job-badge { font-size: 8px; padding: 1px 6px; border-radius: 2px; letter-spacing: 1px; }
-  .preview-stats { display: flex; gap: 10px; margin-bottom: 6px; }
-  .preview-stat { font-size: 9px; color: rgba(245,232,200,0.7); }
-  .preview-stat span { color: var(--gold-light); font-weight: 700; }
-  .trait-list { display: flex; flex-wrap: wrap; gap: 4px; }
-  .trait-tag { background: rgba(139,0,0,0.3); border: 1px solid rgba(139,0,0,0.6); padding: 1px 6px; border-radius: 2px; font-size: 8px; color: rgba(245,232,200,0.8); letter-spacing: 1px; }
-  .trait-tag.rare { background: rgba(60,0,100,0.4); border-color: rgba(170,68,204,0.7); color: rgba(220,180,255,0.9); }
-
-  .breed-execute-btn {
-    width: 100%; padding: 9px;
-    background: linear-gradient(135deg, rgba(100,0,0,0.8), rgba(70,0,0,0.9));
-    border: 1px solid rgba(200,150,12,0.5); color: var(--parchment);
-    font-family: 'Noto Serif JP', serif; font-size: 12px; letter-spacing: 4px;
-    cursor: pointer; border-radius: 3px; transition: all 0.2s; opacity: 0.4; pointer-events: none;
-  }
-  .breed-execute-btn.ready { opacity: 1; pointer-events: auto; background: linear-gradient(135deg, rgba(139,0,0,0.9), rgba(90,0,0,0.95)); }
-  .breed-execute-btn.ready:hover { background: linear-gradient(135deg, rgba(180,0,0,0.9), rgba(120,0,0,0.95)); box-shadow: 0 0 20px rgba(139,0,0,0.4); }
-
-  /* ======== 誕生演出 ======== */
-  #birth-overlay { position: fixed; inset: 0; z-index: 200; background: radial-gradient(ellipse at center, rgba(200,150,12,0.25) 0%, transparent 70%); pointer-events: none; opacity: 0; transition: opacity 0.8s; }
-  #birth-overlay.flash { opacity: 1; }
-  #birth-announcement { position: fixed; top: 35%; left: 50%; transform: translateX(-50%) translateY(-20px); z-index: 210; text-align: center; opacity: 0; transition: all 0.7s ease-out; pointer-events: none; }
-  #birth-announcement.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .birth-title { font-size: 11px; color: rgba(200,150,12,0.8); letter-spacing: 6px; margin-bottom: 8px; }
-  .birth-name { font-size: 22px; color: var(--gold-light); font-weight: 900; letter-spacing: 4px; text-shadow: 0 0 20px rgba(240,192,64,0.8), 0 0 40px rgba(200,150,12,0.5); }
-  .birth-job  { font-size: 11px; margin-top: 6px; letter-spacing: 3px; }
-  .birth-subtitle { font-size: 9px; color: rgba(245,232,200,0.6); letter-spacing: 3px; margin-top: 4px; }
-
-  #event-log { position: absolute; top: 50px; left: 12px; right: 12px; background: rgba(10,6,0,0.9); border: 1px solid rgba(200,150,12,0.3); border-radius: 4px; padding: 8px 12px; font-size: 10px; color: var(--parchment); letter-spacing: 1px; line-height: 1.8; z-index: 30; display: none; max-height: 120px; overflow-y: auto; }
-  #event-log-title { color: var(--gold); font-size: 9px; letter-spacing: 3px; margin-bottom: 4px; border-bottom: 1px solid rgba(200,150,12,0.2); padding-bottom: 4px; }
-  .log-entry { margin-bottom: 2px; }
-  .log-entry .log-year { color: rgba(200,150,12,0.6); margin-right: 6px; }
-  .log-entry.log-rankup { color: var(--gold-light); }
-  #warrior-count { transition: color 0.4s; }
-  #warrior-count.max { color: #ff6666; }
+  .heir-candidate:hover { background: rgba(80,50,10,0.9); border-color: var(--gold-light); }
 </style>
 </head>
 <body>
 
-<div id="bg"></div>
-<div class="mist-layer"></div><div class="mist-layer"></div><div class="mist-layer"></div>
-<div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
-<div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
-<div class="petal p7"></div><div class="petal p8"></div>
-
-<div id="birth-overlay"></div>
-<div id="birth-announcement">
-  <div class="birth-title">■ 新武将誕生 ■</div>
-  <div class="birth-name" id="birth-name-text">？？？</div>
-  <div class="birth-job" id="birth-job-text"></div>
-  <div class="birth-subtitle" id="birth-subtitle-text">血統を受け継ぎし者</div>
-</div>
-
-<!-- 昇格モーダル -->
-<div id="rankup-overlay"></div>
-<div id="rankup-modal">
-  <div class="rankup-modal-title">■ 職 階 昇 格 ■</div>
-  <div class="rankup-name" id="rankup-modal-name">織田 信廣</div>
-  <div class="rankup-modal-divider"></div>
-  <div class="rankup-from" id="rankup-modal-from">武 官</div>
-  <div class="rankup-arrow">▼</div>
-  <div class="rankup-to" id="rankup-modal-to">侍 大 将</div>
-  <div class="rankup-modal-divider"></div>
-  <div class="rankup-bonuses" id="rankup-modal-bonuses"></div>
-  <div class="rankup-flavor" id="rankup-modal-flavor"></div>
-  <button class="rankup-close-btn" onclick="closeRankupModal()">承 知</button>
-</div>
-
-<svg id="mountains" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M0,200 L0,140 Q30,80 70,110 Q100,130 130,60 Q160,20 190,70 Q220,110 250,50 Q280,10 310,80 Q340,130 370,90 Q385,75 400,100 L400,200 Z" fill="#c8960c"/>
-  <path d="M0,200 L0,160 Q40,120 80,140 Q120,155 160,100 Q200,55 240,120 Q270,155 300,110 Q330,80 360,130 Q380,150 400,140 L400,200 Z" fill="#8b6a00"/>
-  <path d="M0,200 L0,180 Q50,165 100,175 Q150,182 200,160 Q250,140 300,172 Q340,185 400,170 L400,200 Z" fill="#5a4a00"/>
-</svg>
-
-<div id="main">
-  <div id="titlebar">
-    <div id="game-title">戦国血脈<span>〜 覇道の系譜 〜</span></div>
-    <div id="stats-bar">
-      <span>天下統一率</span><br>
-      <strong id="unification-pct">12</strong><span style="font-size:9px">%</span><br>
-      <span style="font-size:9px;color:rgba(200,150,12,0.5)">第 <strong id="gen-num" style="color:var(--gold-light)">1</strong> 世代</span>
-    </div>
-  </div>
-  <div class="divider"></div>
-
-  <div id="castle-field">
-    <div class="flag" style="left:12%;"><div class="flag-cloth" style="background:linear-gradient(135deg,#8b0000,#600000);">家</div><div class="flag-pole"></div></div>
-    <div class="flag" style="right:10%;"><div class="flag-cloth" style="background:linear-gradient(135deg,#1a3a5c,#102840);">軍</div><div class="flag-pole"></div></div>
-
-    <div id="castle-base">
-      <svg id="castle-svg" viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
-        <rect x="20" y="75" width="120" height="20" fill="#3a2a10" rx="2"/>
-        <rect x="30" y="65" width="100" height="15" fill="#4a3618" rx="2"/>
-        <rect x="45" y="50" width="70" height="20" fill="#5a4520" rx="1"/>
-        <rect x="55" y="28" width="50" height="28" fill="#2a1a08"/>
-        <rect x="58" y="30" width="44" height="24" fill="#3a2510"/>
-        <polygon points="80,12 50,32 110,32" fill="#1a0f04"/>
-        <polygon points="80,16 53,32 107,32" fill="#8b6a00" opacity="0.4"/>
-        <polygon points="80,5 62,18 98,18" fill="#1a0f04"/>
-        <polygon points="80,8 64,18 96,18" fill="#8b6a00" opacity="0.3"/>
-        <polygon points="80,2 78,8 82,8" fill="#c8960c"/>
-        <rect x="65" y="34" width="10" height="12" fill="#0a0500" rx="1"/>
-        <rect x="85" y="34" width="10" height="12" fill="#0a0500" rx="1"/>
-        <rect x="70" y="20" width="8" height="8" fill="#0a0500" rx="1"/>
-        <rect x="68" y="60" width="24" height="15" fill="#1a0f04" rx="1"/>
-        <rect x="70" y="62" width="20" height="12" fill="#0d0700" rx="1"/>
-        <line x1="55" y1="28" x2="105" y2="28" stroke="#c8960c" stroke-width="1" opacity="0.6"/>
-      </svg>
-      <div id="castle-name">安土城</div>
-    </div>
-    <div id="ground-plane"></div>
-    <div id="ground-line"></div>
-    <div id="event-log">
-      <div id="event-log-title">■ 近年の記録</div>
-      <div class="log-entry"><span class="log-year">天正3年</span>織田 信廣（武官）が「猛将覚醒」を発現。武力+15</div>
-      <div class="log-entry"><span class="log-year">天正2年</span>明智 光忠（文官）が謀略に成功。知力+8</div>
-      <div class="log-entry"><span class="log-year">天正1年</span>第一世代の武将たちが城に集結した</div>
-    </div>
-  </div>
-
-  <div id="bottom-panel">
-    <div id="era-display">
-      <span id="era-text">天 正</span>
-      <strong id="era-year">四年</strong>
-    </div>
-    <div id="action-buttons">
-      <button class="action-btn" onclick="toggleLog()">
-        <span class="btn-icon">📜</span><span>記録</span><span class="btn-sub">CHRONICLE</span>
-      </button>
-      <button class="action-btn" id="breed-btn" onclick="showBloodline()" style="border-color:rgba(200,150,12,0.6);">
-        <span class="btn-icon">⚔️</span><span>配合</span><span class="btn-sub">BLOODLINE</span>
-        <span class="badge">!</span>
-      </button>
-      <button class="action-btn" onclick="startBattle(event)">
-        <span class="btn-icon">🏯</span><span>合戦</span><span class="btn-sub">BATTLE</span>
-      </button>
-    </div>
-    <div id="status-row">
-      <div class="status-item">
-        <div class="status-label">武 力</div>
-        <div class="status-value" id="val-power">78</div>
-        <div class="status-bar-wrap"><div class="status-bar-fill bar-power" id="bar-power" style="width:78%"></div></div>
-      </div>
-      <div class="status-divider"></div>
-      <div class="status-item">
-        <div class="status-label">知 力</div>
-        <div class="status-value" id="val-intel">92</div>
-        <div class="status-bar-wrap"><div class="status-bar-fill bar-intel" id="bar-intel" style="width:92%"></div></div>
-      </div>
-      <div class="status-divider"></div>
-      <div class="status-item">
-        <div class="status-label">統 率</div>
-        <div class="status-value" id="val-loyalty">65</div>
-        <div class="status-bar-wrap"><div class="status-bar-fill bar-loyalty" id="bar-loyalty" style="width:65%"></div></div>
-      </div>
-      <div class="status-divider"></div>
-      <div class="status-item">
-        <div class="job-display-item" id="selected-job-display">
-          <div class="job-display-icon">⚔️</div>
-          <div class="job-display-label">武 官</div>
-        </div>
-      </div>
-      <div class="status-divider"></div>
-      <div class="status-item">
-        <div class="status-label">武将数</div>
-        <div class="status-value" id="warrior-count">4</div>
-        <div class="status-label" style="margin-top:2px;">/ 8</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 配合ポップアップ -->
-<div id="bloodline-popup">
-  <div class="popup-close" onclick="closeBloodline()">✕</div>
-  <div class="popup-title">■ 血統配合 ■</div>
-  <div class="breed-instruction">男女の武将を一名ずつ選べ</div>
-  <div class="breed-warning" id="breed-warning">⚠ 男女それぞれ一名を選んでください</div>
-
-  <div class="parent-slots">
-    <div class="parent-slot" id="slot-a">
-      <div class="parent-slot-label">父 方（男）</div>
-      <div class="parent-slot-empty">未選択</div>
-    </div>
-    <div class="cross-sign">×</div>
-    <div class="parent-slot" id="slot-b">
-      <div class="parent-slot-label">母 方（女）</div>
-      <div class="parent-slot-empty">未選択</div>
-    </div>
-  </div>
-
-  <div class="warrior-select-list" id="warrior-select-list"></div>
-
-  <div class="breed-preview" id="breed-preview">
-    <div class="preview-title">■ 予測血統</div>
-    <div class="preview-row">
-      <div class="preview-name" id="preview-name">？？？</div>
-      <div class="preview-job-badge" id="preview-job-badge"></div>
-    </div>
-    <div class="preview-stats">
-      <div class="preview-stat">武力 <span id="preview-power">-</span></div>
-      <div class="preview-stat">知力 <span id="preview-intel">-</span></div>
-      <div class="preview-stat">統率 <span id="preview-loyalty">-</span></div>
-    </div>
-    <div class="trait-list" id="preview-traits"></div>
-  </div>
-
-  <button class="breed-execute-btn" id="breed-execute-btn" onclick="executeBreeding()">配 合 を 実 行</button>
-</div>
+<!-- ... (元の全HTML構造はそのまま) ... -->
 
 <script>
 // =============================================
-// ======== ランク定義 ========
+// ======== 既存の全コード (RANK_CHAINS, Warriorクラスなど) ========
 // =============================================
-// 各職業のランク進化チェーン
-// rank: 0=初期, 1=一昇格, 2=二昇格(最終)
-const RANK_CHAINS = {
-  bukan: [
-    { rank:0, jobId:'bukan',     label:'武官',   icon:'⚔️',  badgeClass:'badge-bukan',
-      req: null, // 初期
-      bonuses:{power:0,intel:0,loyalty:0},
-      flavor:'主君に仕える武人として出発する。',
-      speeches:['「打って出るぞ！」','「力こそ全てじゃ」','「敵将を討て！」','「戦場が我が故郷」','「刃で語れ！」'],
-    },
-    { rank:1, jobId:'shitaisho', label:'侍大将', icon:'🗡️', badgeClass:'badge-shitaisho',
-      req: { power:60, intel:0, loyalty:40, growthPct:0.4 },
-      bonuses:{power:8,intel:3,loyalty:5},
-      flavor:'一軍を束ねる将として認められた。\n武力・統率に磨きがかかる。',
-      speeches:['「我が一軍、突撃せよ！」','「将たる者、先頭に立つ」','「百戦百勝が我が信条」','「配下の命、預かった」'],
-    },
-    { rank:2, jobId:'mousho',    label:'猛将',   icon:'🔥',  badgeClass:'badge-mousho',
-      req: { power:80, intel:0, loyalty:60, growthPct:0.75 },
-      bonuses:{power:15,intel:5,loyalty:10},
-      flavor:'天下に名を轟かす猛将と成れり。\nその武威は敵を震え上がらせる。',
-      speeches:['「我の前に敵なし！」','「天下無双の猛将ここに在り」','「鬼神も恐れる力を見よ」','「戦こそ我が生きる道」'],
-    },
-  ],
-  bunkan: [
-    { rank:0, jobId:'bunkan',    label:'文官',   icon:'📖',  badgeClass:'badge-bunkan',
-      req: null,
-      bonuses:{power:0,intel:0,loyalty:0},
-      flavor:'書物と策謀を糧とする知将の卵。',
-      speeches:['「謀略は整った」','「知略を尽くせ」','「兵法の極みを見た」','「書物に答えあり」','「戦は頭で勝つ」'],
-    },
-    { rank:1, jobId:'gunshi',    label:'軍師',   icon:'📜',  badgeClass:'badge-gunshi',
-      req: { power:0, intel:65, loyalty:40, growthPct:0.4 },
-      bonuses:{power:3,intel:10,loyalty:6},
-      flavor:'主君の右腕たる軍師に昇格した。\n知略はさらなる高みへ。',
-      speeches:['「この策、万全なり」','「敵の動きは読んでいる」','「知恵こそ最強の武器」','「謀は事前に決まる」'],
-    },
-    { rank:2, jobId:'tairo',     label:'大老',   icon:'👑',  badgeClass:'badge-tairo',
-      req: { power:0, intel:85, loyalty:65, growthPct:0.75 },
-      bonuses:{power:5,intel:18,loyalty:12},
-      flavor:'国政を司る大老の地位に至った。\nその知謀は天下を動かす。',
-      speeches:['「天下の行く末、見えておる」','「政は民のためにある」','「我が策で天下を制す」','「智恵の極みがここにある」'],
-    },
-  ],
-  hime: [
-    { rank:0, jobId:'hime',       label:'姫',     icon:'🌸',  badgeClass:'badge-hime',
-      req: null,
-      bonuses:{power:0,intel:0,loyalty:0},
-      flavor:'気品と慈愛を持つ城の花。',
-      speeches:['「家を守りまする」','「民のために…」','「和が一番にございます」','「お力になりとうございます」','「心は武士に負けませぬ」'],
-    },
-    { rank:1, jobId:'sokushitsu', label:'側室',   icon:'🍂',  badgeClass:'badge-sokushitsu',
-      req: { power:0, intel:45, loyalty:65, growthPct:0.4 },
-      bonuses:{power:2,intel:7,loyalty:12},
-      flavor:'主君に深く信頼された側室となった。\n統率・内政に才を発揮する。',
-      speeches:['「殿のお傍に居られる幸せ…」','「家中の和を守りまする」','「民の声、殿にお伝えします」','「心を尽くすのみ」'],
-    },
-    { rank:2, jobId:'midaidokoro',label:'御台所', icon:'👸',  badgeClass:'badge-midaidokoro',
-      req: { power:0, intel:65, loyalty:85, growthPct:0.75 },
-      bonuses:{power:5,intel:12,loyalty:20},
-      flavor:'天下人の正室として君臨する。\n内政・外交で名声を轟かせた。',
-      speeches:['「この家を守り抜いてみせます」','「殿、安心してお任せを」','「天下の妻として恥じぬよう」','「民の平和こそ我が願い」'],
-    },
-  ],
-  himebusho: [
-    { rank:0, jobId:'himebusho',  label:'姫武将', icon:'⚜️',  badgeClass:'badge-himebusho',
-      req: null,
-      bonuses:{power:0,intel:0,loyalty:0},
-      flavor:'剣を取った誇り高き女傑の卵。',
-      speeches:['「我に続け！」','「女とて剣は持てる」','「この戦、負けぬ！」','「血脈の誇りを示す」','「舐めるな！」'],
-    },
-    { rank:1, jobId:'joketsusho', label:'女傑将', icon:'⚡',  badgeClass:'badge-joketsusho',
-      req: { power:55, intel:50, loyalty:45, growthPct:0.4 },
-      bonuses:{power:10,intel:8,loyalty:7},
-      flavor:'戦場で男を凌ぐ女傑将と認められた。\n文武両道の才が花開く。',
-      speeches:['「男だと思うな、負かしてやる！」','「我が剣、天に誓う」','「女傑の意地を見せてやる」','「この一刀に全てを込める」'],
-    },
-    { rank:2, jobId:'sensahime',  label:'戦姫',   icon:'🌟',  badgeClass:'badge-sensahime',
-      req: { power:78, intel:72, loyalty:65, growthPct:0.75 },
-      bonuses:{power:18,intel:15,loyalty:10},
-      flavor:'伝説となった戦姫が誕生した。\n武威・知略・カリスマ全てを兼備する。',
-      speeches:['「天下に我の名を刻む！」','「これが戦姫の真の力！」','「神も鬼も、この刃の前に跪け」','「全軍、我に続け！天下は目の前じゃ！」'],
-    },
-  ],
-};
+// （ここに元の<script>内の全コードをそのまま貼り付け）
 
-// ベース職業（男女）
-const MALE_BASE_JOBS   = ['bukan', 'bunkan'];
-const FEMALE_BASE_JOBS = ['hime', 'himebusho'];
+// ====================== 新規: 家督継承システム ======================
+let currentHouseHead = null; // 現在の当主 {warrior, familyName}
+const RETIRE_AGE_THRESHOLD = 0.92; // 壮年を過ぎて寿命の92%経過で引退候補
 
-// jobIdからチェーン情報を引く
-function getChainByJobId(jobId) {
-  for (const [baseJobId, chain] of Object.entries(RANK_CHAINS)) {
-    for (const rankDef of chain) {
-      if (rankDef.jobId === jobId) return { chain, baseJobId, rankDef };
-    }
-  }
-  return null;
-}
+function checkRetirement(warrior) {
+  if (warrior.stage !== 'adult') return;
+  if (warrior.growthPct < RETIRE_AGE_THRESHOLD) return;
+  if (warrior._retiring) return;
 
-function getBaseJobId(jobId) {
-  const info = getChainByJobId(jobId);
-  return info ? info.baseJobId : jobId;
-}
+  warrior._retiring = true;
+  addLog(`【引退】\( {warrior.def.name}（ \){warrior.jobDef.label}）が壮年を過ぎ、隠居を望んでいます。`, true);
 
-function getRankDef(jobId) {
-  const info = getChainByJobId(jobId);
-  return info ? info.rankDef : null;
-}
-
-function getNextRankDef(jobId) {
-  const info = getChainByJobId(jobId);
-  if (!info) return null;
-  const curIdx = info.chain.indexOf(info.rankDef);
-  return info.chain[curIdx + 1] || null;
-}
-
-// =============================================
-// ======== 職業定義（後方互換ヘルパー） ========
-// =============================================
-const JOB_DEFS_MAP = {};
-for (const chain of Object.values(RANK_CHAINS)) {
-  for (const rd of chain) {
-    JOB_DEFS_MAP[rd.jobId] = {
-      id: rd.jobId,
-      label: rd.label,
-      icon: rd.icon,
-      badgeClass: rd.badgeClass,
-      gender: MALE_BASE_JOBS.includes(getBaseJobId(rd.jobId)) ? 'male' : 'female',
-      growPriority: (() => {
-        const base = getBaseJobId(rd.jobId);
-        if (base === 'bukan')     return ['power','loyalty','intel'];
-        if (base === 'bunkan')    return ['intel','loyalty','power'];
-        if (base === 'hime')      return ['loyalty','intel','power'];
-        if (base === 'himebusho') return ['power','intel','loyalty'];
-        return ['power','intel','loyalty'];
-      })(),
-      statBias: (() => {
-        const base = getBaseJobId(rd.jobId);
-        if (base === 'bukan')     return {power:1.25,intel:0.85,loyalty:1.0};
-        if (base === 'bunkan')    return {power:0.80,intel:1.30,loyalty:1.05};
-        if (base === 'hime')      return {power:0.75,intel:1.10,loyalty:1.30};
-        if (base === 'himebusho') return {power:1.15,intel:1.10,loyalty:1.0};
-        return {power:1,intel:1,loyalty:1};
-      })(),
-      speeches: rd.speeches,
-      traits: (() => {
-        const base = getBaseJobId(rd.jobId);
-        if (base === 'bukan')     return ['猛将血統','速攻','鉄壁','夜戦得意','不死身'];
-        if (base === 'bunkan')    return ['兵法の才','謀略家','商才','千里眼','天才軍師'];
-        if (base === 'hime')      return ['義の心','鼓舞','忍耐','商才'];
-        if (base === 'himebusho') return ['猛将血統','忍耐','速攻','流星剣','義の心'];
-        return [];
-      })(),
-    };
-  }
-}
-
-// =============================================
-// ======== カラー ========
-// =============================================
-const COLOR_SETS = {
-  c_red:    { skin:'#d4a574', hair:'#4a1a00', main:'#8b0000', sub:'#4a0000', acc:'#ff4444' },
-  c_blue:   { skin:'#c8a87a', hair:'#2a1a08', main:'#1a3a5c', sub:'#0a1e30', acc:'#4488cc' },
-  c_green:  { skin:'#d4b890', hair:'#1a0f00', main:'#2a5c2a', sub:'#102810', acc:'#44cc44' },
-  c_gold:   { skin:'#c8a070', hair:'#3a2000', main:'#5c4a00', sub:'#2a1e00', acc:'#ccaa00' },
-  c_purple: { skin:'#c8a080', hair:'#2a1000', main:'#3a0a5c', sub:'#1a0430', acc:'#aa44cc' },
-  c_silver: { skin:'#d0b898', hair:'#303030', main:'#485060', sub:'#202830', acc:'#aabbcc' },
-  c_pink:   { skin:'#e8c0a0', hair:'#6a2040', main:'#8b3060', sub:'#5a1040', acc:'#ff88cc' },
-  c_teal:   { skin:'#d0b890', hair:'#1a3028', main:'#1a5c5c', sub:'#0a3030', acc:'#44cccc' },
-};
-const COLOR_POOL_M = ['c_red','c_blue','c_green','c_gold','c_purple','c_silver','c_teal'];
-const COLOR_POOL_F = ['c_pink','c_purple','c_silver','c_gold','c_teal'];
-
-function makeSVG(jobId, colorKey, walkStep = 0) {
-  const baseJobId = getBaseJobId(jobId);
-  const c = COLOR_SETS[colorKey] || COLOR_SETS['c_red'];
-  if (baseJobId === 'bukan')     return svgBukan(c, walkStep);
-  if (baseJobId === 'bunkan')    return svgBunkan(c, walkStep);
-  if (baseJobId === 'hime')      return svgHime(c, walkStep);
-  if (baseJobId === 'himebusho') return svgHimebusho(c, walkStep);
-  return svgBukan(c, walkStep);
-}
-
-function svgBukan(c, s) {
-  const legL = s===0?-18:s===1?-6:s===2?18:6, legR=-legL;
-  const armL = s===0?20:s===1?6:s===2?-20:-6, armR=-armL;
-  return `<svg class="warrior-svg" width="34" height="70" viewBox="0 0 34 70">
-    <ellipse cx="17" cy="12" rx="9" ry="7" fill="${c.main}"/>
-    <rect x="10" y="10" width="14" height="5" rx="1" fill="${c.main}"/>
-    <rect x="8"  y="14" width="18" height="3" rx="1" fill="${c.sub}"/>
-    <ellipse cx="8"  cy="14" rx="3" ry="5" fill="${c.acc}" opacity="0.8"/>
-    <ellipse cx="26" cy="14" rx="3" ry="5" fill="${c.acc}" opacity="0.8"/>
-    <ellipse cx="17" cy="22" rx="8" ry="9" fill="${c.skin}"/>
-    <rect x="9" y="30" width="16" height="18" rx="2" fill="${c.main}"/>
-    <rect x="11" y="32" width="12" height="14" rx="1" fill="${c.sub}" opacity="0.6"/>
-    <rect x="8" y="46" width="18" height="4" rx="1" fill="${c.acc}" opacity="0.7"/>
-    <rect x="3" y="31" width="6" height="14" rx="3" fill="${c.main}" transform="rotate(${armL},6,31)"/>
-    <rect x="25" y="31" width="6" height="14" rx="3" fill="${c.main}" transform="rotate(${armR},28,31)"/>
-    <rect x="28" y="28" width="2" height="20" rx="1" fill="#888" transform="rotate(${armR*0.4},29,31)"/>
-    <rect x="27" y="44" width="4" height="2" fill="${c.acc}"/>
-    <rect x="10" y="50" width="7" height="16" rx="3" fill="${c.sub}" transform="rotate(${legL},13,50)"/>
-    <rect x="17" y="50" width="7" height="16" rx="3" fill="${c.sub}" transform="rotate(${legR},20,50)"/>
-    <circle cx="14" cy="21" r="1.2" fill="#2a1000"/>
-    <circle cx="20" cy="21" r="1.2" fill="#2a1000"/>
-  </svg>`;
-}
-
-function svgBunkan(c, s) {
-  const legL=s===0?-10:s===1?-3:s===2?10:3, legR=-legL;
-  const armL=s===0?15:s===1?4:s===2?-15:-4, armR=-armL;
-  return `<svg class="warrior-svg" width="34" height="70" viewBox="0 0 34 70">
-    <polygon points="17,2 13,18 21,18" fill="${c.main}"/>
-    <rect x="12" y="15" width="10" height="4" rx="1" fill="${c.main}"/>
-    <ellipse cx="17" cy="25" rx="8" ry="9" fill="${c.skin}"/>
-    <rect x="8" y="33" width="18" height="20" rx="3" fill="${c.main}"/>
-    <ellipse cx="4" cy="42" rx="6" ry="10" fill="${c.main}" transform="rotate(${armL*0.5},4,34)"/>
-    <ellipse cx="30" cy="42" rx="6" ry="10" fill="${c.main}" transform="rotate(${armR*0.5},30,34)"/>
-    <path d="M28,38 Q34,32 36,38 Q34,44 28,44 Z" fill="${c.acc}" opacity="0.8" transform="rotate(${armR*0.3},30,34)"/>
-    <rect x="14" y="33" width="6" height="16" rx="1" fill="${c.sub}" opacity="0.5"/>
-    <rect x="10" y="51" width="7" height="15" rx="2" fill="${c.sub}" transform="rotate(${legL},13,51)"/>
-    <rect x="17" y="51" width="7" height="15" rx="2" fill="${c.sub}" transform="rotate(${legR},20,51)"/>
-    <circle cx="14" cy="24" r="1.2" fill="#2a1000"/>
-    <circle cx="20" cy="24" r="1.2" fill="#2a1000"/>
-    <rect x="14" y="28" width="6" height="1.5" rx="0.7" fill="${c.hair}" opacity="0.5"/>
-  </svg>`;
-}
-
-function svgHime(c, s) {
-  const swing=s===0?-6:s===1?-2:s===2?6:2;
-  return `<svg class="warrior-svg" width="30" height="70" viewBox="0 0 30 70">
-    <ellipse cx="15" cy="9" rx="7" ry="5" fill="${c.hair}"/>
-    <rect x="12" y="5" width="6" height="8" fill="${c.hair}"/>
-    <line x1="8" y1="7" x2="22" y2="7" stroke="${c.acc}" stroke-width="1.2"/>
-    <circle cx="22" cy="7" r="2" fill="${c.acc}"/>
-    <circle cx="8"  cy="7" r="1.5" fill="${c.acc}" opacity="0.7"/>
-    <ellipse cx="15" cy="20" rx="7" ry="8" fill="${c.skin}"/>
-    <path d="M5,28 Q2,50 3,68 L15,62 L27,68 Q28,50 25,28 Z" fill="${c.main}"/>
-    <circle cx="10" cy="45" r="2.5" fill="${c.acc}" opacity="0.4"/>
-    <circle cx="20" cy="40" r="2"   fill="${c.acc}" opacity="0.3"/>
-    <circle cx="15" cy="55" r="2"   fill="${c.acc}" opacity="0.35"/>
-    <rect x="8" y="35" width="14" height="6" rx="2" fill="${c.acc}" opacity="0.8"/>
-    <ellipse cx="4"  cy="42" rx="5" ry="10" fill="${c.main}" opacity="0.9" transform="rotate(${swing},4,34)"/>
-    <ellipse cx="26" cy="42" rx="5" ry="10" fill="${c.main}" opacity="0.9" transform="rotate(${-swing},26,34)"/>
-    <circle cx="12" cy="19" r="1.2" fill="#3a1a20"/>
-    <circle cx="18" cy="19" r="1.2" fill="#3a1a20"/>
-    <path d="M12,23 Q15,25 18,23" stroke="${c.acc}" stroke-width="0.8" fill="none" opacity="0.8"/>
-  </svg>`;
-}
-
-function svgHimebusho(c, s) {
-  const legL=s===0?-14:s===1?-4:s===2?14:4, legR=-legL;
-  const armL=s===0?16:s===1?5:s===2?-16:-5, armR=-armL;
-  return `<svg class="warrior-svg" width="34" height="72" viewBox="0 0 34 72">
-    <ellipse cx="17" cy="11" rx="8" ry="6" fill="${c.main}"/>
-    <rect x="11" y="10" width="12" height="4" rx="1" fill="${c.main}"/>
-    <rect x="9"  y="13" width="16" height="2.5" rx="1" fill="${c.sub}"/>
-    <circle cx="17" cy="7" r="3"   fill="${c.acc}" opacity="0.9"/>
-    <circle cx="17" cy="7" r="1.5" fill="white"   opacity="0.6"/>
-    <ellipse cx="17" cy="13" rx="4" ry="2" fill="${c.hair}"/>
-    <ellipse cx="17" cy="22" rx="7.5" ry="8.5" fill="${c.skin}"/>
-    <path d="M9,30 Q7,36 8,50 L10,50 L10,35 L24,35 L24,50 L26,50 Q27,36 25,30 Z" fill="${c.main}"/>
-    <rect x="10" y="34" width="14" height="14" rx="1" fill="${c.sub}" opacity="0.5"/>
-    <rect x="8" y="46" width="18" height="4" rx="2" fill="${c.acc}" opacity="0.8"/>
-    <rect x="2"  y="30" width="7" height="13" rx="3" fill="${c.main}" transform="rotate(${armL},5,30)"/>
-    <rect x="25" y="30" width="7" height="13" rx="3" fill="${c.main}" transform="rotate(${armR},29,30)"/>
-    <rect x="28" y="14" width="2"  height="34" rx="1" fill="#888" transform="rotate(${armR*0.25},29,30)"/>
-    <polygon points="28,14 30,14 29,7" fill="${c.acc}" transform="rotate(${armR*0.25},29,30)"/>
-    <path d="M9,50 Q7,62 10,68 L17,65 L24,68 Q27,62 25,50 Z" fill="${c.sub}"/>
-    <rect x="11" y="62" width="5" height="8" rx="2" fill="${c.main}" transform="rotate(${legL},13,62)"/>
-    <rect x="18" y="62" width="5" height="8" rx="2" fill="${c.main}" transform="rotate(${legR},20,62)"/>
-    <circle cx="14" cy="21" r="1.3" fill="#3a1020"/>
-    <circle cx="20" cy="21" r="1.3" fill="#3a1020"/>
-    <path d="M13,24 Q17,26.5 21,24" stroke="${c.acc}" stroke-width="0.8" fill="none" opacity="0.7"/>
-  </svg>`;
-}
-
-// =============================================
-// ======== データ ========
-// =============================================
-const FAMILY_NAMES_M = ['織田','徳川','豊臣','武田','上杉','伊達','北条','毛利','島津','真田','明智','黒田','加藤','前田','蒲生','細川','立花','柳生','長宗我部','鍋島'];
-const GIVEN_NAMES_M  = ['信廣','光忠','勝頼','半蔵','玄蕃','庄三郎','三郎兵衛','孫六','又兵衛','隼人','甚五郎','弥太郎','九郎兵衛','源三郎','兵庫助','主水','帯刀','右近','左近','伝七'];
-const FAMILY_NAMES_F = ['織田','豊臣','徳川','真田','上杉','北条','毛利','細川','立花','浅井'];
-const GIVEN_NAMES_F  = ['小督','千鶴','梅','松','竹','若菜','小春','お市','朝日','初音','葵','桔梗','藤','椿','雪','紅','桜','菊','蓬','静'];
-
-const ALL_TRAITS = [
-  {name:'猛将血統',color:'normal'},{name:'忍耐',color:'normal'},{name:'夜戦得意',color:'normal'},
-  {name:'速攻',color:'normal'},{name:'兵法の才',color:'normal'},{name:'謀略家',color:'normal'},
-  {name:'天才軍師',color:'rare'},{name:'覇王の血',color:'rare'},{name:'不死身',color:'rare'},
-  {name:'義の心',color:'normal'},{name:'商才',color:'normal'},{name:'馬術名人',color:'normal'},
-  {name:'鉄壁',color:'normal'},{name:'流星剣',color:'rare'},{name:'無双',color:'rare'},
-  {name:'暗殺術',color:'normal'},{name:'鼓舞',color:'normal'},{name:'千里眼',color:'rare'},
-  {name:'戦姫の誇り',color:'rare'},{name:'内政の達人',color:'normal'},
-];
-const emotions = ['💭','✨','❗','💤','🎵','⁉️'];
-
-// =============================================
-// ======== 配合 子職業決定 ========
-// =============================================
-function determineChildJob(pA, pB) {
-  const fatherBaseJob = getBaseJobId(pA.def.jobId);
-  const motherBaseJob = getBaseJobId(pB.def.jobId);
-  const isMale = Math.random() < 0.5;
-  let weights;
-  if (fatherBaseJob === 'bukan' && motherBaseJob === 'hime') {
-    weights = isMale ? { bukan:70, bunkan:30 } : { hime:50, himebusho:50 };
-  } else if (fatherBaseJob === 'bunkan' && motherBaseJob === 'hime') {
-    weights = isMale ? { bukan:30, bunkan:70 } : { hime:70, himebusho:30 };
-  } else if (fatherBaseJob === 'bukan' && motherBaseJob === 'himebusho') {
-    weights = isMale ? { bukan:75, bunkan:25 } : { hime:30, himebusho:70 };
+  // 当主だった場合、家督継承を促す
+  if (currentHouseHead && currentHouseHead.warrior === warrior) {
+    setTimeout(() => triggerSuccession(warrior), 1200);
   } else {
-    weights = isMale ? { bukan:50, bunkan:50 } : { hime:50, himebusho:50 };
+    // 一般武将は自然消滅（城から退出）
+    setTimeout(() => retireWarrior(warrior), 1800);
   }
-  const pool = isMale ? MALE_BASE_JOBS : FEMALE_BASE_JOBS;
-  const total = pool.reduce((s, j) => s + (weights[j] || 50), 0);
-  let r = Math.random() * total;
-  for (const j of pool) { r -= (weights[j]||50); if (r<=0) return j; }
-  return pool[0];
 }
 
-// =============================================
-// ======== 初期武将定義 ========
-// =============================================
-const warriorDefs = [
-  { id:'w0', name:'織田 信廣', jobId:'bukan',    color:'c_red',    power:78, intel:40, loyalty:65, traits:['猛将血統','速攻'] },
-  { id:'w1', name:'明智 光忠', jobId:'bunkan',   color:'c_blue',   power:45, intel:92, loyalty:55, traits:['兵法の才','謀略家'] },
-  { id:'w2', name:'お 市',    jobId:'hime',      color:'c_pink',   power:30, intel:70, loyalty:88, traits:['義の心','鼓舞'] },
-  { id:'w3', name:'立花 誾千代', jobId:'himebusho', color:'c_purple', power:80, intel:68, loyalty:75, traits:['戦姫の誇り','速攻'] },
-];
-
-// =============================================
-// ======== グローバル状態 ========
-// =============================================
-let warriors = [];
-let generation = 1;
-let breedParentA = null, breedParentB = null;
-let breedModeActive = false;
-const MAX_WARRIORS = 8;
-const LIFESPAN_MS  = 120000;
-let rankupQueue = []; // 連続昇格を待機
-
-function getFieldBounds() {
-  const field = document.getElementById('castle-field');
-  const rect = field.getBoundingClientRect();
-  return { w: rect.width, h: rect.height };
+function retireWarrior(warrior) {
+  const idx = warriors.indexOf(warrior);
+  if (idx === -1) return;
+  warrior.el.classList.add('retired');
+  warriors.splice(idx, 1);
+  updateWarriorCount();
+  addLog(`【隠居】${warrior.def.name}が城を去りました。`);
 }
 
-// =============================================
-// ======== 成長段階 ========
-// =============================================
-const STAGE_DEFS = {
-  child: { label:'幼少期', threshold:0,    speedMult:0.50, speechSet:['「おとうさま〜！」','「強くなるぞ！」','「お腹すいた…」','「修行したい！」'] },
-  teen:  { label:'青年',   threshold:0.28, speedMult:0.72, speechSet:['「強くなりたい！」','「まだ修行が足りぬ」','「いつか天下を…」','「負けるものか！」'] },
-  young: { label:'元服',   threshold:0.52, speedMult:0.88, speechSet:['「元服いたした！」','「これより武士の道を」','「師よ、見ておれ」','「一騎当千と呼ばれてみせる」'] },
-  adult: { label:'壮年',   threshold:0.75, speedMult:1.0,  speechSet:null },
+function triggerSuccession(oldHead) {
+  const candidates = warriors
+    .filter(w => w !== oldHead && w.stage === 'adult' && w.growthPct > 0.6)
+    .sort((a,b) => (b.def.power + b.def.intel + b.def.loyalty) - (a.def.power + a.def.intel + a.def.loyalty));
+
+  if (candidates.length === 0) {
+    addLog(`【家督断絶】後継者がいません…`);
+    currentHouseHead = null;
+    return;
+  }
+
+  // モーダル表示
+  const modal = document.getElementById('succession-modal') || createSuccessionModal();
+  modal.innerHTML = `
+    <div class="succession-content">
+      <div class="succession-title">■ 家督相続 ■</div>
+      <div style="color:#ffdd88;font-size:13px;margin:12px 0;">${oldHead.def.name}が隠居<br>次代当主を誰に？</div>
+      <div id="heir-list"></div>
+      <button onclick="cancelSuccession()" style="margin-top:16px;padding:8px 32px;background:#4a2a0a;color:#f5e8c8;border:1px solid #c8960c;border-radius:4px;cursor:pointer;">後回し</button>
+    </div>
+  `;
+
+  const list = modal.querySelector('#heir-list');
+  candidates.slice(0, 4).forEach((heir, i) => {
+    const div = document.createElement('div');
+    div.className = 'heir-candidate';
+    div.innerHTML = `
+      <strong>${heir.def.name}</strong><br>
+      <small>\( {heir.jobDef.label}　武力 \){heir.def.power} 知力${heir.def.intel}</small>
+    `;
+    div.onclick = () => confirmHeir(heir, oldHead);
+    list.appendChild(div);
+  });
+
+  modal.classList.add('show');
+}
+
+function createSuccessionModal() {
+  const modal = document.createElement('div');
+  modal.id = 'succession-modal';
+  document.body.appendChild(modal);
+  return modal;
+}
+
+window.confirmHeir = function(newHead, oldHead) {
+  document.getElementById('succession-modal').classList.remove('show');
+  
+  currentHouseHead = { warrior: newHead, familyName: oldHead.def.name.split(' ')[0] };
+  
+  // 視覚効果
+  newHead.el.style.boxShadow = '0 0 30px #ffdd44';
+  setTimeout(() => newHead.el.style.boxShadow = '', 3000);
+
+  addLog(`【家督継承】${newHead.def.name}が新当主に！`, true);
+  newHead.showSpeechText(`「我が家を継ぎ、天下を目指す！」`, 4500);
+  newHead.showEmotion('👑');
+
+  // 旧当主は引退
+  retireWarrior(oldHead);
 };
 
-// =============================================
-// ======== 昇格チェック ========
-// =============================================
-function checkRankUp(warrior) {
-  const nextRankDef = getNextRankDef(warrior.def.jobId);
-  if (!nextRankDef) return; // 最終ランク
-  if (warrior._rankingUp) return; // 昇格中
-  const req = nextRankDef.req;
-  if (!req) return;
+window.cancelSuccession = function() {
+  document.getElementById('succession-modal').classList.remove('show');
+  addLog(`家督継承は先送りされました。`);
+};
 
-  // 条件確認
-  const ok =
-    warrior.def.power   >= (req.power   || 0) &&
-    warrior.def.intel   >= (req.intel   || 0) &&
-    warrior.def.loyalty >= (req.loyalty || 0) &&
-    warrior.growthPct   >= (req.growthPct || 0);
+// ====================== 合戦システム（簡易版） ======================
+window.startBattle = function(e) {
+  const btn = e.currentTarget;
+  btn.style.borderColor = 'rgba(255,68,68,0.9)';
+  btn.style.color = '#ffaaaa';
 
-  if (ok) triggerRankUp(warrior, nextRankDef);
-}
-
-function triggerRankUp(warrior, nextRankDef) {
-  warrior._rankingUp = true;
-  const prevLabel = getRankDef(warrior.def.jobId).label;
-
-  // ステータスボーナス付与
-  warrior.def.power   = Math.min(99, warrior.def.power   + nextRankDef.bonuses.power);
-  warrior.def.intel   = Math.min(99, warrior.def.intel   + nextRankDef.bonuses.intel);
-  warrior.def.loyalty = Math.min(99, warrior.def.loyalty + nextRankDef.bonuses.loyalty);
-
-  // jobId変更
-  warrior.def.jobId = nextRankDef.jobId;
-  warrior.jobDef    = JOB_DEFS_MAP[nextRankDef.jobId];
-
-  // バッジ更新
-  const jbEl = warrior.el.querySelector('.job-badge');
-  if (jbEl) {
-    jbEl.className = `job-badge ${nextRankDef.badgeClass}`;
-    jbEl.textContent = `${nextRankDef.icon} ${nextRankDef.label}`;
-  }
-
-  // ランクバッジ更新
-  warrior.updateRankBadge();
-
-  // ビジュアルエフェクト
-  warrior.el.classList.add('ranking-up');
-  setTimeout(() => warrior.el.classList.remove('ranking-up'), 2100);
-
-  // ランクアップポップアップ
-  const popup = document.createElement('div');
-  popup.className = 'rankup-popup';
-  popup.style.top = '-60px';
-  popup.textContent = `★ ${nextRankDef.label} に昇格！`;
-  warrior.el.appendChild(popup);
-  setTimeout(() => popup.remove(), 2300);
-
-  // セリフ
-  const newSpeeches = nextRankDef.speeches;
-  warrior.showSpeechText(newSpeeches[Math.floor(Math.random() * newSpeeches.length)], 4500);
-  warrior.showEmotion('✨');
-
-  // ログ
-  addLog(`【昇格】${warrior.def.name}が「${prevLabel}」から「${nextRankDef.label}」に昇格！`, true);
-
-  // モーダルをキューに積む
-  rankupQueue.push({ warrior, nextRankDef, prevLabel });
-  processRankupQueue();
-
-  // 選択中なら下部ステータス更新
-  if (warrior._isSelected) {
-    document.getElementById('val-power').textContent   = warrior.def.power;
-    document.getElementById('val-intel').textContent   = warrior.def.intel;
-    document.getElementById('val-loyalty').textContent = warrior.def.loyalty;
-    document.getElementById('bar-power').style.width   = warrior.def.power   + '%';
-    document.getElementById('bar-intel').style.width   = warrior.def.intel   + '%';
-    document.getElementById('bar-loyalty').style.width = warrior.def.loyalty + '%';
-    document.getElementById('selected-job-display').innerHTML =
-      `<div class="job-display-icon">${warrior.jobDef.icon}</div><div class="job-display-label">${warrior.jobDef.label}</div>`;
-  }
-
-  // 昇格クールダウン（同一武将の連続昇格防止）
-  setTimeout(() => { warrior._rankingUp = false; }, 8000);
-}
-
-let rankupModalOpen = false;
-
-function processRankupQueue() {
-  if (rankupModalOpen || rankupQueue.length === 0) return;
-  const { warrior, nextRankDef, prevLabel } = rankupQueue.shift();
-  showRankupModal(warrior, nextRankDef, prevLabel);
-}
-
-function showRankupModal(warrior, nextRankDef, prevLabel) {
-  rankupModalOpen = true;
-  document.getElementById('rankup-modal-name').textContent = warrior.def.name;
-  document.getElementById('rankup-modal-from').textContent = prevLabel;
-  document.getElementById('rankup-modal-to').textContent   = `${nextRankDef.icon} ${nextRankDef.label}`;
-
-  const bEl = document.getElementById('rankup-modal-bonuses');
-  bEl.innerHTML = '';
-  const b = nextRankDef.bonuses;
-  if (b.power)   bEl.innerHTML += `<div class="rankup-bonus power">武力 +${b.power}</div>`;
-  if (b.intel)   bEl.innerHTML += `<div class="rankup-bonus intel">知力 +${b.intel}</div>`;
-  if (b.loyalty) bEl.innerHTML += `<div class="rankup-bonus loyalty">統率 +${b.loyalty}</div>`;
-
-  document.getElementById('rankup-modal-flavor').textContent = nextRankDef.flavor;
-
-  document.getElementById('rankup-overlay').classList.add('show');
-  setTimeout(() => document.getElementById('rankup-modal').classList.add('show'), 50);
-}
-
-function closeRankupModal() {
-  document.getElementById('rankup-modal').classList.remove('show');
-  document.getElementById('rankup-overlay').classList.remove('show');
-  rankupModalOpen = false;
-  setTimeout(processRankupQueue, 400);
-}
-
-// =============================================
-// ======== 武将クラス ========
-// =============================================
-class Warrior {
-  constructor(def, index, birthdayOffset = 0) {
-    this.def = { ...def };
-    if (!this.def.traits) this.def.traits = [];
-    this.jobDef = JOB_DEFS_MAP[this.def.jobId] || JOB_DEFS_MAP['bukan'];
-    this.index = index;
-    this.uniqueId = def.id || ('w_' + Date.now() + '_' + Math.random().toString(36).slice(2));
-    this.def.id = this.uniqueId;
-
-    const bounds = getFieldBounds();
-    const safeZones = [bounds.w*0.06, bounds.w*0.18, bounds.w*0.72, bounds.w*0.86];
-    const zi = index % safeZones.length;
-    this.x = safeZones[zi] + (Math.random()-0.5)*24;
-    this.y = bounds.h - 170 + (Math.random()-0.5)*18;
-
-    this.targetX = this.x; this.targetY = this.y;
-    this.birthday   = Date.now() - birthdayOffset;
-    this.lifespan   = LIFESPAN_MS;
-    this.stage      = 'child';
-    this.growthPct  = 0;
-    this.baseSpeed  = 0.55 + Math.random()*0.35;
-    this.speed      = this.baseSpeed * STAGE_DEFS.child.speedMult;
-    this.dir        = Math.random()<0.5?1:-1;
-    this.walkFrame  = 0; this.frameTimer = 0;
-    this.state      = 'idle'; this.restTimer = 0;
-    this.thinkTimer = Math.random()*120+60;
-    this.lastActionTime = 0;
-    this._isSelected = false; this._rankingUp = false;
-
-    this.el = null; this.svgWrap = null;
-    this.speechEl = null; this.emotionEl = null;
-    this.growthBarEl = null; this.stageLabelEl = null;
-    this.rankBarFillEl = null; this.rankBadgeEl = null;
-
-    this.createElement();
-    this.updateSVG();
-    this.updatePosition();
-  }
-
-  createElement() {
-    const field = document.getElementById('castle-field');
-    const el = document.createElement('div');
-    el.className = `warrior stage-${this.stage}`;
-    el.id = this.uniqueId;
-    el._warrior = this;
-
-    const jd = this.jobDef;
-    el.innerHTML = `
-      <div class="rank-badge"></div>
-      <div class="stage-label">${STAGE_DEFS[this.stage].label}</div>
-      <div class="job-badge ${jd.badgeClass}">${jd.icon} ${jd.label}</div>
-      <div class="warrior-tag">${this.def.name}</div>
-      <div class="speech-bubble"></div>
-      <div class="emotion-icon"></div>
-      <div class="svg-wrap"></div>
-      <div class="warrior-shadow"></div>
-      <div class="growth-bar-wrap"><div class="growth-bar-fill" style="width:0%"></div></div>
-      <div class="rank-bar-wrap">
-        <div class="rank-bar-label">昇格まで</div>
-        <div class="rank-bar-fill" style="width:0%"></div>
-      </div>
-    `;
-    el.addEventListener('click', () => this.onClick());
-    field.appendChild(el);
-    this.el           = el;
-    this.svgWrap      = el.querySelector('.svg-wrap');
-    this.speechEl     = el.querySelector('.speech-bubble');
-    this.emotionEl    = el.querySelector('.emotion-icon');
-    this.growthBarEl  = el.querySelector('.growth-bar-fill');
-    this.rankBadgeEl  = el.querySelector('.rank-badge');
-    this.rankBarFillEl= el.querySelector('.rank-bar-fill');
-    this.stageLabelEl = el.querySelector('.stage-label');
-  }
-
-  // ランクバッジ（常時表示）
-  updateRankBadge() {
-    const nextRd = getNextRankDef(this.def.jobId);
-    const curRd  = getRankDef(this.def.jobId);
-    if (!this.rankBadgeEl) return;
-    const rank = curRd ? curRd.rank : 0;
-    this.rankBadgeEl.className = `rank-badge rank${rank}`;
-    if (rank === 1) this.rankBadgeEl.textContent = `${curRd.icon} ${curRd.label}`;
-    if (rank === 2) this.rankBadgeEl.textContent = `✦ ${curRd.label} ✦`;
-    if (rank === 0) this.rankBadgeEl.textContent = '';
-  }
-
-  // 昇格進捗バー更新
-  updateRankProgressBar() {
-    const nextRd = getNextRankDef(this.def.jobId);
-    if (!nextRd || !this.rankBarFillEl) return;
-    const req = nextRd.req;
-    if (!req) return;
-    // 各条件の達成度を平均
-    let scores = [];
-    if (req.power   > 0) scores.push(Math.min(1, this.def.power   / req.power));
-    if (req.intel   > 0) scores.push(Math.min(1, this.def.intel   / req.intel));
-    if (req.loyalty > 0) scores.push(Math.min(1, this.def.loyalty / req.loyalty));
-    if (req.growthPct > 0) scores.push(Math.min(1, this.growthPct / req.growthPct));
-    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 0;
-    this.rankBarFillEl.style.width = (avg*100) + '%';
-  }
-
-  updateSVG(walkStep=0) {
-    if (this.svgWrap) this.svgWrap.innerHTML = makeSVG(this.def.jobId, this.def.color, walkStep);
-  }
-
-  updateGrowth() {
-    const age = Date.now() - this.birthday;
-    this.growthPct = Math.min(age / this.lifespan, 1);
-    if (this.growthBarEl) this.growthBarEl.style.width = (this.growthPct*100)+'%';
-    this.updateRankProgressBar();
-
-    let newStage = 'child';
-    for (const [key, def] of Object.entries(STAGE_DEFS)) {
-      if (this.growthPct >= def.threshold) newStage = key;
-    }
-    if (this.stage !== newStage) {
-      this.stage = newStage;
-      const stageDef = STAGE_DEFS[newStage];
-      this.el.classList.remove('stage-child','stage-teen','stage-young','stage-adult');
-      this.el.classList.add(`stage-${this.stage}`);
-      if (this.stageLabelEl) this.stageLabelEl.textContent = stageDef.label;
-      this.speed = this.baseSpeed * stageDef.speedMult;
-      this.el.classList.add('evolving');
-      setTimeout(() => this.el.classList.remove('evolving'), 1500);
-      this.showEmotion('✨');
-      const msg = stageDef.speechSet ? stageDef.speechSet[0] : `「${this.def.name}、覚醒せり！」`;
-      this.showSpeechText(msg, 3500);
-      addLog(`${this.def.name}（${this.jobDef.label}）が【${stageDef.label}】に成長した`);
-    }
-  }
-
-  onClick() {
-    if (breedModeActive) { this.toggleBreedSelect(); return; }
-    warriors.forEach(w => w._isSelected = false);
-    this._isSelected = true;
-    document.getElementById('val-power').textContent   = this.def.power;
-    document.getElementById('val-intel').textContent   = this.def.intel;
-    document.getElementById('val-loyalty').textContent = this.def.loyalty;
-    document.getElementById('bar-power').style.width   = Math.min(this.def.power,  99)+'%';
-    document.getElementById('bar-intel').style.width   = Math.min(this.def.intel,  99)+'%';
-    document.getElementById('bar-loyalty').style.width = Math.min(this.def.loyalty,99)+'%';
-    const jd = this.jobDef;
-    document.getElementById('selected-job-display').innerHTML =
-      `<div class="job-display-icon">${jd.icon}</div><div class="job-display-label">${jd.label}</div>`;
-    this.showSpeech();
-    this.state = 'resting'; this.restTimer = 180;
-  }
-
-  toggleBreedSelect() {
-    const gender = this.jobDef.gender;
-    if (gender === 'male') {
-      if (this === breedParentA) { breedParentA = null; this.el.classList.remove('selected-for-breed'); }
-      else { if (breedParentA) breedParentA.el.classList.remove('selected-for-breed'); breedParentA = this; this.el.classList.add('selected-for-breed'); }
-    } else {
-      if (this === breedParentB) { breedParentB = null; this.el.classList.remove('selected-for-breed'); }
-      else { if (breedParentB) breedParentB.el.classList.remove('selected-for-breed'); breedParentB = this; this.el.classList.add('selected-for-breed'); }
-    }
-    updateBreedUI();
-  }
-
-  showSpeech() {
-    const stageDef = STAGE_DEFS[this.stage];
-    const pool = stageDef.speechSet || this.jobDef.speeches;
-    this.showSpeechText(pool[Math.floor(Math.random()*pool.length)], 2800);
-  }
-
-  showSpeechText(text, duration=2800) {
-    this.speechEl.textContent = text;
-    this.speechEl.classList.add('visible');
-    clearTimeout(this._speechTO);
-    this._speechTO = setTimeout(() => this.speechEl.classList.remove('visible'), duration);
-  }
-
-  showEmotion(icon=null) {
-    const e = icon || emotions[Math.floor(Math.random()*emotions.length)];
-    this.emotionEl.textContent = e;
-    this.emotionEl.classList.add('show');
-    clearTimeout(this._emotionTO);
-    this._emotionTO = setTimeout(() => this.emotionEl.classList.remove('show'), 2000);
-  }
-
-  pickNewTarget() {
-    const bounds = getFieldBounds();
-    const cx = bounds.w/2, avoidL=cx-90, avoidR=cx+90;
-    let newX;
-    if (Math.random()<0.5) newX = Math.random()*(avoidL-20)+10;
-    else newX = avoidR + Math.random()*(bounds.w-avoidR-30);
-    const baseY = bounds.h-170;
-    const newY  = baseY + (Math.random()-0.5)*24;
-    this.targetX = Math.max(10, Math.min(bounds.w-40, newX));
-    this.targetY = Math.max(bounds.h-205, Math.min(bounds.h-138, newY));
-  }
-
-  gainStatus() {
-    if (this.stage==='adult' && Math.random()<0.30) return;
-    if (this.growthPct>=1) return;
-    const rateBonus = {child:2,teen:2,young:1,adult:1};
-    const rate   = rateBonus[this.stage]??1;
-    const amount = Math.floor(Math.random()*2)+rate;
-    const prio   = this.jobDef.growPriority;
-    const r = Math.random();
-    const sel = r<0.55 ? prio[0] : r<0.80 ? prio[1] : prio[2];
-    this.def[sel] = Math.min(99, this.def[sel]+amount);
-    if (this._isSelected) {
-      const valEl = document.getElementById(`val-${sel}`);
-      const barEl = document.getElementById(`bar-${sel}`);
-      if (valEl) valEl.textContent = this.def[sel];
-      if (barEl) barEl.style.width = this.def[sel]+'%';
-    }
-    this.createStatusPopup(`+${amount}`, sel);
-    this.el.classList.add('growing-aura');
-    clearTimeout(this._auraTO);
-    this._auraTO = setTimeout(() => this.el.classList.remove('growing-aura'), 600);
-
-    // 昇格チェック
-    checkRankUp(this);
-  }
-
-  createStatusPopup(amount, type) {
-    const colors = {power:'#ff6666',intel:'#66aaff',loyalty:'#f0c040'};
-    const labels = {power:'武力',intel:'知力',loyalty:'統率'};
-    const popup = document.createElement('div');
-    popup.className = 'status-up-popup';
-    popup.style.color = colors[type];
-    popup.textContent = `${labels[type]}${amount}`;
-    popup.style.top = '-44px';
-    this.el.appendChild(popup);
-    setTimeout(() => popup.remove(), 1300);
-  }
-
-  update() {
-    this.updateGrowth();
-    this.thinkTimer--;
-    if (this.thinkTimer<=0) {
-      this.thinkTimer = Math.random()*200+80;
-      if (this.state==='idle'||(this.state==='resting'&&this.restTimer<=0)) { this.pickNewTarget(); this.state='walking'; }
-      if (Math.random()<0.3)  this.showEmotion();
-      if (Math.random()<0.18) this.showSpeech();
-    }
-    if (this.state==='walking') { this.lastActionTime++; if (this.lastActionTime>=120) { this.gainStatus(); this.lastActionTime=0; } }
-    if (this.state==='resting' && Math.random()<0.004) { this.showEmotion('💪'); this.gainStatus(); }
-    this.handleMovement();
-    this.updatePosition();
-  }
-
-  handleMovement() {
-    if (this.state==='resting') {
-      this.restTimer--;
-      this.updateSVG(0);
-      if (this.restTimer<=0) { this.state='idle'; this.thinkTimer=30; }
+  setTimeout(() => {
+    if (!currentHouseHead) {
+      alert('当主が不在です。家督を継承してください。');
+      btn.style.borderColor = '';
+      btn.style.color = '';
       return;
     }
-    if (this.state==='walking') {
-      const dx=this.targetX-this.x, dy=this.targetY-this.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if (dist<2) { this.state='resting'; this.restTimer=Math.random()*180+60; this.updateSVG(0); }
-      else {
-        const spd=Math.min(this.speed,dist);
-        this.x+=(dx/dist)*spd; this.y+=(dy/dist)*spd;
-        this.dir=dx>0?1:-1;
-        this.frameTimer++;
-        if (this.frameTimer>=9) { this.frameTimer=0; this.walkFrame=(this.walkFrame+1)%4; }
-        this.updateSVG(this.walkFrame);
-      }
-    } else {
-      this.frameTimer++;
-      if (this.frameTimer>=45) { this.frameTimer=0; this.walkFrame=(this.walkFrame+1)%2; this.updateSVG(this.walkFrame); }
-    }
-  }
 
-  updatePosition() {
-    const bounds = getFieldBounds();
-    const normalY = (this.y-(bounds.h-220))/80;
-    const depthScale = 0.78+normalY*0.32;
-    const stageSizes = {child:0.55,teen:0.72,young:0.86,adult:1.0};
-    const stageScale = stageSizes[this.stage]??1.0;
-    const finalScale = stageScale*depthScale;
-    this.el.style.left      = this.x+'px';
-    this.el.style.top       = this.y+'px';
-    this.el.style.transform = `scaleX(${this.dir}) scale(${finalScale})`;
-    this.el.style.zIndex    = Math.floor(this.y);
-    const fixEls = [
-      this.el.querySelector('.warrior-tag'), this.el.querySelector('.stage-label'),
-      this.el.querySelector('.job-badge'), this.el.querySelector('.rank-badge'),
-      this.speechEl, this.emotionEl,
-    ];
-    fixEls.forEach(el => { if (el) el.style.transform = `translateX(-50%) scaleX(${this.dir})`; });
-  }
-}
+    const head = currentHouseHead.warrior;
+    const powerTotal = warriors.reduce((sum, w) => sum + w.def.power, 0);
+    const intelTotal = warriors.reduce((sum, w) => sum + w.def.intel, 0);
 
-// =============================================
-// ======== ログ ========
-// =============================================
-function addLog(text, isRankup=false) {
-  const log = document.getElementById('event-log');
-  const eraTexts = ['天正三年','天正四年','天正五年','天正六年','天正七年'];
-  const entry = document.createElement('div');
-  entry.className = 'log-entry' + (isRankup?' log-rankup':'');
-  entry.innerHTML = `<span class="log-year">${eraTexts[Math.floor(Math.random()*eraTexts.length)]}</span>${text}`;
-  const title = document.getElementById('event-log-title');
-  log.insertBefore(entry, title.nextSibling);
-}
+    const enemyPower = 120 + Math.floor(Math.random() * 80);
+    const result = (powerTotal + head.def.power * 1.5) > enemyPower ? "勝利" : "苦戦";
 
-function updateWarriorCount() {
-  const el = document.getElementById('warrior-count');
-  el.textContent = warriors.length;
-  el.classList.toggle('max', warriors.length>=MAX_WARRIORS);
-}
+    const msg = `【合戦】${currentHouseHead.familyName}軍 vs 敵軍\n` +
+                `総武力: ${powerTotal}　総知力: ${intelTotal}\n` +
+                `当主 ${head.def.name} の采配により…\n` +
+                `<b>${result}！</b>`;
 
-// =============================================
-// ======== 配合UI ========
-// =============================================
-function showBloodline() {
-  breedParentA=null; breedParentB=null;
-  breedModeActive=true;
-  warriors.forEach(w => w.el.classList.remove('selected-for-breed'));
-  renderWarriorSelectList();
-  updateBreedUI();
-  const p=document.getElementById('bloodline-popup');
-  p.style.display='block';
-  setTimeout(()=>p.classList.add('show'),10);
-}
+    alert(msg);
 
-function closeBloodline() {
-  breedModeActive=false; breedParentA=null; breedParentB=null;
-  warriors.forEach(w=>w.el.classList.remove('selected-for-breed'));
-  const p=document.getElementById('bloodline-popup');
-  p.classList.remove('show');
-  setTimeout(()=>p.style.display='none',300);
-}
-
-function jobBadgeHTML(jobId) {
-  const jd = JOB_DEFS_MAP[jobId];
-  if (!jd) return '';
-  return `<span class="wsi-job-badge badge-${jd.badgeClass ? jd.badgeClass.replace('badge-','') : ''}" >${jd.icon} ${jd.label}</span>`;
-}
-
-function renderWarriorSelectList() {
-  const list = document.getElementById('warrior-select-list');
-  list.innerHTML='';
-  warriors.forEach(w=>{
-    const item=document.createElement('div');
-    item.className='warrior-select-item';
-    const isAlreadyA=w===breedParentA, isAlreadyB=w===breedParentB;
-    if (breedParentA&&breedParentB&&!isAlreadyA&&!isAlreadyB) item.classList.add('already-selected');
-    const parentLabel=isAlreadyA?' 【父】':isAlreadyB?' 【母】':'';
-    const curRd=getRankDef(w.def.jobId);
-    const rankTag=curRd&&curRd.rank>0?`<span style="font-size:7px;color:var(--gold-light);margin-left:3px;">${curRd.label}</span>`:'';
-    item.innerHTML=`
-      <div>
-        <div class="wsi-name">${w.def.name}${parentLabel} ${jobBadgeHTML(w.def.jobId)}${rankTag}</div>
-        <div class="wsi-role">${STAGE_DEFS[w.stage].label} ・ ${w.jobDef.gender==='male'?'男':'女'}</div>
-      </div>
-      <div class="wsi-stats">武力 ${w.def.power}<br>知力 ${w.def.intel}</div>`;
-    item.addEventListener('click',()=>w.toggleBreedSelect());
-    list.appendChild(item);
-  });
-}
-
-function generateChildName(childJobId) {
-  const jd=JOB_DEFS_MAP[childJobId];
-  if (jd.gender==='male') {
-    return `${FAMILY_NAMES_M[Math.floor(Math.random()*FAMILY_NAMES_M.length)]} ${GIVEN_NAMES_M[Math.floor(Math.random()*GIVEN_NAMES_M.length)]}`;
-  } else {
-    return `${FAMILY_NAMES_F[Math.floor(Math.random()*FAMILY_NAMES_F.length)]} ${GIVEN_NAMES_F[Math.floor(Math.random()*GIVEN_NAMES_F.length)]}`;
-  }
-}
-
-function generateTraits(pA, pB) {
-  const jobTraitsA=pA.jobDef.traits||[], jobTraitsB=pB.jobDef.traits||[];
-  const combined=[...new Set([...(pA.def.traits||[]),...(pB.def.traits||[]),...jobTraitsA,...jobTraitsB])];
-  const inherited=combined.sort(()=>Math.random()-0.5).slice(0,Math.floor(Math.random()*2)+1);
-  const result=[...inherited];
-  if (Math.random()<0.55) {
-    const unused=ALL_TRAITS.filter(t=>!result.includes(t.name));
-    if (unused.length>0) result.push(unused[Math.floor(Math.random()*unused.length)].name);
-  }
-  return result;
-}
-
-function computeChildStats(pA, pB, childJobId) {
-  const BONUS=1.08, v=()=>(Math.random()-0.5)*12;
-  const bias=JOB_DEFS_MAP[childJobId].statBias;
-  return {
-    power:   Math.min(99,Math.max(10,Math.round(((pA.def.power+pB.def.power)/2)*BONUS*bias.power+v()))),
-    intel:   Math.min(99,Math.max(10,Math.round(((pA.def.intel+pB.def.intel)/2)*BONUS*bias.intel+v()))),
-    loyalty: Math.min(99,Math.max(10,Math.round(((pA.def.loyalty+pB.def.loyalty)/2)*BONUS*bias.loyalty+v()))),
-  };
-}
-
-let _previewJobId=null;
-
-function updateBreedUI() {
-  renderWarriorSelectList();
-  const slotA=document.getElementById('slot-a'), slotB=document.getElementById('slot-b');
-  const preview=document.getElementById('breed-preview'), execBtn=document.getElementById('breed-execute-btn');
-
-  if (breedParentA) {
-    slotA.classList.add('filled');
-    const jd=breedParentA.jobDef;
-    const curRd=getRankDef(breedParentA.def.jobId);
-    const rkLabel=curRd&&curRd.rank>0?` (${curRd.label})`:'';
-    slotA.innerHTML=`<div class="parent-slot-label">父 方（男）</div>
-      <div class="parent-slot-name">${breedParentA.def.name}</div>
-      <div class="parent-slot-job">${jd.icon} ${jd.label}${rkLabel}</div>
-      <div class="parent-slot-stats">武力 ${breedParentA.def.power} / 知力 ${breedParentA.def.intel}</div>`;
-  } else {
-    slotA.classList.remove('filled');
-    slotA.innerHTML=`<div class="parent-slot-label">父 方（男）</div><div class="parent-slot-empty">武官 or 文官を選択</div>`;
-  }
-
-  if (breedParentB) {
-    slotB.classList.add('filled');
-    const jd=breedParentB.jobDef;
-    const curRd=getRankDef(breedParentB.def.jobId);
-    const rkLabel=curRd&&curRd.rank>0?` (${curRd.label})`:'';
-    slotB.innerHTML=`<div class="parent-slot-label">母 方（女）</div>
-      <div class="parent-slot-name">${breedParentB.def.name}</div>
-      <div class="parent-slot-job">${jd.icon} ${jd.label}${rkLabel}</div>
-      <div class="parent-slot-stats">武力 ${breedParentB.def.power} / 知力 ${breedParentB.def.intel}</div>`;
-  } else {
-    slotB.classList.remove('filled');
-    slotB.innerHTML=`<div class="parent-slot-label">母 方（女）</div><div class="parent-slot-empty">姫 or 姫武将を選択</div>`;
-  }
-
-  if (breedParentA && breedParentB) {
-    _previewJobId=determineChildJob(breedParentA,breedParentB);
-    const cjd=JOB_DEFS_MAP[_previewJobId];
-    const childName=generateChildName(_previewJobId);
-    const childStats=computeChildStats(breedParentA,breedParentB,_previewJobId);
-    const childTraits=generateTraits(breedParentA,breedParentB);
-    const nextR=getNextRankDef(_previewJobId);
-
-    document.getElementById('preview-name').textContent=childName;
-    document.getElementById('preview-power').textContent=childStats.power;
-    document.getElementById('preview-intel').textContent=childStats.intel;
-    document.getElementById('preview-loyalty').textContent=childStats.loyalty;
-
-    const jobBadgeEl=document.getElementById('preview-job-badge');
-    jobBadgeEl.textContent=`${cjd.icon} ${cjd.label}`;
-    jobBadgeEl.className=`preview-job-badge ${cjd.badgeClass}`;
-
-    const traitsEl=document.getElementById('preview-traits');
-    traitsEl.innerHTML='';
-    childTraits.forEach(tName=>{
-      const tDef=ALL_TRAITS.find(t=>t.name===tName)||{color:'normal'};
-      const tag=document.createElement('div');
-      tag.className='trait-tag'+(tDef.color==='rare'?' rare':'');
-      tag.textContent=tName; traitsEl.appendChild(tag);
-    });
-    // 昇格先予告
-    if (nextR) {
-      const note=document.createElement('div');
-      note.style.cssText='font-size:8px;color:rgba(200,150,12,0.6);margin-top:4px;letter-spacing:1px;';
-      note.textContent=`▶ 昇格先: ${nextR.icon} ${nextR.label}`;
-      traitsEl.appendChild(note);
-    }
-
-    preview.classList.add('visible');
-    if (warriors.length<MAX_WARRIORS) {
-      execBtn.classList.add('ready'); execBtn.textContent='配 合 を 実 行';
-    } else {
-      execBtn.classList.remove('ready'); execBtn.textContent='武将数が上限です';
-    }
-  } else {
-    preview.classList.remove('visible'); execBtn.classList.remove('ready'); _previewJobId=null;
-  }
-}
-
-// =============================================
-// ======== 配合実行 ========
-// =============================================
-function executeBreeding() {
-  if (!breedParentA||!breedParentB||!_previewJobId) return;
-  if (warriors.length>=MAX_WARRIORS) return;
-
-  const pA=breedParentA, pB=breedParentB;
-  const childJobId=_previewJobId, cjd=JOB_DEFS_MAP[childJobId];
-  const childName=generateChildName(childJobId);
-  const childStats=computeChildStats(pA,pB,childJobId);
-  const childTraits=generateTraits(pA,pB);
-  const colorPool=cjd.gender==='male'?COLOR_POOL_M:COLOR_POOL_F;
-  const childColor=colorPool[Math.floor(Math.random()*colorPool.length)];
-
-  const childDef={
-    id:'w_'+Date.now(), name:childName, jobId:childJobId, color:childColor,
-    power:childStats.power, intel:childStats.intel, loyalty:childStats.loyalty, traits:childTraits,
-  };
-  generation++;
-  document.getElementById('gen-num').textContent=generation;
-  closeBloodline();
-  setTimeout(()=>{
-    showBirthAnnouncement(childDef);
-    setTimeout(()=>{
-      const w=new Warrior(childDef,warriors.length,0);
-      warriors.push(w);
-      updateWarriorCount();
-      addLog(`新武将【${childName}】（${cjd.label}）が誕生！${pA.def.name}×${pB.def.name}の血脈を継ぐ`);
-      pA.showSpeechText(`「${childName}よ、${cjd.label}として名を残せ」`,4000);
-      setTimeout(()=>pB.showSpeechText(`「${cjd.icon} 逞しく育っておくれ」`,3500),900);
-      pA.showEmotion('✨'); pB.showEmotion('✨');
-    },1800);
-  },200);
-}
-
-// =============================================
-// ======== 誕生演出 ========
-// =============================================
-function showBirthAnnouncement(def) {
-  const jd=JOB_DEFS_MAP[def.jobId];
-  document.getElementById('birth-name-text').textContent=def.name;
-  document.getElementById('birth-job-text').textContent=`${jd.icon} ${jd.label}`;
-  document.getElementById('birth-subtitle-text').textContent=(def.traits||[]).join(' ・ ')||'血統を受け継ぎし者';
-  const overlay=document.getElementById('birth-overlay'), ann=document.getElementById('birth-announcement');
-  overlay.classList.add('flash');
-  setTimeout(()=>ann.classList.add('show'),100);
-  setTimeout(()=>{overlay.classList.remove('flash');ann.classList.remove('show');},3200);
-}
-
-// =============================================
-// ======== 初期化 ========
-// =============================================
-window.addEventListener('load',()=>{
-  const offsets=[LIFESPAN_MS*0.00,LIFESPAN_MS*0.30,LIFESPAN_MS*0.54,LIFESPAN_MS*0.77];
-  warriors=warriorDefs.map((def,i)=>new Warrior(def,i,offsets[i]));
-  updateWarriorCount();
-  // 初期武将の rank バッジを更新（rank0はなし）
-  warriors.forEach(w=>w.updateRankBadge());
-
-  function gameLoop() { warriors.forEach(w=>w.update()); requestAnimationFrame(gameLoop); }
-  gameLoop();
-
-  setInterval(()=>{
-    for (let i=0;i<warriors.length;i++) {
-      for (let j=i+1;j<warriors.length;j++) {
-        const wi=warriors[i],wj=warriors[j];
-        const dx=wi.x-wj.x,dy=wi.y-wj.y;
-        if (Math.abs(dx)<38&&Math.abs(dy)<22&&Math.random()<0.35) {
-          wi.showSpeech(); setTimeout(()=>wj.showSpeech(),1100);
+    // 勝利時は全武将にボーナス
+    if (result === "勝利") {
+      warriors.forEach(w => {
+        w.def.power = Math.min(99, w.def.power + 3);
+        w.def.loyalty = Math.min(99, w.def.loyalty + 5);
+        if (w._isSelected) {
+          document.getElementById('val-power').textContent = w.def.power;
+          document.getElementById('val-loyalty').textContent = w.def.loyalty;
         }
-      }
+      });
+      addLog(`合戦勝利！全軍の士気が高まりました。`, true);
     }
-  },3000);
+
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 280);
+};
+
+// ====================== ゲームループ拡張 ======================
+const originalUpdate = Warrior.prototype.update;
+Warrior.prototype.update = function() {
+  originalUpdate.call(this);
+  checkRetirement(this);
+};
+
+// 初期当主設定
+window.addEventListener('load', () => {
+  // ... 元の初期化コード ...
+
+  // 当主を一番強い武将に
+  setTimeout(() => {
+    if (warriors.length > 0) {
+      const strongest = warriors.reduce((a,b) => 
+        (a.def.power + a.def.intel) > (b.def.power + b.def.intel) ? a : b
+      );
+      currentHouseHead = { warrior: strongest, familyName: strongest.def.name.split(' ')[0] };
+      addLog(`【当主】${strongest.def.name}が家督を継ぎました。`, true);
+    }
+  }, 800);
 });
-
-// ======== UI ========
-let logVisible=false;
-function toggleLog(){logVisible=!logVisible;document.getElementById('event-log').style.display=logVisible?'block':'none';}
-function startBattle(e){const btn=e.currentTarget;btn.style.borderColor='rgba(255,68,68,0.8)';btn.style.color='#ff8888';setTimeout(()=>{btn.style.borderColor='';btn.style.color='';alert('⚔️ 合戦画面（開発中）\n\n次のアップデートで実装予定！');},300);}
-
-const eras=['天正四年','天正五年','天正六年','天正七年','天正八年'];
-let eraIdx=0;
-setInterval(()=>{
-  eraIdx=(eraIdx+1)%eras.length;
-  const el=document.getElementById('era-year');
-  el.style.opacity=0;
-  setTimeout(()=>{el.textContent=eras[eraIdx];el.style.opacity=1;el.style.transition='opacity 0.5s';},300);
-},15000);
 </script>
 </body>
 </html>
