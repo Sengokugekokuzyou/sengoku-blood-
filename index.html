@@ -6,271 +6,102 @@
 <title>戦国血脈 〜覇道の系譜〜</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
-
 :root {
-  --gold:      #c8960c;
-  --gold-l:    #f0c040;
-  --gold-d:    rgba(200,150,12,.4);
-  --parchment: #f5e8c8;
-  --ink:       #0e0800;
-  --panel:     rgba(8,4,0,.85);
+  --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
+  --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.85);
 }
-
-*,*::before,*::after { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
-
-html,body {
-  width:100%;height:100%;
-  background:var(--ink);
-  font-family:'Noto Serif JP',serif;
-  overflow:hidden;
-  user-select:none;-webkit-user-select:none;
-}
-
-/* ════════════════════════════
-   背景
-════════════════════════════ */
-#sky {
-  position:fixed;inset:0;z-index:0;
-  background:linear-gradient(175deg,
-    #0a0500 0%,
-    #18100a 35%,
-    #251808 65%,
-    #1a1005 100%);
-}
-
-/* 星 */
-.star {
-  position:fixed;border-radius:50%;background:#fff;opacity:0;
-  animation:twinkle ease-in-out infinite;
-}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
+#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
+.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
-
-/* 霞レイヤー */
-.mist {
-  position:fixed;left:-20%;width:140%;
-  background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);
-  border-radius:50%;animation:drift linear infinite;
-  pointer-events:none;
-}
+.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none;}
 .mist:nth-child(1){height:55px;top:30%;animation-duration:32s;}
 .mist:nth-child(2){height:70px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
 .mist:nth-child(3){height:45px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
 @keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
-
-/* 花びら */
-.petal{
-  position:fixed;border-radius:50% 0 50% 0;
-  background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);
-  animation:petalFall linear infinite;pointer-events:none;
-}
-@keyframes petalFall{
-  0%  {transform:translateY(-10px) rotate(0deg)   translateX(0);opacity:0}
-  7%  {opacity:.9}
-  93% {opacity:.5}
-  100%{transform:translateY(102vh)  rotate(760deg) translateX(45px);opacity:0}
-}
-
-/* ════════════════════════════
-   メインレイアウト
-════════════════════════════ */
-#main {
-  position:relative;z-index:10;
-  width:100%;height:100%;
-  display:flex;flex-direction:column;
-}
-
-/* ── ヘッダー ── */
-#header {
-  flex-shrink:0;
-  padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;
-  display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
-}
-#game-title {
-  color:var(--gold);
-  font-size:clamp(15px,4.8vw,20px);
-  font-weight:900;letter-spacing:.3em;
-  text-shadow:0 0 20px rgba(200,150,12,.75);
-  line-height:1.5;
-}
-#game-title .sub {
-  display:block;font-size:clamp(8px,2vw,10px);
-  letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;
-}
+.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
+@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
+#main{position:relative;z-index:10;width:100%;height:100%;display:flex;flex-direction:column;}
+#header{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+#game-title{color:var(--gold);font-size:clamp(15px,4.8vw,20px);font-weight:900;letter-spacing:.3em;text-shadow:0 0 20px rgba(200,150,12,.75);line-height:1.5;}
+#game-title .sub{display:block;font-size:clamp(8px,2vw,10px);letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;}
 #status-panel{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-.stat-chip{
-  display:flex;align-items:center;gap:5px;
-  background:var(--panel);border:1px solid var(--gold-d);
-  border-radius:20px;padding:4px 11px;
-}
-.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}
-.sv{font-size:14px;font-weight:700;color:var(--gold-l);}
-.su{font-size:9px;color:var(--gold-d);}
-
-/* ── アイソメトリックフィールド ── */
-#iso-field {
-  flex:1;position:relative;overflow:hidden;min-height:0;
-}
-
-/* アイソ変換ラッパー */
-#iso-world {
-  position:absolute;
-  bottom:-8%;
-  left:50%;
-  transform:translateX(-50%);
-  width:460px;
-  transform-origin:bottom center;
-}
-
-/* Canvas でアイソ描画 */
-#iso-canvas {
-  position:absolute;
-  bottom:0;left:50%;
-  transform:translateX(-50%);
-  pointer-events:none;
-}
-
-/* ── ボトムUI ── */
-#bottom-ui {
-  flex-shrink:0;
-  padding:0 12px max(env(safe-area-inset-bottom,0px),12px);
-  background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);
-}
-#nation-bar{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 4px 5px;
-  border-bottom:1px solid rgba(200,150,12,.15);
-}
+.stat-chip{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--gold-d);border-radius:20px;padding:4px 11px;}
+.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}.sv{font-size:14px;font-weight:700;color:var(--gold-l);}.su{font-size:9px;color:var(--gold-d);}
+#time-display{position:absolute;top:max(env(safe-area-inset-top,0px),8px);left:12px;font-size:11px;color:var(--gold);opacity:.8;z-index:20;pointer-events:none;}
+#iso-field{flex:1;position:relative;overflow:hidden;min-height:0;}
+#iso-canvas{position:absolute;bottom:0;left:50%;transform:translateX(-50%);pointer-events:none;}
+#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
+.speech-bubble{position:absolute;background:rgba(245,232,180,.96);border:2px solid var(--gold);border-radius:12px;padding:5px 10px;font-size:11px;font-family:'Noto Serif JP',serif;color:#2a1800;white-space:nowrap;transform:translateX(-50%);box-shadow:0 3px 12px rgba(0,0,0,.6);animation:bubblePop .25s ease-out;z-index:31;}
+.speech-bubble::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--gold);}
+@keyframes bubblePop{0%{transform:translateX(-50%) scale(0.4);opacity:0}60%{transform:translateX(-50%) scale(1.08)}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.relation-label{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;color:rgba(240,192,64,.9);pointer-events:none;text-shadow:0 1px 4px #000;animation:fadeInOut 2.5s ease-in-out forwards;}
+@keyframes fadeInOut{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+/* 施設アクティブ表示 */
+.facility-activity{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;color:#ffdd88;pointer-events:none;text-shadow:0 1px 4px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop 0.3s ease-out;}
+@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+#bottom-ui{flex-shrink:0;padding:0 12px max(env(safe-area-inset-bottom,0px),12px);background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);}
+#nation-bar{display:flex;align-items:center;gap:8px;padding:8px 4px 5px;border-bottom:1px solid rgba(200,150,12,.15);}
 .nl{font-size:9px;color:var(--gold-d);letter-spacing:.2em;white-space:nowrap;}
 .nt{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
 .nf{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
 .np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
-
-#party-row{
-  display:flex;gap:7px;padding:6px 0 5px;
-  overflow-x:auto;scrollbar-width:none;
-}
+#party-row{display:flex;gap:7px;padding:6px 0 5px;overflow-x:auto;scrollbar-width:none;}
 #party-row::-webkit-scrollbar{display:none;}
-.party-card{
-  flex-shrink:0;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(200,150,12,.2);
-  border-radius:8px;padding:5px 10px;min-width:56px;
-  cursor:pointer;transition:border-color .2s,background .2s;
-}
+.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:56px;cursor:pointer;transition:border-color .2s,background .2s;}
 .party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
 .party-card:active{background:rgba(200,150,12,.15);}
 .pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}
 .pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
-.pc-pow {font-size:9px;color:#ffaa44;}
-
-#action-row{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:7px;padding:5px 0 3px;
-}
-.act-btn{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  background:var(--panel);border:1px solid var(--gold-d);
-  border-radius:10px;padding:10px 4px 8px;
-  cursor:pointer;transition:background .15s,border-color .15s,transform .1s;
-  color:var(--parchment);font-family:inherit;
-}
+.pc-pow{font-size:9px;color:#ffaa44;}
+.pc-loc{font-size:8px;color:#aaddff;margin-top:1px;}
+.pc-rel{font-size:8px;color:#88ffaa;margin-top:0px;}
+#action-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:5px 0 3px;}
+.act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;padding:10px 4px 8px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;}
 .act-btn:active{transform:scale(.92);background:rgba(200,150,12,.14);border-color:var(--gold);}
-.act-btn .ico{font-size:21px;line-height:1;}
-.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
+.act-btn .ico{font-size:21px;line-height:1;}.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
 .act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.4);}
 .act-btn.primary .lbl{color:var(--gold-l);}
-
-/* ════════════════════════════
-   合戦画面
-════════════════════════════ */
-#battle-screen{
-  position:fixed;inset:0;z-index:500;
-  background:linear-gradient(#060200,#180f00);
-  display:none;flex-direction:column;color:var(--parchment);
-}
+#battle-screen{position:fixed;inset:0;z-index:500;background:linear-gradient(#060200,#180f00);display:none;flex-direction:column;color:var(--parchment);}
 #battle-screen.show{display:flex;}
-.bh{
-  flex-shrink:0;
-  padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;
-  background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);
-  display:flex;justify-content:space-between;align-items:center;
-}
-.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}
-.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
-.bf{
-  flex:1;min-height:0;
-  background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));
-  display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;
-}
-.army{text-align:center;width:42%;}
-.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
-.our-army .army-title{color:#ffdd88;}
-.enemy-army .army-title{color:#ff8888;}
+.bh{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;}
+.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
+.bf{flex:1;min-height:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;}
+.army{text-align:center;width:42%;}.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
+.our-army .army-title{color:#ffdd88;}.enemy-army .army-title{color:#ff8888;}
 .wi{font-size:clamp(34px,10vw,50px);margin:5px 4px;display:inline-block;filter:drop-shadow(0 4px 12px #000);}
-.blog{
-  flex-shrink:0;height:165px;
-  background:rgba(6,3,0,.97);border-top:2px solid var(--gold);
-  padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;
-}
+.blog{flex-shrink:0;height:165px;background:rgba(6,3,0,.97);border-top:2px solid var(--gold);padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;}
 .ll{margin:3px 0;}.ll.ally{color:#bbffbb;}
-.bfooter{
-  flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);
-  background:rgba(0,0,0,.9);display:flex;gap:10px;
-}
-.bbtn{
-  flex:1;padding:15px 8px;font-size:15px;font-weight:700;
-  background:linear-gradient(#5a2a0a,#2a1800);
-  border:1px solid var(--gold);color:var(--parchment);
-  cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;
-}
+.bfooter{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);background:rgba(0,0,0,.9);display:flex;gap:10px;}
+.bbtn{flex:1;padding:15px 8px;font-size:15px;font-weight:700;background:linear-gradient(#5a2a0a,#2a1800);border:1px solid var(--gold);color:var(--parchment);cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;}
 .bbtn:active{filter:brightness(1.3);}
-
-/* 新規追加: モーダル (ゲーム発展途上国風) */
-.modal {
-  position:fixed;inset:0;z-index:700;
-  background:rgba(8,4,0,.94);
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-}
-.modal-content {
-  background:var(--panel);
-  width:92%;
-  max-width:420px;
-  border:3px solid var(--gold);
-  border-radius:16px;
-  padding:20px;
-  color:var(--parchment);
-  box-shadow:0 0 30px rgba(200,150,12,.6);
-}
+.modal{position:fixed;inset:0;z-index:700;background:rgba(8,4,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;}
+.modal-content{position:relative;background:var(--panel);width:92%;max-width:420px;border:3px solid var(--gold);border-radius:16px;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6);}
 </style>
 </head>
 <body>
-
 <div id="sky"></div>
-
-<!-- 星 -->
-<div class="star" style="left:6%;  top:4%; width:2px;height:2px;animation-duration:3.1s;"></div>
-<div class="star" style="left:19%; top:8%; width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
-<div class="star" style="left:33%; top:3%; width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
-<div class="star" style="left:52%; top:6%; width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
-<div class="star" style="left:68%; top:2%; width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
-<div class="star" style="left:82%; top:7%; width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
-<div class="star" style="left:91%; top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
+<div class="star" style="left:6%;top:4%;width:2px;height:2px;animation-duration:3.1s;"></div>
+<div class="star" style="left:19%;top:8%;width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
+<div class="star" style="left:33%;top:3%;width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
+<div class="star" style="left:52%;top:6%;width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
+<div class="star" style="left:68%;top:2%;width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
+<div class="star" style="left:82%;top:7%;width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
+<div class="star" style="left:91%;top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
 <div class="mist"></div><div class="mist"></div><div class="mist"></div>
-<div class="petal" style="left:3%; width:7px;height:7px;animation-duration:8.2s;"></div>
+<div class="petal" style="left:3%;width:7px;height:7px;animation-duration:8.2s;"></div>
 <div class="petal" style="left:14%;width:5px;height:5px;animation-duration:10.5s;animation-delay:-2.8s;"></div>
 <div class="petal" style="left:28%;width:8px;height:8px;animation-duration:9.1s;animation-delay:-5.5s;"></div>
 <div class="petal" style="left:47%;width:6px;height:6px;animation-duration:13.2s;animation-delay:-1.2s;"></div>
 <div class="petal" style="left:61%;width:5px;height:5px;animation-duration:10.8s;animation-delay:-4.2s;"></div>
-<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;  animation-delay:-7.1s;"></div>
-<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s; animation-delay:-2.4s;"></div>
+<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;animation-delay:-7.1s;"></div>
+<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s;animation-delay:-2.4s;"></div>
 
-<!-- 合戦画面 -->
+<div id="time-display">第1年 1月 1日</div>
+
 <div id="battle-screen">
-  <div class="bh">
-    <div class="bt" id="battle-family">織田軍 出陣</div>
-    <div class="bc" onclick="endBattle()">✕</div>
-  </div>
+  <div class="bh"><div class="bt" id="battle-family">織田軍 出陣</div><div class="bc" onclick="endBattle()">✕</div></div>
   <div class="bf">
     <div class="army our-army"><div class="army-title">我が軍</div><div id="our-warriors"></div></div>
     <div style="font-size:clamp(30px,9vw,42px);color:var(--gold);align-self:center;margin-top:-40px;font-weight:900;">VS</div>
@@ -283,47 +114,39 @@ html,body {
   </div>
 </div>
 
-<!-- 武将詳細モーダル（会話でステータスアップ） -->
 <div id="warrior-modal" class="modal">
   <div class="modal-content">
     <div onclick="closeWarriorModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
-    <div id="modal-warrior-name" style="font-size:24px;font-weight:900;color:var(--gold-l);text-align:center;margin-bottom:12px;"></div>
-    <div id="modal-stats" style="background:rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-bottom:20px;font-size:15px;line-height:1.7;text-align:center;"></div>
-    
-    <div style="margin-bottom:24px;">
-      <div onclick="talkToWarrior(currentModalIndex,'encourage')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:10px;">
-        <span>激励する（家臣を励ます）</span>
-        <span style="color:#88ff88;font-weight:700;">+忠誠</span>
-      </div>
-      <div onclick="talkToWarrior(currentModalIndex,'train')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:10px;">
-        <span>訓練する（武芸を磨く）</span>
-        <span style="color:#ffcc66;font-weight:700;">+武力</span>
-      </div>
-      <div onclick="talkToWarrior(currentModalIndex,'teach')" class="modal-action" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;">
-        <span>教えを請う（知略を学ぶ）</span>
-        <span style="color:#aaddff;font-weight:700;">+知力</span>
-      </div>
+    <div id="modal-warrior-name" style="font-size:22px;font-weight:900;color:var(--gold-l);text-align:center;margin-bottom:10px;"></div>
+    <div id="modal-stats" style="background:rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;font-size:14px;line-height:1.7;text-align:center;"></div>
+    <div id="modal-relations" style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;line-height:1.8;"></div>
+    <div style="margin-bottom:20px;">
+      <div onclick="talkToWarrior(currentModalIndex,'encourage')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:8px;"><span>激励する</span><span style="color:#88ff88;font-weight:700;">+忠誠</span></div>
+      <div onclick="talkToWarrior(currentModalIndex,'train')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;margin-bottom:8px;"><span>訓練する</span><span style="color:#ffcc66;font-weight:700;">+武力</span></div>
+      <div onclick="talkToWarrior(currentModalIndex,'teach')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;"><span>教えを請う</span><span style="color:#aaddff;font-weight:700;">+知力</span></div>
     </div>
-    
-    <button onclick="closeWarriorModal()" style="width:100%;padding:14px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:16px;">城に戻る</button>
+    <button onclick="closeWarriorModal()" style="width:100%;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:15px;">城に戻る</button>
   </div>
 </div>
 
-<!-- 内政モーダル（施設で成長率アップ） -->
 <div id="dev-modal" class="modal">
   <div class="modal-content">
     <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:16px;font-size:22px;letter-spacing:.15em;">内政 ─ 施設整備</h2>
-    <div id="facilities-list" style="max-height:420px;overflow-y:auto;"></div>
-    <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--gold-d);">
-      施設を強化すると武将の成長が「ポコポコ」加速します<br>
-      時間経過でステータスが自動上昇！
-    </div>
-    <button onclick="closeDevModal()" style="margin-top:20px;width:100%;padding:14px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">閉じる</button>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:14px;font-size:20px;letter-spacing:.15em;">内政 ─ 施設整備</h2>
+    <div id="facilities-list" style="max-height:360px;overflow-y:auto;"></div>
+    <button onclick="closeDevModal()" style="margin-top:16px;width:100%;padding:12px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">閉じる</button>
   </div>
 </div>
 
-<!-- メイン -->
+<div id="history-modal" class="modal">
+  <div class="modal-content" style="max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;font-size:20px;letter-spacing:.15em;">戦国記録</h2>
+    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;padding-right:4px;"></div>
+    <button onclick="closeHistory()" style="margin-top:14px;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:14px;cursor:pointer;">閉じる</button>
+  </div>
+</div>
+
 <div id="main">
   <div id="header">
     <div id="game-title">戦国血脈<span class="sub">〜 覇道の系譜 〜</span></div>
@@ -332,11 +155,10 @@ html,body {
       <div class="stat-chip"><span class="sl">第</span><span class="sv" id="gen-num">1</span><span class="su">世代</span></div>
     </div>
   </div>
-
   <div id="iso-field">
     <canvas id="iso-canvas"></canvas>
+    <div id="bubble-layer"></div>
   </div>
-
   <div id="bottom-ui">
     <div id="nation-bar">
       <span class="nl">国力</span>
@@ -347,1175 +169,1001 @@ html,body {
     <div id="action-row">
       <button class="act-btn primary" onclick="startBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
       <button class="act-btn" onclick="showBloodline()"><span class="ico">🌸</span><span class="lbl">配合</span></button>
-      <button class="act-btn" onclick="showDiplomacy()"><span class="ico">📜</span><span class="lbl">外交</span></button>
+      <button class="act-btn" onclick="showHistory()"><span class="ico">📜</span><span class="lbl">歴史</span></button>
       <button class="act-btn" onclick="showDev()"><span class="ico">🏯</span><span class="lbl">内政</span></button>
     </div>
   </div>
 </div>
 
 <script>
-/* ══════════════════════════════════════════════
-   アイソメトリック描画エンジン
-══════════════════════════════════════════════ */
+/* ══════════════════════════════════════
+   アイソメトリック エンジン
+══════════════════════════════════════ */
 const canvas = document.getElementById('iso-canvas');
 const ctx    = canvas.getContext('2d');
-
-const TILE = 44;
+const TILE   = 44;
 const ISO_ANG = Math.PI / 6;
 
-function isoToScreen(tx, ty, tz) {
-  const sx = (tx - ty) * Math.cos(ISO_ANG) * TILE;
-  const sy = (tx + ty) * Math.sin(ISO_ANG) * TILE - tz * TILE * 0.88;
-  return { x: sx, y: sy };
+function isoToScreen(tx,ty,tz){
+  const sx=(tx-ty)*Math.cos(ISO_ANG)*TILE;
+  const sy=(tx+ty)*Math.sin(ISO_ANG)*TILE-tz*TILE*0.88;
+  return{x:sx,y:sy};
+}
+let CX,CY;
+function resizeCanvas(){
+  const f=document.getElementById('iso-field');
+  canvas.width=f.clientWidth; canvas.height=f.clientHeight;
+  CX=canvas.width/2; CY=canvas.height*0.72;
 }
 
-let CX, CY;
-
-function resizeCanvas() {
-  const field = document.getElementById('iso-field');
-  canvas.width  = field.clientWidth;
-  canvas.height = field.clientHeight;
-  CX = canvas.width  / 2;
-  CY = canvas.height * 0.72;
-}
-
-/* カラーパレット */
-const PAL = {
-  grassTop:  '#2d4a1e',
-  grassSide: '#1e3214',
-  dirtTop:   '#5a3a1a',
-  dirtSide:  '#3a2010',
-  stoneTop:  '#4a3a28',
-  stoneSide: '#322514',
-  stoneLit:  '#5c4a34',
-  moatTop:   '#0a1a2e',
-  moatDark:  '#060e1a',
-  wallTop:   '#5a4a35',
-  wallFront: '#4a3a25',
-  wallSide:  '#3a2c1a',
-  roofDark:  '#1a0e04',
-  roofMid:   '#241608',
-  roofLit:   '#2e1c0a',
-  woodDark:  '#3a2a18',
-  woodMid:   '#4a3826',
-  flagRed:   '#8b0000',
-  gold:      '#c8960c',
-  goldLit:   '#f0c040',
-  sky1:      'rgba(20,14,5,.0)',
+/* ══════════════════════════════════════
+   施設データ
+   配置: 天守を中心に 3×3 グリッド
+   [訓練場]  [鍛冶場]  [学問所]
+   [茶室]    天守      [庭園]
+   [忠誠殿]  [──]    [──]
+   ※ 指定レイアウトに合わせて座標設定
+══════════════════════════════════════ */
+const FACILITY_MAP = {
+  training: { name:'訓練場', icon:'⚔',  x:-3.5, y:-3.2, level:1, type:'power',    color:'#8b2020' },
+  forge:    { name:'鍛冶場', icon:'🔥', x:-0.5, y:-3.5, level:1, type:'power',    color:'#555533' },
+  academy:  { name:'学問所', icon:'📖', x: 2.5, y:-3.2, level:1, type:'wisdom',   color:'#223355' },
+  tea:      { name:'茶室',   icon:'🍵', x:-3.5, y: 0.2, level:1, type:'social',   color:'#5a3a1e' },
+  garden:   { name:'庭園',   icon:'🌸', x:-0.5, y: 2.8, level:1, type:'heal',     color:'#2a5a2a' },
+  loyalty:  { name:'忠誠殿', icon:'🌟', x: 2.5, y: 2.8, level:1, type:'loyalty',  color:'#7a1a1a' },
 };
 
-/* ゲーム状態（ゲーム発展途上国風） */
+// 施設入口（武将が向かう座標）
+const FACILITY_ENTRANCE = {
+  training: { x:-3.0, y:-2.8 },
+  forge:    { x:-0.2, y:-3.0 },
+  academy:  { x: 2.8, y:-2.8 },
+  tea:      { x:-3.0, y: 0.5 },
+  garden:   { x:-0.2, y: 2.5 },
+  loyalty:  { x: 2.8, y: 2.5 },
+};
+
+// 施設の効果テキスト（入場時に出る）
+const FACILITY_EFFECT = {
+  training: { stat:'power',   label:'武力', color:'#ffcc44', range:[4,9]  },
+  forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[3,7]  },
+  academy:  { stat:'wisdom',  label:'知力', color:'#aaddff', range:[4,8]  },
+  tea:      { stat:'loyalty', label:'忠誠', color:'#88ffaa', range:[5,10] },
+  garden:   { stat:'hp',      label:'回復', color:'#ff88cc', range:[3,6]  },
+  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[6,12] },
+};
+
+// 施設内でのセリフ
+const FACILITY_SPEECH = {
+  training: ['うりゃーっ！','もっと強く！','千本素振り！','気合だ！'],
+  forge:    ['いい刃だ…','打ち直すか','熱い…','業物になるぞ'],
+  academy:  ['ふむふむ…','これは深い','兵法書か','なるほど！'],
+  tea:      ['心が安らぐ…','一服どうぞ','静かじゃ','よい茶だ'],
+  garden:   ['美しい…','花が咲いた','英気を養う','心洗われる'],
+  loyalty:  ['お館様の御為に！','命を捧げん','忠義を尽くす','必ずや！'],
+};
+
+/* ══════════════════════════════════════
+   ゲーム状態
+══════════════════════════════════════ */
 let state = {
-  unification: 12,
-  genNum: 1,
-  koku: 4200,
-  facilities: {
-    trainingGround: 1,   // 武力成長加速
-    academy: 1,          // 知力成長加速
-    loyaltyHall: 1       // 忠誠成長加速
-  }
+  unification:12, genNum:1, koku:4200,
 };
+let gameTime={year:1,month:1,day:1};
 
-const FACILITY_DATA = [
-  { key: 'trainingGround', name: '訓練場', desc: '武将の武力成長がポコポコ加速', icon: '⚔️', costBase: 450 },
-  { key: 'academy', name: '学問所', desc: '文官の知力成長がポコポコ加速', icon: '📖', costBase: 520 },
-  { key: 'loyaltyHall', name: '忠誠殿', desc: '全武将の忠誠心が上がりやすい', icon: '🌸', costBase: 680 }
-];
-
-function getFacilityBonus() {
-  let bonus = 1.0;
-  bonus += (state.facilities.trainingGround - 1) * 0.32;
-  bonus += (state.facilities.academy - 1) * 0.28;
-  bonus += (state.facilities.loyaltyHall - 1) * 0.22;
-  return Math.max(1, bonus);
+function updateTime(){
+  if(++gameTime.day>30){gameTime.day=1;gameTime.month++;}
+  if(gameTime.month>12){gameTime.month=1;gameTime.year++;}
+  document.getElementById('time-display').textContent=`第${gameTime.year}年 ${gameTime.month}月 ${gameTime.day}日`;
 }
 
-function updateStatusUI() {
-  document.getElementById('unification-pct').textContent = Math.floor(state.unification);
-  document.getElementById('gen-num').textContent = state.genNum;
-  document.getElementById('koku-display').textContent = state.koku.toLocaleString('ja-JP');
-  const fillPct = Math.min(100, Math.floor(state.koku / 100));
-  document.getElementById('nfill').style.width = fillPct + '%';
+let gameLog=[];
+function addLog(text,type='normal'){
+  gameLog.push({text,type,time:`${gameTime.year}年${gameTime.month}月`});
+  if(gameLog.length>60)gameLog.shift();
 }
 
-/* 浮遊テキスト（ポコポコステータスアップ演出） */
-let floatingTexts = [];
+/* ══════════════════════════════════════
+   関係システム
+══════════════════════════════════════ */
+let relations={};
+function initRelations(ws){
+  relations={};
+  ws.forEach((_,i)=>ws.forEach((_,j)=>{
+    if(i===j)return;
+    const k=relKey(i,j);
+    if(relations[k]===undefined) relations[k]=Math.floor(-20+Math.random()*60);
+  }));
+}
+function relKey(i,j){return i<j?`${i}_${j}`:`${j}_${i}`;}
+function getRel(i,j){const k=relKey(i,j);return relations[k]!==undefined?relations[k]:0;}
+function changeRel(i,j,d){const k=relKey(i,j);if(relations[k]===undefined)relations[k]=0;relations[k]=Math.max(-100,Math.min(100,relations[k]+d));}
+function relLabel(v){if(v>=70)return'莫逆の友';if(v>=40)return'友好';if(v>=10)return'普通';if(v>=-20)return'やや対立';if(v>=-50)return'反目';return'宿敵';}
+function relColor(v){if(v>=40)return'#88ffaa';if(v>=10)return'#aaddff';if(v>=-20)return'#ffdd88';return'#ff8888';}
 
-function createFloatText(warrior, text, color = '#ffdd88') {
-  if (!warrior) return;
-  const s = isoToScreen(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2);
-  floatingTexts.push({
-    x: CX + s.x + (Math.random() * 24 - 12),
-    y: CY + s.y - 48,
-    text: text,
-    color: color,
-    vy: -1.8 - Math.random() * 0.9,
-    life: 68,
-    alpha: 1
+/* ══════════════════════════════════════
+   セリフ定義
+══════════════════════════════════════ */
+const SPEECHES={
+  bukan:{idle:['参れ！','うぬ…','天下一！','討ち取ったり！','鍛えねば'],train:['武を磨く！','もっと強く！','訓練だ！'],highLoyalty:['この命、殿に！','共に天下を！'],lowLoyalty:['うぬ…','不満じゃ…'],friendly:['頼もしい奴だ','一緒に参ろう'],rival:['邪魔するな！','お主とは合わん'],levelUp:['更に強くなった！','成長したぞ！']},
+  hime:{idle:['桜よ散れ','ふふ…','風が優しい','月が綺麗'],train:['心を鎮めよう','花びら一枚…'],highLoyalty:['ずっとそばに','共に参ります'],lowLoyalty:['悲しい…','寂しいですわ'],friendly:['仲良くしましょ','嬉しいわ'],rival:['困った方ね…','もう…'],levelUp:['また強くなった♪','嬉しい！']},
+  bunkan:{idle:['謀略が要る','算段通り','知略こそ武'],train:['書を読まねば','計略を練る'],highLoyalty:['殿の御為に','全力を尽くします'],lowLoyalty:['再考の余地あり'],friendly:['お互い補い合おう','良い判断だ'],rival:['浅慮な輩め'],levelUp:['更に知を極めた','良い学びだ']},
+};
+function getSpeech(w,sit){const p=SPEECHES[w.jobId]||SPEECHES.bukan;const a=p[sit]||p.idle;return a[Math.floor(Math.random()*a.length)];}
+
+/* ══════════════════════════════════════
+   吹き出し UI
+══════════════════════════════════════ */
+const bubbleLayer=document.getElementById('bubble-layer');
+let activeBubbles=[];
+function showSpeechBubble(warrior,text,duration=2200){
+  const s=isoToScreen(warrior.tileX+0.5,warrior.tileY+0.5,0.25);
+  const H=Math.round(canvas.height*0.092);
+  const field=document.getElementById('iso-field');
+  const fR=field.getBoundingClientRect(), cR=canvas.getBoundingClientRect();
+  const ox=cR.left-fR.left, oy=cR.top-fR.top;
+  const el=document.createElement('div');
+  el.className='speech-bubble';
+  el.textContent=text;
+  el.style.left=(ox+CX+s.x)+'px';
+  el.style.top=(oy+CY+s.y-H*1.4)+'px';
+  bubbleLayer.appendChild(el);
+  const obj={el,timer:setTimeout(()=>removeBubble(obj),duration)};
+  activeBubbles.push(obj);
+  if(activeBubbles.length>8)removeBubble(activeBubbles[0]);
+}
+function removeBubble(obj){
+  if(!obj)return;
+  clearTimeout(obj.timer);
+  obj.el.style.transition='opacity .3s';obj.el.style.opacity='0';
+  setTimeout(()=>{if(obj.el.parentNode)obj.el.parentNode.removeChild(obj.el);},320);
+  const i=activeBubbles.indexOf(obj);if(i>=0)activeBubbles.splice(i,1);
+}
+
+/* 施設アクティビティポップアップ（施設の上に表示） */
+function showFacilityActivity(facKey, text, color){
+  const f=FACILITY_MAP[facKey];
+  const s=isoToScreen(f.x+0.5, f.y+0.5, 1.4);
+  const field=document.getElementById('iso-field');
+  const fR=field.getBoundingClientRect(), cR=canvas.getBoundingClientRect();
+  const ox=cR.left-fR.left, oy=cR.top-fR.top;
+  const el=document.createElement('div');
+  el.className='facility-activity';
+  el.textContent=text;
+  el.style.left=(ox+CX+s.x)+'px';
+  el.style.top=(oy+CY+s.y)+'px';
+  el.style.color=color||'#ffdd88';
+  bubbleLayer.appendChild(el);
+  setTimeout(()=>{
+    el.style.transition='opacity .5s, transform .5s';
+    el.style.opacity='0';
+    el.style.transform='translateX(-50%) translateY(-18px)';
+    setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},520);
+  },1800);
+}
+
+/* 浮遊テキスト */
+let floatingTexts=[];
+function createFloatText(warrior,text,color){
+  if(!warrior)return;
+  const s=isoToScreen(warrior.tileX+0.5,warrior.tileY+0.5,1.2);
+  floatingTexts.push({x:CX+s.x+(Math.random()*24-12),y:CY+s.y-48,text,color:color||'#ffdd88',vy:-1.8-Math.random()*0.9,life:68,alpha:1});
+}
+function drawFloatingTexts(){
+  for(let i=floatingTexts.length-1;i>=0;i--){
+    const f=floatingTexts[i];f.y+=f.vy;f.vy*=0.975;f.life--;f.alpha=(f.life/68)*0.9;
+    if(f.life<=0){floatingTexts.splice(i,1);continue;}
+    ctx.save();ctx.globalAlpha=f.alpha;ctx.shadowColor='#000';ctx.shadowBlur=8;
+    ctx.font=`bold ${Math.round(17+f.life/12)}px 'Noto Serif JP',serif`;
+    ctx.textAlign='center';ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);ctx.restore();
+  }
+}
+
+/* ══════════════════════════════════════
+   描画プリミティブ
+══════════════════════════════════════ */
+function drawBox(tx,ty,tz,w,d,h,cT,cL,cR2){
+  const p=(x,y,z)=>{const s=isoToScreen(x,y,z);return[CX+s.x,CY+s.y];};
+  const[ax,ay]=p(tx,ty,tz+h),[bx,by]=p(tx+w,ty,tz+h);
+  const[cx2,cy2]=p(tx+w,ty+d,tz+h),[dx,dy]=p(tx,ty+d,tz+h);
+  const[ex,ey]=p(tx,ty,tz),[fx,fy]=p(tx+w,ty,tz);
+  const[gx,gy]=p(tx+w,ty+d,tz),[hx,hy]=p(tx,ty+d,tz);
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.fillStyle=cT;ctx.fill();
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.fillStyle=cL;ctx.fill();
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle=cR2;ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.stroke();
+}
+function drawRoof(tx,ty,tz,w,d,rh,c1,c2){
+  const p=(x,y,z)=>{const s=isoToScreen(x,y,z);return[CX+s.x,CY+s.y];};
+  const mx=tx+w/2,my=ty+d/2;
+  const[ax,ay]=p(tx,ty,tz),[bx,by]=p(tx+w,ty,tz);
+  const[cx2,cy2]=p(tx+w,ty+d,tz),[dx,dy]=p(tx,ty+d,tz);
+  const[px2,py2]=p(mx,my,tz+rh);
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(px2,py2);ctx.lineTo(dx,dy);ctx.closePath();ctx.fillStyle=c2;ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(px2,py2);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle=c1;ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(px2,py2);ctx.closePath();ctx.fillStyle=c2;ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(cx2,cy2);ctx.lineTo(px2,py2);ctx.closePath();ctx.fillStyle=c1;ctx.fill();ctx.stroke();
+}
+function drawFlag(tx,ty,tz,t){
+  const base=isoToScreen(tx,ty,tz),top=isoToScreen(tx,ty,tz+0.9);
+  const bx=CX+base.x,by=CY+base.y,tx2=CX+top.x,ty2=CY+top.y;
+  ctx.strokeStyle='#c8960c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(tx2,ty2);ctx.stroke();
+  const wave=Math.sin(t*0.07)*4;
+  ctx.fillStyle='#8b0000';ctx.beginPath();ctx.moveTo(tx2,ty2);ctx.lineTo(tx2+14+wave,ty2+6);ctx.lineTo(tx2+12,ty2+13);ctx.closePath();ctx.fill();
+}
+
+/* ══════════════════════════════════════
+   施設描画
+══════════════════════════════════════ */
+function drawFacilities(tick){
+  Object.entries(FACILITY_MAP).forEach(([key,f])=>{
+    drawFacility(key,f,tick);
+    // 誰かが滞在中なら光る
+    const inside=gWarriors.some(w=>w.insideFacility===key);
+    if(inside) drawEntranceGlow(f.x,f.y,tick);
   });
 }
 
-function drawFloatingTexts() {
-  for (let i = floatingTexts.length - 1; i >= 0; i--) {
-    const f = floatingTexts[i];
-    f.y += f.vy;
-    f.vy *= 0.975;
-    f.life--;
-    f.alpha = (f.life / 68) * 0.9;
-    if (f.life <= 0) {
-      floatingTexts.splice(i, 1);
-      continue;
-    }
+function drawFacility(key,f,tick){
+  const{x,y,level:lv}=f;
+  switch(key){
+    case'training': drawDojo    (x,y,lv,tick); break;
+    case'forge':    drawForge   (x,y,lv,tick); break;
+    case'academy':  drawAcademy (x,y,lv);      break;
+    case'tea':      drawTea     (x,y,lv,tick); break;
+    case'garden':   drawGarden  (x,y,lv,tick); break;
+    case'loyalty':  drawShrine  (x,y,lv,tick); break;
+  }
+  // 施設名ラベル
+  const s=isoToScreen(x+0.5,y+0.5,1.0);
+  ctx.font=`bold ${Math.round(canvas.width*0.024)}px 'Noto Serif JP',serif`;
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(240,192,64,.82)';
+  ctx.shadowColor='#000';ctx.shadowBlur=5;
+  ctx.fillText(f.name+'　Lv'+lv, CX+s.x, CY+s.y);
+  ctx.shadowBlur=0;
+}
+
+function drawEntranceGlow(x,y,tick){
+  const s=isoToScreen(x+0.5,y+0.5,0.4);
+  const r=10+4*Math.sin(tick*0.1);
+  ctx.save();
+  ctx.globalAlpha=0.35+0.15*Math.sin(tick*0.1);
+  ctx.beginPath();ctx.arc(CX+s.x,CY+s.y,r,0,Math.PI*2);
+  ctx.fillStyle='#ffd700';ctx.fill();
+  ctx.restore();
+}
+
+// 個別施設
+function drawDojo(x,y,lv,tick){
+  const h=0.6+lv*0.15;
+  drawBox(x-0.45,y-0.45,0.25,0.9,0.9,h,'#7a3a1e','#4a2010','#5a2e12');
+  drawRoof(x-0.55,y-0.55,0.25+h,1.1,1.1,0.38,'#2a1208','#100600');
+  if(lv>=2) drawFlag(x,y,0.25+h+0.35,tick);
+}
+function drawForge(x,y,lv,tick){
+  drawBox(x-0.38,y-0.38,0.25,0.76,0.76,0.65,'#505040','#303028','#404038');
+  drawRoof(x-0.45,y-0.45,0.9,0.9,0.9,0.28,'#252520','#121210');
+  // 煙
+  for(let i=0;i<lv+1;i++){
+    const t=((tick*0.02+i*0.7)%1);
+    const s=isoToScreen(x+0.3,y+0.3,0.95+t*0.6);
     ctx.save();
-    ctx.globalAlpha = f.alpha;
-    ctx.shadowColor = '#000';
-    ctx.shadowBlur = 8;
-    ctx.font = `bold ${Math.round(17 + f.life / 12)}px 'Noto Serif JP', serif`;
-    ctx.textAlign = 'center';
-    ctx.fillStyle = f.color;
-    ctx.fillText(f.text, f.x, f.y);
-    ctx.restore();
+    ctx.globalAlpha=0.22*(1-t);
+    ctx.beginPath();ctx.arc(CX+s.x,CY+s.y,4+t*8,0,Math.PI*2);
+    ctx.fillStyle='#cccccc';ctx.fill();ctx.restore();
+  }
+}
+function drawAcademy(x,y,lv){
+  drawBox(x-0.45,y-0.45,0.25,0.9,0.9,0.75,'#3a3a5a','#202040','#2a2a48');
+  drawRoof(x-0.55,y-0.55,1.0,1.1,1.1,0.38,'#1a1a30','#0a0a1a');
+  if(lv>=2){
+    const s=isoToScreen(x+0.5,y+0.5,1.1);
+    ctx.fillStyle='#ffddaa';ctx.beginPath();ctx.roundRect(CX+s.x-7,CY+s.y,14,4,1);ctx.fill();
+  }
+}
+function drawTea(x,y,lv,tick){
+  drawBox(x-0.38,y-0.38,0.2,0.76,0.76,0.38,'#7a5030','#4a3018','#5a3c20');
+  drawRoof(x-0.45,y-0.45,0.58,0.9,0.9,0.28,'#3a2010','#1a0e08');
+  // 湯気
+  for(let i=0;i<2;i++){
+    const t=((tick*0.018+i*0.5)%1);
+    const s=isoToScreen(x+0.3+i*0.2,y+0.3,0.75+t*0.5);
+    ctx.save();
+    ctx.globalAlpha=0.18*(1-t);
+    ctx.beginPath();ctx.arc(CX+s.x,CY+s.y,3+t*6,0,Math.PI*2);
+    ctx.fillStyle='#ffffff';ctx.fill();ctx.restore();
+  }
+}
+function drawGarden(x,y,lv,tick){
+  // 地面
+  drawBox(x-0.45,y-0.45,0.2,0.9,0.9,0.1,'#2a5a1a','#183a10','#204a14');
+  // 木々（固定シード）
+  const trees=[{ox:-0.15,oy:-0.1},{ox:0.3,oy:0.1},{ox:0.0,oy:0.3}];
+  trees.slice(0,Math.min(lv+1,3)).forEach((t,i)=>{
+    const sway=Math.sin(tick*0.015+i*1.2)*0.012;
+    drawBox(x+t.ox+sway,y+t.oy,0.3,0.2,0.2,0.35,'#3a6a22','#244a14','#2e5a1a');
+  });
+  // 花
+  const s=isoToScreen(x+0.4,y+0.4,0.35);
+  ctx.fillStyle='rgba(255,150,180,0.6)';
+  ctx.beginPath();ctx.arc(CX+s.x,CY+s.y,4,0,Math.PI*2);ctx.fill();
+}
+function drawShrine(x,y,lv,tick){
+  drawBox(x-0.45,y-0.45,0.25,0.9,0.9,0.65,'#8a2828','#501818','#6a2020');
+  drawRoof(x-0.55,y-0.55,0.9,1.1,1.1,0.38,'#400808','#1e0404');
+  // 後光
+  const s=isoToScreen(x+0.5,y+0.5,1.1);
+  const pulse=0.2+0.12*Math.sin(tick*0.06);
+  ctx.save();ctx.globalAlpha=pulse;
+  ctx.beginPath();ctx.arc(CX+s.x,CY+s.y,10+lv*3,0,Math.PI*2);
+  ctx.fillStyle='#ffcc44';ctx.fill();ctx.restore();
+}
+
+/* ══════════════════════════════════════
+   地形
+══════════════════════════════════════ */
+const TERRAIN=[];
+function buildTerrain(){
+  TERRAIN.length=0;
+  for(let r=0;r<10;r++) for(let c=0;c<10;c++){
+    const cx2=c-4.5,ry=r-4.5;
+    const dist=Math.sqrt(cx2*cx2+ry*ry);
+    TERRAIN.push({c,r,type:dist<4?'stone':'grass'});
   }
 }
 
-/* プリミティブ描画関数（変更なし） */
-function drawBox(tx, ty, tz, w, d, h, colTop, colLeft, colRight) {
-  const p = (x,y,z) => {
-    const s = isoToScreen(x,y,z);
-    return [CX+s.x, CY+s.y];
-  };
-  const [ax,ay] = p(tx,   ty,   tz+h);
-  const [bx,by] = p(tx+w, ty,   tz+h);
-  const [cx2,cy2] = p(tx+w, ty+d, tz+h);
-  const [dx,dy] = p(tx,   ty+d, tz+h);
-  const [ex,ey] = p(tx,   ty,   tz  );
-  const [fx,fy] = p(tx+w, ty,   tz  );
-  const [gx,gy] = p(tx+w, ty+d, tz  );
-  const [hx,hy] = p(tx,   ty+d, tz  );
-
-  ctx.beginPath();
-  ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.lineTo(cx2,cy2); ctx.lineTo(dx,dy);
-  ctx.closePath();
-  ctx.fillStyle = colTop; ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(ax,ay); ctx.lineTo(ex,ey); ctx.lineTo(hx,hy); ctx.lineTo(dx,dy);
-  ctx.closePath();
-  ctx.fillStyle = colLeft; ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(bx,by); ctx.lineTo(fx,fy); ctx.lineTo(gx,gy); ctx.lineTo(cx2,cy2);
-  ctx.closePath();
-  ctx.fillStyle = colRight; ctx.fill();
-
-  ctx.strokeStyle = 'rgba(0,0,0,.35)';
-  ctx.lineWidth   = 0.5;
-  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.lineTo(dx,dy);ctx.closePath();ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(bx,by);ctx.lineTo(fx,fy);ctx.lineTo(gx,gy);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.stroke();
-}
-
-function drawRoof(tx, ty, tz, w, d, rh, col1, col2) {
-  const p = (x,y,z) => {
-    const s = isoToScreen(x,y,z);
-    return [CX+s.x, CY+s.y];
-  };
-  const mx = tx + w/2, my = ty + d/2;
-  const [ax,ay] = p(tx,   ty,   tz);
-  const [bx,by] = p(tx+w, ty,   tz);
-  const [cx2,cy2] = p(tx+w, ty+d, tz);
-  const [dx,dy] = p(tx,   ty+d, tz);
-  const [px2,py2] = p(mx, my, tz+rh);
-
-  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(px2,py2);ctx.lineTo(dx,dy);ctx.closePath(); ctx.fillStyle=col2;ctx.fill();ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(bx,by);ctx.lineTo(px2,py2);ctx.lineTo(cx2,cy2);ctx.closePath(); ctx.fillStyle=col1;ctx.fill();ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(px2,py2);ctx.closePath(); ctx.fillStyle=col2;ctx.fill();ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(dx,dy);ctx.lineTo(cx2,cy2);ctx.lineTo(px2,py2);ctx.closePath(); ctx.fillStyle=col1;ctx.fill();ctx.stroke();
-}
-
-/* 地形・シーン描画 */
-const TERRAIN = [];
-function buildTerrain() {
-  TERRAIN.length = 0;
-  for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
-    const cx2=(c-4), ry=(r-4);
-    const dist = Math.sqrt(cx2*cx2+ry*ry);
-    const h = dist < 3.5 ? 1 : 0;
-    TERRAIN.push({c,r,h, type: dist<3.5?'stone':'grass'});
-  }
-}
-
-function drawScene(tick) {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  const sorted = [...TERRAIN].sort((a,b)=>(a.r+a.c)-(b.r+b.c));
-  for (const t of sorted) {
-    const {c,r,h,type} = t;
-    const tx = c-4, ty = r-4;
-    if (type==='grass') {
-      drawBox(tx,ty,0, 1,1, 0.18, '#2d4a1e','#1c3010','#233c16');
-    } else {
-      const even = (c+r)%2===0;
-      const top = even ? '#4e4032':'#443828';
-      drawBox(tx,ty,0, 1,1, 0.25, top,'#2e2416','#382e1c');
-    }
-  }
-
-  // お堀・石垣・城（変更なし）
-  const moatRing = [[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],[3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],[2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],[-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]];
-  for (const [mc,mr] of moatRing) {
-    const p1 = isoToScreen(mc, mr, 0); const p2 = isoToScreen(mc+1, mr, 0);
-    const p3 = isoToScreen(mc+1, mr+1, 0); const p4 = isoToScreen(mc, mr+1, 0);
-    ctx.beginPath();
-    ctx.moveTo(CX+p1.x,CY+p1.y); ctx.lineTo(CX+p2.x,CY+p2.y);
-    ctx.lineTo(CX+p3.x,CY+p3.y); ctx.lineTo(CX+p4.x,CY+p4.y); ctx.closePath();
-    const shimmer = 0.5 + 0.12*Math.sin(tick*0.04 + mc*0.5 + mr*0.3);
-    ctx.fillStyle = `rgba(12,28,52,${shimmer})`; ctx.fill();
-    ctx.strokeStyle='rgba(20,50,90,.5)';ctx.lineWidth=0.5;ctx.stroke();
-  }
-
-  for (let i=-2;i<=2;i++) drawBox(i,-2,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit);
-  for (let i=-2;i<=2;i++) drawBox(i,2,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit);
-  for (let i=-1;i<=1;i++) { drawBox(-2,i,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit); drawBox(2,i,0.25,1,1,0.5,PAL.stoneTop,PAL.stoneSide,PAL.stoneLit); }
-
-  drawBox(-1,-1,0.75,2,2,0.9,PAL.wallTop,PAL.wallSide,PAL.wallFront);
-  drawBox(-0.8,-0.8,1.65,1.6,1.6,1.4,PAL.woodMid,PAL.woodDark,PAL.woodMid);
-  drawBox(-0.6,-0.6,1.65,0.7,0.7,0.9,PAL.woodMid,PAL.woodDark,PAL.woodMid);
-
-  drawRoof(-1.1,-1.1,2.65+1.4,2.2,2.2,0.9,PAL.roofMid,PAL.roofDark);
-  drawRoof(-0.9,-0.9,2.65+1.4+0.7,1.8,1.8,0.7,PAL.roofDark,'#120900');
-  drawRoof(-0.65,-0.65,2.65+1.4+1.1,1.3,1.3,0.55,PAL.roofMid,PAL.roofDark);
-  drawRoof(-0.4,-0.4,2.65+1.4+1.5,0.8,0.8,0.4,PAL.roofDark,'#100800');
-
-  drawFlag(-0.05, -0.05, 2.65+1.4+1.85, tick);
-  drawLabel(0,0,2.65+1.4+2.3,'安土城',tick);
-
-  drawWarriors(tick);
-  drawFloatingTexts();   // ← ポコポコ演出
-}
-
-function drawFlag(tx,ty,tz,tick) { /* 変更なし */ 
-  const base = isoToScreen(tx, ty, tz);
-  const top  = isoToScreen(tx, ty, tz+0.9);
-  const bx=CX+base.x, by=CY+base.y;
-  const topx=CX+top.x, topy=CY+top.y;
-  ctx.strokeStyle = PAL.gold; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(topx,topy); ctx.stroke();
-  const wave = Math.sin(tick*0.07)*4;
-  ctx.fillStyle = PAL.flagRed;
-  ctx.beginPath(); ctx.moveTo(topx,topy); ctx.lineTo(topx+18+wave,topy+7); ctx.lineTo(topx+16,topy+16); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = PAL.goldLit;
-  ctx.beginPath(); ctx.arc(topx+10+wave*0.5,topy+9,2,0,Math.PI*2); ctx.fill();
-}
-
-function drawLabel(tx, ty, tz, text, tick) { /* 変更なし */ 
-  const s = isoToScreen(tx,ty,tz+0.3);
-  const x = CX+s.x, y = CY+s.y;
-  const alpha = 0.7 + 0.3*Math.sin(tick*0.03);
-  ctx.font = `bold ${Math.round(canvas.width*0.036)}px 'Noto Serif JP', serif`;
-  ctx.textAlign = 'center';
-  ctx.fillStyle = `rgba(240,192,64,${alpha})`;
-  ctx.shadowColor = 'rgba(200,150,12,.8)';
-  ctx.shadowBlur  = 10;
-  ctx.fillText(text, x, y);
-  ctx.shadowBlur = 0;
-}
-
-/* 武将クラス（ステータス拡張） */
-const COLOR_SETS = {
-  c_red:  { armor:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', dark:'#6a1010' },
-  c_blue: { armor:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', dark:'#0a2a4a' },
-  c_pink: { armor:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', dark:'#6a1050' },
+/* ══════════════════════════════════════
+   武将クラス
+══════════════════════════════════════ */
+const COLOR_SETS={
+  c_red: {armor:'#8b0000',sub:'#4a0000',skin:'#d4a574',acc:'#ff4444',dark:'#6a1010'},
+  c_blue:{armor:'#1a3a5c',sub:'#0a1e30',skin:'#c8a87a',acc:'#4488cc',dark:'#0a2a4a'},
+  c_pink:{armor:'#8b3060',sub:'#5a1040',skin:'#e8c0a0',acc:'#ff88cc',dark:'#6a1050'},
 };
+let gWarriors=[];
+let currentHouseHead=null, currentModalIndex=-1;
+const roles={bukan:'武官',hime:'姫',bunkan:'文官'};
 
-let gWarriors = [];
-let currentHouseHead = null;
-let animTimer = null;
-let currentModalIndex = -1;
+class IsoWarrior{
+  constructor(name,jobId,power,tx,ty){
+    this.name=name; this.jobId=jobId;
+    this.tileX=tx; this.tileY=ty;
+    this.color=jobId==='hime'?'c_pink':jobId==='bunkan'?'c_blue':'c_red';
+    this.stats={power,loyalty:jobId==='hime'?92:jobId==='bunkan'?72:65,wisdom:jobId==='bunkan'?84:jobId==='hime'?58:52,level:1,exp:0};
 
-const roles = { bukan:'武官', hime:'姫', bunkan:'文官' };
+    // 移動
+    this.destX=tx; this.destY=ty;
+    this.moving=false;
+    this.moveSpeed=0.028+Math.random()*0.012;
+    this.idleTicks=0;
+    this.idleMax=80+Math.floor(Math.random()*100);
+    this.walkFrame=0; this.frameCount=0;
 
-class IsoWarrior {
-  constructor(name, jobId, initialPower, tileX, tileY) {
-    this.name = name;
-    this.jobId = jobId;
-    this.tileX = tileX;
-    this.tileY = tileY;
-    this.walkFrame = 0;
-    this.frameCount = 0;
-    this.color = jobId==='hime' ? 'c_pink' : jobId==='bunkan' ? 'c_blue' : 'c_red';
-    
-    // ゲーム発展途上国風ステータス
-    this.stats = {
-      power: initialPower,
-      loyalty: jobId === 'hime' ? 92 : (jobId === 'bunkan' ? 72 : 65),
-      wisdom: jobId === 'bunkan' ? 84 : (jobId === 'hime' ? 58 : 52),
-      level: 1,
-      exp: 0
-    };
-    
+    // 施設入退場
+    this.state='idle';          // idle|moving|entering|acting|exiting
+    this.target=null;            // 目的施設key
+    this.insideFacility=null;    // 現在滞在中の施設key
+    this.wait=0;
+    this.anim={type:null,t:0};
+    this.visible=true;
+
+    // AI
+    this.speechTimer=Math.floor(Math.random()*200);
+
     gWarriors.push(this);
   }
 
-  tick() {
-    if (++this.frameCount >= 12) {
-      this.frameCount = 0;
-      this.walkFrame = (this.walkFrame+1)%4;
+  /* ─── メインティック ─────────── */
+  tick(myIdx){
+    this._moveTick();
+    this._aiTick(myIdx);
+  }
+
+  /* ─── 移動＆施設入退場 ────────── */
+  _moveTick(){
+    if(this.state==='idle'){
+      if(++this.idleTicks>this.idleMax){
+        this.idleTicks=0;
+        this.idleMax=80+Math.floor(Math.random()*100);
+        this._pickDest();
+      }
+    }
+
+    else if(this.state==='moving'){
+      const dx=this.destX-this.tileX, dy=this.destY-this.tileY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<0.08){
+        this.tileX=this.destX; this.tileY=this.destY;
+        if(++this.frameCount>=8){this.frameCount=0;this.walkFrame=(this.walkFrame+1)%4;}
+        // 施設入口に到着？
+        if(this.target){
+          this.state='entering';
+          this.anim={type:'enter',t:0};
+          // 入場セリフ
+          const speechPool=FACILITY_SPEECH[this.target]||['…'];
+          showSpeechBubble(this, speechPool[Math.floor(Math.random()*speechPool.length)], 1600);
+        } else {
+          this.state='idle';
+        }
+      } else {
+        this.tileX+=dx/dist*this.moveSpeed;
+        this.tileY+=dy/dist*this.moveSpeed;
+        if(++this.frameCount>=8){this.frameCount=0;this.walkFrame=(this.walkFrame+1)%4;}
+      }
+    }
+
+    else if(this.state==='entering'){
+      this.anim.t+=0.045;
+      if(this.anim.t>=1){
+        this.visible=false;
+        this.state='acting';
+        this.insideFacility=this.target;
+        this.wait=100+Math.random()*120;
+        // 施設効果を即時付与（一部）
+        this._applyFacilityEffect(this.target, true);
+      }
+    }
+
+    else if(this.state==='acting'){
+      // 滞在中は施設効果を少しずつ受ける
+      if(Math.random()<0.04) this._applyFacilityEffect(this.insideFacility, false);
+      if(--this.wait<=0){
+        this.state='exiting';
+        this.anim={type:'exit',t:0};
+        this.visible=true;
+        const e=FACILITY_ENTRANCE[this.insideFacility];
+        this.tileX=e.x; this.tileY=e.y;
+        this.insideFacility=null;
+        this.target=null;
+      }
+    }
+
+    else if(this.state==='exiting'){
+      this.anim.t+=0.045;
+      if(this.anim.t>=1){
+        this.state='idle';
+        this.anim={type:null,t:0};
+      }
     }
   }
 
-  draw() {
-    const s = this.walkFrame % 4;
-    const c = COLOR_SETS[this.color];
-    const foot = isoToScreen(this.tileX + 0.5, this.tileY + 0.5, 0.25);
-    const fx = CX + foot.x;
-    const fy = CY + foot.y;
-    const H = Math.round(canvas.height * 0.092);
-    const W = H * 0.55;
-    const legSwing = [0, H*0.06, 0, -H*0.06][s];
-    const armSwing = [H*0.05, 0, -H*0.05, 0][s];
-    const bob = Math.abs([0,1,0,-1][s]) * 1.5;
-    const baseY = fy - bob;
-
-    if (this.jobId === 'bukan') this._drawBukan(fx, baseY, H, W, s, c, legSwing, armSwing);
-    else if (this.jobId === 'hime') this._drawHime(fx, baseY, H, W, s, c);
-    else this._drawBunkan(fx, baseY, H, W, c);
-
-    ctx.font = `${Math.round(canvas.width*0.028)}px 'Noto Serif JP', serif`;
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(240,192,64,.95)';
-    ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
-    ctx.fillText(this.name, fx, baseY - H*0.12);
-    ctx.shadowBlur = 0;
+  _pickDest(){
+    // 50%: ランダム施設へ向かう  50%: 他の武将の近くへ
+    if(Math.random()<0.5){
+      const keys=Object.keys(FACILITY_MAP);
+      const key=keys[Math.floor(Math.random()*keys.length)];
+      const e=FACILITY_ENTRANCE[key];
+      this.destX=e.x+(Math.random()*0.3-0.15);
+      this.destY=e.y+(Math.random()*0.3-0.15);
+      this.target=key;
+      this.state='moving';
+    } else {
+      const others=gWarriors.filter(w=>w!==this);
+      if(others.length>0 && Math.random()<0.5){
+        const t=others[Math.floor(Math.random()*others.length)];
+        this.destX=t.tileX+(Math.random()*1.0-0.5);
+        this.destY=t.tileY+(Math.random()*1.0-0.5);
+      } else {
+        // 城周辺をうろうろ
+        this.destX=(Math.random()*6-3);
+        this.destY=(Math.random()*6-3);
+      }
+      this.target=null;
+      this.state='moving';
+    }
   }
 
-  /* 描画メソッドは変更なし（省略） */
-  _drawBukan(fx, fy, H, W, s, c, legSwing, armSwing) { /* 元コードそのまま */ 
-    const hH = H*0.22; const bH = H*0.32; const lH = H*0.38; const aH = H*0.28;
-    const headY = fy - lH - bH - hH; const bodyY = fy - lH - bH;
-    ctx.beginPath(); ctx.ellipse(fx, fy+2, W*0.6, H*0.05, 0, 0, Math.PI*2); ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
-    ctx.fillStyle = c.sub;
-    ctx.save();ctx.translate(fx-legW*0.6, fy-lH/2);ctx.rotate(legSwing*0.04); ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+legW*0.6, fy-lH/2);ctx.rotate(-legSwing*0.04); ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
-    ctx.fillStyle=c.dark; ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-3, W*0.28, 5, 2);ctx.fill(); ctx.beginPath();ctx.roundRect(fx+W*0.04, fy-3, W*0.28, 5, 2);ctx.fill();
-    ctx.fillStyle = c.armor; ctx.beginPath();ctx.roundRect(fx-W*0.44, bodyY, W*0.88, bH, 3);ctx.fill();
-    ctx.fillStyle = c.dark; ctx.beginPath();ctx.roundRect(fx-W*0.38, bodyY+2, W*0.76, bH-4, 2);ctx.fill();
-    ctx.fillStyle=c.armor; ctx.save();ctx.translate(fx-W*0.52, bodyY+4);ctx.rotate(armSwing*0.05); ctx.beginPath();ctx.roundRect(-W*0.18,0,W*0.22,aH,4);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+W*0.52, bodyY+4);ctx.rotate(-armSwing*0.05); ctx.beginPath();ctx.roundRect(-W*0.04,0,W*0.22,aH,4);ctx.fill();
-    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(W*0.1, aH*0.5);ctx.lineTo(W*0.4,-aH*0.5);ctx.stroke();
+  /* 施設効果を武将に適用 */
+  _applyFacilityEffect(key, isEntry){
+    const eff=FACILITY_EFFECT[key];
+    if(!eff)return;
+    const fac=FACILITY_MAP[key];
+    const [lo,hi]=eff.range;
+    const gain=isEntry
+      ? Math.floor(lo+Math.random()*(hi-lo))
+      : Math.floor(1+Math.random()*2);
+
+    if(eff.stat==='power')  this.stats.power+=gain;
+    if(eff.stat==='wisdom') this.stats.wisdom=Math.min(99,this.stats.wisdom+gain);
+    if(eff.stat==='loyalty')this.stats.loyalty=Math.min(100,this.stats.loyalty+gain);
+    if(eff.stat==='hp')     this.stats.loyalty=Math.min(100,this.stats.loyalty+gain); // 庭園は忠誠回復
+
+    if(gain>0){
+      createFloatText(this, `+${gain}${eff.label}`, eff.color);
+      if(isEntry){
+        showFacilityActivity(key, `${this.name}が${fac.name}で鍛練！ +${gain}${eff.label}`, eff.color);
+        addLog(`${this.name}が${fac.name}で${eff.label}+${gain}`, 'normal');
+      }
+    }
+    updatePartyRow();
+    updateStatusUI();
+  }
+
+  /* ─── AI（セリフ・関係） ──────── */
+  _aiTick(myIdx){
+    this.speechTimer=Math.max(0,this.speechTimer-1);
+    if(this.speechTimer===0&&Math.random()<0.005){
+      let sit='idle';
+      if(this.stats.loyalty>80&&Math.random()<0.3) sit='highLoyalty';
+      else if(this.stats.loyalty<35&&Math.random()<0.4) sit='lowLoyalty';
+      showSpeechBubble(this,getSpeech(this,sit));
+      this.speechTimer=180+Math.floor(Math.random()*280);
+    }
+    // 近接武将との関係変動
+    if(this.state==='idle'&&Math.random()<0.004){
+      gWarriors.forEach((other,j)=>{
+        if(j===myIdx)return;
+        const dx=this.tileX-other.tileX, dy=this.tileY-other.tileY;
+        if(Math.sqrt(dx*dx+dy*dy)<1.6) this._interact(myIdx,j,other);
+      });
+    }
+  }
+
+  _interact(mi,oi,other){
+    const rel=getRel(mi,oi);
+    let delta,sitA,sitB;
+    if(rel>=20&&Math.random()<0.65){ delta=Math.floor(3+Math.random()*8); sitA=sitB='friendly'; }
+    else if(rel<-20&&Math.random()<0.55){ delta=-Math.floor(3+Math.random()*8); sitA=sitB='rival'; }
+    else { delta=Math.floor(-4+Math.random()*9); sitA=sitB=delta>=0?'friendly':'rival'; }
+    changeRel(mi,oi,delta);
+    const nv=getRel(mi,oi);
+    if(Math.random()<0.65) showSpeechBubble(this,getSpeech(this,sitA),1800);
+    setTimeout(()=>{ if(Math.random()<0.65) showSpeechBubble(other,getSpeech(other,sitB),1800); },700);
+    if(Math.abs(delta)>=5){
+      const sign=delta>0?'▲':'▼';
+      const s=isoToScreen((this.tileX+other.tileX)/2+0.5,(this.tileY+other.tileY)/2+0.5,1.0);
+      const field=document.getElementById('iso-field');
+      const fR=field.getBoundingClientRect(),cR=canvas.getBoundingClientRect();
+      const el=document.createElement('div');
+      el.className='relation-label';
+      el.style.left=(cR.left-fR.left+CX+s.x)+'px';
+      el.style.top=(cR.top-fR.top+CY+s.y-40)+'px';
+      el.style.color=relColor(nv);
+      el.textContent=`${sign} ${relLabel(nv)}`;
+      bubbleLayer.appendChild(el);
+      setTimeout(()=>{if(el.parentNode)el.parentNode.removeChild(el);},2800);
+      if(Math.abs(delta)>=8) addLog(`${this.name}と${other.name}の仲が${delta>0?'深まった':'険悪になった'}（${relLabel(nv)}）`,delta>0?'success':'betrayal');
+    }
+    updatePartyRow();
+  }
+
+  /* ─── 描画 ────────────────────── */
+  draw(){
+    if(!this.visible&&this.state!=='exiting') return;
+
+    const s=this.walkFrame%4;
+    const c=COLOR_SETS[this.color];
+    const foot=isoToScreen(this.tileX+0.5,this.tileY+0.5,0.25);
+    const fx=CX+foot.x, fy=CY+foot.y;
+    const H=Math.round(canvas.height*0.09);
+    const W=H*0.55;
+
+    // 入退場フェード
+    let scale=1, alpha=1;
+    if(this.state==='entering'){ scale=1-this.anim.t; alpha=1-this.anim.t; }
+    if(this.state==='exiting') { scale=this.anim.t;   alpha=this.anim.t;   }
+    if(scale<=0||alpha<=0) return;
+
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    ctx.translate(fx,fy); ctx.scale(scale,scale); ctx.translate(-fx,-fy);
+
+    if(this.jobId==='bukan')       this._drawBukan(fx,fy,H,W,s,c);
+    else if(this.jobId==='hime')   this._drawHime(fx,fy,H,W,s,c);
+    else                            this._drawBunkan(fx,fy,H,W,c);
+
+    ctx.font=`${Math.round(canvas.width*0.027)}px 'Noto Serif JP',serif`;
+    ctx.textAlign='center';
+    ctx.fillStyle='rgba(240,192,64,.95)';
+    ctx.shadowColor='#000'; ctx.shadowBlur=5;
+    ctx.fillText(this.name, fx, fy-H*1.22);
+    ctx.shadowBlur=0;
+
+    // 施設へ向かっているときの行先ラベル
+    if(this.state==='moving'&&this.target){
+      const fac=FACILITY_MAP[this.target];
+      ctx.font=`${Math.round(canvas.width*0.021)}px 'Noto Serif JP',serif`;
+      ctx.fillStyle='rgba(200,200,255,.8)';
+      ctx.fillText('→'+fac.name, fx, fy-H*1.44);
+    }
+
+    ctx.restore();
+
+    // 入場エフェクト
+    if(this.state==='entering'){
+      const es=isoToScreen(this.tileX+0.5,this.tileY+0.5,0.4);
+      ctx.save();
+      ctx.globalAlpha=0.4*(1-this.anim.t);
+      ctx.beginPath();
+      ctx.arc(CX+es.x,CY+es.y,22*(1+this.anim.t),0,Math.PI*2);
+      ctx.strokeStyle='#ffd700'; ctx.lineWidth=2; ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  _drawBukan(fx,fy,H,W,s,c){
+    const legW=W*0.28;
+    const legSwing=[0,H*0.06,0,-H*0.06][s];
+    const armSwing=[H*0.05,0,-H*0.05,0][s];
+    const bob=Math.abs([0,1,0,-1][s])*1.5;
+    const bY=fy-bob;
+    const hH=H*0.22,bH=H*0.32,lH=H*0.38,aH=H*0.28;
+    const headY=bY-lH-bH-hH, bodyY=bY-lH-bH;
+    ctx.beginPath();ctx.ellipse(fx,bY+2,W*0.6,H*0.05,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.4)';ctx.fill();
+    ctx.fillStyle=c.sub;
+    ctx.save();ctx.translate(fx-legW*0.6,bY-lH/2);ctx.rotate(legSwing*0.04);ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+legW*0.6,bY-lH/2);ctx.rotate(-legSwing*0.04);ctx.beginPath();ctx.roundRect(-legW/2,0,legW,lH,3);ctx.fill();ctx.restore();
+    ctx.fillStyle=c.dark;
+    ctx.beginPath();ctx.roundRect(fx-W*0.32,bY-3,W*0.28,5,2);ctx.fill();
+    ctx.beginPath();ctx.roundRect(fx+W*0.04,bY-3,W*0.28,5,2);ctx.fill();
+    ctx.fillStyle=c.armor;ctx.beginPath();ctx.roundRect(fx-W*0.44,bodyY,W*0.88,bH,3);ctx.fill();
+    ctx.fillStyle=c.dark;ctx.beginPath();ctx.roundRect(fx-W*0.38,bodyY+2,W*0.76,bH-4,2);ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.save();ctx.translate(fx-W*0.52,bodyY+4);ctx.rotate(armSwing*0.05);ctx.beginPath();ctx.roundRect(-W*0.18,0,W*0.22,aH,4);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+W*0.52,bodyY+4);ctx.rotate(-armSwing*0.05);ctx.beginPath();ctx.roundRect(-W*0.04,0,W*0.22,aH,4);ctx.fill();
+    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*0.1,aH*0.5);ctx.lineTo(W*0.4,-aH*0.5);ctx.stroke();
     ctx.fillStyle=c.acc;ctx.beginPath();ctx.arc(W*0.12,aH*0.45,3,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.fillStyle=c.armor; ctx.beginPath();ctx.ellipse(fx,headY+hH*0.45,W*0.38,hH*0.55,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx,headY+hH*0.55,W*0.28,hH*0.42,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#3a2010'; ctx.beginPath();ctx.arc(fx-W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.1, headY+hH*0.5, 1.5, 0, Math.PI*2);ctx.fill();
-    ctx.strokeStyle=c.acc;ctx.lineWidth=2; ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*0.4);ctx.stroke();
-    ctx.fillStyle=c.acc; ctx.beginPath();ctx.moveTo(fx-4,headY-hH*0.2);ctx.lineTo(fx+4,headY-hH*0.2);ctx.lineTo(fx,headY-hH*0.5);ctx.fill();
+    ctx.fillStyle=c.armor;ctx.beginPath();ctx.ellipse(fx,headY+hH*0.45,W*0.38,hH*0.55,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,headY+hH*0.55,W*0.28,hH*0.42,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#3a2010';
+    ctx.beginPath();ctx.arc(fx-W*0.1,headY+hH*0.5,1.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.1,headY+hH*0.5,1.5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=c.acc;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,headY);ctx.lineTo(fx,headY-hH*0.4);ctx.stroke();
+    ctx.fillStyle=c.acc;ctx.beginPath();ctx.moveTo(fx-4,headY-hH*0.2);ctx.lineTo(fx+4,headY-hH*0.2);ctx.lineTo(fx,headY-hH*0.5);ctx.fill();
   }
-  _drawHime(fx, fy, H, W, s, c) { /* 元コードそのまま */ 
-    const bob = Math.abs([0,1,0,-1][s])*1.2; const bY = fy - bob;
-    ctx.beginPath();ctx.ellipse(fx, bY+2, W*0.55, H*0.045, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-    const grd = ctx.createLinearGradient(fx-W*0.55,0,fx+W*0.55,0); grd.addColorStop(0, c.dark); grd.addColorStop(0.5, c.armor); grd.addColorStop(1, c.dark);
-    ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(fx-W*0.22, bY-H*0.55); ctx.lineTo(fx+W*0.22, bY-H*0.55); ctx.lineTo(fx+W*0.5, bY); ctx.lineTo(fx-W*0.5, bY); ctx.closePath();ctx.fill();
-    ctx.fillStyle=c.acc; ctx.beginPath();ctx.roundRect(fx-W*0.22, bY-H*0.42, W*0.44, H*0.1, 2);ctx.fill();
-    ctx.fillStyle=c.armor; ctx.save();ctx.translate(fx-W*0.28, bY-H*0.52);ctx.rotate(-0.2); ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.save();ctx.translate(fx+W*0.28, bY-H*0.52);ctx.rotate(0.2); ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.ellipse(fx, bY-H*0.78, W*0.3, H*0.18, 0, 0, Math.PI*2);ctx.fill();
-    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx, bY-H*0.73, W*0.22, H*0.15, 0, 0, Math.PI*2);ctx.fill();
-    ctx.fillStyle='#8b3060'; ctx.beginPath();ctx.arc(fx-W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.09, bY-H*0.74, 1.4, 0, Math.PI*2);ctx.fill();
-    for (let i=-1;i<=1;i++) { ctx.fillStyle = i===0?c.acc:'rgba(255,140,200,.8)'; ctx.beginPath();ctx.arc(fx+i*W*0.18, bY-H*0.9, 3.5, 0, Math.PI*2);ctx.fill(); }
+  _drawHime(fx,fy,H,W,s,c){
+    const bob=Math.abs([0,1,0,-1][s])*1.2, bY=fy-bob;
+    ctx.beginPath();ctx.ellipse(fx,bY+2,W*0.55,H*0.045,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+    const grd=ctx.createLinearGradient(fx-W*0.55,0,fx+W*0.55,0);
+    grd.addColorStop(0,c.dark);grd.addColorStop(0.5,c.armor);grd.addColorStop(1,c.dark);
+    ctx.fillStyle=grd;
+    ctx.beginPath();ctx.moveTo(fx-W*0.22,bY-H*0.55);ctx.lineTo(fx+W*0.22,bY-H*0.55);ctx.lineTo(fx+W*0.5,bY);ctx.lineTo(fx-W*0.5,bY);ctx.closePath();ctx.fill();
+    ctx.fillStyle=c.acc;ctx.beginPath();ctx.roundRect(fx-W*0.22,bY-H*0.42,W*0.44,H*0.1,2);ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.save();ctx.translate(fx-W*0.28,bY-H*0.52);ctx.rotate(-0.2);ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(fx+W*0.28,bY-H*0.52);ctx.rotate(0.2);ctx.beginPath();ctx.ellipse(0,0,W*0.15,H*0.2,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.fillStyle='#1a0a00';ctx.beginPath();ctx.ellipse(fx,bY-H*0.78,W*0.3,H*0.18,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,bY-H*0.73,W*0.22,H*0.15,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#8b3060';
+    ctx.beginPath();ctx.arc(fx-W*0.09,bY-H*0.74,1.4,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.09,bY-H*0.74,1.4,0,Math.PI*2);ctx.fill();
+    for(let i=-1;i<=1;i++){ctx.fillStyle=i===0?c.acc:'rgba(255,140,200,.8)';ctx.beginPath();ctx.arc(fx+i*W*0.18,bY-H*0.9,3.5,0,Math.PI*2);ctx.fill();}
   }
-  _drawBunkan(fx, fy, H, W, c) { /* 元コードそのまま */ 
-    ctx.beginPath();ctx.ellipse(fx, fy+2, W*0.5, H*0.04, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
-    ctx.fillStyle=c.armor; ctx.beginPath();ctx.roundRect(fx-W*0.32, fy-H*0.65, W*0.64, H*0.65, 3);ctx.fill();
-    ctx.fillStyle=c.sub; ctx.beginPath();ctx.roundRect(fx-W*0.25, fy-H*0.6, W*0.5, H*0.5, 2);ctx.fill();
-    ctx.fillStyle=c.armor; ctx.beginPath();ctx.ellipse(fx-W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill(); ctx.beginPath();ctx.ellipse(fx+W*0.42, fy-H*0.48, W*0.16,H*0.22, 0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5; ctx.beginPath();ctx.moveTo(fx+W*0.28, fy-H*0.55);ctx.lineTo(fx+W*0.2, fy-H*0.2);ctx.stroke();
-    ctx.fillStyle=c.skin; ctx.beginPath();ctx.ellipse(fx, fy-H*0.76, W*0.25, H*0.16, 0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.moveTo(fx-W*0.2, fy-H*0.82); ctx.lineTo(fx+W*0.2, fy-H*0.82); ctx.lineTo(fx+W*0.05, fy-H*1.0); ctx.lineTo(fx-W*0.05, fy-H*1.0); ctx.closePath();ctx.fill();
-    ctx.fillStyle='#1a0a00'; ctx.beginPath();ctx.roundRect(fx-W*0.2, fy-H*0.85, W*0.4, H*0.07, 1);ctx.fill();
-    ctx.fillStyle='#4a3a2a'; ctx.beginPath();ctx.arc(fx-W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill(); ctx.beginPath();ctx.arc(fx+W*0.07, fy-H*0.77, 1.3, 0, Math.PI*2);ctx.fill();
+  _drawBunkan(fx,fy,H,W,c){
+    ctx.beginPath();ctx.ellipse(fx,fy+2,W*0.5,H*0.04,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.35)';ctx.fill();
+    ctx.fillStyle=c.armor;ctx.beginPath();ctx.roundRect(fx-W*0.32,fy-H*0.65,W*0.64,H*0.65,3);ctx.fill();
+    ctx.fillStyle=c.sub;ctx.beginPath();ctx.roundRect(fx-W*0.25,fy-H*0.6,W*0.5,H*0.5,2);ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.beginPath();ctx.ellipse(fx-W*0.42,fy-H*0.48,W*0.16,H*0.22,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(fx+W*0.42,fy-H*0.48,W*0.16,H*0.22,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#c8a850';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(fx+W*0.28,fy-H*0.55);ctx.lineTo(fx+W*0.2,fy-H*0.2);ctx.stroke();
+    ctx.fillStyle=c.skin;ctx.beginPath();ctx.ellipse(fx,fy-H*0.76,W*0.25,H*0.16,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1a0a00';
+    ctx.beginPath();ctx.moveTo(fx-W*0.2,fy-H*0.82);ctx.lineTo(fx+W*0.2,fy-H*0.82);ctx.lineTo(fx+W*0.05,fy-H*1.0);ctx.lineTo(fx-W*0.05,fy-H*1.0);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.roundRect(fx-W*0.2,fy-H*0.85,W*0.4,H*0.07,1);ctx.fill();
+    ctx.fillStyle='#4a3a2a';
+    ctx.beginPath();ctx.arc(fx-W*0.07,fy-H*0.77,1.3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+W*0.07,fy-H*0.77,1.3,0,Math.PI*2);ctx.fill();
   }
 }
 
-function drawWarriors(tick) {
-  const sorted = [...gWarriors].sort((a,b)=>(a.tileX+a.tileY)-(b.tileX+b.tileY));
-  sorted.forEach(w => w.draw());
+/* ══════════════════════════════════════
+   シーン描画
+══════════════════════════════════════ */
+function drawScene(tick){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // 地形
+  const sorted=[...TERRAIN].sort((a,b)=>(a.r+a.c)-(b.r+b.c));
+  for(const t of sorted){
+    const tx=t.c-4.5, ty=t.r-4.5;
+    if(t.type==='grass') drawBox(tx,ty,0,1,1,0.18,'#2d4a1e','#1c3010','#233c16');
+    else{ const even=(t.c+t.r)%2===0; drawBox(tx,ty,0,1,1,0.25,even?'#4e4032':'#443828','#2e2416','#382e1c'); }
+  }
+
+  // 濠
+  const moat=[[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],[3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],[2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],[-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]];
+  for(const[mc,mr]of moat){
+    const p1=isoToScreen(mc,mr,0),p2=isoToScreen(mc+1,mr,0),p3=isoToScreen(mc+1,mr+1,0),p4=isoToScreen(mc,mr+1,0);
+    ctx.beginPath();ctx.moveTo(CX+p1.x,CY+p1.y);ctx.lineTo(CX+p2.x,CY+p2.y);ctx.lineTo(CX+p3.x,CY+p3.y);ctx.lineTo(CX+p4.x,CY+p4.y);ctx.closePath();
+    const sh=0.5+0.12*Math.sin(tick*0.04+mc*0.5+mr*0.3);
+    ctx.fillStyle=`rgba(12,28,52,${sh})`;ctx.fill();
+    ctx.strokeStyle='rgba(20,50,90,.5)';ctx.lineWidth=0.5;ctx.stroke();
+  }
+
+  // 外壁
+  for(let i=-2;i<=2;i++) drawBox(i,-2,0.25,1,1,0.5,'#4a3a28','#322514','#5c4a34');
+  for(let i=-2;i<=2;i++) drawBox(i, 2,0.25,1,1,0.5,'#4a3a28','#322514','#5c4a34');
+  for(let i=-1;i<=1;i++){
+    drawBox(-2,i,0.25,1,1,0.5,'#4a3a28','#322514','#5c4a34');
+    drawBox( 2,i,0.25,1,1,0.5,'#4a3a28','#322514','#5c4a34');
+  }
+
+  // 施設（天守より先に描く）
+  drawFacilities(tick);
+
+  // 天守
+  drawBox(-1,-1,0.75,2,2,0.9,'#5a4a35','#3a2c1a','#4a3a25');
+  drawBox(-0.8,-0.8,1.65,1.6,1.6,1.4,'#4a3826','#3a2a18','#4a3826');
+  drawBox(-0.6,-0.6,1.65,0.7,0.7,0.9,'#4a3826','#3a2a18','#4a3826');
+  drawRoof(-1.1,-1.1,2.65+1.4,    2.2,2.2,0.9,'#241608','#1a0e04');
+  drawRoof(-0.9,-0.9,2.65+1.4+0.7,1.8,1.8,0.7,'#1a0e04','#120900');
+  drawRoof(-0.65,-0.65,2.65+1.4+1.1,1.3,1.3,0.55,'#241608','#1a0e04');
+  drawRoof(-0.4,-0.4,2.65+1.4+1.5,0.8,0.8,0.4,'#1a0e04','#100800');
+  drawFlag(-0.05,-0.05,2.65+1.4+1.85,tick);
+  const la=isoToScreen(0,0,2.65+1.4+2.3);
+  const a2=0.7+0.3*Math.sin(tick*0.03);
+  ctx.font=`bold ${Math.round(canvas.width*0.036)}px 'Noto Serif JP',serif`;
+  ctx.textAlign='center';ctx.fillStyle=`rgba(240,192,64,${a2})`;
+  ctx.shadowColor='rgba(200,150,12,.8)';ctx.shadowBlur=10;
+  ctx.fillText('安土城',CX+la.x,CY+la.y);ctx.shadowBlur=0;
+
+  // 武将（ソートして描画）
+  const sw=[...gWarriors].sort((a,b)=>(a.tileX+a.tileY)-(b.tileX+b.tileY));
+  sw.forEach(w=>w.draw());
+
+  drawFloatingTexts();
 }
 
-/* 時間経過でポコポコステータスアップ（ゲーム発展途上国2風） */
-function performIdleTick() {
-  const bonus = getFacilityBonus();
-  
-  gWarriors.forEach(w => {
-    // EXP獲得 → レベルアップ → ステータスポコポコ
-    let expGain = Math.floor((5 + Math.random() * 11) * bonus);
-    if (w.jobId === 'bunkan') expGain = Math.floor(expGain * 1.15);
-    w.stats.exp += expGain;
-
-    let leveled = false;
-    while (w.stats.exp >= 100) {
-      w.stats.exp -= 100;
-      w.stats.level++;
-      leveled = true;
-
-      // 武力アップ（メイン）
-      const powerUp = Math.floor(2 + Math.random() * 3 + (bonus - 1) * 1.8);
-      w.stats.power += powerUp;
-      createFloatText(w, `+${powerUp}武力`, '#ffcc66');
-    }
-    if (leveled) createFloatText(w, `Lv${w.stats.level}↑`, '#ffeeaa');
-
-    // ランダム小アップ（ポコポコ感）
-    if (Math.random() < 0.78) {
-      const smallP = 1;
-      w.stats.power += smallP;
-      createFloatText(w, `+${smallP}`, '#ffaa44');
-    }
-    if (Math.random() < 0.48) {
-      w.stats.wisdom = Math.min(99, w.stats.wisdom + (Math.random() < 0.6 ? 1 : 2));
-      createFloatText(w, '+知', '#aaddff');
-    }
-    if (Math.random() < 0.42) {
-      w.stats.loyalty = Math.min(100, w.stats.loyalty + Math.floor(1 + Math.random() * 4));
-      createFloatText(w, '+忠', '#88ffaa');
-    }
-  });
-
-  // 国力・天下統一も自然増加
-  state.koku += Math.floor(62 + Math.random() * 98);
-  state.unification = Math.min(99.9, state.unification + 0.14 * (1 + (state.facilities.loyaltyHall - 1) * 0.15));
-
-  updateStatusUI();
-  updatePartyRow();
+/* ══════════════════════════════════════
+   UI 更新
+══════════════════════════════════════ */
+function updateStatusUI(){
+  document.getElementById('unification-pct').textContent=Math.floor(state.unification);
+  document.getElementById('gen-num').textContent=state.genNum;
+  document.getElementById('koku-display').textContent=state.koku.toLocaleString('ja-JP');
+  document.getElementById('nfill').style.width=Math.min(100,Math.floor(state.koku/100))+'%';
 }
 
-/* パーティー表示 */
-function updatePartyRow() {
-  const row = document.getElementById('party-row');
-  row.innerHTML = '';
-  gWarriors.forEach((w, i) => {
-    const card = document.createElement('div');
-    card.className = 'party-card' + (i === 0 ? ' head' : '');
-    card.innerHTML = `
+function locationLabel(w){
+  if(w.insideFacility) return FACILITY_MAP[w.insideFacility].name+'で鍛練中';
+  if(w.target&&w.state==='moving') return FACILITY_MAP[w.target]?.name+'へ向かう中';
+  return '城内';
+}
+
+function updatePartyRow(){
+  const row=document.getElementById('party-row');
+  row.innerHTML='';
+  gWarriors.forEach((w,i)=>{
+    const card=document.createElement('div');
+    card.className='party-card'+(i===0?' head':'');
+    let relText='';
+    gWarriors.forEach((_,j)=>{
+      if(j===i)return;
+      const rv=getRel(i,j);
+      if(!relText||Math.abs(rv)>30) relText=gWarriors[j].name.split(' ')[1]||gWarriors[j].name+'：'+relLabel(rv);
+    });
+    card.innerHTML=`
       <span class="pc-role">${roles[w.jobId]||'武将'}</span>
       <span class="pc-name">${w.name}</span>
-      <span class="pc-pow">武力 \( {w.stats.power} Lv \){w.stats.level}</span>`;
-    card.onclick = () => showWarriorModal(i);
+      <span class="pc-pow">武力 ${w.stats.power} Lv${w.stats.level}</span>
+      <span class="pc-loc">${locationLabel(w)}</span>
+      ${relText?`<span class="pc-rel">${relText}</span>`:''}`;
+    card.onclick=()=>showWarriorModal(i);
     row.appendChild(card);
   });
 }
 
-/* 武将モーダル（会話） */
-function showWarriorModal(i) {
-  currentModalIndex = i;
-  const w = gWarriors[i];
-  const modal = document.getElementById('warrior-modal');
-  modal.style.display = 'flex';
-  
-  document.getElementById('modal-warrior-name').innerHTML = `\( {w.name}<br><span style="font-size:13px;color:#c8960c;"> \){roles[w.jobId] || '武将'}　Lv.${w.stats.level}</span>`;
-  
-  document.getElementById('modal-stats').innerHTML = `
-    <span style="color:#ffcc66">武力 ${w.stats.power}</span>　｜　
-    <span style="color:#88ff88">忠誠 ${w.stats.loyalty}</span>　｜　
-    <span style="color:#aaddff">知力 ${w.stats.wisdom}</span>
-  `;
+/* ══════════════════════════════════════
+   武将モーダル
+══════════════════════════════════════ */
+function showWarriorModal(i){
+  currentModalIndex=i;
+  const w=gWarriors[i];
+  document.getElementById('warrior-modal').style.display='flex';
+  document.getElementById('modal-warrior-name').innerHTML=
+    `${w.name}<br><span style="font-size:13px;color:#c8960c;">${roles[w.jobId]||'武将'}　Lv.${w.stats.level}</span>`;
+  document.getElementById('modal-stats').innerHTML=
+    `<span style="color:#ffcc66">武力 ${w.stats.power}</span>　｜　`+
+    `<span style="color:#88ff88">忠誠 ${w.stats.loyalty}</span>　｜　`+
+    `<span style="color:#aaddff">知力 ${w.stats.wisdom}</span>`;
+  let relHtml='<div style="color:var(--gold-d);font-size:11px;margin-bottom:4px;letter-spacing:.1em;">─ 人間関係 ─</div>';
+  gWarriors.forEach((other,j)=>{
+    if(j===i)return;
+    const rv=getRel(i,j);
+    relHtml+=`<div style="display:flex;justify-content:space-between;padding:2px 0;">
+      <span>${other.name}</span>
+      <span style="color:${relColor(rv)};">${relLabel(rv)}（${rv>=0?'+':''}${rv}）</span></div>`;
+  });
+  document.getElementById('modal-relations').innerHTML=relHtml;
+}
+function closeWarriorModal(){document.getElementById('warrior-modal').style.display='none';currentModalIndex=-1;}
+
+function talkToWarrior(index,type){
+  if(index<0||index>=gWarriors.length)return;
+  const w=gWarriors[index];
+  let msg='',col='#ffdd88',gain=0,sit='';
+  if(type==='encourage'){gain=Math.floor(5+Math.random()*7);w.stats.loyalty=Math.min(100,w.stats.loyalty+gain);msg=`+${gain}忠`;col='#88ff88';sit='highLoyalty';}
+  else if(type==='train'){gain=Math.floor(4+Math.random()*5);w.stats.power+=gain;msg=`+${gain}武力`;col='#ffcc66';sit='train';}
+  else if(type==='teach'){gain=Math.floor(3+Math.random()*4);w.stats.wisdom=Math.min(99,w.stats.wisdom+gain);msg=`+${gain}知`;col='#aaddff';sit='train';}
+  createFloatText(w,msg,col);
+  showSpeechBubble(w,getSpeech(w,sit));
+  state.koku=Math.max(0,state.koku-35);
+  updateStatusUI();updatePartyRow();
+  if(currentModalIndex===index)showWarriorModal(index);
 }
 
-function closeWarriorModal() {
-  document.getElementById('warrior-modal').style.display = 'none';
-  currentModalIndex = -1;
-}
-
-function talkToWarrior(index, type) {
-  if (index < 0) return;
-  const w = gWarriors[index];
-  let msg = '';
-  let col = '#ffdd88';
-  let gain = 0;
-
-  if (type === 'encourage') {
-    gain = Math.floor(5 + Math.random() * 7);
-    w.stats.loyalty = Math.min(100, w.stats.loyalty + gain);
-    msg = `+${gain}忠`;
-    col = '#88ff88';
-  } else if (type === 'train') {
-    gain = Math.floor(4 + Math.random() * 5);
-    w.stats.power += gain;
-    msg = `+${gain}武力`;
-    col = '#ffcc66';
-  } else if (type === 'teach') {
-    gain = Math.floor(3 + Math.random() * 4);
-    w.stats.wisdom = Math.min(99, w.stats.wisdom + gain);
-    msg = `+${gain}知`;
-    col = '#aaddff';
-  }
-
-  createFloatText(w, msg, col);
-  state.koku = Math.max(0, state.koku - 35); // 軽いコスト
-  updateStatusUI();
-  updatePartyRow();
-  if (currentModalIndex === index) showWarriorModal(index); // 即時反映
-}
-
-/* 内政モーダル（施設強化） */
-function showDev() {
-  const modal = document.getElementById('dev-modal');
-  modal.style.display = 'flex';
-  renderFacilities();
-}
-
-function closeDevModal() {
-  document.getElementById('dev-modal').style.display = 'none';
-}
-
-function renderFacilities() {
-  let html = '';
-  FACILITY_DATA.forEach(f => {
-    const lvl = state.facilities[f.key];
-    const cost = Math.floor(f.costBase * Math.pow(1.65, lvl - 1));
-    html += `
-    <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);padding:14px 16px;border-radius:12px;margin-bottom:12px;">
-      <div style="font-size:34px;width:48px;text-align:center;">${f.icon}</div>
+/* ══════════════════════════════════════
+   内政モーダル（施設アップグレード）
+══════════════════════════════════════ */
+function showDev(){document.getElementById('dev-modal').style.display='flex';renderFacilities();}
+function closeDevModal(){document.getElementById('dev-modal').style.display='none';}
+function renderFacilities(){
+  const COST_BASE={training:450,forge:380,academy:520,tea:310,garden:280,loyalty:680};
+  let html='';
+  Object.entries(FACILITY_MAP).forEach(([key,f])=>{
+    const cost=Math.floor((COST_BASE[key]||400)*Math.pow(1.65,f.level-1));
+    html+=`<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);padding:12px 14px;border-radius:12px;margin-bottom:10px;">
+      <div style="font-size:28px;width:40px;text-align:center;">${f.icon}</div>
       <div style="flex:1;">
-        <div style="font-size:17px;font-weight:700;">\( {f.name} <span style="font-size:13px;color:#c8960c;">Lv. \){lvl}</span></div>
-        <div style="font-size:13px;color:rgba(245,232,200,.75);">${f.desc}</div>
+        <div style="font-size:16px;font-weight:700;">${f.name} <span style="font-size:12px;color:#c8960c;">Lv.${f.level}</span></div>
+        <div style="font-size:11px;color:rgba(245,232,200,.7);">${FACILITY_EFFECT[key]?.label||''}が鍛えられる施設</div>
       </div>
-      <button onclick="upgradeFacility('${f.key}', \( {cost});" style="background:var(--gold);color:#0e0800;padding:8px 20px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;"> \){cost}石<br>強化</button>
+      <button onclick="upgradeFacility('${key}',${cost})" style="background:var(--gold);color:#0e0800;padding:7px 13px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;cursor:pointer;font-size:12px;">${cost}石<br>強化</button>
     </div>`;
   });
-  document.getElementById('facilities-list').innerHTML = html;
+  document.getElementById('facilities-list').innerHTML=html;
 }
-
-window.upgradeFacility = function(key, cost) {
-  if (state.koku < cost) {
-    alert('国力が不足しています！');
-    return;
-  }
-  state.koku -= cost;
-  state.facilities[key]++;
-  updateStatusUI();
-  renderFacilities();
-  // 即時ボーナス演出
-  gWarriors.forEach(w => {
-    if (Math.random() < 0.6) createFloatText(w, '施設効果！', '#ffeecc');
+window.upgradeFacility=function(key,cost){
+  if(state.koku<cost){alert('国力が不足しています！');return;}
+  state.koku-=cost;
+  FACILITY_MAP[key].level++;
+  gWarriors.forEach(w=>{
+    const b=Math.floor(2+Math.random()*4);
+    w.stats.power+=b;
+    createFloatText(w,`施設+${b}`,'#ffdd88');
+    showSpeechBubble(w,getSpeech(w,'train'));
   });
+  addLog(`${FACILITY_MAP[key].name}が強化された！`,'success');
+  updateStatusUI();updatePartyRow();renderFacilities();
 };
 
-/* メインループ */
-let tick = 0;
-function gameLoop() {
+/* ══════════════════════════════════════
+   歴史モーダル
+══════════════════════════════════════ */
+window.showHistory=function(){
+  const list=document.getElementById('history-list');
+  list.innerHTML=gameLog.length
+    ? gameLog.slice().reverse().map(l=>{
+        let col='#ddd';
+        if(l.type==='awakening')col='#ff6666';
+        if(l.type==='betrayal')col='#ff3333';
+        if(l.type==='success')col='#ffcc66';
+        return`<div style="margin-bottom:6px;color:${col};border-bottom:1px solid rgba(200,150,12,.1);padding-bottom:4px;"><span style="color:var(--gold-d);font-size:11px;">【${l.time}】</span> ${l.text}</div>`;
+      }).join('')
+    : '<div style="color:rgba(245,232,200,.5);text-align:center;padding:20px;">まだ歴史は刻まれていない…</div>';
+  document.getElementById('history-modal').style.display='flex';
+};
+window.closeHistory=function(){document.getElementById('history-modal').style.display='none';};
+
+/* ══════════════════════════════════════
+   放置ティック・イベント
+══════════════════════════════════════ */
+function performIdleTick(){
+  gWarriors.forEach(w=>{
+    let eg=Math.floor(5+Math.random()*11);
+    w.stats.exp+=eg;
+    let lv=false;
+    while(w.stats.exp>=100){w.stats.exp-=100;w.stats.level++;lv=true;const pu=Math.floor(2+Math.random()*3);w.stats.power+=pu;createFloatText(w,`+${pu}武力`,'#ffcc66');}
+    if(lv){createFloatText(w,`Lv${w.stats.level}↑`,'#ffeeaa');showSpeechBubble(w,getSpeech(w,'levelUp'),2500);addLog(`${w.name}がLv${w.stats.level}に！`);}
+    if(Math.random()<0.6) w.stats.power++;
+    if(Math.random()<0.35) w.stats.wisdom=Math.min(99,w.stats.wisdom+1);
+    if(Math.random()<0.3)  w.stats.loyalty=Math.min(100,w.stats.loyalty+Math.floor(1+Math.random()*3));
+  });
+  state.koku+=Math.floor(62+Math.random()*98);
+  state.unification=Math.min(99.9,state.unification+0.12);
+  updateStatusUI();updatePartyRow();
+}
+
+function triggerEvent(){
+  if(Math.random()>0.35)return;
+  const w=gWarriors[Math.floor(Math.random()*gWarriors.length)];
+  if(!w)return;
+  const roll=Math.random();
+  if(roll<0.15){const up=10+Math.floor(Math.random()*10);w.stats.power+=up;createFloatText(w,`覚醒 +${up}`,'#ff4444');showSpeechBubble(w,'目覚めた…！',2500);addLog(`${w.name}が覚醒した！`,'awakening');}
+  else if(roll<0.25){w.stats.loyalty=Math.max(0,w.stats.loyalty-30);createFloatText(w,'裏切り兆候','#ff0000');showSpeechBubble(w,getSpeech(w,'lowLoyalty'),2500);addLog(`${w.name}に裏切りの兆し…`,'betrayal');}
+  else if(roll<0.5){const g=500+Math.floor(Math.random()*500);state.koku+=g;addLog(`内政大成功！ +${g}石`,'success');}
+  else{w.stats.power+=3;createFloatText(w,'+3','#ffdd88');addLog(`${w.name}が成長した`);}
+  updateStatusUI();updatePartyRow();
+}
+
+/* ══════════════════════════════════════
+   合戦
+══════════════════════════════════════ */
+window.startBattle=()=>{
+  document.getElementById('battle-screen').classList.add('show');
+  document.getElementById('battle-family').textContent=(currentHouseHead?currentHouseHead.familyName:'織田')+'軍 出陣';
+  document.getElementById('our-warriors').innerHTML=gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'🌸':'⚔️'}</span>`).join('');
+  document.getElementById('enemy-warriors').innerHTML='<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
+  document.getElementById('battle-log').innerHTML='<div class="ll ally">敵軍が城に迫っています！</div>';
+};
+window.startBattleSimulation=function(){
+  const log=document.getElementById('battle-log');
+  log.innerHTML+=`<div class="ll ally">${gWarriors[0]?.name||'武将'}が先陣を切った！</div>`;
+  setTimeout(()=>{
+    log.innerHTML+='<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
+    log.scrollTop=log.scrollHeight;
+    state.koku+=1680; state.unification=Math.min(100,state.unification+4.5);
+    gWarriors.forEach((w,i)=>{
+      w.stats.power+=5;createFloatText(w,'+5武力','#ffdd88');
+      w.stats.loyalty=Math.min(100,w.stats.loyalty+8);
+      showSpeechBubble(w,getSpeech(w,'highLoyalty'),2000);
+      gWarriors.forEach((_,j)=>{if(i!==j)changeRel(i,j,Math.floor(3+Math.random()*5));});
+    });
+    addLog('合戦大勝利！','success');updateStatusUI();updatePartyRow();
+  },1400);
+};
+window.endBattle=()=>document.getElementById('battle-screen').classList.remove('show');
+
+window.showBloodline=()=>{
+  if(state.genNum>=5){alert('すでに最終世代です！');return;}
+  if(confirm('次世代へ進みますか？')){
+    state.genNum++;
+    const nw=new IsoWarrior('織田 次郎','bukan',75+Math.floor(Math.random()*25),-1.5,3.5);
+    const ni=gWarriors.length-1;
+    gWarriors.forEach((_,i)=>{if(i!==ni)changeRel(i,ni,Math.floor(10+Math.random()*30));});
+    addLog(`第${state.genNum}世代開始！`,'success');
+    updatePartyRow();updateStatusUI();
+    alert(`第${state.genNum}世代開始！`);
+  }
+};
+
+/* ══════════════════════════════════════
+   メインループ・初期化
+══════════════════════════════════════ */
+let tick=0;
+function gameLoop(){
   tick++;
-  gWarriors.forEach(w => w.tick());
+  gWarriors.forEach((w,i)=>w.tick(i));
   drawScene(tick);
   requestAnimationFrame(gameLoop);
 }
 
-/* 初期化 */
-function initGame() {
-  gWarriors = [];
+function initGame(){
+  gWarriors=[];
   buildTerrain();
   resizeCanvas();
 
-  // 武将生成
-  new IsoWarrior('織田 信廣', 'bukan', 88, -2.3, 2.5);
-  new IsoWarrior('お 市',    'hime',   72,  0.2,  2.8);
-  new IsoWarrior('明智 光忠', 'bunkan', 65,  1.8,  2.3);
+  new IsoWarrior('織田 信廣','bukan', 88,  0.2,  3.5);
+  new IsoWarrior('お 市',    'hime',  72, -1.8,  3.2);
+  new IsoWarrior('明智 光忠','bunkan',65,  1.8,  3.0);
 
-  currentHouseHead = { warrior: gWarriors[0], familyName: '織田' };
+  currentHouseHead={warrior:gWarriors[0],familyName:'織田'};
+  initRelations(gWarriors);
 
-  updatePartyRow();
-  updateStatusUI();
+  setTimeout(()=>showSpeechBubble(gWarriors[0],'天下を取るぞ！',2500),1200);
+  setTimeout(()=>showSpeechBubble(gWarriors[1],'桜が綺麗ですね…',2500),2200);
+  setTimeout(()=>showSpeechBubble(gWarriors[2],'謀略が要りますな',2500),3100);
 
-  // 時間経過システム開始（ゲーム発展途上国2風）
-  setInterval(performIdleTick, 1650);   // 約1.65秒ごとにポコポコ上昇
+  updatePartyRow();updateStatusUI();
+
+  canvas.style.pointerEvents='auto';
+  canvas.addEventListener('click',()=>{
+    const w=gWarriors[Math.floor(Math.random()*gWarriors.length)];
+    if(!w)return;
+    const g=1+Math.floor(Math.random()*3);
+    w.stats.power+=g;
+    createFloatText(w,`+${g}`,'#ffaa44');
+    showSpeechBubble(w,getSpeech(w,'train'));
+    addLog(`${w.name}を強化`);
+    updatePartyRow();
+  });
+
+  setInterval(performIdleTick,1800);
+  setInterval(()=>{updateTime();triggerEvent();},2200);
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden){for(let i=0;i<5;i++)performIdleTick();addLog('放置ボーナス発生！','success');}
+  });
 
   gameLoop();
 }
 
-/* 合戦関連（報酬強化） */
-window.startBattleSimulation = function() {
-  const log = document.getElementById('battle-log');
-  const name = currentHouseHead ? currentHouseHead.warrior.name : '武将';
-  log.innerHTML += `<div class="ll ally">${name}が先陣を切った！</div>`;
-  setTimeout(() => {
-    log.innerHTML += '<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！</div>';
-    log.scrollTop = log.scrollHeight;
-
-    // 勝利報酬（ステータス大幅アップ）
-    state.koku += 1680;
-    state.unification = Math.min(100, state.unification + 4.5);
-    gWarriors.forEach(w => {
-      w.stats.power += 5;
-      createFloatText(w, '+5武力', '#ffdd88');
-      w.stats.loyalty = Math.min(100, w.stats.loyalty + 8);
-    });
-    updateStatusUI();
-    updatePartyRow();
-  }, 1400);
-};
-
-window.endBattle = () => {
-  document.getElementById('battle-screen').classList.remove('show');
-};
-
-window.startBattle = () => {
-  document.getElementById('battle-screen').classList.add('show');
-  document.getElementById('battle-family').textContent = (currentHouseHead?currentHouseHead.familyName:'織田') + '軍 出陣';
-  document.getElementById('our-warriors').innerHTML = gWarriors.map(w=>`<span class="wi">${w.jobId==='hime'?'🌸':'⚔️'}</span>`).join('');
-  document.getElementById('enemy-warriors').innerHTML = '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
-  document.getElementById('battle-log').innerHTML = '<div class="ll ally">敵軍が城に迫っています！</div>';
-};
-
-window.showBloodline = () => {
-  if (state.genNum >= 5) {
-    alert('すでに最終世代です！');
-    return;
-  }
-  if (confirm('次世代へ進みますか？\n（現在の武将の血脈が強化され、新たな武将が加わります）')) {
-    state.genNum++;
-    // 新しい後継者追加（簡易）
-    const newPower = Math.floor(75 + Math.random() * 25);
-    new IsoWarrior('織田 次郎', 'bukan', newPower, -1.5, 3.2);
-    updatePartyRow();
-    updateStatusUI();
-    alert(`第${state.genNum}世代開始！\n血脈が強化されました！`);
-  }
-};
-
-window.showDiplomacy = () => alert('外交機能は現在拡張中です（今後のアップデートで同盟・和平を実装予定）');
-window.showDev = showDev;   // 内政モーダル
-
-window.onload = initGame;
-window.addEventListener('resize', resizeCanvas);
+window.onload=initGame;
+window.addEventListener('resize',resizeCanvas);
 </script>
 </body>
 </html>
-
-<script>
-// ===============================
-// カイロソフト完全ループ
-// ===============================
-
-let gameTime = {
-  year: 1,
-  month: 1,
-  day: 1
-};
-
-let gameLog = [];
-
-// UI追加（既存に干渉しない）
-const timeDisplay = document.createElement("div");
-timeDisplay.style.position = "absolute";
-timeDisplay.style.top = "8px";
-timeDisplay.style.left = "12px";
-timeDisplay.style.fontSize = "11px";
-timeDisplay.style.color = "#c8960c";
-timeDisplay.style.opacity = "0.8";
-document.body.appendChild(timeDisplay);
-
-function updateTime() {
-  gameTime.day++;
-
-  if (gameTime.day > 30) {
-    gameTime.day = 1;
-    gameTime.month++;
-  }
-
-  if (gameTime.month > 12) {
-    gameTime.month = 1;
-    gameTime.year++;
-  }
-
-  timeDisplay.innerText =
-    `第${gameTime.year}年 ${gameTime.month}月 ${gameTime.day}日`;
-}
-
-// ===============================
-// イベントシステム（核）
-// ===============================
-
-function triggerEvent() {
-  if (Math.random() > 0.35) return;
-
-  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
-  if (!w) return;
-
-  const roll = Math.random();
-
-  // 覚醒（激アツ）
-  if (roll < 0.15) {
-    const up = 10 + Math.floor(Math.random() * 10);
-    w.stats.power += up;
-    createFloatText(w, `覚醒 +${up}`, "#ff4444");
-    addLog(`${w.name}が覚醒した！`);
-  }
-
-  // 裏切り（緊張）
-  else if (roll < 0.25) {
-    w.stats.loyalty -= 30;
-    createFloatText(w, "裏切り兆候", "#ff0000");
-    addLog(`${w.name}に不穏な動き…`);
-  }
-
-  // 大成功（快感）
-  else if (roll < 0.5) {
-    const gain = 500 + Math.floor(Math.random() * 500);
-    state.koku += gain;
-    addLog(`内政成功！ +${gain}石`);
-  }
-
-  // 通常イベント
-  else {
-    const stat = ["power", "wisdom", "loyalty"];
-    const s = stat[Math.floor(Math.random() * 3)];
-    w.stats[s] += 3;
-    createFloatText(w, "+3", "#ffdd88");
-    addLog(`${w.name}が成長した`);
-  }
-
-  updateStatusUI();
-  updatePartyRow();
-}
-
-// ===============================
-// ログシステム
-// ===============================
-
-function addLog(text) {
-  gameLog.push(text);
-  if (gameLog.length > 20) gameLog.shift();
-
-  // 軽量表示（コンソール）
-  console.log("LOG:", text);
-}
-
-// ===============================
-// メインループ統合
-// ===============================
-
-setInterval(() => {
-  updateTime();
-  triggerEvent();
-}, 2200);
-
-// ===============================
-// 中毒補助（クリック報酬）
-// ===============================
-
-canvas.addEventListener("click", () => {
-  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
-  if (!w) return;
-
-  const gain = 1 + Math.floor(Math.random() * 3);
-  w.stats.power += gain;
-
-  createFloatText(w, `+${gain}`, "#ffaa44");
-  addLog(`${w.name}を強化`);
-
-  updatePartyRow();
-});
-
-// ===============================
-// 放置復帰ブースト
-// ===============================
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    for (let i = 0; i < 5; i++) {
-      performIdleTick();
-    }
-    addLog("放置ボーナス発生");
-  }
-});
-</script>
-
-<button class="act-btn" onclick="showDev()">
-  <span class="ico">🏯</span>
-  <span class="lbl">施設</span>
-</button>
-
-<button class="act-btn" onclick="showHistory()">
-  <span class="ico">📜</span>
-  <span class="lbl">歴史</span>
-</button>
-window.showHistory = function() {
-  if (!gameLog || gameLog.length === 0) {
-    alert("まだ歴史は刻まれていない...");
-    return;
-  }
-
-  let text = "【戦国記録】\n\n";
-  gameLog.slice().reverse().forEach(log => {
-    text += "・" + log + "\n";
-  });
-
-  alert(text);
-};
-
-<div id="history-modal" class="modal">
-  <div class="modal-content" style="max-height:80%;overflow:hidden;display:flex;flex-direction:column;">
-    
-    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
-    
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;">戦国記録</h2>
-
-    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;"></div>
-
-    <button onclick="closeHistory()" style="margin-top:10px;padding:12px;background:var(--gold);border:none;border-radius:10px;font-weight:700;">
-      閉じる
-    </button>
-  </div>
-</div>
-
-// =====================
-// 歴史システム強化
-// =====================
-
-function addLog(text, type = "normal") {
-  gameLog.push({
-    text,
-    type,
-    time: `${gameTime.year}年${gameTime.month}月`
-  });
-
-  if (gameLog.length > 50) gameLog.shift();
-}
-
-// 表示
-window.showHistory = function() {
-  const modal = document.getElementById("history-modal");
-  const list = document.getElementById("history-list");
-
-  if (!gameLog.length) {
-    list.innerHTML = "<div>まだ歴史は刻まれていない…</div>";
-  } else {
-    list.innerHTML = gameLog.slice().reverse().map(log => {
-      let color = "#ddd";
-      if (log.type === "awakening") color = "#ff6666";
-      if (log.type === "betrayal") color = "#ff2222";
-      if (log.type === "success") color = "#ffcc66";
-
-      return `<div style="margin-bottom:6px;color:${color}">
-        【${log.time}】 ${log.text}
-      </div>`;
-    }).join("");
-  }
-
-  modal.style.display = "flex";
-};
-
-function closeHistory() {
-  document.getElementById("history-modal").style.display = "none";
-}
-
-function triggerEvent() {
-  if (Math.random() > 0.35) return;
-
-  const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
-  if (!w) return;
-
-  const roll = Math.random();
-
-  if (roll < 0.15) {
-    const up = 10 + Math.floor(Math.random() * 10);
-    w.stats.power += up;
-    createFloatText(w, `覚醒 +${up}`, "#ff4444");
-    addLog(`${w.name}が覚醒した！`, "awakening");
-  }
-
-  else if (roll < 0.25) {
-    w.stats.loyalty -= 30;
-    createFloatText(w, "裏切り兆候", "#ff0000");
-    addLog(`${w.name}に裏切りの兆し…`, "betrayal");
-  }
-
-  else if (roll < 0.5) {
-    const gain = 500 + Math.floor(Math.random() * 500);
-    state.koku += gain;
-    addLog(`内政大成功！ +${gain}石`, "success");
-  }
-
-  else {
-    w.stats.power += 3;
-    createFloatText(w, "+3", "#ffdd88");
-    addLog(`${w.name}が成長した`);
-  }
-
-  updateStatusUI();
-  updatePartyRow();
-}
-
-window.upgradeFacility = function(key, cost) {
-  if (state.koku < cost) {
-    alert('国力が不足しています！');
-    return;
-  }
-
-  state.koku -= cost;
-  state.facilities[key]++;
-
-  // 爆発的演出
-  gWarriors.forEach(w => {
-    const boost = Math.floor(2 + Math.random() * 4);
-    w.stats.power += boost;
-    createFloatText(w, `施設+${boost}`, "#ffdd88");
-  });
-
-  addLog("施設が発展した！", "success");
-
-  updateStatusUI();
-  updatePartyRow();
-  renderFacilities();
-};
-
-const FACILITY_POS = {
-  training: { x:-2, y:-2 },
-  academy:  { x: 2, y:-2 },
-  loyalty:  { x: 2, y: 2 },
-  garden:   { x:-2, y: 2 },
-  tea:      { x: 0, y: 2 },
-  forge:    { x: 0, y:-2 }
-};
-
-this.target = null;
-this.state  = 'idle'; // idle / moving / acting
-this.wait   = 0;
-decideNextAction() {
-  const r = Math.random();
-
-  if (this.jobId === 'bukan') {
-    this.target = r < 0.6 ? 'training' : 'forge';
-  } else if (this.jobId === 'bunkan') {
-    this.target = r < 0.7 ? 'academy' : 'tea';
-  } else if (this.jobId === 'hime') {
-    this.target = r < 0.5 ? 'garden' : 'tea';
-  }
-
-  this.state = 'moving';
-}
-
-
-updateAI() {
-  if (this.state === 'idle') {
-    if (Math.random() < 0.02) this.decideNextAction();
-  }
-
-  else if (this.state === 'moving') {
-    const t = FACILITY_POS[this.target];
-    const dx = t.x - this.tileX;
-    const dy = t.y - this.tileY;
-
-    const speed = 0.02;
-    this.tileX += Math.sign(dx) * speed;
-    this.tileY += Math.sign(dy) * speed;
-
-    if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
-      this.state = 'acting';
-      this.wait = 60 + Math.random()*120;
-      enterFacility(this, this.target);
-    }
-  }
-
-  else if (this.state === 'acting') {
-    if (--this.wait <= 0) {
-      this.state = 'idle';
-    }
-  }
-}
-
-this.updateAI();
-
-
-function enterFacility(w, type) {
-  if (type === 'training') {
-    const gain = 2 + Math.floor(Math.random()*3);
-    w.stats.power += gain;
-    createFloatText(w, `+${gain}武`, '#ffcc66');
-  }
-
-  else if (type === 'academy') {
-    const gain = 2 + Math.floor(Math.random()*3);
-    w.stats.wisdom += gain;
-    createFloatText(w, `+${gain}知`, '#aaddff');
-  }
-
-  else if (type === 'loyalty') {
-    const gain = 3 + Math.floor(Math.random()*4);
-    w.stats.loyalty = Math.min(100, w.stats.loyalty + gain);
-    createFloatText(w, `+${gain}忠`, '#88ff88');
-  }
-
-  else if (type === 'garden') {
-    createFloatText(w, '癒し', '#aaffcc');
-  }
-
-  else if (type === 'tea') {
-    triggerConversationNearby(w);
-  }
-
-  else if (type === 'forge') {
-    const gain = 4 + Math.floor(Math.random()*4);
-    w.stats.power += gain;
-    createFloatText(w, `鍛+${gain}`, '#ffaa44');
-  }
-}
-
-function triggerConversationNearby(w) {
-  const other = gWarriors.find(o =>
-    o !== w &&
-    Math.abs(o.tileX - w.tileX) < 0.8 &&
-    Math.abs(o.tileY - w.tileY) < 0.8
-  );
-
-  if (!other) return;
-
-  const lines = [
-    "最近どうだ？",
-    "強くなったな…",
-    "あの戦は見事だった",
-    "少し休むか…"
-  ];
-
-  const line = lines[Math.floor(Math.random()*lines.length)];
-
-  createFloatText(w, line, '#ffffff');
-  createFloatText(other, "……", '#cccccc');
-
-  // 仲良くなる
-  if (Math.random() < 0.3) {
-    w.stats.loyalty += 2;
-    other.stats.loyalty += 2;
-  }
-}
-
-function randomMonologue(w) {
-  if (Math.random() > 0.01) return;
-
-  let text = "……";
-
-  if (w.stats.loyalty < 40) text = "ここにいる意味あるか…";
-  else if (w.stats.power > 100) text = "俺が最強だ";
-  else if (w.stats.wisdom > 80) text = "戦は情報だ…";
-
-  createFloatText(w, text, '#bbbbbb');
-}
-
-randomMonologue(this);
-
-
-if (countInFacility(type) > 2) return; // 混雑
-
-w.relations[other.name] += 1;
-
-const FACILITIES = {
-  training: { name:'訓練場', type:'power' },
-  forge:    { name:'鍛冶場', type:'power' },
-  academy:  { name:'学問所', type:'wisdom' },
-  council:  { name:'軍議所', type:'strategy' },
-  loyalty:  { name:'忠誠殿', type:'loyalty' },
-  tea:      { name:'茶室', type:'social' },
-  garden:   { name:'庭園', type:'heal' },
-  market:   { name:'市場', type:'money' },
-  farm:     { name:'農地', type:'money' }
-};
-
-[訓練場]　[鍛冶場]
-
-　[茶室]　　🏯天守　　[学問所]
-
-　　　[庭園]　[忠誠殿]
-
-this.anim = {
-  type: null,   // 'enter' / 'exit'
-  t: 0
-};
-this.visible = true;
-
-const FACILITY_ENTRANCE = {
-  training: { x:-2, y:-2.4 },
-  academy:  { x: 2, y:-2.4 },
-  loyalty:  { x: 2, y: 2.4 },
-  garden:   { x:-2, y: 2.4 },
-  tea:      { x: 0, y: 2.4 },
-  forge:    { x: 0, y:-2.4 }
-};
-
-if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
-  this.state = 'entering';
-  this.anim.type = 'enter';
-  this.anim.t = 0;
-}
-
-else if (this.state === 'entering') {
-  this.anim.t += 0.05;
-
-  if (this.anim.t >= 1) {
-    this.visible = false;
-    this.state = 'acting';
-    this.wait = 80 + Math.random()*120;
-
-    enterFacility(this, this.target);
-  }
-}
-
-else if (this.state === 'acting') {
-  if (--this.wait <= 0) {
-    this.state = 'exiting';
-    this.anim.type = 'exit';
-    this.anim.t = 0;
-    this.visible = true;
-
-    // 出口位置（入口と同じ）
-    const e = FACILITY_ENTRANCE[this.target];
-    this.tileX = e.x;
-    this.tileY = e.y;
-  }
-}
-
-else if (this.state === 'exiting') {
-  this.anim.t += 0.05;
-
-  if (this.anim.t >= 1) {
-    this.state = 'idle';
-  }
-}
-
-
-let scale = 1;
-let alpha = 1;
-
-if (this.state === 'entering') {
-  scale = 1 - this.anim.t;
-  alpha = 1 - this.anim.t;
-}
-if (this.state === 'exiting') {
-  scale = this.anim.t;
-  alpha = this.anim.t;
-}
-if (!this.visible && this.state !== 'exiting') return;
-
-ctx.save();
-ctx.globalAlpha = alpha;
-ctx.translate(fx, fy);
-ctx.scale(scale, scale);
-ctx.translate(-fx, -fy);
-
-ctx.restore();
-
-if (this.anim.type === 'enter' && Math.random() < 0.3) {
-  createFloatText(this, "…", "#888");
-}
-
-function drawEntranceEffect(x, y, t) {
-  const s = isoToScreen(x, y, 0.3);
-  const sx = CX + s.x;
-  const sy = CY + s.y;
-
-  ctx.save();
-  ctx.globalAlpha = 0.4 * (1 - t);
-  ctx.beginPath();
-  ctx.arc(sx, sy, 20 * (1 + t), 0, Math.PI * 2);
-  ctx.strokeStyle = '#ffd700';
-  ctx.stroke();
-  ctx.restore();
-}
