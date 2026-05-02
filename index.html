@@ -68,7 +68,6 @@
   @keyframes castleFloat { 0%,100% { transform: translateX(-50%) translateY(0px); } 50% { transform: translateX(-50%) translateY(-4px); } }
 
   .warrior { position: absolute; bottom: 86px; cursor: pointer; z-index: 15; transition: filter 0.2s; }
-  .warrior:hover .warrior-svg { filter: brightness(1.25); }
 
   /* 合戦画面 */
   #battle-screen {
@@ -120,9 +119,14 @@
 
 <div id="bg"></div>
 <div class="mist-layer"></div><div class="mist-layer"></div><div class="mist-layer"></div>
-<div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
-<div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
+<div class="petal" style="left:5%;width:6px;height:6px;animation-duration:8s;"></div>
+<div class="petal" style="left:15%;width:8px;height:8px;animation-duration:11s;animation-delay:-3s;"></div>
+<div class="petal" style="left:30%;width:5px;height:5px;animation-duration:9s;animation-delay:-6s;"></div>
+<div class="petal" style="left:50%;width:8px;height:8px;animation-duration:13s;animation-delay:-1s;"></div>
+<div class="petal" style="left:65%;width:7px;height:7px;animation-duration:10s;animation-delay:-4s;"></div>
+<div class="petal" style="left:80%;width:5px;height:5px;animation-duration:12s;animation-delay:-7s;"></div>
 
+<!-- 合戦画面 -->
 <div id="battle-screen">
   <div class="battle-header">
     <div class="battle-title" id="battle-family">織田軍 出陣</div>
@@ -146,6 +150,7 @@
   </div>
 </div>
 
+<!-- 元のホーム画面 -->
 <div id="main">
   <div id="titlebar">
     <div id="game-title">戦国血脈<span>〜 覇道の系譜 〜</span></div>
@@ -169,16 +174,16 @@
 </div>
 
 <script>
-// 武将管理
+// 武将管理（簡易版）
 let warriors = [];
 let currentHouseHead = null;
 
 class Warrior {
-  constructor(name, jobId, power, leftPos) {
+  constructor(name, jobId, power, left) {
     this.def = { name, jobId, power };
     this.el = document.createElement('div');
     this.el.className = 'warrior';
-    this.el.style.left = leftPos + 'px';
+    this.el.style.left = left + 'px';
     this.el.innerHTML = `<div style="font-size:52px;">\( {jobId === 'bukan' ? '⚔️' : '🌸'}</div><div style="font-size:11px;color:var(--gold-light);"> \){name}</div>`;
     document.getElementById('castle-field').appendChild(this.el);
     warriors.push(this);
@@ -187,10 +192,11 @@ class Warrior {
 
 function initGame() {
   warriors = [];
-  document.getElementById('castle-field').innerHTML = `<div id="castle-base"><div id="castle-name">安土城</div></div>`;
-  
-  new Warrior('織田 信廣', 'bukan', 88, 120);
-  new Warrior('お 市', 'hime', 72, 220);
+  const field = document.getElementById('castle-field');
+  field.innerHTML = `<div id="castle-base"><div id="castle-name">安土城</div></div>`;
+
+  new Warrior('織田 信廣', 'bukan', 88, 80);
+  new Warrior('お 市', 'hime', 72, 200);
   new Warrior('明智 光忠', 'bunkan', 65, 320);
 
   currentHouseHead = { warrior: warriors[0], familyName: '織田' };
@@ -201,19 +207,19 @@ function showBattleScreen() {
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-family').textContent = `${currentHouseHead.familyName}軍`;
 
-  const our = document.getElementById('our-warriors');
-  our.innerHTML = warriors.map(w => `<span class="warrior-icon">${w.def.jobId === 'bukan' ? '⚔️' : '🌸'}</span>`).join('');
+  document.getElementById('our-warriors').innerHTML = warriors.map(w => 
+    `<span class="warrior-icon">${w.def.jobId === 'bukan' ? '⚔️' : '🌸'}</span>`
+  ).join('');
 
-  const enemy = document.getElementById('enemy-warriors');
-  enemy.innerHTML = `<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>`;
+  document.getElementById('enemy-warriors').innerHTML = `<span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span><span class="warrior-icon">⚔️</span>`;
 
-  document.getElementById('battle-log').innerHTML = '<div class="log-line ally">敵軍が現れました！</div>';
+  document.getElementById('battle-log').innerHTML = '<div class="log-line ally">敵軍が城に迫っています！</div>';
 }
 
 window.startBattleSimulation = function() {
   const log = document.getElementById('battle-log');
-  log.innerHTML += '<div class="log-line ally">織田信廣が敵将を討ち取った！</div>';
-  setTimeout(() => log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！</div>', 1500);
+  log.innerHTML += '<div class="log-line ally">織田信廣が先陣を切った！</div>';
+  setTimeout(() => log.innerHTML += '<div class="log-line ally" style="color:#ffdd88">大勝利！</div>', 1400);
 };
 
 window.endBattle = function() {
@@ -228,7 +234,6 @@ window.showBloodline = function() {
   alert("配合機能は現在開発中です");
 };
 
-// 起動
 window.onload = initGame;
 </script>
 </body>
