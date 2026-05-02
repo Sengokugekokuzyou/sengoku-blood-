@@ -1,193 +1,2179 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>戦国血脈 - 武将詳細</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #d1b891; /* ゴールド系の文字 */
-            font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>戦国血脈 〜覇道の系譜〜</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
+:root{
+  --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
+  --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.85);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
 
-        .busho-detail-popup {
-            background-color: #111; /* 黒に近い背景 */
-            border: 3px solid #ffcc00; /* 派手なゴールド枠 */
-            border-radius: 15px;
-            width: 340px;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
-            position: relative;
-        }
+/* ── 背景 ── */
+#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
+.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
+.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none;}
+.mist:nth-child(1){height:55px;top:30%;animation-duration:32s;}
+.mist:nth-child(2){height:70px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
+.mist:nth-child(3){height:45px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
+@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
+.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
+@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            color: #ffcc00;
-            cursor: pointer;
-        }
+/* ── レイアウト ── */
+#main{position:relative;z-index:10;width:100%;height:100%;display:flex;flex-direction:column;}
+#header{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+#game-title{color:var(--gold);font-size:clamp(15px,4.8vw,20px);font-weight:900;letter-spacing:.3em;text-shadow:0 0 20px rgba(200,150,12,.75);line-height:1.5;}
+#game-title .sub{display:block;font-size:clamp(8px,2vw,10px);letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;}
+#status-panel{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.stat-chip{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--gold-d);border-radius:20px;padding:4px 11px;}
+.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}
+.sv{font-size:14px;font-weight:700;color:var(--gold-l);}
+.su{font-size:9px;color:var(--gold-d);}
+#time-display{position:absolute;top:max(env(safe-area-inset-top,0px),8px);left:12px;font-size:11px;color:var(--gold);opacity:.8;z-index:20;pointer-events:none;}
+#iso-field{flex:1;position:relative;overflow:hidden;min-height:0;}
+#iso-canvas{position:absolute;bottom:0;left:50%;transform:translateX(-50%);}
+#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
+.facility-activity{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;color:#ffdd88;pointer-events:none;text-shadow:0 1px 4px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop 0.3s ease-out;}
+@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+.relation-label{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;pointer-events:none;text-shadow:0 1px 4px #000;animation:fadeInOut 2.5s ease-in-out forwards;}
+@keyframes fadeInOut{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+/* ── 下部UI ── */
+#bottom-ui{flex-shrink:0;padding:0 12px max(env(safe-area-inset-bottom,0px),12px);background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);}
+#nation-bar{display:flex;align-items:center;gap:8px;padding:8px 4px 5px;border-bottom:1px solid rgba(200,150,12,.15);}
+.nl{font-size:9px;color:var(--gold-d);letter-spacing:.2em;white-space:nowrap;}
+.nt{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
+.nf{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
+.np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
+#party-row{display:flex;gap:7px;padding:6px 0 5px;overflow-x:auto;scrollbar-width:none;}
+#party-row::-webkit-scrollbar{display:none;}
+.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:56px;cursor:pointer;transition:border-color .2s,background .2s;}
+.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
+.party-card:active{background:rgba(200,150,12,.15);}
+.pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}
+.pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
+.pc-pow{font-size:9px;color:#ffaa44;}
+.pc-loc{font-size:8px;color:#aaddff;margin-top:1px;}
+.pc-rel{font-size:8px;color:#88ffaa;}
+#action-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:5px 0 3px;}
+.act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;padding:10px 4px 8px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;}
+.act-btn:active{transform:scale(.92);background:rgba(200,150,12,.14);border-color:var(--gold);}
+.act-btn .ico{font-size:21px;line-height:1;}
+.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
+.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.4);}
+.act-btn.primary .lbl{color:var(--gold-l);}
 
-        .busho-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffcc00;
-        }
+/* ── 合戦画面 ── */
+#battle-screen{position:fixed;inset:0;z-index:500;background:linear-gradient(#060200,#180f00);display:none;flex-direction:column;color:var(--parchment);}
+#battle-screen.show{display:flex;}
+.bh{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;}
+.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}
+.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
+.bf{flex:1;min-height:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;}
+.army{text-align:center;width:42%;}
+.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
+.our-army .army-title{color:#ffdd88;}
+.enemy-army .army-title{color:#ff8888;}
+.wi{font-size:clamp(34px,10vw,50px);margin:5px 4px;display:inline-block;filter:drop-shadow(0 4px 12px #000);}
+.blog{flex-shrink:0;height:165px;background:rgba(6,3,0,.97);border-top:2px solid var(--gold);padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;}
+.ll{margin:3px 0;}
+.ll.ally{color:#bbffbb;}
+.bfooter{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);background:rgba(0,0,0,.9);display:flex;gap:10px;}
+.bbtn{flex:1;padding:15px 8px;font-size:15px;font-weight:700;background:linear-gradient(#5a2a0a,#2a1800);border:1px solid var(--gold);color:var(--parchment);cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;}
+.bbtn:active{filter:brightness(1.3);}
 
-        .busho-meta {
-            font-size: 14px;
-            margin-top: 5px;
-        }
+/* ── モーダル共通 ── */
+.modal{position:fixed;inset:0;z-index:700;background:rgba(8,4,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;}
+.modal-content{position:relative;background:var(--panel);width:92%;max-width:420px;border:3px solid var(--gold);border-radius:16px;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6);}
 
-        .status-block {
-            background-color: #222; /* 濃いグレー背景 */
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            display: flex;
-            justify-content: space-around;
-        }
+/* ── 武将詳細モーダル ── */
+#warrior-modal .modal-content{
+  background:#111;border:3px solid #ffcc00;border-radius:15px;
+  box-shadow:0 0 15px rgba(255,204,0,.5);max-width:360px;max-height:90vh;overflow-y:auto;
+}
+.wm-name{font-size:22px;font-weight:bold;color:#ffcc00;text-align:center;margin-bottom:4px;}
+.wm-meta{font-size:13px;text-align:center;color:#d1b891;margin-bottom:14px;}
+.wm-status{background:#222;border-radius:10px;padding:10px;margin-bottom:14px;display:flex;justify-content:space-around;text-align:center;}
+.wm-stat-item{font-size:14px;font-weight:700;}
+.wm-stat-item.pow{color:#ffcc66;}
+.wm-stat-item.wis{color:#aaddff;}
+.wm-stat-item.loy{color:#88ff88;}
+.wm-section-title{font-size:11px;color:#aaa;text-align:center;margin-bottom:5px;letter-spacing:.1em;}
+.wm-skill-block,.wm-bloodline-block,.wm-relation-block{border:1px solid #444;border-radius:8px;padding:10px;margin-bottom:12px;}
+.wm-skill-list{font-size:13px;text-align:center;color:#d1b891;}
+.wm-bloodline-pair{font-size:16px;text-align:center;color:#ffcc00;margin-bottom:10px;font-weight:700;}
+.wm-pedigree-btn{background:#ffcc00;color:#000;border:none;border-radius:5px;width:100%;padding:8px;font-weight:bold;font-size:13px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .1s;}
+.wm-pedigree-btn:active{filter:brightness(.85);transform:scale(.97);}
+.wm-rel-item{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;color:#eee;padding:2px 0;border-bottom:1px solid rgba(255,204,0,.07);}
+.wm-back-btn{background:#ffcc00;color:#000;border:none;border-radius:7px;width:100%;padding:12px;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;letter-spacing:.1em;}
+.wm-back-btn:active{filter:brightness(.85);}
+.wm-close-btn{position:absolute;top:12px;right:16px;font-size:26px;color:#ffcc00;cursor:pointer;line-height:1;z-index:1;}
 
-        .status-item {
-            font-size: 16px;
-        }
+/* ── 血統ツリー ── */
+.bt-node{text-align:center;padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.5;min-width:80px;}
+.bt-node.gen1{background:rgba(200,150,12,.18);border:2px solid var(--gold);}
+.bt-node.gen2{background:rgba(255,255,255,.07);border:1px solid rgba(200,150,12,.3);}
+.bt-node.gen3{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.15);font-size:10px;}
+.bt-node .bn{font-weight:700;color:var(--parchment);}
+.bt-node .bc-name{font-size:9px;color:var(--gold-d);}
+.bt-bonus-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.bt-bonus{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
 
-        .section-title {
-            font-size: 12px;
-            color: #aaa;
-            text-align: center;
-            margin-bottom: 5px;
-        }
+/* ════════════════════════════════
+   家系図モーダル（新UI）
+════════════════════════════════ */
+#pedigree-modal{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.92);
+  display:none;flex-direction:column;align-items:center;justify-content:flex-start;
+  overflow-y:auto;
+}
+#pedigree-modal.show{display:flex;}
 
-        .skill-block, .relationship-block, .bloodline-block {
-            border: 1px solid #444; /* 薄い枠 */
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
+.pg-wrap{
+  width:100%;max-width:480px;
+  padding:max(env(safe-area-inset-top,0px),20px) 16px max(env(safe-area-inset-bottom,0px),20px);
+  min-height:100%;
+  display:flex;flex-direction:column;gap:0;
+  animation:pgSlideIn .35s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes pgSlideIn{
+  from{opacity:0;transform:translateY(30px) scale(.96)}
+  to{opacity:1;transform:none}
+}
 
-        .skill-list {
-            font-size: 14px;
-            text-align: center;
-        }
+/* ヘッダー */
+.pg-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:14px;
+  border-bottom:1px solid rgba(200,150,12,.25);
+  margin-bottom:18px;
+}
+.pg-title{
+  font-size:18px;font-weight:900;letter-spacing:.25em;
+  color:var(--gold-l);
+  text-shadow:0 0 20px rgba(200,150,12,.5);
+}
+.pg-subtitle{font-size:10px;color:var(--gold-d);letter-spacing:.2em;margin-top:2px;}
+.pg-close{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(200,150,12,.35);
+  background:rgba(0,0,0,.5);
+  color:var(--gold-l);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+  transition:background .15s;
+}
+.pg-close:active{background:rgba(200,150,12,.2);}
 
-        .skill-item {
-            margin: 0 5px;
-        }
+/* ボーナスカード */
+.pg-bonus-card{
+  background:linear-gradient(135deg,rgba(20,12,4,.95),rgba(10,6,2,.95));
+  border:1px solid rgba(200,150,12,.4);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:22px;
+  position:relative;
+  overflow:hidden;
+}
+.pg-bonus-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at top left,rgba(200,150,12,.08),transparent 60%);
+  pointer-events:none;
+}
+.pg-bonus-warrior{
+  font-size:20px;font-weight:900;color:#fff;
+  letter-spacing:.1em;margin-bottom:2px;
+}
+.pg-bonus-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;
+  border:1px solid;margin-bottom:10px;
+}
+.pg-bonus-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+}
+.pg-bonus-item{
+  background:rgba(255,255,255,.05);border-radius:8px;
+  padding:7px 4px;text-align:center;
+}
+.pg-bonus-item .pbi-val{font-size:16px;font-weight:900;}
+.pg-bonus-item .pbi-lbl{font-size:9px;color:rgba(245,232,200,.55);margin-top:1px;letter-spacing:.05em;}
+.pg-bonus-battle{
+  margin-top:8px;
+  background:rgba(139,0,0,.25);border:1px solid rgba(200,50,50,.3);
+  border-radius:8px;padding:6px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;
+}
+.pg-bonus-battle .pbb-val{font-size:15px;font-weight:900;color:#ffaaaa;}
 
-        .bloodline-pair {
-            font-size: 18px;
-            text-align: center;
-            color: #ffcc00;
-            margin-bottom: 10px;
-        }
+/* 家系ツリー本体 */
+.pg-tree-section{
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;
+}
+.pg-tree-label{
+  font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.6);
+  text-align:center;margin-bottom:10px;
+}
 
-        .pedigree-btn {
-            background-color: #ffcc00;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            width: 100%;
-            padding: 10px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            display: block;
-            text-align: center;
-        }
+/* ノード */
+.pgn{
+  display:flex;flex-direction:column;align-items:center;
+}
+.pgn-box{
+  border-radius:12px;padding:10px 14px;
+  text-align:center;cursor:default;
+  position:relative;
+  transition:transform .15s;
+}
+.pgn-box.self{
+  background:linear-gradient(135deg,rgba(139,0,0,.5),rgba(80,0,0,.5));
+  border:2px solid var(--gold);
+  box-shadow:0 0 18px rgba(200,150,12,.3);
+  min-width:130px;
+}
+.pgn-box.parent{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(200,150,12,.35);
+  min-width:110px;
+}
+.pgn-box.grand{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(200,150,12,.18);
+  min-width:88px;
+}
+.pgn-box.unknown{
+  background:rgba(255,255,255,.03);
+  border:1px dashed rgba(200,150,12,.2);
+  min-width:80px;opacity:.5;
+}
+.pgn-name{font-weight:700;color:var(--parchment);font-size:13px;letter-spacing:.05em;}
+.pgn-box.grand .pgn-name{font-size:11px;}
+.pgn-box.unknown .pgn-name{font-size:11px;color:rgba(245,232,200,.4);}
+.pgn-clan{font-size:9px;margin-top:1px;font-weight:400;}
+.pgn-role{font-size:8px;color:rgba(245,232,200,.4);margin-top:1px;letter-spacing:.1em;}
 
-        .relationship-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #eee;
-        }
+/* コネクタ線 */
+.pg-vline{width:1px;background:linear-gradient(rgba(200,150,12,.5),rgba(200,150,12,.2));flex-shrink:0;}
+.pg-hline{height:1px;background:rgba(200,150,12,.3);flex-shrink:0;}
 
-        .relationship-value {
-            color: #44ee44; /* 緑の文字 */
-        }
+/* 親行レイアウト */
+.pg-parent-row{
+  display:flex;align-items:flex-start;gap:0;width:100%;
+}
+.pg-parent-col{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+}
+.pg-parent-divider{width:16px;flex-shrink:0;}
 
-        .back-btn {
-            background-color: #ffcc00; /* ゴールド背景 */
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            width: 100%;
-            padding: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            display: block;
-            text-align: center;
-        }
+/* 祖父母行 */
+.pg-grand-row{
+  display:flex;align-items:flex-start;gap:6px;width:100%;
+}
+.pg-grand-col{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+}
 
-    </style>
+/* メモ・血統バー */
+.pg-meter-wrap{
+  margin-top:22px;
+  background:rgba(20,12,4,.9);
+  border:1px solid rgba(200,150,12,.25);
+  border-radius:12px;padding:14px 16px;
+  width:100%;
+}
+.pg-meter-title{font-size:10px;letter-spacing:.2em;color:var(--gold-d);margin-bottom:10px;}
+.pg-meter-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.pg-meter-lbl{font-size:10px;color:rgba(245,232,200,.6);width:36px;flex-shrink:0;}
+.pg-meter-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden;}
+.pg-meter-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,.68,0,1.2);}
+.pg-meter-val{font-size:11px;font-weight:700;min-width:34px;text-align:right;}
+
+/* 閉じるボタン（下） */
+.pg-footer{margin-top:20px;width:100%;}
+.pg-footer-btn{
+  width:100%;padding:14px;border-radius:12px;
+  background:rgba(200,150,12,.15);
+  border:1px solid rgba(200,150,12,.4);
+  color:var(--gold-l);font-size:14px;font-weight:700;
+  letter-spacing:.15em;cursor:pointer;font-family:inherit;
+  transition:background .15s;
+}
+.pg-footer-btn:active{background:rgba(200,150,12,.28);}
+
+/* 血統ツリーモーダル */
+#bloodline-modal .modal-content{max-width:460px;}
+#bloodline-modal .modal-content{max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+</style>
 </head>
 <body>
+<div id="sky"></div>
+<div class="star" style="left:6%;top:4%;width:2px;height:2px;animation-duration:3.1s;"></div>
+<div class="star" style="left:19%;top:8%;width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
+<div class="star" style="left:33%;top:3%;width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
+<div class="star" style="left:52%;top:6%;width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
+<div class="star" style="left:68%;top:2%;width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
+<div class="star" style="left:82%;top:7%;width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
+<div class="star" style="left:91%;top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
+<div class="mist"></div><div class="mist"></div><div class="mist"></div>
+<div class="petal" style="left:3%;width:7px;height:7px;animation-duration:8.2s;"></div>
+<div class="petal" style="left:14%;width:5px;height:5px;animation-duration:10.5s;animation-delay:-2.8s;"></div>
+<div class="petal" style="left:28%;width:8px;height:8px;animation-duration:9.1s;animation-delay:-5.5s;"></div>
+<div class="petal" style="left:47%;width:6px;height:6px;animation-duration:13.2s;animation-delay:-1.2s;"></div>
+<div class="petal" style="left:61%;width:5px;height:5px;animation-duration:10.8s;animation-delay:-4.2s;"></div>
+<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;animation-delay:-7.1s;"></div>
+<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s;animation-delay:-2.4s;"></div>
+<div id="time-display">第1年 1月 1日</div>
 
-<div class="busho-detail-popup">
-    <div class="close-btn">×</div>
-    
-    <div class="header">
-        <div class="busho-name">明智 光忠</div>
-        <div class="busho-meta">文官 Lv.15 | 〇〇歳</div>
-    </div>
-
-    <div class="status-block">
-        <div class="status-item">武力 257</div>
-        <div class="status-item">知力 99</div>
-        <div class="status-item">統率 180</div>
-    </div>
-
-    <div class="section-title">所持スキル</div>
-    <div class="skill-block">
-        <div class="skill-list">
-            <span class="skill-item">・外交術</span>
-            <span class="skill-item">・和歌</span>
-            <span class="skill-item">・建築</span>
-        </div>
-    </div>
-
-    <div class="section-title">血統 (父 × 母)</div>
-    <div class="bloodline-block">
-        <div class="bloodline-pair">
-            織田信長 × 濃姫(齋藤)
-        </div>
-        <button class="pedigree-btn">家系図の系譜を表示</button>
-    </div>
-
-    <div class="section-title">人間関係</div>
-    <div class="relationship-block">
-        <div class="relationship-item">
-            <span>織田 信廣</span>
-            <span class="relationship-value">やや対立 (+3)</span>
-        </div>
-        <div class="relationship-item">
-            <span>お 市</span>
-            <span class="relationship-value">普通 (+24)</span>
-        </div>
-        <div class="relationship-item">
-            <span>(空き)</span>
-            <span></span>
-        </div>
-    </div>
-
-    <button class="back-btn">城に戻る</button>
+<!-- ══ 合戦画面 ══ -->
+<div id="battle-screen">
+  <div class="bh">
+    <div class="bt" id="battle-family">織田軍 出陣</div>
+    <div class="bc" onclick="endBattle()">✕</div>
+  </div>
+  <div class="bf">
+    <div class="army our-army"><div class="army-title">我が軍</div><div id="our-warriors"></div></div>
+    <div style="font-size:clamp(30px,9vw,42px);color:var(--gold);align-self:center;margin-top:-40px;font-weight:900;">VS</div>
+    <div class="army enemy-army"><div class="army-title">敵軍</div><div id="enemy-warriors"></div></div>
+  </div>
+  <div class="blog" id="battle-log"></div>
+  <div class="bfooter">
+    <button class="bbtn" onclick="startBattleSimulation()">⚔ 戦闘開始</button>
+    <button class="bbtn" onclick="endBattle()" style="background:linear-gradient(#4a1010,#180606);">撤退</button>
+  </div>
 </div>
 
+<!-- ══ 家系図モーダル（新UI） ══ -->
+<div id="pedigree-modal">
+  <div class="pg-wrap">
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">家系図の系譜</div>
+        <div class="pg-subtitle" id="pg-warrior-sub">─</div>
+      </div>
+      <div class="pg-close" onclick="closePedigreeModal()">✕</div>
+    </div>
+
+    <!-- ボーナスカード -->
+    <div class="pg-bonus-card" id="pg-bonus-card"></div>
+
+    <!-- ツリー本体 -->
+    <div class="pg-tree-label">── 血の系譜 ──</div>
+    <div class="pg-tree-section" id="pg-tree-body"></div>
+
+    <!-- 血統メーター -->
+    <div class="pg-meter-wrap" id="pg-meter-wrap"></div>
+
+    <div class="pg-footer">
+      <button class="pg-footer-btn" onclick="closePedigreeModal()">城に戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 血統モーダル ══ -->
+<div id="bloodline-modal" class="modal">
+  <div class="modal-content" style="max-height:88vh;overflow:hidden;display:flex;flex-direction:column;max-width:460px;">
+    <div onclick="closeBloodlineModal()" style="position:absolute;top:14px;right:20px;font-size:28px;cursor:pointer;color:var(--gold);z-index:1;">✕</div>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:4px;font-size:19px;letter-spacing:.15em;">血脈 ─ 縁組</h2>
+    <div id="bl-tabs" style="display:flex;gap:6px;margin-bottom:12px;">
+      <button id="bl-tab-tree"  onclick="blTab('tree')"  style="flex:1;padding:7px;border:1px solid var(--gold);background:rgba(200,150,12,.2);color:var(--gold-l);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">🌳 血統ツリー</button>
+      <button id="bl-tab-marry" onclick="blTab('marry')" style="flex:1;padding:7px;border:1px solid rgba(200,150,12,.3);background:transparent;color:var(--parchment);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">🌸 縁組を結ぶ</button>
+    </div>
+    <div id="bl-panel-tree" style="flex:1;overflow-y:auto;">
+      <div id="bl-warrior-select" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+      <div id="bl-tree-view"></div>
+    </div>
+    <div id="bl-panel-marry" style="flex:1;overflow-y:auto;display:none;">
+      <div style="font-size:12px;color:rgba(245,232,200,.6);margin-bottom:10px;text-align:center;">父方・母方を選んで次世代を誕生させます</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">父（武官）</div>
+          <div id="father-select"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">母（姫）</div>
+          <div id="mother-select"></div>
+        </div>
+      </div>
+      <div id="bl-preview" style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:12px;margin-bottom:12px;min-height:60px;"></div>
+      <button onclick="doMarriage()" style="width:100%;padding:13px;background:linear-gradient(#8b0000,#5a0000);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">縁を結ぶ 〜 誕生</button>
+    </div>
+    <button onclick="closeBloodlineModal()" style="margin-top:10px;padding:10px;background:rgba(100,60,0,.4);color:var(--parchment);border:1px solid var(--gold-d);border-radius:10px;font-size:13px;cursor:pointer;">閉じる</button>
+  </div>
+</div>
+
+<!-- ══ 武将モーダル ══ -->
+<div id="warrior-modal" class="modal">
+  <div class="modal-content">
+    <div class="wm-close-btn" onclick="closeWarriorModal()">×</div>
+    <div class="wm-name" id="wm-name">─</div>
+    <div class="wm-meta" id="wm-meta">─</div>
+    <div class="wm-status">
+      <div class="wm-stat-item pow" id="wm-pow">武力 ─</div>
+      <div class="wm-stat-item wis" id="wm-wis">知力 ─</div>
+      <div class="wm-stat-item loy" id="wm-loy">忠誠 ─</div>
+    </div>
+    <div class="wm-section-title">所持スキル</div>
+    <div class="wm-skill-block">
+      <div class="wm-skill-list" id="wm-skills">─</div>
+    </div>
+    <div class="wm-section-title">血統 (父 × 母)</div>
+    <div class="wm-bloodline-block">
+      <div class="wm-bloodline-pair" id="wm-bloodline">─</div>
+      <button class="wm-pedigree-btn" onclick="openPedigreeFromModal()">🌳 家系図の系譜を表示</button>
+    </div>
+    <div class="wm-section-title">人間関係</div>
+    <div class="wm-relation-block" id="wm-relations"></div>
+    <button class="wm-back-btn" onclick="closeWarriorModal()">城に戻る</button>
+  </div>
+</div>
+
+<!-- ══ 内政モーダル ══ -->
+<div id="dev-modal" class="modal">
+  <div class="modal-content">
+    <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:14px;font-size:20px;letter-spacing:.15em;">内政 ─ 施設整備</h2>
+    <div id="facilities-list" style="max-height:360px;overflow-y:auto;"></div>
+    <button onclick="closeDevModal()" style="margin-top:16px;width:100%;padding:12px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">閉じる</button>
+  </div>
+</div>
+
+<!-- ══ 歴史モーダル ══ -->
+<div id="history-modal" class="modal">
+  <div class="modal-content" style="max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
+    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;font-size:20px;letter-spacing:.15em;">戦国記録</h2>
+    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;padding-right:4px;"></div>
+    <button onclick="closeHistory()" style="margin-top:14px;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:14px;cursor:pointer;">閉じる</button>
+  </div>
+</div>
+
+<!-- ══ メインレイアウト ══ -->
+<div id="main">
+  <div id="header">
+    <div id="game-title">戦国血脈<span class="sub">〜 覇道の系譜 〜</span></div>
+    <div id="status-panel">
+      <div class="stat-chip"><span class="sl">天下統一</span><span class="sv" id="unification-pct">12</span><span class="su">%</span></div>
+      <div class="stat-chip"><span class="sl">第</span><span class="sv" id="gen-num">1</span><span class="su">世代</span></div>
+    </div>
+  </div>
+  <div id="iso-field">
+    <canvas id="iso-canvas"></canvas>
+    <div id="bubble-layer"></div>
+  </div>
+  <div id="bottom-ui">
+    <div id="nation-bar">
+      <span class="nl">国力</span>
+      <div class="nt"><div class="nf" id="nfill" style="width:42%"></div></div>
+      <span class="np" id="koku-display">4,200</span><span class="nl" style="margin-left:1px">石</span>
+    </div>
+    <div id="party-row"></div>
+    <div id="action-row">
+      <button class="act-btn primary" onclick="openBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
+      <button class="act-btn" onclick="openBloodline()"><span class="ico">🌸</span><span class="lbl">配合</span></button>
+      <button class="act-btn" onclick="showHistory()"><span class="ico">📜</span><span class="lbl">歴史</span></button>
+      <button class="act-btn" onclick="showDev()"><span class="ico">🏯</span><span class="lbl">内政</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════
+   Canvasエンジン
+═══════════════════════════════════════════ */
+const canvas = document.getElementById('iso-canvas');
+const ctx    = canvas.getContext('2d');
+const TILE   = 44;
+const ISO_ANG = Math.PI / 6;
+let CX = 0, CY = 0;
+
+function isoToScreen(tx, ty, tz) {
+  return {
+    x: (tx - ty) * Math.cos(ISO_ANG) * TILE,
+    y: (tx + ty) * Math.sin(ISO_ANG) * TILE - tz * TILE * 0.88
+  };
+}
+function toSX(tx, ty, tz) { return CX + isoToScreen(tx, ty, tz).x; }
+function toSY(tx, ty, tz) { return CY + isoToScreen(tx, ty, tz).y; }
+
+function resizeCanvas() {
+  const f = document.getElementById('iso-field');
+  canvas.width  = f.clientWidth;
+  canvas.height = f.clientHeight;
+  CX = canvas.width  / 2;
+  CY = canvas.height * 0.72;
+}
+
+/* ═══════════════════════════════════════════
+   Canvas 吹き出し
+═══════════════════════════════════════════ */
+let canvasBubbles = [];
+
+function addCanvasBubble(warrior, text, duration = 150) {
+  canvasBubbles = canvasBubbles.filter(b => b.warrior !== warrior);
+  canvasBubbles.push({ warrior, text, life: duration, maxLife: duration, popT: 0 });
+}
+
+function tickCanvasBubbles() {
+  for (let i = canvasBubbles.length - 1; i >= 0; i--) {
+    const b = canvasBubbles[i];
+    b.life--;
+    b.popT = Math.min(1, b.popT + 0.12);
+    if (b.life <= 0) canvasBubbles.splice(i, 1);
+  }
+}
+
+function drawCanvasBubbles() {
+  for (const b of canvasBubbles) {
+    const w = b.warrior;
+    if (!w.visible && w.state !== 'exiting') continue;
+    const H  = Math.round(canvas.height * 0.09);
+    const sx = toSX(w.tileX + 0.5, w.tileY + 0.5, 0.25);
+    const sy = toSY(w.tileX + 0.5, w.tileY + 0.5, 0.25);
+    const fadeRatio = b.life / b.maxLife;
+    const alpha = Math.min(1, fadeRatio * 3) * b.popT;
+    if (alpha <= 0) continue;
+    const scale = 0.6 + 0.4 * b.popT;
+    const bx = sx;
+    const by = sy - H * 1.55;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(bx, by); ctx.scale(scale, scale); ctx.translate(-bx, -by);
+    ctx.font = "bold 12px 'Noto Serif JP', serif";
+    const tw  = ctx.measureText(b.text).width;
+    const pad = 8;
+    const bw  = tw + pad * 2;
+    const bh  = 22;
+    const rx  = bx - bw / 2;
+    const ry  = by - bh / 2;
+    ctx.beginPath();
+    ctx.roundRect(rx, ry, bw, bh, 6);
+    ctx.fillStyle   = 'rgba(245,232,178,0.96)';
+    ctx.fill();
+    ctx.strokeStyle = '#c8960c';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(bx - 5, ry + bh);
+    ctx.lineTo(bx + 5, ry + bh);
+    ctx.lineTo(bx,     ry + bh + 7);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(245,232,178,0.96)';
+    ctx.fill();
+    ctx.strokeStyle = '#c8960c';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+    ctx.fillStyle    = '#2a1800';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.text, bx, by);
+    ctx.restore();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   施設アクティビティ（HTML overlay）
+═══════════════════════════════════════════ */
+const bubbleLayer = document.getElementById('bubble-layer');
+
+function showFacilityActivity(facKey, text, color) {
+  const f  = FACILITY_MAP[facKey];
+  if (!f) return;
+  const sx = toSX(f.x + 0.5, f.y + 0.5, 1.4);
+  const sy = toSY(f.x + 0.5, f.y + 0.5, 1.4);
+  const fR = document.getElementById('iso-field').getBoundingClientRect();
+  const cR = canvas.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className   = 'facility-activity';
+  el.textContent = text;
+  el.style.left  = (cR.left - fR.left + sx) + 'px';
+  el.style.top   = (cR.top  - fR.top  + sy) + 'px';
+  el.style.color = color || '#ffdd88';
+  bubbleLayer.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .5s,transform .5s';
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateX(-50%) translateY(-18px)';
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 520);
+  }, 1800);
+}
+
+/* ═══════════════════════════════════════════
+   施設データ
+═══════════════════════════════════════════ */
+const FACILITY_MAP = {
+  training: { name:'訓練場', icon:'⚔',  x:-3.8, y:-3.2, level:1, type:'power'   },
+  forge:    { name:'鍛冶場', icon:'🔥', x:-0.5, y:-3.8, level:1, type:'power'   },
+  academy:  { name:'学問所', icon:'📖', x: 2.8, y:-3.2, level:1, type:'wisdom'  },
+  tea:      { name:'茶室',   icon:'🍵', x:-3.8, y: 0.2, level:1, type:'social'  },
+  garden:   { name:'庭園',   icon:'🌸', x:-0.5, y: 2.8, level:1, type:'heal'    },
+  loyalty:  { name:'忠誠殿', icon:'🌟', x: 2.8, y: 2.8, level:1, type:'loyalty' },
+};
+const FACILITY_ENTRANCE = {
+  training: { x:-3.2, y:-2.8 }, forge:   { x:-0.2, y:-3.2 }, academy: { x: 2.5, y:-2.8 },
+  tea:      { x:-3.2, y: 0.4 }, garden:  { x:-0.2, y: 2.5 }, loyalty: { x: 2.5, y: 2.5 },
+};
+const FACILITY_EFFECT = {
+  training: { stat:'power',   label:'武力', color:'#ffcc44', range:[4,9]  },
+  forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[3,7]  },
+  academy:  { stat:'wisdom',  label:'知力', color:'#aaddff', range:[4,8]  },
+  tea:      { stat:'loyalty', label:'忠誠', color:'#88ffaa', range:[5,10] },
+  garden:   { stat:'loyalty', label:'回復', color:'#ff88cc', range:[3,6]  },
+  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[6,12] },
+};
+const FACILITY_SPEECH = {
+  training: ['うりゃーっ！','もっと強く！','千本素振り！','気合だ！'],
+  forge:    ['いい刃だ…','熱い…','業物になるぞ','打ち直すか'],
+  academy:  ['ふむふむ…','なるほど！','兵法書か','これは深い'],
+  tea:      ['心が安らぐ…','一服どうぞ','静かじゃ','よい茶だ'],
+  garden:   ['美しい…','心洗われる','花が咲いた','英気を養う'],
+  loyalty:  ['お館様の御為に！','命を捧げん','忠義を尽くす'],
+};
+const COST_BASE = { training:450, forge:380, academy:520, tea:310, garden:280, loyalty:680 };
+
+/* 武将スキルテーブル */
+const SKILL_TABLE = {
+  bukan:  [['武者震い','一騎討ち','突撃','馬術'],['槍術','剣術','弓術']],
+  hime:   [['外交術','和歌','茶道'],['占い','祈祷']],
+  bunkan: [['謀略','算術','建築'],['外交術','和歌','兵法']],
+};
+
+function getSkills(jobId, power, wisdom) {
+  const table = SKILL_TABLE[jobId] || SKILL_TABLE.bukan;
+  const result = [];
+  const primary   = table[0];
+  const secondary = table[1] || [];
+  result.push(primary[Math.floor((power  / 30)) % primary.length] || primary[0]);
+  if (wisdom > 60) result.push(secondary[0] || '─');
+  if (wisdom > 80) result.push(secondary[1] || '─');
+  return result.length ? result : ['─'];
+}
+
+/* ═══════════════════════════════════════════
+   ゲーム状態
+═══════════════════════════════════════════ */
+let state    = { unification:12, genNum:1, koku:4200 };
+let gameTime = { year:1, month:1, day:1 };
+let gameLog  = [];
+
+function updateTime() {
+  if (++gameTime.day > 30)  { gameTime.day = 1; gameTime.month++; }
+  if (gameTime.month > 12)  { gameTime.month = 1; gameTime.year++; }
+  document.getElementById('time-display').textContent =
+    `第${gameTime.year}年 ${gameTime.month}月 ${gameTime.day}日`;
+}
+
+function addLog(text, type = 'normal') {
+  gameLog.push({ text, type, time: `${gameTime.year}年${gameTime.month}月` });
+  if (gameLog.length > 60) gameLog.shift();
+}
+
+/* ═══════════════════════════════════════════
+   関係システム
+═══════════════════════════════════════════ */
+let relations = {};
+
+function initRelations(ws) {
+  relations = {};
+  ws.forEach((_, i) => ws.forEach((_, j) => {
+    if (i === j) return;
+    const k = relKey(i, j);
+    if (relations[k] === undefined)
+      relations[k] = Math.floor(-20 + Math.random() * 60);
+  }));
+}
+
+function relKey(i, j) { return i < j ? `${i}_${j}` : `${j}_${i}`; }
+function getRel(i, j)  { return relations[relKey(i, j)] ?? 0; }
+function changeRel(i, j, d) {
+  const k = relKey(i, j);
+  relations[k] = Math.max(-100, Math.min(100, (relations[k] ?? 0) + d));
+}
+function relLabel(v) {
+  if (v >= 70) return '莫逆の友'; if (v >= 40) return '友好';
+  if (v >= 10) return '普通';     if (v >= -20) return 'やや対立';
+  if (v >= -50) return '反目';    return '宿敵';
+}
+function relColor(v) {
+  if (v >= 40)  return '#88ffaa'; if (v >= 10) return '#aaddff';
+  if (v >= -20) return '#ffdd88'; return '#ff8888';
+}
+
+/* ═══════════════════════════════════════════
+   セリフ
+═══════════════════════════════════════════ */
+const SPEECHES = {
+  bukan:  { idle:['参れ！','うぬ…','天下一！','鍛えねば'],           train:['武を磨く！','訓練だ！'],        highLoyalty:['この命、殿に！'],    lowLoyalty:['うぬ…','不満じゃ'],   friendly:['頼もしい奴だ'],   rival:['邪魔するな！'],   levelUp:['成長したぞ！'] },
+  hime:   { idle:['桜よ散れ','風が優しい','月が綺麗'],               train:['心を鎮めよう'],                  highLoyalty:['ずっとそばに'],      lowLoyalty:['悲しい…'],           friendly:['仲良くしましょ'], rival:['困った方ね…'],    levelUp:['また強くなった♪'] },
+  bunkan: { idle:['謀略が要る','算段通り'],                          train:['書を読まねば'],                  highLoyalty:['殿の御為に'],        lowLoyalty:['再考の余地あり'],    friendly:['良い判断だ'],     rival:['浅慮な輩め'],     levelUp:['知を極めた'] },
+};
+function getSpeech(w, sit) {
+  const p = SPEECHES[w.jobId] || SPEECHES.bukan;
+  const a = p[sit] || p.idle;
+  return a[Math.floor(Math.random() * a.length)];
+}
+
+/* ═══════════════════════════════════════════
+   浮遊テキスト（canvas）
+═══════════════════════════════════════════ */
+let floatingTexts = [];
+
+function createFloatText(warrior, text, color) {
+  if (!warrior) return;
+  floatingTexts.push({
+    sx:    toSX(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2) + (Math.random() * 24 - 12),
+    sy:    toSY(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2) - 20,
+    text,
+    color: color || '#ffdd88',
+    vy:    -1.4 - Math.random() * 0.7,
+    life:  60,
+    alpha: 1,
+  });
+}
+
+function drawFloatingTexts() {
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const f = floatingTexts[i];
+    f.sy   += f.vy;
+    f.vy   *= 0.975;
+    f.life--;
+    f.alpha = (f.life / 60) * 0.9;
+    if (f.life <= 0) { floatingTexts.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha  = f.alpha;
+    ctx.shadowColor  = '#000';
+    ctx.shadowBlur   = 8;
+    ctx.font         = `bold ${Math.round(16 + f.life / 10)}px 'Noto Serif JP',serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = f.color;
+    ctx.fillText(f.text, f.sx, f.sy);
+    ctx.restore();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   描画プリミティブ
+═══════════════════════════════════════════ */
+function drawBox(tx, ty, tz, w, d, h, cT, cL, cR2) {
+  const p = (x, y, z) => [toSX(x, y, z), toSY(x, y, z)];
+  const [ax,ay] = p(tx,ty,tz+h),     [bx,by] = p(tx+w,ty,tz+h);
+  const [cx,cy] = p(tx+w,ty+d,tz+h), [dx,dy] = p(tx,ty+d,tz+h);
+  const [ex,ey] = p(tx,ty,tz),       [fx,fy] = p(tx+w,ty,tz);
+  const [gx,gy] = p(tx+w,ty+d,tz),   [hx,hy] = p(tx,ty+d,tz);
+  const face = (pts, fill) => {
+    ctx.beginPath();
+    pts.forEach(([px,py], i) => i ? ctx.lineTo(px,py) : ctx.moveTo(px,py));
+    ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.32)'; ctx.lineWidth = 0.5; ctx.stroke();
+  };
+  face([[ax,ay],[bx,by],[cx,cy],[dx,dy]], cT);
+  face([[ax,ay],[ex,ey],[hx,hy],[dx,dy]], cL);
+  face([[bx,by],[fx,fy],[gx,gy],[cx,cy]], cR2);
+}
+
+function drawRoof(tx, ty, tz, w, d, rh, c1, c2) {
+  const p  = (x, y, z) => [toSX(x, y, z), toSY(x, y, z)];
+  const mx = tx + w / 2, my = ty + d / 2;
+  const [ax,ay] = p(tx,ty,tz),       [bx,by] = p(tx+w,ty,tz);
+  const [cx,cy] = p(tx+w,ty+d,tz),   [dx,dy] = p(tx,ty+d,tz);
+  const [px2,py2] = p(mx, my, tz+rh);
+  [[ax,ay,px2,py2,dx,dy,c2],[bx,by,px2,py2,cx,cy,c1],
+   [ax,ay,bx,by,px2,py2,c2],[dx,dy,cx,cy,px2,py2,c1]].forEach(([x1,y1,x2,y2,x3,y3,c]) => {
+    ctx.beginPath();
+    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3);
+    ctx.closePath();
+    ctx.fillStyle = c; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.32)'; ctx.lineWidth = 0.5; ctx.stroke();
+  });
+}
+
+function drawFlag(tx, ty, tz, t) {
+  const bx = toSX(tx,ty,tz),   by = toSY(tx,ty,tz);
+  const tx2 = toSX(tx,ty,tz+0.9), ty2 = toSY(tx,ty,tz+0.9);
+  ctx.strokeStyle = '#c8960c'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(tx2,ty2); ctx.stroke();
+  const wave = Math.sin(t * 0.07) * 4;
+  ctx.fillStyle = '#8b0000';
+  ctx.beginPath();
+  ctx.moveTo(tx2, ty2); ctx.lineTo(tx2+14+wave, ty2+6); ctx.lineTo(tx2+12, ty2+13);
+  ctx.closePath(); ctx.fill();
+}
+
+/* ═══════════════════════════════════════════
+   施設描画
+═══════════════════════════════════════════ */
+function drawFacilities(tick) {
+  Object.entries(FACILITY_MAP).forEach(([key, f]) => {
+    drawFacility(key, f, tick);
+    if (gWarriors.some(w => w.insideFacility === key)) drawGlow(f.x+0.5, f.y+0.5, tick);
+  });
+}
+
+function drawGlow(cx, cy, tick) {
+  const r = 10 + 4 * Math.sin(tick * 0.1);
+  ctx.save();
+  ctx.globalAlpha = 0.35 + 0.12 * Math.sin(tick * 0.1);
+  ctx.beginPath();
+  ctx.arc(toSX(cx,cy,0.4), toSY(cx,cy,0.4), r, 0, Math.PI*2);
+  ctx.fillStyle = '#ffd700'; ctx.fill();
+  ctx.restore();
+}
+
+function drawFacility(key, f, tick) {
+  const { x, y, level: lv } = f;
+  if (key === 'training') {
+    drawBox(x-.45,y-.45,.25,.9,.9,.6+lv*.15,'#7a3a1e','#4a2010','#5a2e12');
+    drawRoof(x-.55,y-.55,.85+lv*.15,1.1,1.1,.38,'#2a1208','#100600');
+    if (lv >= 2) drawFlag(x, y, .85+lv*.15+.35, tick);
+  }
+  if (key === 'forge') {
+    drawBox(x-.38,y-.38,.25,.76,.76,.65,'#505040','#303028','#404038');
+    drawRoof(x-.45,y-.45,.9,.9,.9,.28,'#252520','#121210');
+    for (let i = 0; i < lv+1; i++) {
+      const t = (tick*.02 + i*.7) % 1;
+      ctx.save(); ctx.globalAlpha = .22*(1-t);
+      ctx.beginPath();
+      ctx.arc(toSX(x+.3,y+.3,.95+t*.6), toSY(x+.3,y+.3,.95+t*.6), 4+t*8, 0, Math.PI*2);
+      ctx.fillStyle = '#cccccc'; ctx.fill(); ctx.restore();
+    }
+  }
+  if (key === 'academy') {
+    drawBox(x-.45,y-.45,.25,.9,.9,.75,'#3a3a5a','#202040','#2a2a48');
+    drawRoof(x-.55,y-.55,1,1.1,1.1,.38,'#1a1a30','#0a0a1a');
+    if (lv >= 2) {
+      ctx.fillStyle = '#ffddaa';
+      ctx.beginPath();
+      ctx.roundRect(toSX(x+.5,y+.5,1.1)-7, toSY(x+.5,y+.5,1.1), 14, 4, 1);
+      ctx.fill();
+    }
+  }
+  if (key === 'tea') {
+    drawBox(x-.38,y-.38,.2,.76,.76,.38,'#7a5030','#4a3018','#5a3c20');
+    drawRoof(x-.45,y-.45,.58,.9,.9,.28,'#3a2010','#1a0e08');
+    for (let i = 0; i < 2; i++) {
+      const t = (tick*.018 + i*.5) % 1;
+      ctx.save(); ctx.globalAlpha = .18*(1-t);
+      ctx.beginPath();
+      ctx.arc(toSX(x+.3+i*.2,y+.3,.75+t*.5), toSY(x+.3+i*.2,y+.3,.75+t*.5), 3+t*6, 0, Math.PI*2);
+      ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.restore();
+    }
+  }
+  if (key === 'garden') {
+    drawBox(x-.45,y-.45,.2,.9,.9,.1,'#2a5a1a','#183a10','#204a14');
+    [{ox:-.15,oy:-.1},{ox:.3,oy:.1},{ox:0,oy:.3}].slice(0, Math.min(lv+1,3)).forEach((t, i) => {
+      const sw = Math.sin(tick*.015 + i*1.2) * .012;
+      drawBox(x+t.ox+sw, y+t.oy, .3, .2,.2,.35,'#3a6a22','#244a14','#2e5a1a');
+    });
+  }
+  if (key === 'loyalty') {
+    drawBox(x-.45,y-.45,.25,.9,.9,.65,'#8a2828','#501818','#6a2020');
+    drawRoof(x-.55,y-.55,.9,1.1,1.1,.38,'#400808','#1e0404');
+    const pulse = .2 + .12*Math.sin(tick*.06);
+    ctx.save(); ctx.globalAlpha = pulse;
+    ctx.beginPath();
+    ctx.arc(toSX(x+.5,y+.5,1.1), toSY(x+.5,y+.5,1.1), 10+lv*3, 0, Math.PI*2);
+    ctx.fillStyle = '#ffcc44'; ctx.fill(); ctx.restore();
+  }
+  ctx.font         = `bold ${Math.round(canvas.width*.023)}px 'Noto Serif JP',serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle    = 'rgba(240,192,64,.82)';
+  ctx.shadowColor  = '#000';
+  ctx.shadowBlur   = 5;
+  ctx.fillText(f.name + ' Lv' + lv, toSX(x+.5,y+.5,1.15), toSY(x+.5,y+.5,1.15));
+  ctx.shadowBlur   = 0;
+}
+
+/* ═══════════════════════════════════════════
+   地形
+═══════════════════════════════════════════ */
+const TERRAIN = [];
+function buildTerrain() {
+  TERRAIN.length = 0;
+  for (let r = 0; r < 10; r++) for (let c = 0; c < 10; c++) {
+    const cx = c - 4.5, ry = r - 4.5;
+    const dist = Math.sqrt(cx*cx + ry*ry);
+    TERRAIN.push({ c, r, type: dist < 4 ? 'stone' : 'grass' });
+  }
+}
+
+/* ═══════════════════════════════════════════
+   血統システム
+═══════════════════════════════════════════ */
+class Clan {
+  constructor(name) { this.name = name; }
+}
+
+class Busho {
+  constructor(name, clan, father = null, mother = null) {
+    this.name   = name;
+    this.clan   = clan;
+    this.father = father;
+    this.mother = mother;
+  }
+
+  getBloodline(generation = 1) {
+    if (generation > 3) return null;
+    const info = { name: this.name, clan: this.clan.name };
+    if (this.father || this.mother) {
+      info.father = this.father ? this.father.getBloodline(generation + 1) : null;
+      info.mother = this.mother ? this.mother.getBloodline(generation + 1) : null;
+    }
+    return info;
+  }
+
+  _collectClans(node, out = []) {
+    if (!node) return out;
+    out.push(node.clan);
+    if (node.father) this._collectClans(node.father, out);
+    if (node.mother) this._collectClans(node.mother, out);
+    return out;
+  }
+
+  pureScore() {
+    const clans = this._collectClans(this.getBloodline());
+    if (!clans.length) return 0;
+    const freq = {};
+    clans.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+    return Math.max(...Object.values(freq)) / clans.length;
+  }
+
+  mixScore() {
+    const clans = this._collectClans(this.getBloodline());
+    if (!clans.length) return 0;
+    const unique = new Set(clans).size;
+    return Math.min(1, (unique - 1) / Math.max(1, clans.length - 1));
+  }
+
+  calcBonus() {
+    const pure = this.pureScore();
+    const mix  = this.mixScore();
+    return {
+      pure,
+      mix,
+      power:    Math.floor(pure * 18),
+      loyalty:  Math.floor(pure * 12),
+      wisdom:   Math.floor(mix  * 16),
+      facility: Math.floor(mix  * 0.3 * 100) / 100,
+      battle:   Math.floor((pure * 0.6 + mix * 0.4) * 20),
+      type:     pure >= 0.75 ? '純血' : mix >= 0.5 ? '混血' : '標準',
+    };
+  }
+}
+
+/* 家名定義 */
+const CLANS = {
+  oda:      new Clan('織田家'),
+  saito:    new Clan('齋藤家'),
+  azai:     new Clan('浅井家'),
+  takeda:   new Clan('武田家'),
+  uesugi:   new Clan('上杉家'),
+  mouri:    new Clan('毛利家'),
+  tokugawa: new Clan('徳川家'),
+};
+
+const CLAN_COLORS = {
+  '織田家':'#ff8888','齋藤家':'#88aaff','浅井家':'#88ffaa',
+  '武田家':'#ffaa44','上杉家':'#dd88ff','毛利家':'#44dddd','徳川家':'#ffdd44'
+};
+function clanColor(name) { return CLAN_COLORS[name] || '#ffcc88'; }
+
+const warriorBushoMap = new WeakMap();
+function getBusho(warrior) { return warriorBushoMap.get(warrior) || null; }
+function setBusho(warrior, busho) { warriorBushoMap.set(warrior, busho); }
+
+function applyBloodlineBonus(warrior) {
+  const busho = getBusho(warrior);
+  if (!busho) return;
+  const bonus = busho.calcBonus();
+  warrior.bloodlineBonus = bonus;
+  if (!warrior._bloodlineApplied) {
+    warrior._bloodlineApplied = true;
+    warrior.stats.power   += bonus.power;
+    warrior.stats.loyalty  = Math.min(100, warrior.stats.loyalty + bonus.loyalty);
+    warrior.stats.wisdom   = Math.min(99,  warrior.stats.wisdom  + bonus.wisdom);
+    if (bonus.power > 0 || bonus.wisdom > 0 || bonus.loyalty > 0) {
+      createFloatText(warrior, `血統 +${bonus.power + bonus.wisdom + bonus.loyalty}`, '#ffcc88');
+      addLog(`${warrior.name}の血統ボーナス発動！（${bonus.type}）`, 'success');
+    }
+  }
+}
+
+function bloodlineFacilityMul(warrior) {
+  return warrior.bloodlineBonus ? 1 + warrior.bloodlineBonus.facility : 1;
+}
+
+function bloodlineBattleBonus() {
+  return gWarriors.reduce((s, w) => s + (w.bloodlineBonus ? w.bloodlineBonus.battle : 0), 0);
+}
+
+/* ═══════════════════════════════════════════
+   家系図モーダル（新UI）
+═══════════════════════════════════════════ */
+window.openPedigreeModal = function(warrior) {
+  const busho  = getBusho(warrior);
+  const bl     = busho ? busho.getBloodline() : null;
+  const bonus  = busho ? busho.calcBonus() : null;
+  const ROLES  = { bukan:'武官', hime:'姫', bunkan:'文官' };
+
+  // サブタイトル
+  document.getElementById('pg-warrior-sub').textContent =
+    `${ROLES[warrior.jobId] || '武将'} ／ ${warrior.name}の家系`;
+
+  // ── ボーナスカード ──
+  const badgeColors = {
+    '純血': { fg:'#ffaaaa', bg:'rgba(255,80,80,.15)', border:'rgba(255,100,100,.4)' },
+    '混血': { fg:'#aaddff', bg:'rgba(80,160,255,.15)', border:'rgba(100,160,255,.4)' },
+    '標準': { fg:'#ffdd88', bg:'rgba(200,150,12,.12)', border:'rgba(200,150,12,.35)' },
+  };
+  const bc = bonus ? (badgeColors[bonus.type] || badgeColors['標準']) : badgeColors['標準'];
+
+  document.getElementById('pg-bonus-card').innerHTML = bonus ? `
+    <div class="pg-bonus-warrior">${warrior.name}</div>
+    <div class="pg-bonus-badge" style="color:${bc.fg};background:${bc.bg};border-color:${bc.border};">
+      ${bonus.type === '純血' ? '🔴' : bonus.type === '混血' ? '🔵' : '⭐'} ${bonus.type}の血脈
+    </div>
+    <div class="pg-bonus-grid">
+      <div class="pg-bonus-item">
+        <div class="pbi-val" style="color:#ffcc66;">+${bonus.power}</div>
+        <div class="pbi-lbl">⚔ 武力</div>
+      </div>
+      <div class="pg-bonus-item">
+        <div class="pbi-val" style="color:#88ff88;">+${bonus.loyalty}</div>
+        <div class="pbi-lbl">💚 忠誠</div>
+      </div>
+      <div class="pg-bonus-item">
+        <div class="pbi-val" style="color:#aaddff;">+${bonus.wisdom}</div>
+        <div class="pbi-lbl">📖 知力</div>
+      </div>
+    </div>
+    <div class="pg-bonus-battle">
+      <span style="color:rgba(245,232,200,.6);">⚔ 合戦ボーナス</span>
+      <span class="pbb-val">+${bonus.battle}%</span>
+    </div>
+  ` : `<div style="color:rgba(245,232,200,.4);text-align:center;padding:10px;">血統情報なし</div>`;
+
+  // ── 家系図ツリー ──
+  const treeEl = document.getElementById('pg-tree-body');
+  if (!bl) {
+    treeEl.innerHTML = '<div style="color:rgba(245,232,200,.35);text-align:center;padding:20px 0;">血統記録なし</div>';
+  } else {
+    treeEl.innerHTML = buildPgTree(bl, warrior, bonus);
+  }
+
+  // ── 血統メーター ──
+  const meterEl = document.getElementById('pg-meter-wrap');
+  if (bonus) {
+    const pureW  = Math.round(bonus.pure * 100);
+    const mixW   = Math.round(bonus.mix  * 100);
+    const battleW = Math.min(100, bonus.battle * 5);
+    meterEl.innerHTML = `
+      <div class="pg-meter-title">── 血統分析 ──</div>
+      <div class="pg-meter-row">
+        <div class="pg-meter-lbl">純血度</div>
+        <div class="pg-meter-bar">
+          <div class="pg-meter-fill" style="width:${pureW}%;background:linear-gradient(90deg,#8b0000,#ffaaaa);"></div>
+        </div>
+        <div class="pg-meter-val" style="color:#ffaaaa;">${pureW}%</div>
+      </div>
+      <div class="pg-meter-row">
+        <div class="pg-meter-lbl">混血度</div>
+        <div class="pg-meter-bar">
+          <div class="pg-meter-fill" style="width:${mixW}%;background:linear-gradient(90deg,#1a3a8b,#aaddff);"></div>
+        </div>
+        <div class="pg-meter-val" style="color:#aaddff;">${mixW}%</div>
+      </div>
+      <div class="pg-meter-row">
+        <div class="pg-meter-lbl">合戦力</div>
+        <div class="pg-meter-bar">
+          <div class="pg-meter-fill" style="width:${battleW}%;background:linear-gradient(90deg,#5a1a00,#ffcc44);"></div>
+        </div>
+        <div class="pg-meter-val" style="color:#ffcc44;">+${bonus.battle}%</div>
+      </div>
+    `;
+  } else {
+    meterEl.innerHTML = '';
+  }
+
+  const modal = document.getElementById('pedigree-modal');
+  modal.classList.add('show');
+  modal.scrollTop = 0;
+};
+
+function buildPgTree(bl, warrior, bonus) {
+  const selfClan = bl.clan;
+  const selfColor = clanColor(selfClan);
+  const ROLES = { bukan:'武官', hime:'姫', bunkan:'文官' };
+
+  // 本人ノード
+  const selfNode = `
+    <div class="pgn">
+      <div class="pgn-box self" style="border-color:${selfColor};box-shadow:0 0 18px ${selfColor}40;">
+        <div class="pgn-name">${bl.name}</div>
+        <div class="pgn-clan" style="color:${selfColor};">${selfClan}</div>
+        <div class="pgn-role">${ROLES[warrior.jobId] || '武将'}</div>
+      </div>
+    </div>`;
+
+  if (!bl.father && !bl.mother) {
+    return selfNode + `
+      <div style="margin-top:16px;color:rgba(245,232,200,.3);font-size:12px;text-align:center;">
+        ─ 祖先の記録なし ─
+      </div>`;
+  }
+
+  // 縦線
+  const vlineDown = (h=20) => `<div class="pg-vline" style="height:${h}px;margin:0 auto;"></div>`;
+
+  // 親ノード生成
+  function parentNode(node, side) {
+    if (!node) return `
+      <div class="pgn-box unknown" style="margin:0 auto;">
+        <div class="pgn-name">不明</div>
+        <div class="pgn-clan" style="color:rgba(200,150,12,.3);">─</div>
+      </div>`;
+    const cc = clanColor(node.clan);
+    return `
+      <div class="pgn-box parent" style="border-color:${cc}60;margin:0 auto;">
+        <div class="pgn-name">${node.name}</div>
+        <div class="pgn-clan" style="color:${cc};">${node.clan}</div>
+        <div class="pgn-role">${side === 'father' ? '父' : '母'}</div>
+      </div>`;
+  }
+
+  // 祖父母ノード生成
+  function grandNode(node, label) {
+    if (!node) return `
+      <div class="pgn-box grand unknown" style="margin:0 auto;opacity:.35;">
+        <div class="pgn-name" style="font-size:10px;">不明</div>
+      </div>`;
+    const cc = clanColor(node.clan);
+    return `
+      <div class="pgn-box grand" style="border-color:${cc}50;margin:0 auto;">
+        <div class="pgn-name">${node.name}</div>
+        <div class="pgn-clan" style="color:${cc};font-size:8px;">${node.clan}</div>
+        <div class="pgn-role">${label}</div>
+      </div>`;
+  }
+
+  const fNode = bl.father;
+  const mNode = bl.mother;
+
+  // 祖父母行（父方）
+  const ffGrand = fNode?.father ? grandNode(fNode.father, '父方祖父') : grandNode(null,'');
+  const fmGrand = fNode?.mother ? grandNode(fNode.mother, '父方祖母') : grandNode(null,'');
+  const mfGrand = mNode?.father ? grandNode(mNode.father, '母方祖父') : grandNode(null,'');
+  const mmGrand = mNode?.mother ? grandNode(mNode.mother, '母方祖母') : grandNode(null,'');
+
+  const showGrandFather = fNode && (fNode.father || fNode.mother);
+  const showGrandMother = mNode && (mNode.father || mNode.mother);
+
+  let grandRowHtml = '';
+  if (showGrandFather || showGrandMother) {
+    grandRowHtml = `
+      <div class="pg-grand-row" style="width:100%;margin-bottom:4px;">
+        <div class="pg-grand-col">
+          ${showGrandFather ? `
+            <div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;letter-spacing:.1em;">父方の家</div>
+            <div style="display:flex;gap:6px;width:100%;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                ${ffGrand}
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                ${fmGrand}
+              </div>
+            </div>
+          ` : '<div style="flex:1;"></div>'}
+        </div>
+        <div style="width:12px;flex-shrink:0;"></div>
+        <div class="pg-grand-col">
+          ${showGrandMother ? `
+            <div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;letter-spacing:.1em;">母方の家</div>
+            <div style="display:flex;gap:6px;width:100%;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                ${mfGrand}
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                ${mmGrand}
+              </div>
+            </div>
+          ` : '<div style="flex:1;"></div>'}
+        </div>
+      </div>
+      <div class="pg-hline" style="width:80%;margin:0 auto 0;"></div>
+      ${vlineDown(10)}
+    `;
+  }
+
+  return `
+    ${selfNode}
+    ${vlineDown(16)}
+    <div class="pg-hline" style="width:70%;margin:0 auto;"></div>
+    <div class="pg-parent-row" style="margin-top:0;width:100%;">
+      <div class="pg-parent-col">
+        ${vlineDown(10)}
+        ${parentNode(fNode,'father')}
+      </div>
+      <div class="pg-parent-divider"></div>
+      <div class="pg-parent-col">
+        ${vlineDown(10)}
+        ${parentNode(mNode,'mother')}
+      </div>
+    </div>
+    ${grandRowHtml ? vlineDown(14) + grandRowHtml : ''}
+  `;
+}
+
+window.closePedigreeModal = function() {
+  document.getElementById('pedigree-modal').classList.remove('show');
+};
+
+/* ═══════════════════════════════════════════
+   血統モーダル UI
+═══════════════════════════════════════════ */
+let blSelectedWarrior = null;
+let blFatherIdx = 0;
+let blMotherIdx = 0;
+
+window.openBloodline = function () {
+  document.getElementById('bloodline-modal').style.display = 'flex';
+  blTab('tree');
+};
+window.closeBloodlineModal = function () {
+  document.getElementById('bloodline-modal').style.display = 'none';
+};
+
+window.blTab = function (tab) {
+  document.getElementById('bl-panel-tree').style.display  = tab === 'tree'  ? '' : 'none';
+  document.getElementById('bl-panel-marry').style.display = tab === 'marry' ? '' : 'none';
+  document.getElementById('bl-tab-tree').style.background  = tab === 'tree'  ? 'rgba(200,150,12,.2)' : 'transparent';
+  document.getElementById('bl-tab-marry').style.background = tab === 'marry' ? 'rgba(200,150,12,.2)' : 'transparent';
+  document.getElementById('bl-tab-tree').style.color  = tab === 'tree'  ? 'var(--gold-l)' : 'var(--parchment)';
+  document.getElementById('bl-tab-marry').style.color = tab === 'marry' ? 'var(--gold-l)' : 'var(--parchment)';
+  if (tab === 'tree')  renderBloodlineTree();
+  if (tab === 'marry') renderMarriagePanel();
+};
+
+function renderBloodlineTree() {
+  const sel = document.getElementById('bl-warrior-select');
+  if (!blSelectedWarrior && gWarriors.length) blSelectedWarrior = gWarriors[0];
+  sel.innerHTML = gWarriors.map((w, i) => `
+    <button onclick="blSelectWarrior(${i})"
+      style="padding:5px 10px;border-radius:6px;
+             border:1px solid ${blSelectedWarrior === w ? 'var(--gold)' : 'rgba(200,150,12,.3)'};
+             background:${blSelectedWarrior === w ? 'rgba(200,150,12,.2)' : 'transparent'};
+             color:var(--parchment);cursor:pointer;font-family:inherit;font-size:11px;">
+      ${w.name}
+    </button>`).join('');
+  renderTreeView(blSelectedWarrior);
+}
+
+window.blSelectWarrior = function (i) {
+  blSelectedWarrior = gWarriors[i];
+  renderBloodlineTree();
+};
+
+function renderTreeView(warrior) {
+  const view = document.getElementById('bl-tree-view');
+  if (!warrior) return;
+  const busho = getBusho(warrior);
+  if (!busho) { view.innerHTML = '<div style="color:rgba(245,232,200,.4);text-align:center;padding:20px;">血統情報なし</div>'; return; }
+  const bl    = busho.getBloodline();
+  const bonus = busho.calcBonus();
+  const badgeColor = bonus.type === '純血' ? '#ffaaaa' : bonus.type === '混血' ? '#aaddff' : '#ffdd88';
+  const badgeBg    = bonus.type === '純血' ? 'rgba(255,80,80,.2)' : bonus.type === '混血' ? 'rgba(80,160,255,.2)' : 'rgba(200,150,12,.2)';
+  view.innerHTML = `
+    <div style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:14px;font-weight:700;">${warrior.name}</span>
+        <span style="background:${badgeBg};color:${badgeColor};border:1px solid ${badgeColor};border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">${bonus.type}</span>
+        <span style="font-size:10px;color:var(--gold-d);">純血${Math.round(bonus.pure*100)}% / 混血${Math.round(bonus.mix*100)}%</span>
+      </div>
+      <div class="bt-bonus-row">
+        <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">⚔ 武力+${bonus.power}</span>
+        <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">🌸 忠誠+${bonus.loyalty}</span>
+        <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">📖 知力+${bonus.wisdom}</span>
+        <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">🏯 施設×${(1 + bonus.facility).toFixed(2)}</span>
+        <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">⚔合戦+${bonus.battle}%</span>
+      </div>
+    </div>
+    ${renderTreeNode(bl, 1)}`;
+}
+
+function renderTreeNode(node, gen) {
+  if (!node) return `<div class="bt-node gen${Math.min(gen,3)}" style="opacity:.35;"><span class="bn">不明</span></div>`;
+  const cc = clanColor(node.clan);
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+      <div class="bt-node gen${Math.min(gen,3)}" style="border-color:${cc}40;">
+        <div class="bn">${node.name}</div>
+        <div class="bc-name" style="color:${cc};">${node.clan}</div>
+      </div>
+      ${(node.father || node.mother) && gen < 3 ? `
+        <div style="width:1px;height:10px;background:rgba(200,150,12,.3);"></div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:9px;color:var(--gold-d);">父</div>${renderTreeNode(node.father, gen+1)}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div style="font-size:9px;color:var(--gold-d);">母</div>${renderTreeNode(node.mother, gen+1)}
+          </div>
+        </div>` : ''}
+    </div>`;
+}
+
+function renderMarriagePanel() {
+  const fathers = gWarriors.filter(w => w.jobId !== 'hime');
+  const mothers = gWarriors.filter(w => w.jobId === 'hime');
+  const extFathers = [
+    { name:'武田 信玄', clan: CLANS.takeda, jobId:'bukan' },
+    { name:'上杉 謙信', clan: CLANS.uesugi, jobId:'bukan' },
+    { name:'毛利 元就', clan: CLANS.mouri,  jobId:'bukan' },
+  ];
+  const extMothers = [
+    { name:'濃姫',    clan: CLANS.saito,    jobId:'hime' },
+    { name:'お江',   clan: CLANS.azai,     jobId:'hime' },
+    { name:'築山殿', clan: CLANS.tokugawa, jobId:'hime' },
+  ];
+  const allFathers = [...fathers.map(w => ({ w, ext:false })), ...extFathers.map(w => ({ w, ext:true }))];
+  const allMothers = [...mothers.map(w => ({ w, ext:false })), ...extMothers.map(w => ({ w, ext:true }))];
+
+  if (blFatherIdx >= allFathers.length) blFatherIdx = 0;
+  if (blMotherIdx >= allMothers.length) blMotherIdx = 0;
+
+  document.getElementById('father-select').innerHTML = allFathers.map((item, i) => {
+    const clanName = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name || '織田家');
+    return `<div onclick="blPickFather(${i})"
+      style="padding:7px 10px;border-radius:7px;cursor:pointer;margin-bottom:5px;font-size:12px;
+             border:1px solid ${blFatherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
+             background:${blFatherIdx===i?'rgba(200,150,12,.12)':'transparent'};">
+      <span style="font-weight:700;">${item.w.name}</span>
+      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${clanName}</span>
+      ${item.ext ? '<span style="font-size:9px;color:#ffaa44;margin-left:4px;">外</span>' : ''}
+    </div>`;
+  }).join('');
+
+  document.getElementById('mother-select').innerHTML = allMothers.map((item, i) => {
+    const clanName = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name || '齋藤家');
+    return `<div onclick="blPickMother(${i})"
+      style="padding:7px 10px;border-radius:7px;cursor:pointer;margin-bottom:5px;font-size:12px;
+             border:1px solid ${blMotherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
+             background:${blMotherIdx===i?'rgba(200,150,12,.12)':'transparent'};">
+      <span style="font-weight:700;">${item.w.name}</span>
+      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${clanName}</span>
+      ${item.ext ? '<span style="font-size:9px;color:#ffaa44;margin-left:4px;">外</span>' : ''}
+    </div>`;
+  }).join('');
+
+  window._allFathers = allFathers;
+  window._allMothers = allMothers;
+  updateMarriagePreview();
+}
+
+window.blPickFather = function (i) { blFatherIdx = i; renderMarriagePanel(); };
+window.blPickMother = function (i) { blMotherIdx = i; renderMarriagePanel(); };
+
+function updateMarriagePreview() {
+  const prev = document.getElementById('bl-preview');
+  const fa   = window._allFathers?.[blFatherIdx];
+  const mo   = window._allMothers?.[blMotherIdx];
+  if (!fa || !mo) {
+    prev.innerHTML = '<div style="color:rgba(245,232,200,.4);text-align:center;">父と母を選んでください</div>';
+    return;
+  }
+  const fClan  = fa.ext ? fa.w.clan : (getBusho(fa.w)?.clan || CLANS.oda);
+  const mClan  = mo.ext ? mo.w.clan : (getBusho(mo.w)?.clan || CLANS.saito);
+  const fBusho = fa.ext ? new Busho(fa.w.name, fClan) : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
+  const mBusho = mo.ext ? new Busho(mo.w.name, mClan) : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
+  const childBusho = new Busho('（生まれる子）', fClan, fBusho, mBusho);
+  const bonus      = childBusho.calcBonus();
+  const badgeColor = bonus.type === '純血' ? '#ffaaaa' : bonus.type === '混血' ? '#aaddff' : '#ffdd88';
+  prev.innerHTML = `
+    <div style="font-size:12px;margin-bottom:6px;color:var(--gold-l);">
+      ${fa.w.name} × ${mo.w.name} の子
+      <span style="color:${badgeColor};margin-left:6px;font-size:10px;">${bonus.type}の血脈</span>
+    </div>
+    <div style="font-size:10px;color:rgba(245,232,200,.55);margin-bottom:6px;">
+      純血度 ${Math.round(bonus.pure*100)}% ／ 混血度 ${Math.round(bonus.mix*100)}%
+    </div>
+    <div class="bt-bonus-row">
+      <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">⚔ 武力+${bonus.power}</span>
+      <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">🌸 忠誠+${bonus.loyalty}</span>
+      <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">📖 知力+${bonus.wisdom}</span>
+      <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">🏯 施設×${(1+bonus.facility).toFixed(2)}</span>
+      <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">⚔合戦+${bonus.battle}%</span>
+    </div>`;
+}
+
+window.doMarriage = function () {
+  const fa = window._allFathers?.[blFatherIdx];
+  const mo = window._allMothers?.[blMotherIdx];
+  if (!fa || !mo) { alert('父と母を選んでください'); return; }
+  if (state.genNum >= 5) { alert('すでに最終世代です！'); return; }
+  if (state.koku < 800) { alert('縁組には 800石 必要です！'); return; }
+
+  const fClan  = fa.ext ? fa.w.clan : (getBusho(fa.w)?.clan || CLANS.oda);
+  const mClan  = mo.ext ? mo.w.clan : (getBusho(mo.w)?.clan || CLANS.saito);
+  const fBusho = fa.ext ? new Busho(fa.w.name, fClan) : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
+  const mBusho = mo.ext ? new Busho(mo.w.name, mClan) : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
+
+  const childClan  = fClan;
+  const childName  = fClan.name.replace('家','') + ' ' + ['太郎','次郎','三郎','四郎','五郎'][Math.floor(Math.random()*5)];
+  const childJob   = Math.random() < 0.15 ? 'bunkan' : 'bukan';
+  const childBusho = new Busho(childName, childClan, fBusho, mBusho);
+  const bonus      = childBusho.calcBonus();
+  const basePow    = 60 + Math.floor(Math.random() * 30);
+
+  state.koku  -= 800;
+  state.genNum = Math.min(5, state.genNum + 1);
+
+  const nw = new IsoWarrior(childName, childJob, basePow, Math.random() * 4 - 2, 3.5);
+  setBusho(nw, childBusho);
+  applyBloodlineBonus(nw);
+
+  const ni = gWarriors.length - 1;
+  for (let j = 0; j < ni; j++) {
+    const k = relKey(ni, j);
+    if (relations[k] === undefined)
+      relations[k] = Math.floor(10 + Math.random() * 40);
+  }
+
+  addLog(`${fa.w.name}×${mo.w.name}の縁組！${childName}が誕生（${bonus.type}の血脈）`, 'success');
+  addCanvasBubble(nw, '参上！', 160);
+  updatePartyRow();
+  updateStatusUI();
+  closeBloodlineModal();
+};
+
+/* ═══════════════════════════════════════════
+   武将クラス
+═══════════════════════════════════════════ */
+const COLOR_SETS = {
+  c_red:  { armor:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', dark:'#6a1010' },
+  c_blue: { armor:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', dark:'#0a2a4a' },
+  c_pink: { armor:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', dark:'#6a1050' },
+};
+let gWarriors = [], currentHouseHead = null, currentModalIndex = -1;
+const ROLES = { bukan:'武官', hime:'姫', bunkan:'文官' };
+
+class IsoWarrior {
+  constructor(name, jobId, power, tx, ty) {
+    this.name   = name;
+    this.jobId  = jobId;
+    this.tileX  = tx;
+    this.tileY  = ty;
+    this.color  = jobId === 'hime' ? 'c_pink' : jobId === 'bunkan' ? 'c_blue' : 'c_red';
+    this.stats  = {
+      power,
+      loyalty: jobId === 'hime' ? 92 : jobId === 'bunkan' ? 72 : 65,
+      wisdom:  jobId === 'bunkan' ? 84 : jobId === 'hime' ? 58 : 52,
+      level: 1,
+      exp:   0,
+    };
+    this.destX  = tx;
+    this.destY  = ty;
+    this.moveSpeed    = 0.013 + Math.random() * 0.005;
+    this.idleTicks    = Math.floor(Math.random() * 120);
+    this.idleMax      = 120 + Math.floor(Math.random() * 140);
+    this.walkFrame    = 0;
+    this.frameCount   = 0;
+    this.state        = 'idle';
+    this.target       = null;
+    this.insideFacility = null;
+    this.wait         = 0;
+    this.anim         = { type: null, t: 0 };
+    this.visible      = true;
+    this.speechTimer  = Math.floor(Math.random() * 200);
+    this.bloodlineBonus       = null;
+    this._bloodlineApplied    = false;
+    gWarriors.push(this);
+  }
+
+  tick(myIdx) {
+    this._moveTick();
+    this._aiTick(myIdx);
+  }
+
+  _moveTick() {
+    switch (this.state) {
+      case 'idle':
+        if (++this.idleTicks > this.idleMax) {
+          this.idleTicks = 0;
+          this.idleMax   = 120 + Math.floor(Math.random() * 140);
+          this._pickDest();
+        }
+        break;
+
+      case 'moving': {
+        const dx   = this.destX - this.tileX;
+        const dy   = this.destY - this.tileY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 0.07) {
+          this.tileX = this.destX;
+          this.tileY = this.destY;
+          if (this.target) {
+            this.state = 'entering';
+            this.anim  = { type:'enter', t:0 };
+            const sp = FACILITY_SPEECH[this.target] || ['…'];
+            addCanvasBubble(this, sp[Math.floor(Math.random() * sp.length)], 130);
+          } else {
+            this.state = 'idle';
+          }
+        } else {
+          this.tileX += dx / dist * this.moveSpeed;
+          this.tileY += dy / dist * this.moveSpeed;
+          if (++this.frameCount >= 10) { this.frameCount = 0; this.walkFrame = (this.walkFrame + 1) % 4; }
+        }
+        break;
+      }
+
+      case 'entering':
+        this.anim.t += 0.04;
+        if (this.anim.t >= 1) {
+          this.visible        = false;
+          this.state          = 'acting';
+          this.insideFacility = this.target;
+          this.wait           = 110 + Math.random() * 130;
+          this._applyEffect(this.target, true);
+        }
+        break;
+
+      case 'acting':
+        if (Math.random() < 0.035) this._applyEffect(this.insideFacility, false);
+        if (--this.wait <= 0) {
+          this.state  = 'exiting';
+          this.anim   = { type:'exit', t:0 };
+          this.visible = true;
+          const e = FACILITY_ENTRANCE[this.insideFacility];
+          if (e) { this.tileX = e.x; this.tileY = e.y; }
+          this.insideFacility = null;
+          this.target = null;
+        }
+        break;
+
+      case 'exiting':
+        this.anim.t += 0.04;
+        if (this.anim.t >= 1) { this.state = 'idle'; this.anim = { type:null, t:0 }; }
+        break;
+    }
+  }
+
+  _pickDest() {
+    if (Math.random() < 0.5) {
+      const keys = Object.keys(FACILITY_ENTRANCE);
+      const key  = keys[Math.floor(Math.random() * keys.length)];
+      const e    = FACILITY_ENTRANCE[key];
+      this.destX  = e.x + (Math.random() * .3 - .15);
+      this.destY  = e.y + (Math.random() * .3 - .15);
+      this.target = key;
+      this.state  = 'moving';
+    } else {
+      const others = gWarriors.filter(w => w !== this);
+      if (others.length && Math.random() < 0.5) {
+        const t     = others[Math.floor(Math.random() * others.length)];
+        this.destX  = t.tileX + (Math.random() - 0.5);
+        this.destY  = t.tileY + (Math.random() - 0.5);
+      } else {
+        this.destX  = Math.random() * 6 - 3;
+        this.destY  = Math.random() * 6 - 3;
+      }
+      this.target = null;
+      this.state  = 'moving';
+    }
+  }
+
+  _applyEffect(key, isEntry) {
+    if (!key) return;
+    const eff = FACILITY_EFFECT[key];
+    if (!eff) return;
+    const [lo, hi] = eff.range;
+    const base = isEntry ? Math.floor(lo + Math.random() * (hi - lo)) : Math.floor(1 + Math.random() * 2);
+    const mul  = bloodlineFacilityMul(this);
+    const gain = Math.floor(base * mul);
+    if (eff.stat === 'power')   this.stats.power   += gain;
+    if (eff.stat === 'wisdom')  this.stats.wisdom   = Math.min(99,  this.stats.wisdom  + gain);
+    if (eff.stat === 'loyalty') this.stats.loyalty  = Math.min(100, this.stats.loyalty + gain);
+    if (gain > 0) {
+      createFloatText(this, `+${gain}${eff.label}`, eff.color);
+      if (isEntry) {
+        showFacilityActivity(key, `${this.name}が${FACILITY_MAP[key].name}で鍛練！`, eff.color);
+        addLog(`${this.name}が${FACILITY_MAP[key].name}で${eff.label}+${gain}`);
+      }
+    }
+    updatePartyRow();
+    updateStatusUI();
+  }
+
+  _aiTick(myIdx) {
+    this.speechTimer = Math.max(0, this.speechTimer - 1);
+    if (this.speechTimer === 0 && Math.random() < 0.005) {
+      let sit = 'idle';
+      if (this.stats.loyalty > 80 && Math.random() < .3) sit = 'highLoyalty';
+      else if (this.stats.loyalty < 35 && Math.random() < .4) sit = 'lowLoyalty';
+      addCanvasBubble(this, getSpeech(this, sit));
+      this.speechTimer = 200 + Math.floor(Math.random() * 280);
+    }
+    if (this.state !== 'acting' && Math.random() < 0.004) {
+      gWarriors.forEach((other, j) => {
+        if (j === myIdx) return;
+        const dx = this.tileX - other.tileX, dy = this.tileY - other.tileY;
+        if (Math.sqrt(dx*dx + dy*dy) < 1.6) this._interact(myIdx, j, other);
+      });
+    }
+  }
+
+  _interact(mi, oi, other) {
+    const rel = getRel(mi, oi);
+    let delta, sitA, sitB;
+    if (rel >= 20 && Math.random() < .65)      { delta = Math.floor(3 + Math.random()*8);  sitA = sitB = 'friendly'; }
+    else if (rel < -20 && Math.random() < .55) { delta = -Math.floor(3 + Math.random()*8); sitA = sitB = 'rival';    }
+    else { delta = Math.floor(-4 + Math.random()*9); sitA = sitB = delta >= 0 ? 'friendly' : 'rival'; }
+
+    changeRel(mi, oi, delta);
+    const nv = getRel(mi, oi);
+    addCanvasBubble(this, getSpeech(this, sitA), 130);
+    setTimeout(() => addCanvasBubble(other, getSpeech(other, sitB), 130), 700);
+
+    if (Math.abs(delta) >= 5) {
+      const sign = delta > 0 ? '▲' : '▼';
+      const midX = (this.tileX + other.tileX) / 2 + 0.5;
+      const midY = (this.tileY + other.tileY) / 2 + 0.5;
+      const fR   = document.getElementById('iso-field').getBoundingClientRect();
+      const cR   = canvas.getBoundingClientRect();
+      const el   = document.createElement('div');
+      el.className = 'relation-label';
+      el.style.left  = (cR.left - fR.left + toSX(midX, midY, 1)) + 'px';
+      el.style.top   = (cR.top  - fR.top  + toSY(midX, midY, 1) - 30) + 'px';
+      el.style.color = relColor(nv);
+      el.textContent = `${sign} ${relLabel(nv)}`;
+      bubbleLayer.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 2800);
+      if (Math.abs(delta) >= 8)
+        addLog(`${this.name}と${other.name}の仲が${delta > 0 ? '深まった' : '険悪になった'}（${relLabel(nv)}）`, delta > 0 ? 'success' : 'betrayal');
+    }
+    updatePartyRow();
+  }
+
+  draw() {
+    if (!this.visible && this.state !== 'exiting') return;
+    const c  = COLOR_SETS[this.color];
+    const fx = toSX(this.tileX + .5, this.tileY + .5, .25);
+    const fy = toSY(this.tileX + .5, this.tileY + .5, .25);
+    const H  = Math.round(canvas.height * .09);
+    const W  = H * .55;
+    const s  = this.walkFrame % 4;
+    let scale = 1, alpha = 1;
+    if (this.state === 'entering') { scale = 1 - this.anim.t; alpha = 1 - this.anim.t; }
+    if (this.state === 'exiting')  { scale = this.anim.t;     alpha = this.anim.t; }
+    if (scale <= 0 || alpha <= 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(fx, fy); ctx.scale(scale, scale); ctx.translate(-fx, -fy);
+
+    if (this.jobId === 'bukan')      this._drawBukan(fx, fy, H, W, s, c);
+    else if (this.jobId === 'hime')  this._drawHime(fx, fy, H, W, s, c);
+    else                              this._drawBunkan(fx, fy, H, W, c);
+
+    ctx.font         = `${Math.round(canvas.width * .026)}px 'Noto Serif JP',serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle    = 'rgba(240,192,64,.95)';
+    ctx.shadowColor  = '#000';
+    ctx.shadowBlur   = 5;
+    ctx.fillText(this.name, fx, fy - H * 1.22);
+    ctx.shadowBlur   = 0;
+
+    if (this.state === 'moving' && this.target) {
+      ctx.font      = `${Math.round(canvas.width * .02)}px 'Noto Serif JP',serif`;
+      ctx.fillStyle = 'rgba(180,200,255,.8)';
+      ctx.fillText('→' + FACILITY_MAP[this.target].name, fx, fy - H * 1.44);
+    }
+
+    if (this.state === 'entering') {
+      ctx.save();
+      ctx.globalAlpha = .4 * (1 - this.anim.t);
+      ctx.beginPath();
+      ctx.arc(fx, fy, 22 * (1 + this.anim.t), 0, Math.PI * 2);
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  _drawBukan(fx, fy, H, W, s, c) {
+    const legW = W*.28, legSw=[0,H*.06,0,-H*.06][s], armSw=[H*.05,0,-H*.05,0][s];
+    const bob  = Math.abs([0,1,0,-1][s])*1.5, bY=fy-bob;
+    const hH=H*.22, bH=H*.32, lH=H*.38, aH=H*.28;
+    const headY=bY-lH-bH-hH, bodyY=bY-lH-bH;
+    ctx.beginPath(); ctx.ellipse(fx,bY+2,W*.6,H*.05,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fill();
+    ctx.fillStyle=c.sub;
+    ctx.save(); ctx.translate(fx-legW*.6,bY-lH/2); ctx.rotate(legSw*.04); ctx.beginPath(); ctx.roundRect(-legW/2,0,legW,lH,3); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(fx+legW*.6,bY-lH/2); ctx.rotate(-legSw*.04); ctx.beginPath(); ctx.roundRect(-legW/2,0,legW,lH,3); ctx.fill(); ctx.restore();
+    ctx.fillStyle=c.dark;
+    ctx.beginPath(); ctx.roundRect(fx-W*.32,bY-3,W*.28,5,2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(fx+W*.04,bY-3,W*.28,5,2); ctx.fill();
+    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.roundRect(fx-W*.44,bodyY,W*.88,bH,3); ctx.fill();
+    ctx.fillStyle=c.dark;  ctx.beginPath(); ctx.roundRect(fx-W*.38,bodyY+2,W*.76,bH-4,2); ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.save(); ctx.translate(fx-W*.52,bodyY+4); ctx.rotate(armSw*.05); ctx.beginPath(); ctx.roundRect(-W*.18,0,W*.22,aH,4); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(fx+W*.52,bodyY+4); ctx.rotate(-armSw*.05); ctx.beginPath(); ctx.roundRect(-W*.04,0,W*.22,aH,4); ctx.fill();
+    ctx.strokeStyle='#b8b8b8'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(W*.1,aH*.5); ctx.lineTo(W*.4,-aH*.5); ctx.stroke();
+    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.arc(W*.12,aH*.45,3,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.ellipse(fx,headY+hH*.45,W*.38,hH*.55,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=c.skin;  ctx.beginPath(); ctx.ellipse(fx,headY+hH*.55,W*.28,hH*.42,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#3a2010';
+    ctx.beginPath(); ctx.arc(fx-W*.1,headY+hH*.5,1.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(fx+W*.1,headY+hH*.5,1.5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=c.acc; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(fx,headY); ctx.lineTo(fx,headY-hH*.4); ctx.stroke();
+    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.moveTo(fx-4,headY-hH*.2); ctx.lineTo(fx+4,headY-hH*.2); ctx.lineTo(fx,headY-hH*.5); ctx.fill();
+  }
+
+  _drawHime(fx, fy, H, W, s, c) {
+    const bob=Math.abs([0,1,0,-1][s])*1.2, bY=fy-bob;
+    ctx.beginPath(); ctx.ellipse(fx,bY+2,W*.55,H*.045,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
+    const grd=ctx.createLinearGradient(fx-W*.55,0,fx+W*.55,0);
+    grd.addColorStop(0,c.dark); grd.addColorStop(.5,c.armor); grd.addColorStop(1,c.dark);
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(fx-W*.22,bY-H*.55); ctx.lineTo(fx+W*.22,bY-H*.55); ctx.lineTo(fx+W*.5,bY); ctx.lineTo(fx-W*.5,bY); ctx.closePath(); ctx.fill();
+    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.roundRect(fx-W*.22,bY-H*.42,W*.44,H*.1,2); ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.save(); ctx.translate(fx-W*.28,bY-H*.52); ctx.rotate(-.2); ctx.beginPath(); ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(fx+W*.28,bY-H*.52); ctx.rotate(.2);  ctx.beginPath(); ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.fillStyle='#1a0a00'; ctx.beginPath(); ctx.ellipse(fx,bY-H*.78,W*.3,H*.18,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=c.skin;    ctx.beginPath(); ctx.ellipse(fx,bY-H*.73,W*.22,H*.15,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#8b3060';
+    ctx.beginPath(); ctx.arc(fx-W*.09,bY-H*.74,1.4,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(fx+W*.09,bY-H*.74,1.4,0,Math.PI*2); ctx.fill();
+    for(let i=-1;i<=1;i++){ ctx.fillStyle=i===0?c.acc:'rgba(255,140,200,.8)'; ctx.beginPath(); ctx.arc(fx+i*W*.18,bY-H*.9,3.5,0,Math.PI*2); ctx.fill(); }
+  }
+
+  _drawBunkan(fx, fy, H, W, c) {
+    ctx.beginPath(); ctx.ellipse(fx,fy+2,W*.5,H*.04,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
+    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.roundRect(fx-W*.32,fy-H*.65,W*.64,H*.65,3); ctx.fill();
+    ctx.fillStyle=c.sub;   ctx.beginPath(); ctx.roundRect(fx-W*.25,fy-H*.6, W*.5, H*.5, 2); ctx.fill();
+    ctx.fillStyle=c.armor;
+    ctx.beginPath(); ctx.ellipse(fx-W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(fx+W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#c8a850'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(fx+W*.28,fy-H*.55); ctx.lineTo(fx+W*.2,fy-H*.2); ctx.stroke();
+    ctx.fillStyle=c.skin; ctx.beginPath(); ctx.ellipse(fx,fy-H*.76,W*.25,H*.16,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#1a0a00';
+    ctx.beginPath(); ctx.moveTo(fx-W*.2,fy-H*.82); ctx.lineTo(fx+W*.2,fy-H*.82); ctx.lineTo(fx+W*.05,fy-H*1); ctx.lineTo(fx-W*.05,fy-H*1); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(fx-W*.2,fy-H*.85,W*.4,H*.07,1); ctx.fill();
+    ctx.fillStyle='#4a3a2a';
+    ctx.beginPath(); ctx.arc(fx-W*.07,fy-H*.77,1.3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(fx+W*.07,fy-H*.77,1.3,0,Math.PI*2); ctx.fill();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   シーン描画
+═══════════════════════════════════════════ */
+function drawScene(tick) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  [...TERRAIN].sort((a,b) => (a.r+a.c)-(b.r+b.c)).forEach(t => {
+    const tx = t.c - 4.5, ty = t.r - 4.5;
+    if (t.type === 'grass') drawBox(tx,ty,0,1,1,.18,'#2d4a1e','#1c3010','#233c16');
+    else { const e=(t.c+t.r)%2; drawBox(tx,ty,0,1,1,.25,e?'#4e4032':'#443828','#2e2416','#382e1c'); }
+  });
+
+  [[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],
+   [3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],
+   [2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],
+   [-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]].forEach(([mc,mr]) => {
+    ctx.beginPath();
+    [[mc,mr],[mc+1,mr],[mc+1,mr+1],[mc,mr+1]].forEach(([x,y],i) =>
+      i ? ctx.lineTo(toSX(x,y,0),toSY(x,y,0)) : ctx.moveTo(toSX(x,y,0),toSY(x,y,0))
+    );
+    ctx.closePath();
+    ctx.fillStyle   = `rgba(12,28,52,${.5 + .12*Math.sin(tick*.04 + mc*.5 + mr*.3)})`;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(20,50,90,.5)';
+    ctx.lineWidth   = .5;
+    ctx.stroke();
+  });
+
+  for (let i=-2; i<=2; i++) {
+    drawBox(i,-2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
+    drawBox(i, 2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
+  }
+  for (let i=-1; i<=1; i++) {
+    drawBox(-2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
+    drawBox( 2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
+  }
+
+  drawFacilities(tick);
+
+  drawBox(-1,-1,.75,2,2,.9, '#5a4a35','#3a2c1a','#4a3a25');
+  drawBox(-.8,-.8,1.65,1.6,1.6,1.4, '#4a3826','#3a2a18','#4a3826');
+  drawBox(-.6,-.6,1.65,.7,.7,.9,   '#4a3826','#3a2a18','#4a3826');
+  drawRoof(-1.1,-1.1,2.65+1.4,2.2,2.2,.9, '#241608','#1a0e04');
+  drawRoof(-.9,-.9,2.65+1.4+.7,1.8,1.8,.7,'#1a0e04','#120900');
+  drawRoof(-.65,-.65,2.65+1.4+1.1,1.3,1.3,.55,'#241608','#1a0e04');
+  drawRoof(-.4,-.4,2.65+1.4+1.5,.8,.8,.4,'#1a0e04','#100800');
+  drawFlag(-.05,-.05,2.65+1.4+1.85,tick);
+
+  ctx.font         = `bold ${Math.round(canvas.width*.036)}px 'Noto Serif JP',serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle    = `rgba(240,192,64,${.7 + .3*Math.sin(tick*.03)})`;
+  ctx.shadowColor  = 'rgba(200,150,12,.8)';
+  ctx.shadowBlur   = 10;
+  ctx.fillText('安土城', toSX(0,0,2.65+1.4+2.3), toSY(0,0,2.65+1.4+2.3));
+  ctx.shadowBlur   = 0;
+
+  [...gWarriors].sort((a,b) => (a.tileX+a.tileY) - (b.tileX+b.tileY)).forEach(w => w.draw());
+  drawCanvasBubbles();
+  drawFloatingTexts();
+}
+
+/* ═══════════════════════════════════════════
+   UI 更新
+═══════════════════════════════════════════ */
+function updateStatusUI() {
+  document.getElementById('unification-pct').textContent = Math.floor(state.unification);
+  document.getElementById('gen-num').textContent         = state.genNum;
+  document.getElementById('koku-display').textContent    = state.koku.toLocaleString('ja-JP');
+  document.getElementById('nfill').style.width           = Math.min(100, Math.floor(state.koku / 100)) + '%';
+}
+
+function locationLabel(w) {
+  if (w.insideFacility) return FACILITY_MAP[w.insideFacility].name + 'で鍛練中';
+  if (w.target && w.state === 'moving') return (FACILITY_MAP[w.target]?.name || '') + 'へ向かう中';
+  return '城内';
+}
+
+function updatePartyRow() {
+  const row = document.getElementById('party-row');
+  row.innerHTML = '';
+  gWarriors.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'party-card' + (i === 0 ? ' head' : '');
+    let relText = '';
+    let bestAbs = 0;
+    gWarriors.forEach((_, j) => {
+      if (j === i) return;
+      const rv = getRel(i, j);
+      if (Math.abs(rv) > bestAbs) {
+        bestAbs  = Math.abs(rv);
+        const shortName = gWarriors[j].name.split(' ')[1] || gWarriors[j].name;
+        relText = `${shortName}：${relLabel(rv)}`;
+      }
+    });
+    card.innerHTML =
+      `<span class="pc-role">${ROLES[w.jobId] || '武将'}</span>` +
+      `<span class="pc-name">${w.name}</span>` +
+      `<span class="pc-pow">武力 ${w.stats.power} Lv${w.stats.level}</span>` +
+      `<span class="pc-loc">${locationLabel(w)}</span>` +
+      (relText ? `<span class="pc-rel">${relText}</span>` : '');
+    card.onclick = () => showWarriorModal(i);
+    row.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   武将モーダル
+═══════════════════════════════════════════ */
+function showWarriorModal(i) {
+  currentModalIndex = i;
+  const w     = gWarriors[i];
+  const busho = getBusho(w);
+  const bl    = busho ? busho.getBloodline() : null;
+
+  document.getElementById('wm-name').textContent = w.name;
+  document.getElementById('wm-meta').textContent =
+    `${ROLES[w.jobId] || '武将'}　Lv.${w.stats.level}　／　第${state.genNum}世代`;
+
+  document.getElementById('wm-pow').textContent = `武力 ${w.stats.power}`;
+  document.getElementById('wm-wis').textContent = `知力 ${w.stats.wisdom}`;
+  document.getElementById('wm-loy').textContent = `忠誠 ${w.stats.loyalty}`;
+
+  const skills = getSkills(w.jobId, w.stats.power, w.stats.wisdom);
+  document.getElementById('wm-skills').innerHTML =
+    skills.map(s => `<span style="margin:0 6px;">・${s}</span>`).join('');
+
+  const fatherName = bl?.father?.name || '不明';
+  const motherName = bl?.mother?.name || '不明';
+  const fClan = bl?.father?.clan || '─';
+  const mClan = bl?.mother?.clan || '─';
+  document.getElementById('wm-bloodline').innerHTML =
+    `${fatherName}<span style="font-size:11px;color:#c8960c;">(${fClan})</span>` +
+    ` × ${motherName}<span style="font-size:11px;color:#c8960c;">(${mClan})</span>`;
+
+  let relHtml = '';
+  if (gWarriors.length <= 1) {
+    relHtml = '<div style="color:rgba(255,255,255,.35);font-size:12px;text-align:center;">まだ仲間がいない</div>';
+  } else {
+    gWarriors.forEach((other, j) => {
+      if (j === i) return;
+      const rv = getRel(i, j);
+      relHtml += `<div class="wm-rel-item">
+        <span>${other.name}</span>
+        <span style="color:${relColor(rv)};">${relLabel(rv)}（${rv >= 0 ? '+' : ''}${rv}）</span>
+      </div>`;
+    });
+  }
+  document.getElementById('wm-relations').innerHTML = relHtml;
+
+  document.getElementById('warrior-modal').style.display = 'flex';
+}
+
+function closeWarriorModal() {
+  document.getElementById('warrior-modal').style.display = 'none';
+  currentModalIndex = -1;
+}
+
+/* 武将モーダル → 家系図モーダルへ */
+window.openPedigreeFromModal = function () {
+  const i = currentModalIndex;
+  if (i < 0 || i >= gWarriors.length) return;
+  const warrior = gWarriors[i];
+  closeWarriorModal();
+  // 少し遅らせてアニメを綺麗に
+  setTimeout(() => openPedigreeModal(warrior), 80);
+};
+
+function showDev() { document.getElementById('dev-modal').style.display = 'flex'; renderFacilities(); }
+function closeDevModal() { document.getElementById('dev-modal').style.display = 'none'; }
+
+function renderFacilities() {
+  document.getElementById('facilities-list').innerHTML = Object.entries(FACILITY_MAP).map(([key, f]) => {
+    const cost = Math.floor((COST_BASE[key] || 400) * Math.pow(1.65, f.level - 1));
+    return `<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);padding:12px 14px;border-radius:12px;margin-bottom:10px;">
+      <div style="font-size:28px;width:40px;text-align:center;">${f.icon}</div>
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:700;">${f.name} <span style="font-size:12px;color:#c8960c;">Lv.${f.level}</span></div>
+        <div style="font-size:11px;color:rgba(245,232,200,.7);">${FACILITY_EFFECT[key]?.label || ''}が強化される施設</div>
+      </div>
+      <button onclick="upgradeFacility('${key}',${cost})"
+        style="background:var(--gold);color:#0e0800;padding:7px 13px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;cursor:pointer;font-size:12px;">
+        ${cost}石<br>強化
+      </button>
+    </div>`;
+  }).join('');
+}
+
+window.upgradeFacility = function (key, cost) {
+  if (state.koku < cost) { alert('国力が不足しています！'); return; }
+  state.koku -= cost;
+  FACILITY_MAP[key].level++;
+  gWarriors.forEach(w => {
+    const b = Math.floor(2 + Math.random() * 4);
+    w.stats.power += b;
+    createFloatText(w, `施設+${b}`, '#ffdd88');
+    addCanvasBubble(w, getSpeech(w, 'train'), 120);
+  });
+  addLog(`${FACILITY_MAP[key].name}が強化された！`, 'success');
+  updateStatusUI();
+  updatePartyRow();
+  renderFacilities();
+};
+
+window.showHistory = function () {
+  document.getElementById('history-list').innerHTML = gameLog.length
+    ? gameLog.slice().reverse().map(l => {
+        let col = '#ddd';
+        if (l.type === 'awakening') col = '#ff6666';
+        if (l.type === 'betrayal')  col = '#ff3333';
+        if (l.type === 'success')   col = '#ffcc66';
+        return `<div style="margin-bottom:6px;color:${col};border-bottom:1px solid rgba(200,150,12,.1);padding-bottom:4px;">` +
+          `<span style="color:var(--gold-d);font-size:11px;">【${l.time}】</span> ${l.text}</div>`;
+      }).join('')
+    : '<div style="color:rgba(245,232,200,.5);text-align:center;padding:20px;">まだ歴史は刻まれていない…</div>';
+  document.getElementById('history-modal').style.display = 'flex';
+};
+window.closeHistory = function () { document.getElementById('history-modal').style.display = 'none'; };
+
+/* ═══════════════════════════════════════════
+   合戦
+═══════════════════════════════════════════ */
+window.openBattle = function () {
+  document.getElementById('battle-screen').classList.add('show');
+  document.getElementById('battle-family').textContent =
+    (currentHouseHead ? currentHouseHead.familyName : '織田') + '軍 出陣';
+  document.getElementById('our-warriors').innerHTML =
+    gWarriors.map(w => `<span class="wi">${w.jobId === 'hime' ? '🌸' : '⚔️'}</span>`).join('');
+  document.getElementById('enemy-warriors').innerHTML =
+    '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
+  document.getElementById('battle-log').innerHTML =
+    '<div class="ll ally">敵軍が城に迫っています！</div>';
+};
+
+window.startBattleSimulation = function () {
+  const log = document.getElementById('battle-log');
+  const firstName = gWarriors[0]?.name || '武将';
+  log.innerHTML += `<div class="ll ally">${firstName}が先陣を切った！</div>`;
+  const battleBonus = bloodlineBattleBonus();
+  const winChance   = Math.min(0.95, 0.65 + battleBonus * 0.005);
+  const isWin       = Math.random() < winChance;
+  setTimeout(() => {
+    if (isWin) {
+      log.innerHTML += `<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！${battleBonus > 0 ? `（血統ボーナス+${battleBonus}%）` : ''}</div>`;
+      state.koku         += 1680;
+      state.unification   = Math.min(100, state.unification + 4.5);
+      gWarriors.forEach((w, i) => {
+        w.stats.power   += 5;
+        w.stats.loyalty  = Math.min(100, w.stats.loyalty + 8);
+        createFloatText(w, '+5武力', '#ffdd88');
+        addCanvasBubble(w, getSpeech(w, 'highLoyalty'), 140);
+        gWarriors.forEach((_, j) => { if (i !== j) changeRel(i, j, Math.floor(3 + Math.random()*5)); });
+      });
+      addLog('合戦大勝利！', 'success');
+    } else {
+      log.innerHTML += '<div class="ll ally" style="color:#ff8888">惜しくも敗戦…次こそ雪辱を！</div>';
+      state.koku = Math.max(0, state.koku - 500);
+      gWarriors.forEach(w => { w.stats.loyalty = Math.max(0, w.stats.loyalty - 5); });
+      addLog('合戦敗北…', 'betrayal');
+    }
+    log.scrollTop = log.scrollHeight;
+    updateStatusUI();
+    updatePartyRow();
+  }, 1400);
+};
+
+window.endBattle = function () { document.getElementById('battle-screen').classList.remove('show'); };
+
+/* ═══════════════════════════════════════════
+   アイドルティック・イベント
+═══════════════════════════════════════════ */
+function performIdleTick() {
+  gWarriors.forEach(w => {
+    w.stats.exp += Math.floor(5 + Math.random() * 11);
+    let leveledUp = false;
+    while (w.stats.exp >= 100) {
+      w.stats.exp -= 100;
+      w.stats.level++;
+      leveledUp = true;
+      const pu = Math.floor(2 + Math.random() * 3);
+      w.stats.power += pu;
+      createFloatText(w, `+${pu}武力`, '#ffcc66');
+    }
+    if (leveledUp) {
+      createFloatText(w, `Lv${w.stats.level}↑`, '#ffeeaa');
+      addCanvasBubble(w, getSpeech(w, 'levelUp'), 140);
+      addLog(`${w.name}がLv${w.stats.level}に！`);
+    }
+    if (Math.random() < .6)  w.stats.power++;
+    if (Math.random() < .35) w.stats.wisdom   = Math.min(99,  w.stats.wisdom  + 1);
+    if (Math.random() < .3)  w.stats.loyalty  = Math.min(100, w.stats.loyalty + Math.floor(1 + Math.random()*3));
+  });
+  state.koku          += Math.floor(62 + Math.random() * 98);
+  state.unification    = Math.min(99.9, state.unification + .12);
+  updateStatusUI();
+  updatePartyRow();
+}
+
+function triggerEvent() {
+  if (Math.random() > .35) return;
+  const w    = gWarriors[Math.floor(Math.random() * gWarriors.length)];
+  if (!w) return;
+  const roll = Math.random();
+  if (roll < .15) {
+    const up = 10 + Math.floor(Math.random() * 10);
+    w.stats.power += up;
+    createFloatText(w, `覚醒 +${up}`, '#ff4444');
+    addCanvasBubble(w, '目覚めた…！', 140);
+    addLog(`${w.name}が覚醒した！`, 'awakening');
+  } else if (roll < .25) {
+    w.stats.loyalty = Math.max(0, w.stats.loyalty - 30);
+    createFloatText(w, '裏切り兆候', '#ff0000');
+    addCanvasBubble(w, getSpeech(w, 'lowLoyalty'), 140);
+    addLog(`${w.name}に裏切りの兆し…`, 'betrayal');
+  } else if (roll < .5) {
+    const g = 500 + Math.floor(Math.random() * 500);
+    state.koku += g;
+    addLog(`内政大成功！ +${g}石`, 'success');
+  } else {
+    w.stats.power += 3;
+    createFloatText(w, '+3', '#ffdd88');
+    addLog(`${w.name}が成長した`);
+  }
+  updateStatusUI();
+  updatePartyRow();
+}
+
+/* ═══════════════════════════════════════════
+   メインループ
+═══════════════════════════════════════════ */
+let tick = 0;
+function gameLoop() {
+  tick++;
+  gWarriors.forEach((w, i) => w.tick(i));
+  tickCanvasBubbles();
+  drawScene(tick);
+  requestAnimationFrame(gameLoop);
+}
+
+/* ═══════════════════════════════════════════
+   初期化
+═══════════════════════════════════════════ */
+function initGame() {
+  gWarriors = [];
+  buildTerrain();
+  resizeCanvas();
+
+  const w0 = new IsoWarrior('織田 信廣', 'bukan',  88,  0.2, 3.5);
+  const w1 = new IsoWarrior('お 市',     'hime',   72, -1.8, 3.2);
+  const w2 = new IsoWarrior('明智 光忠', 'bunkan', 65,  1.8, 3.0);
+
+  setBusho(w0, new Busho('織田 信廣', CLANS.oda));
+  setBusho(w1, new Busho('お 市',     CLANS.oda));
+  setBusho(w2, new Busho('明智 光忠', CLANS.azai));
+  applyBloodlineBonus(w0);
+  applyBloodlineBonus(w1);
+  applyBloodlineBonus(w2);
+
+  currentHouseHead = { warrior: w0, familyName: '織田' };
+  initRelations(gWarriors);
+
+  setTimeout(() => addCanvasBubble(gWarriors[0], '天下を取るぞ！',  180), 1200);
+  setTimeout(() => addCanvasBubble(gWarriors[1], '桜が綺麗ですね…', 180), 2200);
+  setTimeout(() => addCanvasBubble(gWarriors[2], '謀略が要りますな', 180), 3100);
+
+  updatePartyRow();
+  updateStatusUI();
+
+  canvas.style.pointerEvents = 'auto';
+  canvas.addEventListener('click', () => {
+    const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
+    if (!w) return;
+    const g = 1 + Math.floor(Math.random() * 3);
+    w.stats.power += g;
+    createFloatText(w, `+${g}`, '#ffaa44');
+    addCanvasBubble(w, getSpeech(w, 'train'), 120);
+    addLog(`${w.name}を強化`);
+    updatePartyRow();
+  });
+
+  setInterval(performIdleTick, 1800);
+  setInterval(() => { updateTime(); triggerEvent(); }, 2200);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      for (let i = 0; i < 5; i++) performIdleTick();
+      addLog('放置ボーナス発生！', 'success');
+    }
+  });
+
+  gameLoop();
+}
+
+window.onload    = initGame;
+window.addEventListener('resize', resizeCanvas);
+</script>
 </body>
 </html>
