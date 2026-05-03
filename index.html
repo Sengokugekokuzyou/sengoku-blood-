@@ -10,7 +10,6 @@
   --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
   --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);
   --crimson:#8b0000;
-  /* スマホ縦画面基準サイズ変数 */
   --h-header:52px;
   --h-nationbar:28px;
   --h-partyrow:70px;
@@ -24,12 +23,10 @@ html,body{
   font-family:'Noto Serif JP',serif;
   overflow:hidden;
   user-select:none;-webkit-user-select:none;
-  /* iOSバウンス防止 */
   position:fixed;
   touch-action:none;
 }
 
-/* ─── 背景 ─── */
 #sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
 .star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
@@ -41,7 +38,6 @@ html,body{
 .petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
 @keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
 
-/* ─── メインレイアウト（縦画面厳密固定） ─── */
 #main{
   position:fixed;inset:0;
   z-index:10;
@@ -51,7 +47,6 @@ html,body{
   height:100%;
 }
 
-/* ─── ヘッダー ─── */
 #header{
   height:var(--h-header);
   padding:max(env(safe-area-inset-top,0px),8px) 12px 4px;
@@ -90,7 +85,6 @@ html,body{
 .sv{font-size:13px;font-weight:700;color:var(--gold-l);}
 .su{font-size:8px;color:var(--gold-d);}
 
-/* ─── ISOフィールド（残り全高さ） ─── */
 #iso-field{position:relative;overflow:hidden;min-height:0;}
 #iso-canvas{
   position:absolute;
@@ -116,14 +110,12 @@ html,body{
 }
 @keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}
 
-/* ─── ボトムUI ─── */
 #bottom-ui{
   flex-shrink:0;
   padding:0 10px var(--h-bottom-pad);
   background:linear-gradient(0deg,rgba(6,3,0,.98) 0%,rgba(6,3,0,.82) 80%,transparent 100%);
 }
 
-/* 統一バー */
 #nation-bar{
   display:flex;align-items:center;gap:7px;
   padding:5px 2px 4px;
@@ -135,7 +127,6 @@ html,body{
 .nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
 .np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:30px;text-align:right;}
 
-/* パーティ行 */
 #party-row{
   display:flex;gap:5px;
   padding:4px 0 3px;
@@ -167,7 +158,6 @@ html,body{
 .pc-hp{font-size:7px;}
 .pc-loc{font-size:7px;color:#aaddff;margin-top:1px;}
 
-/* アクションボタン行 */
 #action-row{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -185,7 +175,6 @@ html,body{
   transition:background .15s,border-color .15s,transform .1s;
   color:var(--parchment);font-family:inherit;
   touch-action:manipulation;
-  /* タップ領域拡大 */
   min-height:52px;
 }
 .act-btn:active{transform:scale(.91);background:rgba(200,150,12,.16);border-color:var(--gold);}
@@ -194,7 +183,7 @@ html,body{
 .act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45);}
 .act-btn.primary .lbl{color:var(--gold-l);}
 
-/* ─── 合戦画面（ピクセルアートバトル） ─── */
+/* ─── 合戦画面 ─── */
 #battle-screen{
   position:fixed;inset:0;z-index:500;
   background:#0e0600;
@@ -266,7 +255,6 @@ html,body{
 }
 .bpower-ticks{position:absolute;inset:0;display:flex;pointer-events:none;}
 .bpower-ticks span{flex:1;border-right:1px solid #0003;}
-/* 結果パネル */
 #battle-result-panel{
   display:none;position:absolute;inset:0;
   align-items:center;justify-content:center;
@@ -410,7 +398,6 @@ html,body{
   background:rgba(255,255,255,.03);border:1px solid rgba(200,150,12,.15);
   border-radius:10px;padding:10px;cursor:pointer;transition:all .2s;
   touch-action:manipulation;
-  /* タップ領域確保 */
   min-height:60px;
 }
 .warrior-sel-card:active,.warrior-sel-card.selected{background:rgba(200,150,12,.12);border-color:var(--gold);}
@@ -458,7 +445,7 @@ html,body{
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 .suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center;}
 .suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.3em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center;}
-.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2.}
+.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2;}
 .suc-btn{
   background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);
   color:var(--gold-l);font-family:inherit;font-size:13px;
@@ -490,7 +477,6 @@ html,body{
 }
 .dev-btn:active{background:rgba(200,150,12,.14);}
 
-/* 履歴 */
 .hist-shell{
   width:100%;max-width:480px;
   height:78%;
@@ -525,7 +511,7 @@ html,body{
 <div id="sky"></div>
 <div class="mist"></div><div class="mist"></div><div class="mist"></div>
 
-<!-- 合戦画面（ピクセルアートバトル） -->
+<!-- 合戦画面 -->
 <div id="battle-screen">
   <div id="bscr-inner">
     <div id="bscr-frame">
@@ -617,7 +603,7 @@ html,body{
       <div id="engumi-step-content"></div>
     </div>
     <div class="modal-footer">
-      <button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn" onclick="closeEngumi()">取消</button>
+      <button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn">取消</button>
       <button class="modal-btn modal-btn-exec" id="engumi-next-btn" onclick="engumiNext()">次へ →</button>
     </div>
   </div>
@@ -787,11 +773,13 @@ let engumiSelectedMother = null;
 function rnd(lo, hi) { return Math.floor(lo + Math.random() * (hi - lo + 1)); }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
+let toastTimer = null;
 function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), duration || 2200);
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); toastTimer = null; }, duration || 2200);
 }
 
 function addLog(text) {
@@ -801,15 +789,20 @@ function addLog(text) {
   if (state.log.length > 80) state.log.pop();
 }
 
+// ── [修正1] success-overlay も含めてモーダル管理 ──
 function openModal(id) {
   document.getElementById(id).classList.add('show');
-  const bg = document.getElementById('modal-bg');
-  if (bg) bg.style.display = 'block';
+  // success-overlay は z-index:900 なので modal-bg は不要
+  if (id !== 'success-overlay') {
+    const bg = document.getElementById('modal-bg');
+    if (bg) bg.style.display = 'block';
+  }
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('show');
-  // 全モーダルが閉じたらBGも消す
-  const allModals = document.querySelectorAll('#pedigree-modal.show,#warrior-modal.show,#engumi-modal.show,#dev-modal.show,#history-modal.show');
+  const allModals = document.querySelectorAll(
+    '#pedigree-modal.show,#warrior-modal.show,#engumi-modal.show,#dev-modal.show,#history-modal.show'
+  );
   if (allModals.length === 0) {
     const bg = document.getElementById('modal-bg');
     if (bg) bg.style.display = 'none';
@@ -869,7 +862,6 @@ class IsoWarrior {
     this._parents    = null;
     this._birthTurn  = state.turn;
 
-    // ISO座標
     this.isoX = (Math.random() - 0.5) * 4;
     this.isoY = (Math.random() - 0.5) * 4;
     this.dirX = (Math.random() > 0.5 ? 1 : -1);
@@ -928,11 +920,10 @@ class IsoWarrior {
   }
 
   _tryEnterFacility() {
-    // 体力が低いなら回復施設を優先
     const hpPct = this.stats.hp / this.stats.maxHp;
     let candidates;
     if (hpPct < 0.4) {
-      candidates = ['tea','garden','tea']; // 回復優先
+      candidates = ['tea','garden','tea'];
     } else {
       candidates = Object.keys(FACILITY_MAP);
     }
@@ -965,7 +956,6 @@ class IsoWarrior {
     const mul  = bloodlineFacilityMul(this);
     const gain = Math.floor(base * mul);
 
-    // 体力消費 / 回復 (costHp: 正=回復, 負=消費)
     let hpChange = 0;
     if (isEntry) {
       hpChange = eff.costHp > 0
@@ -973,7 +963,6 @@ class IsoWarrior {
         : Math.floor(eff.costHp * (0.7 + Math.random() * 0.6));
     }
 
-    // ステータス変化
     if (eff.stat === 'power') {
       this.stats.power = clamp(this.stats.power + gain, 1, 99);
     } else if (eff.stat === 'wisdom') {
@@ -984,10 +973,8 @@ class IsoWarrior {
       this._loyalty = clamp(this._loyalty + gain, 0, 100);
     }
 
-    // 体力変動
     this.stats.hp = clamp(this.stats.hp + hpChange, 1, this.stats.maxHp);
 
-    // フロートテキスト
     if (isEntry && (gain > 0 || hpChange !== 0)) {
       let text = '';
       if (eff.stat === 'hp') {
@@ -1007,8 +994,11 @@ class IsoWarrior {
   }
 
   _checkLevelUp() {
-    const needed = this.stats.level * 120 + 80;
-    if (this.stats.exp >= needed) {
+    // ── [修正2] ループで複数回レベルアップに対応 ──
+    let loopGuard = 0;
+    while (loopGuard++ < 20) {
+      const needed = this.stats.level * 120 + 80;
+      if (this.stats.exp < needed) break;
       this.stats.exp -= needed;
       this.stats.level++;
       this.stats.power   = clamp(this.stats.power   + rnd(2,5), 1, 99);
@@ -1028,7 +1018,7 @@ class IsoWarrior {
 function bloodlineFacilityMul(w) {
   if (!w._parents) return 1.0;
   const gen = w._generation || 1;
-  return 1 + (gen - 1) * 0.08; // 世代が上がるごとにわずかにボーナス
+  return 1 + (gen - 1) * 0.08;
 }
 
 function randName(gender) {
@@ -1162,7 +1152,6 @@ function openPedigree() {
   const content = document.getElementById('pedigree-content');
   if (!content) return;
 
-  // 現役武将
   let html = '<div class="gen-block"><div class="gen-label">◆ 現役武将</div><div class="gen-list">';
   gWarriors.forEach(w => {
     html += `<div class="gen-card">
@@ -1173,7 +1162,6 @@ function openPedigree() {
   });
   html += '</div></div>';
 
-  // 縁組履歴
   if (state.pedigree.length > 0) {
     html += '<div class="gen-block"><div class="gen-label">◆ 縁組履歴</div><div class="gen-list">';
     state.pedigree.slice().reverse().forEach(p => {
@@ -1194,6 +1182,8 @@ function closePedigree() { closeModal('pedigree-modal'); }
 
 // ============================================================
 //  縁組モーダル
+// ── [修正3] キャンセルボタンの onclick を renderEngumiStep 内で
+//            毎回設定し直すことで step に応じた動作を保証
 // ============================================================
 function openEngumi() {
   engumiStep = 0;
@@ -1206,7 +1196,6 @@ function openEngumi() {
 function closeEngumi() { closeModal('engumi-modal'); }
 
 function renderEngumiStep() {
-  // ステップドット更新
   for (let i = 0; i < 3; i++) {
     const dot = document.getElementById('sdot' + i);
     if (dot) dot.classList.toggle('active', i === engumiStep);
@@ -1216,13 +1205,26 @@ function renderEngumiStep() {
   const cancelBtn = document.getElementById('engumi-cancel-btn');
   const content   = document.getElementById('engumi-step-content');
 
+  // ── キャンセル／戻るボタンを毎回再設定 ──
   if (engumiStep === 0) {
-    // 父を選ぶ
-    nextBtn.textContent = '次へ →';
-    nextBtn.disabled    = !engumiSelectedFather;
     cancelBtn.textContent = '取消';
+    cancelBtn.onclick = () => closeEngumi();
+  } else {
+    cancelBtn.textContent = '← 戻る';
+    cancelBtn.onclick = () => { engumiStep--; renderEngumiStep(); };
+  }
+
+  if (engumiStep === 0) {
+    nextBtn.textContent = '次へ →';
+    nextBtn.disabled    = (engumiSelectedFather === null);
 
     const males = gWarriors.filter(w => w.gender !== 'female');
+    // ── [修正4] 男性武将が0人のときのガード ──
+    if (males.length === 0) {
+      content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">父となれる武将がいません</div>';
+      nextBtn.disabled = true;
+      return;
+    }
     let html = `
       <div class="engumi-cost">
         <div class="ec-label">縁組費用</div>
@@ -1232,7 +1234,7 @@ function renderEngumiStep() {
       <div class="modal-section">
         <div class="modal-section-title">父となる武将を選べ</div>
         <div class="warrior-select-grid">`;
-    males.forEach((w, i) => {
+    males.forEach(w => {
       const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
       const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
       const idx = gWarriors.indexOf(w);
@@ -1244,18 +1246,23 @@ function renderEngumiStep() {
     });
     html += '</div></div>';
     content.innerHTML = html;
-  } else if (engumiStep === 1) {
-    // 母を選ぶ
-    nextBtn.textContent = '縁組 →';
-    nextBtn.disabled    = !engumiSelectedMother;
-    cancelBtn.textContent = '← 戻る';
 
-    const females = gWarriors.filter((w, idx) => idx !== engumiSelectedFather);
+  } else if (engumiStep === 1) {
+    nextBtn.textContent = '次へ →';
+    nextBtn.disabled    = (engumiSelectedMother === null);
+
+    // ── [修正5] 父以外の全武将を選択肢に（性別不問で2名以上いれば縁組可能に） ──
+    const candidates = gWarriors.filter((w, idx) => idx !== engumiSelectedFather);
+    if (candidates.length === 0) {
+      content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">母となれる武将がいません</div>';
+      nextBtn.disabled = true;
+      return;
+    }
     let html = `
       <div class="modal-section">
         <div class="modal-section-title">母となる武将を選べ</div>
         <div class="warrior-select-grid">`;
-    females.forEach(w => {
+    candidates.forEach(w => {
       const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
       const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
       const idx = gWarriors.indexOf(w);
@@ -1287,11 +1294,10 @@ function renderEngumiStep() {
       </div>`;
     }
     content.innerHTML = html;
+
   } else if (engumiStep === 2) {
-    // 確認
     nextBtn.textContent = '成立させる';
     nextBtn.disabled    = false;
-    cancelBtn.textContent = '← 戻る';
 
     const f  = gWarriors[engumiSelectedFather];
     const m  = gWarriors[engumiSelectedMother];
@@ -1322,16 +1328,12 @@ function renderEngumiStep() {
 function selectFather(idx) {
   engumiSelectedFather = idx;
   if (engumiSelectedMother === idx) engumiSelectedMother = null;
-  const nextBtn = document.getElementById('engumi-next-btn');
-  if (nextBtn) nextBtn.disabled = false;
   renderEngumiStep();
 }
 
 function selectMother(idx) {
   if (idx === engumiSelectedFather) { showToast('父と同じ武将は選べません'); return; }
   engumiSelectedMother = idx;
-  const nextBtn = document.getElementById('engumi-next-btn');
-  if (nextBtn) nextBtn.disabled = false;
   renderEngumiStep();
 }
 
@@ -1341,35 +1343,13 @@ function engumiNext() {
     engumiStep = 1;
     renderEngumiStep();
   } else if (engumiStep === 1) {
-    if (engumiSelectedMother === null) {
-      // 戻るボタンとして機能
-      engumiStep = 0;
-      renderEngumiStep();
-      return;
-    }
-    const cancelBtn = document.getElementById('engumi-cancel-btn');
-    cancelBtn.onclick = () => { engumiStep = 1; renderEngumiStep(); };
+    if (engumiSelectedMother === null) { showToast('母を選んでください'); return; }
     engumiStep = 2;
     renderEngumiStep();
   } else if (engumiStep === 2) {
     doEngumi();
   }
 }
-
-// 縁組キャンセル・戻るロジックを修正
-document.addEventListener('DOMContentLoaded', () => {
-  const cancelBtn = document.getElementById('engumi-cancel-btn');
-  if (cancelBtn) {
-    cancelBtn.onclick = () => {
-      if (engumiStep === 0) {
-        closeEngumi();
-      } else {
-        engumiStep--;
-        renderEngumiStep();
-      }
-    };
-  }
-});
 
 function doEngumi() {
   if (state.koku < ENGUMI_COST) {
@@ -1410,7 +1390,6 @@ function doEngumi() {
   addLog(`縁組成立：${f.name} × ${m.name} → ${childName}（第${child._generation}世代）`);
   closeEngumi();
 
-  // 成功オーバーレイ表示
   document.getElementById('suc-name').textContent = childName;
   document.getElementById('suc-stats').innerHTML =
     `武力 ${cs.power}　知力 ${cs.wisdom}　体力 ${cs.maxHp}<br>` +
@@ -1421,38 +1400,30 @@ function doEngumi() {
   updatePartyRow();
 }
 
-function closeSuccessOverlay() { closeModal('success-overlay'); }
+function closeSuccessOverlay() {
+  document.getElementById('success-overlay').classList.remove('show');
+}
 
 // ============================================================
-//  合戦
+//  合戦システム
 // ============================================================
-//  合戦システム（ピクセルアートバトルエンジン）
-// ============================================================
-
-// ── 定数 ────────────────────────────────────────────────
 const BW = 480, BH = 300;
 const B_FIELD_Y_MIN = 68, B_FIELD_Y_MAX = BH - 18;
 const B_ATTACK_RANGE = 20, B_GEN_ATK_RANGE = 30;
 const B_GEN_CHARGE_SPEED = 1.8;
 const B_LOG_HOLD = 90;
-const B_MAX_HP = 120;
 
-// パレット（味方=青紫、敵=赤）
 const PAL_P = { armor:'#6040b0', skin:'#f0c890', helm:'#4830a0', eye:'#201040', acc:'#c8a020', shadow:'#2a1860' };
 const PAL_E = { armor:'#c04080', skin:'#f0c890', helm:'#a02060', eye:'#200010', acc:'#c8a020', shadow:'#601030' };
 
-// 将軍セリフ
 const LINES_P    = ['かかれーっ！','討ち取れ！','引くな！','者ども続け！','前へ！'];
 const LINES_E    = ['押せ押せ！','蹴散らせ！','逃がすな！','突き崩せ！','進め！'];
 const DUEL_LINES = ['一騎討ち！','尋常に勝負！','逃げるな！','受けてみよ！'];
 
-// ── ピクセル描画ヘルパー ─────────────────────────────────
 function bpx(c, color, x, y, w=1, h=1) { c.fillStyle = color; c.fillRect(x, y, w, h); }
 
-// ── 背景描画 ─────────────────────────────────────────────
 function bDrawBackground(bgCtx) {
   bgCtx.clearRect(0, 0, BW, BH);
-  // 城壁
   bgCtx.fillStyle = '#c8bca8'; bgCtx.fillRect(0, 0, BW, 52);
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 18; col++) {
@@ -1465,7 +1436,6 @@ function bDrawBackground(bgCtx) {
   }
   bgCtx.fillStyle = '#b0a490';
   for (let i = 0; i < 33; i++) if (i % 2 === 0) bgCtx.fillRect(i * 15, 0, 14, 6);
-  // 旗・木
   [60, 150, 240, 330].forEach(cx => {
     bgCtx.fillStyle = '#2a6030'; bgCtx.fillRect(cx, 0, 20, 46);
     bgCtx.fillStyle = '#3a7840'; bgCtx.fillRect(cx + 4, 0, 4, 46); bgCtx.fillRect(cx + 13, 0, 3, 46);
@@ -1478,16 +1448,13 @@ function bDrawBackground(bgCtx) {
     bgCtx.fillStyle = '#ffa010'; bgCtx.fillRect(tx - 1, ty - 12, 2, 8);
     bgCtx.fillStyle = '#ffee40'; bgCtx.fillRect(tx, ty - 14, 1, 5);
   });
-  // 中央本陣紋
   const mx = BW / 2, my = 26;
   bgCtx.fillStyle = '#c8a020'; bgCtx.fillRect(mx - 16, my - 14, 32, 28);
   bgCtx.fillStyle = '#e8c040'; bgCtx.fillRect(mx - 12, my - 10, 24, 24);
   bgCtx.fillStyle = '#7040a0'; bgCtx.fillRect(mx - 2, my - 8, 4, 20); bgCtx.fillRect(mx - 10, my - 2, 20, 4);
-  // 地面
   bgCtx.fillStyle = '#909898'; bgCtx.fillRect(0, 52, BW, 8);
   bgCtx.fillStyle = '#a8b0b0'; bgCtx.fillRect(0, 52, BW, 3);
   bgCtx.fillStyle = '#606868'; bgCtx.fillRect(0, 57, BW, 3);
-  // 戦場タイル
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 14; col++) {
       const ox = (row % 2) * 26, x = col * 36 + ox - 18, y = 60 + row * 32;
@@ -1502,7 +1469,6 @@ function bDrawBackground(bgCtx) {
   }
 }
 
-// ── キャラクター描画 ─────────────────────────────────────
 function bDrawSoldier(c, x, y, pal, dir, wf, st) {
   c.save();
   if (dir < 0) { c.translate(x + 8, y); c.scale(-1, 1); c.translate(-8, 0); } else c.translate(x, y);
@@ -1539,7 +1505,6 @@ function bDrawGeneral(c, x, y, pal, dir, wf, st) {
   c.restore();
 }
 
-// ── 吹き出し描画 ─────────────────────────────────────────
 function bDrawSpeechBubble(c, gx, gy, text, side, alpha) {
   if (!text || alpha <= 0) return;
   c.save(); c.globalAlpha = Math.min(1, alpha);
@@ -1571,15 +1536,16 @@ function bDrawSpeechBubble(c, gx, gy, text, side, alpha) {
   c.restore();
 }
 
-// ── バトル状態 ───────────────────────────────────────────
 let bSoldiers, bGenerals, bParticles, bDamageNums;
 let bGameState, bTickCount, bLoopId;
 let bLogText = '', bLogTimer = 0;
 let bBubbles = [];
+// ── [修正6] 将軍の maxHp を別途保持してバー計算に使う ──
+let bGenMaxHp = { p: 120, e: 120 };
 
-function bSetLog(t)         { if (bLogTimer <= 0) { bLogText = t; bLogTimer = B_LOG_HOLD; } }
+function bSetLog(t)          { if (bLogTimer <= 0) { bLogText = t; bLogTimer = B_LOG_HOLD; } }
 function bForceLog(t, h=B_LOG_HOLD) { bLogText = t; bLogTimer = h; }
-function bTickLog()         { if (bLogTimer > 0) bLogTimer--; document.getElementById('battle-log-bar').textContent = bLogText; }
+function bTickLog()          { if (bLogTimer > 0) bLogTimer--; document.getElementById('battle-log-bar').textContent = bLogText; }
 function bAddBubble(side, text, life = 130) {
   bBubbles = bBubbles.filter(b => b.side !== side);
   bBubbles.push({ side, text, life, maxLife: life });
@@ -1602,12 +1568,14 @@ function bUpdateParticles() {
   bDamageNums.forEach(d => { d.y += d.vy; d.vy *= .92; d.life--; });
 }
 
+// ── [修正6] HPバーを maxHp 基準で正しく計算 ──
 function bUpdateBattleUI() {
-  const ph = Math.max(0, bGenerals.p.hp), eh = Math.max(0, bGenerals.e.hp);
+  const ph = Math.max(0, bGenerals.p.hp);
+  const eh = Math.max(0, bGenerals.e.hp);
   document.getElementById('bhp-player').textContent = ph;
   document.getElementById('bhp-enemy').textContent  = eh;
-  document.getElementById('bbar-player').style.width = (ph / B_MAX_HP * 100).toFixed(1) + '%';
-  document.getElementById('bbar-enemy').style.width  = (eh / B_MAX_HP * 100).toFixed(1) + '%';
+  document.getElementById('bbar-player').style.width = (ph / bGenMaxHp.p * 100).toFixed(1) + '%';
+  document.getElementById('bbar-enemy').style.width  = (eh / bGenMaxHp.e * 100).toFixed(1) + '%';
 }
 
 function bNearest(list, x, y) {
@@ -1618,7 +1586,6 @@ function bFindTarget(s) {
   return foes.length ? bNearest(foes, s.x, s.y) : null;
 }
 
-// ── 兵士AI ───────────────────────────────────────────────
 function bUpdateSoldiers() {
   bSoldiers.forEach(s => {
     if (s.dead) return;
@@ -1665,7 +1632,6 @@ function bUpdateSoldiers() {
   });
 }
 
-// ── 将軍AI ───────────────────────────────────────────────
 function bUpdateGenerals() {
   ['p', 'e'].forEach(side => {
     const g = bGenerals[side], foe = bGenerals[side === 'p' ? 'e' : 'p'];
@@ -1715,7 +1681,6 @@ function bUpdateGenerals() {
   });
 }
 
-// ── 合戦メインループ ─────────────────────────────────────
 function bGameLoop(bgCtx, ctx) {
   bTickCount++;
   const animFrame = (bTickCount >> 3) & 1;
@@ -1727,7 +1692,6 @@ function bGameLoop(bgCtx, ctx) {
     bTickLog();
     bTickBubbles();
 
-    // 勝敗判定
     if (bGenerals.p.hp <= 0 || bGenerals.e.hp <= 0) {
       bGameState = 'end';
       const pWin = bGenerals.p.hp > 0;
@@ -1736,7 +1700,6 @@ function bGameLoop(bgCtx, ctx) {
     }
   }
 
-  // 描画
   ctx.clearRect(0, 0, BW, BH);
   const allUnits = [
     ...bSoldiers.filter(s => !s.dead).map(s => ({
@@ -1782,7 +1745,6 @@ function bGameLoop(bgCtx, ctx) {
   if (bGameState !== 'end') bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
 }
 
-// ── 合戦終了処理 ─────────────────────────────────────────
 function bEndBattle(isWin) {
   const titleEl  = document.getElementById('bres-title-text');
   const detailEl = document.getElementById('bres-detail-text');
@@ -1814,19 +1776,16 @@ function bEndBattle(isWin) {
   updatePartyRow();
 }
 
-// ── openBattle / closeBattle ─────────────────────────────
 function openBattle() {
   if (gWarriors.length === 0) { showToast('武将がいません'); return; }
 
-  // 前回のループを止める
   if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
 
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-result-panel').classList.remove('show');
   document.getElementById('battle-log-bar').textContent = '両軍、突撃開始！';
 
-  // Canvas 取得とリサイズ
-  const bgCv  = document.getElementById('bg-canvas');
+  const bgCv   = document.getElementById('bg-canvas');
   const mainCv = document.getElementById('battle-main-canvas');
   const frame  = document.getElementById('bscr-frame');
 
@@ -1844,23 +1803,22 @@ function openBattle() {
   [bgCtx, ctx].forEach(c => c.imageSmoothingEnabled = false);
   bDrawBackground(bgCtx);
 
-  // 状態初期化
   bGameState = 'battle'; bTickCount = 0;
   bLogText = '両軍、突撃開始！'; bLogTimer = B_LOG_HOLD * 2;
   bParticles = []; bDamageNums = []; bBubbles = [];
 
-  // 武将名を UI に反映
   const leader = gWarriors[0];
   document.getElementById('bunit-pname').textContent = leader ? leader.name.slice(-3) : '我が軍';
 
-  // 将軍HP は我が軍の総合戦力に基づく
   const playerPower = clamp(
     gWarriors.reduce((s, w) => s + w.stats.power + w.stats.wisdom, 0) / gWarriors.length,
     60, 150
   ) | 0;
-  const enemyPower = clamp(B_MAX_HP + Math.floor(state.unification * 0.4), 60, 180) | 0;
+  const enemyPower = clamp(120 + Math.floor(state.unification * 0.4), 60, 180) | 0;
 
-  // 兵士生成
+  // ── [修正6] maxHp を保存 ──
+  bGenMaxHp = { p: playerPower, e: enemyPower };
+
   bSoldiers = [];
   const soldierCount = Math.min(8, 4 + gWarriors.length);
   for (let i = 0; i < soldierCount; i++) {
@@ -1881,16 +1839,16 @@ function openBattle() {
     });
   }
 
-  // 将軍生成
   bGenerals = {
     p: { x: 30,      y: BH / 2 - 15, hp: playerPower, maxHp: playerPower, state: 'charge', stateTimer: 0, dead: false },
     e: { x: BW - 54, y: BH / 2 - 15, hp: enemyPower,  maxHp: enemyPower,  state: 'charge', stateTimer: 0, dead: false },
   };
-  // HPバーの最大値を動的に設定
+
   document.getElementById('bhp-player').textContent = playerPower;
   document.getElementById('bhp-enemy').textContent  = enemyPower;
+  document.getElementById('bbar-player').style.width = '100%';
+  document.getElementById('bbar-enemy').style.width  = '100%';
 
-  // 開幕セリフ
   bAddBubble('p', LINES_P[0], 150);
   bAddBubble('e', LINES_E[0], 150);
   bAddPt(bGenerals.p.x + 12, bGenerals.p.y + 15, '#ffe060', 10);
@@ -1905,7 +1863,7 @@ function closeBattle() {
 }
 
 // ============================================================
-//  アイドルティック（自動成長）
+//  アイドルティック
 // ============================================================
 function performIdleTick() {
   state.turn++;
@@ -1913,7 +1871,6 @@ function performIdleTick() {
     w.stats.exp += rnd(3, 8);
     if (Math.random() < 0.4)  w.stats.power  = clamp(w.stats.power  + 1, 1, 99);
     if (Math.random() < 0.25) w.stats.wisdom  = clamp(w.stats.wisdom + 1, 1, 99);
-    // 自然回復（体力が低いほど回復しやすい）
     const hpPct = w.stats.hp / w.stats.maxHp;
     if (hpPct < 0.9) {
       const naturalRec = Math.floor((1 - hpPct) * 4 + 1);
@@ -1946,11 +1903,10 @@ function initIsoCanvas() {
   const ctx = canvas.getContext('2d');
 
   function isoToScreen(ix, iy) {
-    const w     = canvas.width;
-    const h     = canvas.height;
-    const cx    = w / 2;
-    const cy    = h * 0.5;
-    // 縦画面は幅基準でタイルを計算
+    const w   = canvas.width;
+    const h   = canvas.height;
+    const cx  = w / 2;
+    const cy  = h * 0.5;
     const tileW = w * 0.22;
     const tileH = tileW * 0.5;
     return {
@@ -1965,7 +1921,6 @@ function initIsoCanvas() {
     const th    = tileW * 0.3;
     const { x, y } = isoToScreen(ix, iy);
 
-    // 上面
     ctx.fillStyle = topColor;
     ctx.beginPath();
     ctx.moveTo(x,           y - tileH / 2);
@@ -1975,7 +1930,6 @@ function initIsoCanvas() {
     ctx.closePath();
     ctx.fill();
 
-    // 左面
     ctx.fillStyle = leftColor;
     ctx.beginPath();
     ctx.moveTo(x - tileW/2, y);
@@ -1985,7 +1939,6 @@ function initIsoCanvas() {
     ctx.closePath();
     ctx.fill();
 
-    // 右面
     ctx.fillStyle = rightColor;
     ctx.beginPath();
     ctx.moveTo(x,           y + tileH / 2);
@@ -2016,15 +1969,13 @@ function initIsoCanvas() {
   function drawWarrior(w) {
     const { x, y } = isoToScreen(w.isoX, w.isoY);
     const hpPct = w.stats.hp / w.stats.maxHp;
-    const r = Math.max(7, Math.round(canvas.width * 0.028)); // タイル比率でサイズ
+    const r = Math.max(7, Math.round(canvas.width * 0.028));
     const bw = r * 2.6;
     ctx.save();
-    // 影
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath();
     ctx.ellipse(x, y + r * 0.3, r * 1.1, r * 0.4, 0, 0, Math.PI * 2);
     ctx.fill();
-    // 体
     ctx.fillStyle = w._color;
     ctx.beginPath();
     ctx.arc(x, y - r * 0.7, r, 0, Math.PI * 2);
@@ -2032,12 +1983,10 @@ function initIsoCanvas() {
     ctx.strokeStyle = 'rgba(255,255,255,.4)';
     ctx.lineWidth = 1;
     ctx.stroke();
-    // HP バー
     ctx.fillStyle = 'rgba(0,0,0,.5)';
     ctx.fillRect(x - bw/2, y + r * 0.5, bw, 3);
     ctx.fillStyle = hpPct > 0.6 ? '#44ff88' : hpPct > 0.3 ? '#ffaa44' : '#ff4444';
     ctx.fillRect(x - bw/2, y + r * 0.5, bw * hpPct, 3);
-    // 名前
     ctx.fillStyle = 'rgba(245,232,200,.9)';
     ctx.font = `${Math.max(7, r - 1)}px Noto Serif JP`;
     ctx.textAlign = 'center';
@@ -2048,11 +1997,10 @@ function initIsoCanvas() {
   let lastTime = 0;
   function loop(ts) {
     const dt = ts - lastTime;
-    if (dt > 50) { // 約20fps
+    if (dt > 50) {
       lastTime = ts;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // タイル描画（5×5グリッド）
       for (let iy = -2; iy <= 3; iy++) {
         for (let ix = -2; ix <= 2; ix++) {
           const isPath = (ix === 0 || iy === 0);
@@ -2063,10 +2011,8 @@ function initIsoCanvas() {
         }
       }
 
-      // 施設描画
       FACILITY_POSITIONS.forEach(fp => drawFacility(fp));
 
-      // 武将 tick & 描画（Y深さでソート）
       gWarriors.forEach(w => w.tick());
       const sorted = [...gWarriors].sort((a, b) => (a.isoX + a.isoY) - (b.isoX + b.isoY));
       sorted.forEach(w => drawWarrior(w));
@@ -2081,9 +2027,21 @@ function initIsoCanvas() {
 // ============================================================
 function devAddKoku()        { state.koku += 5000; updateStatusUI(); showToast('石高 +5000'); }
 function devAddPower()       { gWarriors.forEach(w => { w.stats.power = clamp(w.stats.power+20,1,99); }); updatePartyRow(); showToast('全武将 武力+20'); }
-function devLevelUp()        { gWarriors.forEach(w => { for(let i=0;i<5;i++) { w.stats.exp += w.stats.level*120+80; w._checkLevelUp(); } }); updatePartyRow(); showToast('全武将 Lv+5'); }
 function devRestoreHp()      { gWarriors.forEach(w => { w.stats.hp = w.stats.maxHp; }); updatePartyRow(); showToast('全武将 体力全回復'); }
 function devSetUnification() { state.unification = Math.min(99.9, state.unification + 30); updateStatusUI(); showToast('統一度 +30%'); }
+
+// ── [修正7] devLevelUp: exp を先に加算してから _checkLevelUp を呼ぶ ──
+function devLevelUp() {
+  gWarriors.forEach(w => {
+    for (let i = 0; i < 5; i++) {
+      w.stats.exp += w.stats.level * 120 + 80;
+      w._checkLevelUp();
+    }
+  });
+  updatePartyRow();
+  showToast('全武将 Lv+5');
+}
+
 function devAddWarrior() {
   const gender = Math.random() < 0.5 ? 'male' : 'female';
   const name   = randName(gender);
@@ -2095,19 +2053,6 @@ function devAddWarrior() {
   closeModal('dev-modal');
 }
 
-// 履歴表示
-function openHistoryFromDev() {
-  const list = document.getElementById('hist-list');
-  list.innerHTML = '';
-  state.log.forEach(item => {
-    const d = document.createElement('div');
-    d.className = 'hist-item';
-    d.innerHTML = `<span class="hi-time">${item.time}</span> ${item.text}`;
-    list.appendChild(d);
-  });
-  openModal('history-modal');
-}
-
 // ============================================================
 //  初期化
 // ============================================================
@@ -2115,7 +2060,6 @@ function initGame() {
   spawnStars();
   spawnPetals();
 
-  // 初期武将生成
   const initialWarriors = [
     { name: '織田信長', jobId: 0, power: 72, gender:'male' },
     { name: '豊臣秀吉', jobId: 1, power: 58, gender:'male' },
@@ -2129,29 +2073,13 @@ function initGame() {
     gWarriors.push(w);
   });
 
-  // キャンバス初期化
   initIsoCanvas();
 
-  // 縁組キャンセルボタン設定
-  const cancelBtn = document.getElementById('engumi-cancel-btn');
-  if (cancelBtn) {
-    cancelBtn.onclick = () => {
-      if (engumiStep === 0) {
-        closeEngumi();
-      } else {
-        engumiStep--;
-        renderEngumiStep();
-      }
-    };
-  }
-
-  // アイドル更新
   idleTimer = setInterval(performIdleTick, 3000);
 
   updateStatusUI();
   updatePartyRow();
   addLog('ゲーム開始。天下統一を目指せ！');
-
   showToast('戦国血脈 〜覇道の系譜〜 開始！', 3000);
 }
 
