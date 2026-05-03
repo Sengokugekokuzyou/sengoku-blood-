@@ -158,10 +158,11 @@ html,body{
 .pc-hp{font-size:7px;}
 .pc-loc{font-size:7px;color:#aaddff;margin-top:1px;}
 
+/* ── アクションバー: 5ボタン対応 ── */
 #action-row{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:5px;
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
   padding:3px 0 2px;
   height:var(--h-actionrow);
 }
@@ -170,7 +171,7 @@ html,body{
   background:var(--panel);
   border:1px solid var(--gold-d);
   border-radius:10px;
-  padding:0 4px;
+  padding:0 2px;
   cursor:pointer;
   transition:background .15s,border-color .15s,transform .1s;
   color:var(--parchment);font-family:inherit;
@@ -178,8 +179,8 @@ html,body{
   min-height:52px;
 }
 .act-btn:active{transform:scale(.91);background:rgba(200,150,12,.16);border-color:var(--gold);}
-.act-btn .ico{font-size:20px;line-height:1;}
-.act-btn .lbl{font-size:9px;letter-spacing:.12em;color:rgba(245,232,200,.72);}
+.act-btn .ico{font-size:18px;line-height:1;}
+.act-btn .lbl{font-size:8px;letter-spacing:.1em;color:rgba(245,232,200,.72);}
 .act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45);}
 .act-btn.primary .lbl{color:var(--gold-l);}
 
@@ -477,6 +478,7 @@ html,body{
 }
 .dev-btn:active{background:rgba(200,150,12,.14);}
 
+/* ─── 戦記履歴モーダル ─── */
 .hist-shell{
   width:100%;max-width:480px;
   height:78%;
@@ -485,12 +487,40 @@ html,body{
   border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;
   animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
 }
-.hist-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.hist-head{
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(200,150,12,.12);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
 .hist-title{font-size:13px;color:var(--gold);letter-spacing:.3em;}
-#hist-list{overflow-y:auto;padding:10px 14px max(env(safe-area-inset-bottom,0px),12px);flex:1;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#hist-list{
+  overflow-y:auto;
+  padding:10px 14px max(env(safe-area-inset-bottom,0px),12px);
+  flex:1;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
 #hist-list::-webkit-scrollbar{display:none;}
-.hist-item{font-size:10px;color:rgba(245,228,180,.7);padding:5px 0;border-bottom:1px solid rgba(200,150,12,.07);line-height:1.5;}
-.hist-item .hi-time{color:rgba(200,150,12,.5);font-size:9px;}
+.hist-item{
+  font-size:11px;color:rgba(245,228,180,.8);
+  padding:7px 0;
+  border-bottom:1px solid rgba(200,150,12,.1);
+  line-height:1.5;
+  display:flex;gap:8px;align-items:baseline;
+}
+.hist-item .hi-time{
+  color:rgba(200,150,12,.55);
+  font-size:9px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.hist-item .hi-text{flex:1;}
+.hist-empty{
+  text-align:center;padding:32px 16px;
+  color:rgba(200,150,12,.35);
+  font-size:11px;letter-spacing:.3em;
+}
 
 /* ─── トースト ─── */
 #toast{
@@ -636,7 +666,7 @@ html,body{
   </div>
 </div>
 
-<!-- 履歴モーダル -->
+<!-- 戦記履歴モーダル -->
 <div id="history-modal">
   <div class="hist-shell">
     <div class="hist-head">
@@ -684,6 +714,7 @@ html,body{
       <span class="np" id="uni-pct">0%</span>
     </div>
     <div id="party-row"></div>
+    <!-- [修正] 5ボタン構成: 履歴ボタンを追加 -->
     <div id="action-row">
       <button class="act-btn primary" onclick="openBattle()">
         <span class="ico">⚔️</span><span class="lbl">合戦</span>
@@ -692,7 +723,10 @@ html,body{
         <span class="ico">⚜️</span><span class="lbl">縁組</span>
       </button>
       <button class="act-btn" onclick="openPedigree()">
-        <span class="ico">📜</span><span class="lbl">系譜</span>
+        <span class="ico">🌳</span><span class="lbl">系譜</span>
+      </button>
+      <button class="act-btn" onclick="openHistory()">
+        <span class="ico">📜</span><span class="lbl">戦記</span>
       </button>
       <button class="act-btn" onclick="openModal('dev-modal')">
         <span class="ico">⚙️</span><span class="lbl">設定</span>
@@ -789,10 +823,8 @@ function addLog(text) {
   if (state.log.length > 80) state.log.pop();
 }
 
-// ── [修正1] success-overlay も含めてモーダル管理 ──
 function openModal(id) {
   document.getElementById(id).classList.add('show');
-  // success-overlay は z-index:900 なので modal-bg は不要
   if (id !== 'success-overlay') {
     const bg = document.getElementById('modal-bg');
     if (bg) bg.style.display = 'block';
@@ -994,7 +1026,6 @@ class IsoWarrior {
   }
 
   _checkLevelUp() {
-    // ── [修正2] ループで複数回レベルアップに対応 ──
     let loopGuard = 0;
     while (loopGuard++ < 20) {
       const needed = this.stats.level * 120 + 80;
@@ -1181,9 +1212,28 @@ function openPedigree() {
 function closePedigree() { closeModal('pedigree-modal'); }
 
 // ============================================================
+//  戦記履歴モーダル（新規実装）
+// ============================================================
+function openHistory() {
+  const list = document.getElementById('hist-list');
+  if (!list) return;
+
+  if (state.log.length === 0) {
+    list.innerHTML = '<div class="hist-empty">まだ記録がありません</div>';
+  } else {
+    list.innerHTML = state.log.map(entry =>
+      `<div class="hist-item">
+        <span class="hi-time">${entry.time}</span>
+        <span class="hi-text">${entry.text}</span>
+      </div>`
+    ).join('');
+  }
+
+  openModal('history-modal');
+}
+
+// ============================================================
 //  縁組モーダル
-// ── [修正3] キャンセルボタンの onclick を renderEngumiStep 内で
-//            毎回設定し直すことで step に応じた動作を保証
 // ============================================================
 function openEngumi() {
   engumiStep = 0;
@@ -1205,7 +1255,6 @@ function renderEngumiStep() {
   const cancelBtn = document.getElementById('engumi-cancel-btn');
   const content   = document.getElementById('engumi-step-content');
 
-  // ── キャンセル／戻るボタンを毎回再設定 ──
   if (engumiStep === 0) {
     cancelBtn.textContent = '取消';
     cancelBtn.onclick = () => closeEngumi();
@@ -1219,7 +1268,6 @@ function renderEngumiStep() {
     nextBtn.disabled    = (engumiSelectedFather === null);
 
     const males = gWarriors.filter(w => w.gender !== 'female');
-    // ── [修正4] 男性武将が0人のときのガード ──
     if (males.length === 0) {
       content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">父となれる武将がいません</div>';
       nextBtn.disabled = true;
@@ -1251,7 +1299,6 @@ function renderEngumiStep() {
     nextBtn.textContent = '次へ →';
     nextBtn.disabled    = (engumiSelectedMother === null);
 
-    // ── [修正5] 父以外の全武将を選択肢に（性別不問で2名以上いれば縁組可能に） ──
     const candidates = gWarriors.filter((w, idx) => idx !== engumiSelectedFather);
     if (candidates.length === 0) {
       content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">母となれる武将がいません</div>';
@@ -1401,7 +1448,15 @@ function doEngumi() {
 }
 
 function closeSuccessOverlay() {
+  // [修正] modal-bg も確実にクリーンアップ
   document.getElementById('success-overlay').classList.remove('show');
+  const anyOpen = document.querySelectorAll(
+    '#pedigree-modal.show,#warrior-modal.show,#engumi-modal.show,#dev-modal.show,#history-modal.show'
+  );
+  if (anyOpen.length === 0) {
+    const bg = document.getElementById('modal-bg');
+    if (bg) bg.style.display = 'none';
+  }
 }
 
 // ============================================================
@@ -1540,7 +1595,6 @@ let bSoldiers, bGenerals, bParticles, bDamageNums;
 let bGameState, bTickCount, bLoopId;
 let bLogText = '', bLogTimer = 0;
 let bBubbles = [];
-// ── [修正6] 将軍の maxHp を別途保持してバー計算に使う ──
 let bGenMaxHp = { p: 120, e: 120 };
 
 function bSetLog(t)          { if (bLogTimer <= 0) { bLogText = t; bLogTimer = B_LOG_HOLD; } }
@@ -1568,7 +1622,6 @@ function bUpdateParticles() {
   bDamageNums.forEach(d => { d.y += d.vy; d.vy *= .92; d.life--; });
 }
 
-// ── [修正6] HPバーを maxHp 基準で正しく計算 ──
 function bUpdateBattleUI() {
   const ph = Math.max(0, bGenerals.p.hp);
   const eh = Math.max(0, bGenerals.e.hp);
@@ -1816,7 +1869,6 @@ function openBattle() {
   ) | 0;
   const enemyPower = clamp(120 + Math.floor(state.unification * 0.4), 60, 180) | 0;
 
-  // ── [修正6] maxHp を保存 ──
   bGenMaxHp = { p: playerPower, e: enemyPower };
 
   bSoldiers = [];
@@ -2030,13 +2082,15 @@ function devAddPower()       { gWarriors.forEach(w => { w.stats.power = clamp(w.
 function devRestoreHp()      { gWarriors.forEach(w => { w.stats.hp = w.stats.maxHp; }); updatePartyRow(); showToast('全武将 体力全回復'); }
 function devSetUnification() { state.unification = Math.min(99.9, state.unification + 30); updateStatusUI(); showToast('統一度 +30%'); }
 
-// ── [修正7] devLevelUp: exp を先に加算してから _checkLevelUp を呼ぶ ──
+// [修正] devLevelUp: exp を必要量まとめて加算してから _checkLevelUp を呼ぶ
 function devLevelUp() {
   gWarriors.forEach(w => {
+    let totalNeeded = 0;
     for (let i = 0; i < 5; i++) {
-      w.stats.exp += w.stats.level * 120 + 80;
-      w._checkLevelUp();
+      totalNeeded += (w.stats.level + i) * 120 + 80;
     }
+    w.stats.exp += totalNeeded;
+    w._checkLevelUp();
   });
   updatePartyRow();
   showToast('全武将 Lv+5');
