@@ -510,12 +510,13 @@ function rnd(lo, hi) { return Math.floor(lo + Math.random() * (hi - lo + 1)); }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 let toastTimer = null;
+// [バグ7修正] duration=0 が無視される問題を修正（nullish coalescing 使用）
 function showToast(msg, duration) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.classList.remove('show'); toastTimer = null; }, duration || 2200);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); toastTimer = null; }, duration != null ? duration : 2200);
 }
 
 function addLog(text) {
@@ -542,8 +543,10 @@ function closeModal(id) {
     if (bg) bg.style.display = 'none';
   }
 }
+
+// [バグ2修正] closeAllModals に success-overlay を追加し、必ず modal-bg を非表示にする
 function closeAllModals() {
-  ['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal'].forEach(id => {
+  ['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal','success-overlay'].forEach(id => {
     document.getElementById(id).classList.remove('show');
   });
   const bg = document.getElementById('modal-bg');
@@ -881,6 +884,8 @@ function openPedigree() {
     html += '</div></div>';
   }
   content.innerHTML = html;
+  // [バグ8修正] 履歴モーダル・系譜モーダルを開くたびに先頭へスクロール
+  content.scrollTop = 0;
   openModal('pedigree-modal');
 }
 function closePedigree() { closeModal('pedigree-modal'); }
@@ -901,6 +906,8 @@ function openHistory() {
       '</div>'
     ).join('');
   }
+  // [バグ8修正] 開くたびに最新（先頭）へスクロール
+  list.scrollTop = 0;
   openModal('history-modal');
 }
 
@@ -966,6 +973,17 @@ function renderEngumiStep() {
   } else if (engumiStep === 1) {
     nextBtn.textContent = '次へ →';
     nextBtn.disabled    = (engumiSelectedMother === null);
+
+    // [バグ3修正] ステップ1遷移時に父インデックスが有効か再確認
+    if (engumiSelectedFather === null || !gWarriors[engumiSelectedFather]) {
+      showToast('父の選択が無効です。最初からやり直してください');
+      engumiStep = 0;
+      engumiSelectedFather = null;
+      engumiSelectedMother = null;
+      renderEngumiStep();
+      return;
+    }
+
     const candidates = gWarriors.filter((w, idx) => idx !== engumiSelectedFather && w.isMature());
     if (candidates.length === 0) {
       content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">成人した母となれる武将がいません</div>';
@@ -1010,6 +1028,18 @@ function renderEngumiStep() {
   } else if (engumiStep === 2) {
     nextBtn.textContent = '成立させる';
     nextBtn.disabled    = false;
+
+    // [バグ3修正] 確認画面でも父母インデックスを再検証
+    if (engumiSelectedFather === null || engumiSelectedMother === null ||
+        !gWarriors[engumiSelectedFather] || !gWarriors[engumiSelectedMother]) {
+      showToast('選択が無効です。最初からやり直してください');
+      engumiStep = 0;
+      engumiSelectedFather = null;
+      engumiSelectedMother = null;
+      renderEngumiStep();
+      return;
+    }
+
     const f  = gWarriors[engumiSelectedFather];
     const m  = gWarriors[engumiSelectedMother];
     const cs = createChildStats(f, m);
@@ -1060,6 +1090,12 @@ function engumiNext() {
 function doEngumi() {
   if (state.koku < ENGUMI_COST) { showToast('石高が足りません（必要：' + ENGUMI_COST + '石）'); return; }
   if (engumiSelectedFather === null || engumiSelectedMother === null) { showToast('父母を選択してください'); return; }
+  // [バグ3修正] 実行直前にもインデックス有効性を確認
+  if (!gWarriors[engumiSelectedFather] || !gWarriors[engumiSelectedMother]) {
+    showToast('選択が無効です。最初からやり直してください');
+    closeEngumi();
+    return;
+  }
 
   const f  = gWarriors[engumiSelectedFather];
   const m  = gWarriors[engumiSelectedMother];
@@ -1097,16 +1133,11 @@ function doEngumi() {
   updatePartyRow();
 }
 
+// [バグ1修正] closeSuccessOverlay を単純化：常に modal-bg を閉じる
 function closeSuccessOverlay() {
   document.getElementById('success-overlay').classList.remove('show');
-  // 他のモーダルが開いていなければ背景も消す
-  const anyOpen = document.querySelectorAll(
-    '#pedigree-modal.show,#warrior-modal.show,#engumi-modal.show,#dev-modal.show,#history-modal.show'
-  );
-  if (anyOpen.length === 0) {
-    const bg = document.getElementById('modal-bg');
-    if (bg) bg.style.display = 'none';
-  }
+  const bg = document.getElementById('modal-bg');
+  if (bg) bg.style.display = 'none';
 }
 
 // ============================================================
@@ -1394,6 +1425,8 @@ function bGameLoop(bgCtx, ctx) {
       const pWin = bGenerals.p.hp > 0;
       bAddBubble(pWin?'p':'e', '勝ったぞ！', 400);
       bEndBattle(pWin);
+      // [バグ4修正] bEndBattle内でループを停止するので return
+      return;
     }
   }
   ctx.clearRect(0, 0, BW, BH);
@@ -1431,10 +1464,13 @@ function bGameLoop(bgCtx, ctx) {
     bDrawSpeechBubble(ctx, g.x, g.y, b.text, b.side, Math.min(1, b.life/20));
   });
   bUpdateBattleUI();
-  if (bGameState !== 'end') bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
+  bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
 }
 
+// [バグ4修正] bEndBattle でアニメーションループを明示的に停止
 function bEndBattle(isWin) {
+  if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
+
   const titleEl  = document.getElementById('bres-title-text');
   const detailEl = document.getElementById('bres-detail-text');
   if (isWin) {
@@ -1467,6 +1503,7 @@ function bEndBattle(isWin) {
 
 function openBattle() {
   if (gWarriors.length === 0) { showToast('武将がいません'); return; }
+  // [バグ4修正] 既存のループを確実にキャンセル
   if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
 
   document.getElementById('battle-screen').classList.add('show');
@@ -1592,7 +1629,8 @@ function initIsoCanvas() {
 
   function resize() {
     canvas.width  = field.clientWidth  || window.innerWidth;
-    canvas.height = field.clientHeight || Math.floor(window.innerHeight * 0.5);
+    // [バグ6修正] フィールド高さを正確に取得し、最小値を保証
+    canvas.height = Math.max(field.clientHeight || 200, 200);
   }
   resize();
   window.addEventListener('resize', resize);
@@ -1601,8 +1639,9 @@ function initIsoCanvas() {
 
   function isoToScreen(ix, iy) {
     const cx    = canvas.width / 2;
-    const cy    = canvas.height * 0.5;
-    const tileW = canvas.width * 0.22;
+    // [バグ6修正] cy をキャンバス中央寄りに調整して施設が切れにくくする
+    const cy    = canvas.height * 0.45;
+    const tileW = Math.min(canvas.width * 0.22, canvas.height * 0.28);
     const tileH = tileW * 0.5;
     return {
       x: cx + (ix - iy) * tileW * 0.5,
@@ -1611,7 +1650,7 @@ function initIsoCanvas() {
   }
 
   function drawTile(ix, iy, topColor, leftColor, rightColor) {
-    const tileW = canvas.width * 0.22;
+    const tileW = Math.min(canvas.width * 0.22, canvas.height * 0.28);
     const tileH = tileW * 0.5;
     const th    = tileW * 0.3;
     const { x, y } = isoToScreen(ix, iy);
@@ -1642,7 +1681,9 @@ function initIsoCanvas() {
     const fm = FACILITY_MAP[fp.key];
     if (!fm) return;
     const { x, y } = isoToScreen(fp.tx, fp.ty);
-    const tileW = canvas.width * 0.22;
+    // [バグ6修正] 画面外の施設は描画しない
+    if (x < -20 || x > canvas.width + 20 || y < -20 || y > canvas.height + 20) return;
+    const tileW = Math.min(canvas.width * 0.22, canvas.height * 0.28);
     const iconSz = Math.max(14, Math.round(tileW * 0.55));
     ctx.save();
     ctx.font = iconSz + 'px serif';
@@ -1736,7 +1777,8 @@ function devAddWarrior() {
   const name   = randName(gender);
   const jobId  = Math.floor(Math.random() * Object.keys(ROLES).length);
   const age    = rnd(20, 35); // 最初から成人として招募
-  const w = new IsoWarrior(name, jobId, rnd(35,65), (Math.random()-0.5)*2, 2+Math.random()*3, gender, age);
+  // [バグ5補足] offsetX は内部で保持されるが使われないため 0 を明示
+  const w = new IsoWarrior(name, jobId, rnd(35,65), 0, 2+Math.random()*3, gender, age);
   gWarriors.push(w);
   updatePartyRow();
   showToast(name + ' が加入！（' + age + '歳）');
