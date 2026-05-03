@@ -5,515 +5,686 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>戦国血脈 〜覇道の系譜〜</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Shippori+Mincho:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');
 :root{
   --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
-  --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.85);
+  --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);
   --crimson:#8b0000;
+  /* スマホ縦画面基準サイズ変数 */
+  --h-header:52px;
+  --h-nationbar:28px;
+  --h-partyrow:70px;
+  --h-actionrow:62px;
+  --h-bottom-pad:max(env(safe-area-inset-bottom,0px),8px);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
+html,body{
+  width:100%;height:100%;
+  background:var(--ink);
+  font-family:'Noto Serif JP',serif;
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  /* iOSバウンス防止 */
+  position:fixed;
+  touch-action:none;
+}
 
-/* ── 背景 ── */
+/* ─── 背景 ─── */
 #sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
 .star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
 @keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
 .mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none;}
-.mist:nth-child(1){height:55px;top:30%;animation-duration:32s;}
-.mist:nth-child(2){height:70px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
-.mist:nth-child(3){height:45px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
+.mist:nth-child(1){height:40px;top:30%;animation-duration:32s;}
+.mist:nth-child(2){height:50px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
+.mist:nth-child(3){height:35px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
 @keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
 .petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
 @keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
 
-/* ── レイアウト ── */
-#main{position:relative;z-index:10;width:100%;height:100%;display:flex;flex-direction:column;}
-#header{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),12px) 16px 6px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-#game-title{color:var(--gold);font-size:clamp(15px,4.8vw,20px);font-weight:900;letter-spacing:.3em;text-shadow:0 0 20px rgba(200,150,12,.75);line-height:1.5;}
-#game-title .sub{display:block;font-size:clamp(8px,2vw,10px);letter-spacing:.5em;color:var(--gold-d);font-weight:400;margin-top:1px;}
-#status-panel{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-.stat-chip{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--gold-d);border-radius:20px;padding:4px 11px;}
-.sl{font-size:9px;color:rgba(245,232,200,.5);letter-spacing:.15em;}
-.sv{font-size:14px;font-weight:700;color:var(--gold-l);}
-.su{font-size:9px;color:var(--gold-d);}
-#time-display{position:absolute;top:max(env(safe-area-inset-top,0px),8px);left:12px;font-size:11px;color:var(--gold);opacity:.8;z-index:20;pointer-events:none;}
-#iso-field{flex:1;position:relative;overflow:hidden;min-height:0;}
-#iso-canvas{position:absolute;bottom:0;left:50%;transform:translateX(-50%);}
-#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
-.facility-activity{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;color:#ffdd88;pointer-events:none;text-shadow:0 1px 4px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop 0.3s ease-out;}
-@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
-.relation-label{position:absolute;font-size:10px;font-family:'Noto Serif JP',serif;pointer-events:none;text-shadow:0 1px 4px #000;animation:fadeInOut 2.5s ease-in-out forwards;}
-@keyframes fadeInOut{0%{opacity:0}10%{opacity:1}80%{opacity:1}100%{opacity:0}}
+/* ─── メインレイアウト（縦画面厳密固定） ─── */
+#main{
+  position:fixed;inset:0;
+  z-index:10;
+  display:grid;
+  grid-template-rows:var(--h-header) 1fr auto;
+  width:100%;
+  height:100%;
+}
 
-/* ── 下部UI ── */
-#bottom-ui{flex-shrink:0;padding:0 12px max(env(safe-area-inset-bottom,0px),12px);background:linear-gradient(0deg,rgba(6,3,0,.97) 0%,rgba(6,3,0,.75) 80%,transparent 100%);}
-#nation-bar{display:flex;align-items:center;gap:8px;padding:8px 4px 5px;border-bottom:1px solid rgba(200,150,12,.15);}
-.nl{font-size:9px;color:var(--gold-d);letter-spacing:.2em;white-space:nowrap;}
-.nt{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;}
-.nf{height:100%;border-radius:3px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
-.np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
-#party-row{display:flex;gap:7px;padding:6px 0 5px;overflow-x:auto;scrollbar-width:none;}
+/* ─── ヘッダー ─── */
+#header{
+  height:var(--h-header);
+  padding:max(env(safe-area-inset-top,0px),8px) 12px 4px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+#game-title{
+  color:var(--gold);
+  font-size:clamp(13px,4.2vw,17px);
+  font-weight:900;
+  letter-spacing:.25em;
+  text-shadow:0 0 16px rgba(200,150,12,.7);
+  line-height:1.3;
+  white-space:nowrap;
+}
+#game-title .sub{
+  display:block;
+  font-size:clamp(7px,1.8vw,9px);
+  letter-spacing:.4em;
+  color:var(--gold-d);
+  font-weight:400;
+  margin-top:1px;
+}
+#status-panel{display:flex;flex-direction:row;align-items:center;gap:5px;}
+.stat-chip{
+  display:flex;align-items:center;gap:3px;
+  background:var(--panel);
+  border:1px solid var(--gold-d);
+  border-radius:16px;
+  padding:3px 8px;
+}
+.sl{font-size:8px;color:rgba(245,232,200,.5);letter-spacing:.1em;}
+.sv{font-size:13px;font-weight:700;color:var(--gold-l);}
+.su{font-size:8px;color:var(--gold-d);}
+
+/* ─── ISOフィールド（残り全高さ） ─── */
+#iso-field{position:relative;overflow:hidden;min-height:0;}
+#iso-canvas{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+}
+#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
+.facility-activity{
+  position:absolute;font-size:9px;
+  font-family:'Noto Serif JP',serif;
+  color:#ffdd88;pointer-events:none;
+  text-shadow:0 1px 3px #000;white-space:nowrap;
+  transform:translateX(-50%);
+  animation:actPop 0.3s ease-out;
+}
+@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(0.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+.float-text{
+  position:absolute;font-size:10px;
+  font-family:'Noto Serif JP',serif;
+  pointer-events:none;text-shadow:0 1px 3px #000;
+  white-space:nowrap;transform:translateX(-50%);
+  animation:floatUp 1.8s ease-out forwards;
+}
+@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}
+
+/* ─── ボトムUI ─── */
+#bottom-ui{
+  flex-shrink:0;
+  padding:0 10px var(--h-bottom-pad);
+  background:linear-gradient(0deg,rgba(6,3,0,.98) 0%,rgba(6,3,0,.82) 80%,transparent 100%);
+}
+
+/* 統一バー */
+#nation-bar{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 2px 4px;
+  border-bottom:1px solid rgba(200,150,12,.12);
+  height:var(--h-nationbar);
+}
+.nl{font-size:8px;color:var(--gold-d);letter-spacing:.18em;white-space:nowrap;}
+.nt{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;}
+.nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
+.np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:30px;text-align:right;}
+
+/* パーティ行 */
+#party-row{
+  display:flex;gap:5px;
+  padding:4px 0 3px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  height:var(--h-partyrow);
+  align-items:center;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+}
 #party-row::-webkit-scrollbar{display:none;}
-.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:60px;cursor:pointer;transition:border-color .2s,background .2s;}
+.party-card{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(200,150,12,.2);
+  border-radius:8px;
+  padding:4px 8px;
+  min-width:56px;
+  cursor:pointer;
+  transition:border-color .2s,background .2s;
+  touch-action:manipulation;
+}
 .party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
-.party-card:active{background:rgba(200,150,12,.15);}
-.pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}
-.pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
-.pc-pow{font-size:9px;color:#ffaa44;}
-.pc-hp{font-size:8px;color:#88dd88;}
-.pc-loc{font-size:8px;color:#aaddff;margin-top:1px;}
-.pc-rel{font-size:8px;color:#88ffaa;}
-#action-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:5px 0 3px;}
-.act-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;padding:10px 4px 8px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;}
-.act-btn:active{transform:scale(.92);background:rgba(200,150,12,.14);border-color:var(--gold);}
-.act-btn .ico{font-size:21px;line-height:1;}
-.act-btn .lbl{font-size:10px;letter-spacing:.15em;color:rgba(245,232,200,.72);}
-.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.4);}
+.party-card:active{background:rgba(200,150,12,.18);}
+.pc-role{font-size:7px;color:var(--gold-d);letter-spacing:.08em;}
+.pc-name{font-size:9px;color:var(--parchment);font-weight:700;}
+.pc-pow{font-size:8px;color:#ffaa44;}
+.pc-hp{font-size:7px;}
+.pc-loc{font-size:7px;color:#aaddff;margin-top:1px;}
+
+/* アクションボタン行 */
+#action-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+  padding:3px 0 2px;
+  height:var(--h-actionrow);
+}
+.act-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:var(--panel);
+  border:1px solid var(--gold-d);
+  border-radius:10px;
+  padding:0 4px;
+  cursor:pointer;
+  transition:background .15s,border-color .15s,transform .1s;
+  color:var(--parchment);font-family:inherit;
+  touch-action:manipulation;
+  /* タップ領域拡大 */
+  min-height:52px;
+}
+.act-btn:active{transform:scale(.91);background:rgba(200,150,12,.16);border-color:var(--gold);}
+.act-btn .ico{font-size:20px;line-height:1;}
+.act-btn .lbl{font-size:9px;letter-spacing:.12em;color:rgba(245,232,200,.72);}
+.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45);}
 .act-btn.primary .lbl{color:var(--gold-l);}
 
-/* ── 合戦画面 ── */
-#battle-screen{position:fixed;inset:0;z-index:500;background:linear-gradient(#060200,#180f00);display:none;flex-direction:column;color:var(--parchment);}
+/* ─── 合戦画面（ピクセルアートバトル） ─── */
+#battle-screen{
+  position:fixed;inset:0;z-index:500;
+  background:#0e0600;
+  display:none;flex-direction:column;
+  font-family:'DotGothic16',monospace;
+}
 #battle-screen.show{display:flex;}
-.bh{flex-shrink:0;padding:max(env(safe-area-inset-top,0px),14px) 20px 12px;background:rgba(0,0,0,.88);border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;}
-.bt{font-size:clamp(14px,4.5vw,19px);letter-spacing:.2em;color:var(--gold-l);}
-.bc{font-size:24px;color:#ffaaaa;cursor:pointer;padding:4px 8px;line-height:1;}
-.bf{flex:1;min-height:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75));display:flex;align-items:flex-end;justify-content:space-around;padding-bottom:55px;}
-.army{text-align:center;width:42%;}
-.army-title{font-size:13px;margin-bottom:10px;letter-spacing:.2em;}
-.our-army .army-title{color:#ffdd88;}
-.enemy-army .army-title{color:#ff8888;}
-.wi{font-size:clamp(34px,10vw,50px);margin:5px 4px;display:inline-block;filter:drop-shadow(0 4px 12px #000);}
-.blog{flex-shrink:0;height:165px;background:rgba(6,3,0,.97);border-top:2px solid var(--gold);padding:10px 14px;overflow-y:auto;font-size:13px;line-height:1.7;}
-.ll{margin:3px 0;}
-.ll.ally{color:#bbffbb;}
-.bfooter{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),10px);background:rgba(0,0,0,.9);display:flex;gap:10px;}
-.bbtn{flex:1;padding:15px 8px;font-size:15px;font-weight:700;background:linear-gradient(#5a2a0a,#2a1800);border:1px solid var(--gold);color:var(--parchment);cursor:pointer;border-radius:6px;font-family:inherit;transition:filter .15s;}
-.bbtn:active{filter:brightness(1.3);}
+#bscr-inner{
+  display:flex;flex-direction:column;
+  width:100%;height:100%;
+}
+#bscr-frame{
+  position:relative;
+  flex:1;min-height:0;
+  border-bottom:3px solid #8b6914;
+  box-shadow:0 4px 20px #c8960033;
+  overflow:hidden;
+}
+#bg-canvas,#battle-main-canvas{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+#battle-log-bar{
+  flex-shrink:0;
+  height:26px;
+  background:#0a0600;
+  border-bottom:1px solid #4a3000;
+  color:#e8c060;
+  font-size:clamp(9px,2.8vw,13px);
+  display:flex;align-items:center;
+  padding:0 10px;
+  letter-spacing:.06em;
+  overflow:hidden;white-space:nowrap;
+}
+#battle-ui-panel{
+  flex-shrink:0;
+  height:72px;
+  display:flex;gap:3px;padding:4px;
+  background:#1a0800;
+}
+.bunit-panel{
+  flex:1;
+  background:linear-gradient(180deg,#e8dcc0,#d4c090 40%,#c0a860);
+  border:2px solid #7a5800;border-radius:4px;
+  padding:4px 8px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:inset 0 1px 0 #fff8,inset 0 -1px 0 #0004;
+}
+.bunit-top{display:flex;align-items:baseline;justify-content:space-between;}
+.bunit-name{font-size:clamp(10px,3.5vw,14px);color:#1a0800;letter-spacing:.04em;}
+.bhp-group{display:flex;align-items:baseline;gap:3px;}
+.bhp-label{font-size:clamp(7px,1.8vw,9px);color:#6a4000;}
+.bhp-value{font-size:clamp(14px,4vw,20px);color:#1a0800;letter-spacing:.08em;min-width:30px;text-align:right;}
+.bpower-label{font-size:clamp(7px,2vw,9px);color:#5a3800;line-height:1;}
+.bpower-wrap{
+  width:100%;height:clamp(8px,2.5vw,13px);
+  background:#2a1800;border:1px solid #5a3000;
+  border-radius:2px;overflow:hidden;position:relative;
+}
+.bpower-bar{
+  height:100%;
+  background:linear-gradient(90deg,#2060c0,#2080e0 40%,#40a0ff);
+  transition:width .35s ease;
+}
+.bpower-bar-enemy{
+  background:linear-gradient(90deg,#c01010,#e82020 40%,#ff4040);
+}
+.bpower-ticks{position:absolute;inset:0;display:flex;pointer-events:none;}
+.bpower-ticks span{flex:1;border-right:1px solid #0003;}
+/* 結果パネル */
+#battle-result-panel{
+  display:none;position:absolute;inset:0;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:0;
+  background:#000b;z-index:10;
+}
+#battle-result-panel.show{display:flex;}
+#result-box{
+  background:linear-gradient(180deg,#f4e080,#c89020);
+  border:3px solid #7a5000;border-radius:10px;
+  padding:18px 32px;text-align:center;
+  box-shadow:0 8px 40px #00000099;
+}
+.bres-title{
+  font-family:'DotGothic16',monospace;
+  font-size:clamp(14px,5vw,20px);
+  color:#1a0800;letter-spacing:.2em;margin-bottom:12px;
+  display:block;
+}
+.bres-detail{
+  font-family:'DotGothic16',monospace;
+  font-size:clamp(10px,3vw,13px);
+  color:#3a1400;text-align:center;
+  line-height:1.9;white-space:pre-line;margin-bottom:14px;
+}
+.bres-btn{
+  font-family:'DotGothic16',monospace;
+  font-size:clamp(11px,3.2vw,14px);
+  background:linear-gradient(180deg,#e05010,#a02808);
+  color:#fff8e0;border:2px solid #601000;border-radius:6px;
+  padding:8px 24px;cursor:pointer;touch-action:manipulation;
+}
 
-/* ── モーダル共通 ── */
-.modal{position:fixed;inset:0;z-index:700;background:rgba(8,4,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center;}
-.modal-content{position:relative;background:var(--panel);width:92%;max-width:420px;border:3px solid var(--gold);border-radius:16px;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6);}
-
-/* ── 武将詳細モーダル ── */
-#warrior-modal .modal-content{background:#111;border:3px solid #ffcc00;border-radius:15px;box-shadow:0 0 15px rgba(255,204,0,.5);max-width:380px;max-height:92vh;overflow-y:auto;}
-.wm-name{font-size:22px;font-weight:bold;color:#ffcc00;text-align:center;margin-bottom:4px;}
-.wm-meta{font-size:13px;text-align:center;color:#d1b891;margin-bottom:14px;}
-.wm-status{background:#222;border-radius:10px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:6px;}
-.wm-stat-item{font-size:14px;font-weight:700;}
-.wm-stat-item.pow{color:#ffcc66;}
-.wm-stat-item.wis{color:#aaddff;}
-.wm-hp-wrap{background:#1a1a1a;border-radius:8px;padding:8px 12px;margin-bottom:10px;}
-.wm-hp-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,232,200,.5);margin-bottom:4px;}
-.wm-hp-track{height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
-.wm-hp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#dd2222,#ffaa44,#44dd44);transition:width .4s;}
-.wm-section-title{font-size:11px;color:#aaa;text-align:center;margin-bottom:5px;letter-spacing:.1em;}
-.wm-skill-block,.wm-bloodline-block,.wm-relation-block{border:1px solid #444;border-radius:8px;padding:10px;margin-bottom:12px;}
-.wm-skill-list{font-size:13px;text-align:center;color:#d1b891;}
-.wm-bloodline-pair{font-size:14px;text-align:center;color:#ffcc00;margin-bottom:10px;font-weight:700;line-height:1.6;}
-.wm-pedigree-btn{background:#ffcc00;color:#000;border:none;border-radius:5px;width:100%;padding:8px;font-weight:bold;font-size:13px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .1s;}
-.wm-pedigree-btn:active{filter:brightness(.85);transform:scale(.97);}
-.wm-rel-item{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;color:#eee;padding:2px 0;border-bottom:1px solid rgba(255,204,0,.07);}
-.wm-back-btn{background:#ffcc00;color:#000;border:none;border-radius:7px;width:100%;padding:12px;font-weight:bold;font-size:15px;cursor:pointer;font-family:inherit;letter-spacing:.1em;}
-.wm-back-btn:active{filter:brightness(.85);}
-.wm-close-btn{position:absolute;top:12px;right:16px;font-size:26px;color:#ffcc00;cursor:pointer;line-height:1;z-index:1;}
-
-/* ── 血統ツリー ── */
-.bt-node{text-align:center;padding:6px 10px;border-radius:8px;font-size:12px;line-height:1.5;min-width:80px;}
-.bt-node.gen1{background:rgba(200,150,12,.18);border:2px solid var(--gold);}
-.bt-node.gen2{background:rgba(255,255,255,.07);border:1px solid rgba(200,150,12,.3);}
-.bt-node.gen3{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.15);font-size:10px;}
-.bt-node .bn{font-weight:700;color:var(--parchment);}
-.bt-node .bc-name{font-size:9px;color:var(--gold-d);}
-.bt-bonus-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.bt-bonus{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
-
-/* ── 家系図モーダル ── */
-#pedigree-modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;}
+/* ─── 系譜モーダル ─── */
+#pedigree-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
 #pedigree-modal.show{display:flex;}
-.pg-wrap{width:100%;max-width:480px;padding:max(env(safe-area-inset-top,0px),20px) 16px max(env(safe-area-inset-bottom,0px),20px);min-height:100%;display:flex;flex-direction:column;gap:0;animation:pgSlideIn .35s cubic-bezier(.22,.68,0,1.2) both;}
-@keyframes pgSlideIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
-.pg-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(200,150,12,.25);margin-bottom:18px;}
-.pg-title{font-size:18px;font-weight:900;letter-spacing:.25em;color:var(--gold-l);text-shadow:0 0 20px rgba(200,150,12,.5);}
-.pg-subtitle{font-size:10px;color:var(--gold-d);letter-spacing:.2em;margin-top:2px;}
-.pg-close{width:36px;height:36px;border-radius:50%;border:1px solid rgba(200,150,12,.35);background:rgba(0,0,0,.5);color:var(--gold-l);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s;}
-.pg-close:active{background:rgba(200,150,12,.2);}
-.pg-bonus-card{background:linear-gradient(135deg,rgba(20,12,4,.95),rgba(10,6,2,.95));border:1px solid rgba(200,150,12,.4);border-radius:14px;padding:14px 16px;margin-bottom:22px;position:relative;overflow:hidden;}
-.pg-bonus-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(200,150,12,.08),transparent 60%);pointer-events:none;}
-.pg-bonus-warrior{font-size:20px;font-weight:900;color:#fff;letter-spacing:.1em;margin-bottom:2px;}
-.pg-bonus-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid;margin-bottom:10px;}
-.pg-bonus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.pg-bonus-item{background:rgba(255,255,255,.05);border-radius:8px;padding:7px 4px;text-align:center;}
-.pg-bonus-item .pbi-val{font-size:16px;font-weight:900;}
-.pg-bonus-item .pbi-lbl{font-size:9px;color:rgba(245,232,200,.55);margin-top:1px;letter-spacing:.05em;}
-.pg-bonus-battle{margin-top:8px;background:rgba(139,0,0,.25);border:1px solid rgba(200,50,50,.3);border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;font-size:11px;}
-.pg-bonus-battle .pbb-val{font-size:15px;font-weight:900;color:#ffaaaa;}
-.pg-tree-section{display:flex;flex-direction:column;align-items:center;gap:0;}
-.pg-tree-label{font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.6);text-align:center;margin-bottom:10px;}
-.pgn{display:flex;flex-direction:column;align-items:center;}
-.pgn-box{border-radius:12px;padding:10px 14px;text-align:center;cursor:default;position:relative;transition:transform .15s;}
-.pgn-box.self{background:linear-gradient(135deg,rgba(139,0,0,.5),rgba(80,0,0,.5));border:2px solid var(--gold);box-shadow:0 0 18px rgba(200,150,12,.3);min-width:130px;}
-.pgn-box.parent{background:rgba(255,255,255,.07);border:1px solid rgba(200,150,12,.35);min-width:110px;}
-.pgn-box.grand{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);min-width:88px;}
-.pgn-box.unknown{background:rgba(255,255,255,.03);border:1px dashed rgba(200,150,12,.2);min-width:80px;opacity:.5;}
-.pgn-name{font-weight:700;color:var(--parchment);font-size:13px;letter-spacing:.05em;}
-.pgn-box.grand .pgn-name{font-size:11px;}
-.pgn-box.unknown .pgn-name{font-size:11px;color:rgba(245,232,200,.4);}
-.pgn-clan{font-size:9px;margin-top:1px;font-weight:400;}
-.pgn-role{font-size:8px;color:rgba(245,232,200,.4);margin-top:1px;letter-spacing:.1em;}
-.pg-vline{width:1px;background:linear-gradient(rgba(200,150,12,.5),rgba(200,150,12,.2));flex-shrink:0;}
-.pg-hline{height:1px;background:rgba(200,150,12,.3);flex-shrink:0;}
-.pg-parent-row{display:flex;align-items:flex-start;gap:0;width:100%;}
-.pg-parent-col{flex:1;display:flex;flex-direction:column;align-items:center;}
-.pg-parent-divider{width:16px;flex-shrink:0;}
-.pg-grand-row{display:flex;align-items:flex-start;gap:6px;width:100%;}
-.pg-grand-col{flex:1;display:flex;flex-direction:column;align-items:center;}
-.pg-meter-wrap{margin-top:22px;background:rgba(20,12,4,.9);border:1px solid rgba(200,150,12,.25);border-radius:12px;padding:14px 16px;width:100%;}
-.pg-meter-title{font-size:10px;letter-spacing:.2em;color:var(--gold-d);margin-bottom:10px;}
-.pg-meter-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.pg-meter-lbl{font-size:10px;color:rgba(245,232,200,.6);width:36px;flex-shrink:0;}
-.pg-meter-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden;}
-.pg-meter-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,.68,0,1.2);}
-.pg-meter-val{font-size:11px;font-weight:700;min-width:34px;text-align:right;}
-.pg-footer{margin-top:20px;width:100%;}
-.pg-footer-btn{width:100%;padding:14px;border-radius:12px;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold-l);font-size:14px;font-weight:700;letter-spacing:.15em;cursor:pointer;font-family:inherit;transition:background .15s;}
-.pg-footer-btn:active{background:rgba(200,150,12,.28);}
+.ped-shell{
+  width:100%;max-width:480px;
+  height:88%;
+  background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));
+  border:1px solid rgba(200,150,12,.35);
+  border-radius:18px 18px 0 0;
+  overflow:hidden;display:flex;flex-direction:column;
+  animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
+}
+@keyframes slideUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+.ped-head{
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(200,150,12,.15);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.ped-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em;}
+.close-btn{
+  background:none;border:1px solid rgba(200,150,12,.3);
+  color:var(--gold);font-size:13px;padding:5px 14px;
+  border-radius:20px;cursor:pointer;font-family:inherit;
+  touch-action:manipulation;
+}
+#pedigree-content{overflow-y:auto;padding:12px 14px;flex:1;-webkit-overflow-scrolling:touch;}
+.gen-block{margin-bottom:14px;}
+.gen-label{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-bottom:5px;}
+.gen-list{display:flex;flex-wrap:wrap;gap:5px;}
+.gen-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);
+  border-radius:8px;padding:7px 10px;font-size:9px;color:var(--parchment);line-height:1.6;
+}
+.gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l);}
+.gen-card .gp{color:#ffaa44;}
 
-/* ── 縁組モーダル ── */
-#engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;padding:8px;background:rgba(8,4,0,.94);}
-.modal-shell{position:relative;width:100%;max-width:430px;height:92%;max-height:660px;background:linear-gradient(160deg,rgba(14,8,2,.98) 0%,rgba(10,5,1,.99) 100%);border:1px solid rgba(200,150,12,.35);border-radius:18px;box-shadow:0 0 0 1px rgba(200,150,12,.12),0 0 60px rgba(139,0,0,.25),0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,150,12,.15);overflow:hidden;display:flex;flex-direction:column;animation:shellIn .5s cubic-bezier(.22,.68,0,1.15) both;}
-@keyframes shellIn{from{opacity:0;transform:translateY(28px) scale(.96);}to{opacity:1;transform:none;}}
-.modal-shell::before,.modal-shell::after{content:'';position:absolute;width:40px;height:40px;border:2px solid rgba(200,150,12,.3);pointer-events:none;z-index:5;}
-.modal-shell::before{top:8px;left:8px;border-right:none;border-bottom:none;border-radius:6px 0 0 0;}
-.modal-shell::after{bottom:8px;right:8px;border-left:none;border-top:none;border-radius:0 0 6px 0;}
-.eng-header{flex-shrink:0;padding:14px 18px 10px;border-bottom:1px solid rgba(200,150,12,.18);background:linear-gradient(180deg,rgba(139,0,0,.12) 0%,transparent 100%);}
-.eng-header-top{display:flex;align-items:flex-start;justify-content:space-between;}
-.eng-title{font-size:20px;font-weight:800;letter-spacing:.35em;color:var(--gold-l);text-shadow:0 0 30px rgba(200,150,12,.6);}
-.eng-subtitle{font-size:9px;letter-spacing:.4em;color:rgba(200,150,12,.5);margin-top:1px;font-weight:300;}
-.eng-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(200,150,12,.3);background:rgba(0,0,0,.4);color:var(--gold-l);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
-.eng-close:active{background:rgba(200,150,12,.2);}
-.step-tabs{flex-shrink:0;display:flex;border-bottom:1px solid rgba(200,150,12,.12);background:rgba(0,0,0,.3);}
-.step-tab{flex:1;padding:9px 4px;text-align:center;font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.4);border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;}
-.step-tab.active{color:var(--gold-l);border-bottom-color:var(--gold);background:rgba(200,150,12,.05);}
-.step-tab .tab-num{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.3);font-size:9px;font-weight:700;margin-right:4px;color:rgba(200,150,12,.6);}
-.step-tab.active .tab-num{background:rgba(200,150,12,.3);color:var(--gold-l);}
-.step-tab.done .tab-num{background:var(--gold);color:#0a0500;}
-.eng-body{flex:1;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:rgba(200,150,12,.25) transparent;}
-.eng-body::-webkit-scrollbar{width:3px;}
-.eng-body::-webkit-scrollbar-thumb{background:rgba(200,150,12,.25);border-radius:2px;}
-.dual-select{padding:10px 12px 14px;}
-.role-toggle{display:flex;gap:0;margin-bottom:12px;background:rgba(0,0,0,.35);border:1px solid rgba(200,150,12,.18);border-radius:12px;overflow:hidden;}
-.role-btn{flex:1;padding:10px 6px 8px;text-align:center;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:.2em;background:transparent;border:none;color:rgba(200,150,12,.4);transition:all .18s;position:relative;line-height:1.3;}
-.role-btn.active{background:linear-gradient(160deg,rgba(139,0,0,.35),rgba(80,0,0,.2));color:var(--gold-l);}
-.role-btn.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--gold);border-radius:1px;}
-.rbtn-main{font-size:12px;font-weight:700;}
-.rbtn-sel{display:block;font-size:9px;margin-top:2px;color:rgba(200,150,12,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;margin:2px auto 0;}
-.role-btn.active .rbtn-sel{color:rgba(245,232,200,.6);}
-.role-btn.has-sel .rbtn-sel{color:var(--gold-l)!important;font-weight:700;}
-.rbtn-tick{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--gold);color:#0a0500;font-size:8px;font-weight:900;margin-right:3px;vertical-align:middle;opacity:0;transition:opacity .2s;}
-.role-btn.has-sel .rbtn-tick{opacity:1;}
-.selected-mini{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(139,0,0,.15),rgba(100,50,0,.08));border:1px solid rgba(200,150,12,.28);border-radius:11px;padding:10px 12px;margin-bottom:10px;position:relative;overflow:hidden;}
-.sm-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#6a1010,#3a0808);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px rgba(200,150,12,.3);}
-.sm-info{flex:1;min-width:0;}
-.sm-role{font-size:8px;letter-spacing:.18em;color:rgba(200,150,12,.5);margin-bottom:1px;}
-.sm-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;}
-.sm-stats{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
-.sm-stat{background:rgba(255,255,255,.05);border-radius:5px;padding:2px 7px;text-align:center;}
-.sm-stat-val{font-size:12px;font-weight:700;}
-.sm-stat-lbl{font-size:7px;color:rgba(245,232,200,.38);}
-.parent-placeholder{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1px dashed rgba(200,150,12,.18);border-radius:11px;color:rgba(200,150,12,.3);font-size:10px;letter-spacing:.18em;margin-bottom:10px;}
-.parent-label{font-size:9px;letter-spacing:.22em;color:rgba(200,150,12,.38);margin-bottom:5px;padding-left:2px;}
-.filter-row{display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none;}
-.filter-row::-webkit-scrollbar{display:none;}
-.filter-btn{flex-shrink:0;padding:4px 11px;border-radius:14px;font-size:9px;letter-spacing:.1em;border:1px solid rgba(200,150,12,.2);background:transparent;color:rgba(245,232,200,.4);cursor:pointer;font-family:inherit;transition:all .16s;}
-.filter-btn.active{background:rgba(200,150,12,.15);border-color:var(--gold);color:var(--gold-l);}
-.candidates-wrap{display:flex;flex-direction:column;gap:6px;}
-.candidate-card{border-radius:12px;padding:10px 12px;border:1px solid rgba(200,150,12,.14);background:rgba(255,255,255,.024);cursor:pointer;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;transition:border-color .16s,background .16s,transform .1s;}
-.candidate-card:active{transform:scale(.98);}
-.candidate-card.selected{border-color:var(--gold);background:rgba(200,150,12,.08);}
-.c-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(200,150,12,.2);}
-.c-info{flex:1;min-width:0;}
-.c-name{font-size:14px;font-weight:700;color:var(--parchment);margin-bottom:1px;letter-spacing:.04em;}
-.c-clan{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.1em;margin-bottom:4px;}
-.c-mini-stats{display:flex;gap:6px;flex-wrap:wrap;}
-.c-mstat{font-size:9px;color:rgba(245,232,200,.38);}
-.c-mstat span{color:rgba(245,232,200,.7);font-weight:700;}
-.compat-mini{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
-.compat-track{width:28px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
-.compat-fill{height:100%;border-radius:2px;}
-.compat-lbl{font-size:8px;font-weight:700;}
-.selected-tick{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:9px;color:#0d0600;font-weight:900;}
-.candidate-card.selected .selected-tick{display:flex;}
-.preview-wrap{padding:10px 12px 4px;}
-.parents-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.pr-card{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:10px;padding:8px 10px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
-.pr-card:active{border-color:rgba(200,150,12,.5);background:rgba(200,150,12,.05);}
-.pr-role{font-size:8px;letter-spacing:.2em;color:rgba(200,150,12,.45);margin-bottom:3px;}
-.pr-name{font-size:12px;font-weight:700;color:var(--parchment);}
-.pr-clan{font-size:8px;color:rgba(200,150,12,.45);margin-top:1px;}
-.pr-change{font-size:8px;color:rgba(200,150,12,.35);margin-top:3px;letter-spacing:.05em;}
-.pr-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:28px;}
-.pr-line{width:1px;height:14px;background:rgba(200,150,12,.25);}
-.pr-heart{font-size:14px;}
-.blood-preview{background:linear-gradient(135deg,rgba(20,10,2,.9),rgba(12,6,1,.95));border:1px solid rgba(200,150,12,.22);border-radius:14px;overflow:hidden;margin-bottom:10px;}
-.bp-header{padding:10px 14px 8px;border-bottom:1px solid rgba(200,150,12,.1);display:flex;align-items:center;justify-content:space-between;}
-.bp-title{font-size:9px;letter-spacing:.25em;color:rgba(200,150,12,.5);}
-.bp-badge{padding:2px 10px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:.04em;border:1px solid;}
-.child-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;}
-.cs-block{background:rgba(255,255,255,.04);border-radius:8px;padding:8px;}
-.cs-label{font-size:8px;letter-spacing:.15em;color:rgba(245,232,200,.35);margin-bottom:4px;}
-.cs-val{font-size:20px;font-weight:900;}
-.cs-bar{height:3px;border-radius:2px;margin-top:4px;}
-.child-skills{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:5px;}
-.skill-tag{padding:3px 10px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.04em;}
-.battle-row{margin:0 14px 8px;background:rgba(139,0,0,.18);border:1px solid rgba(200,50,50,.2);border-radius:8px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;}
-.br-val{font-size:14px;font-weight:900;color:#ffaaaa;}
-.facility-row{margin:0 14px 14px;background:rgba(26,74,46,.15);border:1px solid rgba(60,138,94,.18);border-radius:8px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:rgba(245,232,200,.55);}
-.fac-val{font-size:13px;font-weight:900;color:#88ffaa;}
-.cost-note{text-align:center;font-size:9px;color:rgba(200,150,12,.45);letter-spacing:.1em;padding:0 12px 8px;}
-.cost-note span{color:var(--gold-l);font-weight:700;}
-.eng-footer{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),12px);border-top:1px solid rgba(200,150,12,.12);background:rgba(6,3,0,.96);display:flex;gap:7px;}
-.execute-btn{flex:1;padding:14px 8px;background:linear-gradient(160deg,rgba(139,0,0,.8) 0%,rgba(80,0,0,.9) 100%);border:1px solid var(--gold);border-radius:11px;color:var(--parchment);font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.14em;cursor:pointer;box-shadow:0 0 20px rgba(139,0,0,.25),inset 0 1px 0 rgba(200,150,12,.2);position:relative;overflow:hidden;transition:filter .15s,transform .1s;}
-.execute-btn:active{filter:brightness(1.25);transform:scale(.98);}
-.execute-btn:disabled{opacity:.34;cursor:not-allowed;box-shadow:none;border-color:rgba(200,150,12,.18);}
-.sub-btn{padding:14px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.16);border-radius:11px;color:rgba(245,232,200,.5);font-family:inherit;font-size:11px;letter-spacing:.1em;cursor:pointer;transition:background .15s;white-space:nowrap;}
-.sub-btn:active{background:rgba(200,150,12,.1);}
+/* ─── 武将モーダル ─── */
+#warrior-modal{position:fixed;inset:0;z-index:700;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
+#warrior-modal.show{display:flex;}
+.wm-shell{
+  width:100%;max-width:480px;
+  background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));
+  border:1px solid rgba(200,150,12,.35);
+  border-radius:18px 18px 0 0;
+  overflow:hidden;
+  animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
+}
+.wm-head{padding:16px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);}
+.wm-name{font-size:18px;font-weight:900;color:var(--gold-l);letter-spacing:.2em;}
+.wm-role{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-top:2px;}
+.wm-body{padding:10px 16px max(env(safe-area-inset-bottom,0px),16px);}
+.wm-stat{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;}
+.wm-stat .wsk{color:rgba(245,228,180,.6);}
+.wm-stat .wsv{color:var(--parchment);font-weight:700;}
+.wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px;}
+.wm-hp-fill{height:100%;border-radius:3px;transition:width .4s;}
+.wm-close{
+  display:block;width:100%;background:none;
+  border:1px solid rgba(200,150,12,.3);color:var(--gold);
+  font-family:inherit;font-size:12px;padding:11px;
+  border-radius:8px;cursor:pointer;margin-top:10px;letter-spacing:.3em;
+  touch-action:manipulation;
+}
 
-/* ── 成功オーバーレイ ── */
-#success-overlay{position:fixed;inset:0;z-index:900;background:rgba(8,4,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;}
-#success-overlay.show{display:flex;}
-.so-kanji{font-size:68px;font-weight:900;color:var(--gold-l);text-shadow:0 0 40px rgba(200,150,12,.8);animation:kanjiPulse 1.5s ease-in-out infinite;}
-@keyframes kanjiPulse{0%,100%{text-shadow:0 0 40px rgba(200,150,12,.8);}50%{text-shadow:0 0 80px rgba(200,150,12,1),0 0 120px rgba(255,200,50,.4);}}
-.so-text{font-size:14px;letter-spacing:.4em;color:var(--gold-l);}
-.so-child{background:rgba(255,255,255,.05);border:1px solid rgba(200,150,12,.4);border-radius:16px;padding:16px 24px;text-align:center;width:100%;max-width:320px;}
-.so-child-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:.1em;margin-bottom:4px;}
-.so-child-blood{font-size:11px;color:rgba(200,150,12,.6);margin-bottom:12px;letter-spacing:.15em;}
-.so-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
-.so-stat{background:rgba(255,255,255,.06);border-radius:8px;padding:6px 2px;text-align:center;}
-.so-stat-val{font-size:18px;font-weight:900;}
-.so-stat-lbl{font-size:7px;color:rgba(245,232,200,.4);margin-top:2px;}
-.so-skills{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
-.so-skill-tag{padding:3px 10px;border-radius:8px;font-size:9px;font-weight:700;}
-.so-dismiss{margin-top:6px;padding:12px 36px;background:var(--gold);color:#0a0500;font-family:inherit;font-size:14px;font-weight:700;border:none;border-radius:22px;cursor:pointer;letter-spacing:.15em;}
+/* ─── 縁組モーダル ─── */
+#engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
+#engumi-modal.show{display:flex;}
+.modal-shell{
+  position:relative;width:100%;max-width:480px;
+  height:92%;
+  background:linear-gradient(160deg,rgba(14,8,2,.99) 0%,rgba(10,5,1,1) 100%);
+  border:1px solid rgba(200,150,12,.35);
+  border-radius:18px 18px 0 0;
+  box-shadow:0 0 0 1px rgba(200,150,12,.1),0 -20px 60px rgba(139,0,0,.2);
+  overflow:hidden;display:flex;flex-direction:column;
+  animation:slideUp .4s cubic-bezier(.22,.68,0,1.1) both;
+}
+.modal-deco-top{height:3px;background:linear-gradient(90deg,transparent,var(--gold),rgba(200,150,12,.4),var(--gold),transparent);}
+.modal-header{
+  padding:14px 18px 10px;
+  border-bottom:1px solid rgba(200,150,12,.1);
+  flex-shrink:0;
+}
+.modal-kamon{font-size:28px;text-align:center;margin-bottom:4px;text-shadow:0 0 24px rgba(200,150,12,.4);}
+.modal-title{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:.5em;text-align:center;}
+.modal-subtitle{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.35em;text-align:center;margin-top:3px;}
+.modal-body{
+  flex:1;overflow-y:auto;
+  padding:14px 16px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+}
+.modal-body::-webkit-scrollbar{display:none;}
+.modal-section{margin-bottom:14px;}
+.modal-section-title{font-size:9px;color:rgba(200,150,12,.6);letter-spacing:.3em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(200,150,12,.12);}
+.engumi-cost{
+  text-align:center;padding:8px;
+  background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);
+  border-radius:8px;margin-bottom:12px;
+}
+.engumi-cost .ec-label{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.3em;}
+.engumi-cost .ec-val{font-size:20px;font-weight:900;color:var(--gold-l);display:block;margin-top:2px;}
+.engumi-cost .ec-unit{font-size:9px;color:rgba(200,150,12,.6);}
+.warrior-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.warrior-sel-card{
+  background:rgba(255,255,255,.03);border:1px solid rgba(200,150,12,.15);
+  border-radius:10px;padding:10px;cursor:pointer;transition:all .2s;
+  touch-action:manipulation;
+  /* タップ領域確保 */
+  min-height:60px;
+}
+.warrior-sel-card:active,.warrior-sel-card.selected{background:rgba(200,150,12,.12);border-color:var(--gold);}
+.wsc-name{font-size:12px;font-weight:700;color:var(--parchment);}
+.wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px;}
+.wsc-hp{font-size:9px;margin-top:2px;}
+.confirm-panel{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px;}
+.confirm-pair{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.confirm-w{text-align:center;}
+.confirm-w .cw-name{font-size:13px;font-weight:700;color:var(--parchment);}
+.confirm-w .cw-role{font-size:9px;color:var(--gold-d);}
+.confirm-heart{font-size:22px;color:var(--crimson);text-shadow:0 0 12px rgba(139,0,0,.5);}
+.child-preview{background:rgba(255,255,255,.03);border-radius:8px;padding:9px;margin-top:7px;}
+.cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px;}
+.cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0;}
+.cp-stat .cpv{color:var(--gold-l);font-weight:700;}
+.modal-footer{
+  padding:10px 16px max(env(safe-area-inset-bottom,0px),12px);
+  border-top:1px solid rgba(200,150,12,.1);
+  display:flex;gap:8px;flex-shrink:0;
+}
+.modal-btn{
+  flex:1;padding:13px;border-radius:10px;
+  font-family:inherit;font-size:12px;letter-spacing:.25em;
+  cursor:pointer;transition:all .2s;touch-action:manipulation;
+}
+.modal-btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:rgba(200,150,12,.6);}
+.modal-btn-cancel:active{background:rgba(200,150,12,.08);}
+.modal-btn-exec{
+  background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));
+  border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-weight:700;
+  box-shadow:0 3px 16px rgba(139,0,0,.25);
+}
+.modal-btn-exec:active{transform:scale(.96);}
+.modal-btn-exec:disabled{opacity:.38;cursor:not-allowed;}
+.modal-step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:12px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(200,150,12,.22);transition:all .3s;}
+.step-dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,150,12,.5);}
 
-/* ── 内政・歴史モーダル ── */
-#dev-modal .modal-content{max-height:80vh;overflow-y:auto;}
-#history-modal .modal-content{max-height:80vh;overflow:hidden;display:flex;flex-direction:column;}
+/* ─── 成功オーバーレイ ─── */
+#success-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96);flex-direction:column;gap:12px;padding:20px;}
+#success-overlay.show{display:flex;animation:fadeIn .4s ease;}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+.suc-kamon{font-size:52px;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center;}
+.suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.3em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center;}
+.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2.}
+.suc-btn{
+  background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);
+  color:var(--gold-l);font-family:inherit;font-size:13px;
+  letter-spacing:.35em;padding:13px 28px;border-radius:10px;
+  cursor:pointer;margin-top:6px;touch-action:manipulation;
+}
 
-/* ── Toast ── */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(14,8,2,.97);border:1px solid var(--gold);border-radius:20px;padding:9px 20px;color:var(--gold-l);font-size:12px;letter-spacing:.1em;z-index:999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* ─── 開発者・履歴モーダル ─── */
+#dev-modal,#history-modal{position:fixed;inset:0;z-index:800;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
+#dev-modal.show,#history-modal.show{display:flex;}
+.dev-shell{
+  width:100%;max-width:480px;
+  background:rgba(10,5,1,.99);
+  border:1px solid rgba(200,150,12,.3);
+  border-radius:18px 18px 0 0;overflow:hidden;
+  animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
+}
+.dev-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center;}
+.dev-title{font-size:13px;color:var(--gold);letter-spacing:.3em;}
+.dev-body{
+  padding:12px 16px max(env(safe-area-inset-bottom,0px),16px);
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;
+}
+.dev-btn{
+  background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);
+  color:var(--parchment);font-family:inherit;font-size:11px;
+  padding:12px 6px;border-radius:8px;cursor:pointer;letter-spacing:.15em;
+  touch-action:manipulation;
+}
+.dev-btn:active{background:rgba(200,150,12,.14);}
+
+/* 履歴 */
+.hist-shell{
+  width:100%;max-width:480px;
+  height:78%;
+  background:rgba(10,5,1,.99);
+  border:1px solid rgba(200,150,12,.3);
+  border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;
+  animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
+}
+.hist-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.hist-title{font-size:13px;color:var(--gold);letter-spacing:.3em;}
+#hist-list{overflow-y:auto;padding:10px 14px max(env(safe-area-inset-bottom,0px),12px);flex:1;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#hist-list::-webkit-scrollbar{display:none;}
+.hist-item{font-size:10px;color:rgba(245,228,180,.7);padding:5px 0;border-bottom:1px solid rgba(200,150,12,.07);line-height:1.5;}
+.hist-item .hi-time{color:rgba(200,150,12,.5);font-size:9px;}
+
+/* ─── トースト ─── */
+#toast{
+  position:fixed;
+  bottom:calc(var(--h-actionrow) + var(--h-partyrow) + var(--h-nationbar) + var(--h-bottom-pad) + 10px);
+  left:50%;transform:translateX(-50%);
+  background:rgba(14,8,2,.97);border:1px solid var(--gold-d);
+  color:var(--parchment);font-size:11px;padding:8px 18px;
+  border-radius:18px;white-space:nowrap;z-index:999;
+  opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:.15em;
+  max-width:90vw;overflow:hidden;text-overflow:ellipsis;
+}
+#toast.show{opacity:1;}
 </style>
 </head>
 <body>
+
 <div id="sky"></div>
-<div class="star" style="left:6%;top:4%;width:2px;height:2px;animation-duration:3.1s;"></div>
-<div class="star" style="left:19%;top:8%;width:1px;height:1px;animation-duration:4.3s;animation-delay:-.7s;"></div>
-<div class="star" style="left:33%;top:3%;width:2px;height:2px;animation-duration:2.9s;animation-delay:-1.3s;"></div>
-<div class="star" style="left:52%;top:6%;width:1px;height:1px;animation-duration:5.1s;animation-delay:-.4s;"></div>
-<div class="star" style="left:68%;top:2%;width:2px;height:2px;animation-duration:3.8s;animation-delay:-2.1s;"></div>
-<div class="star" style="left:82%;top:7%;width:1px;height:1px;animation-duration:4.2s;animation-delay:-.2s;"></div>
-<div class="star" style="left:91%;top:11%;width:2px;height:2px;animation-duration:3.3s;animation-delay:-1.8s;"></div>
 <div class="mist"></div><div class="mist"></div><div class="mist"></div>
-<div class="petal" style="left:3%;width:7px;height:7px;animation-duration:8.2s;"></div>
-<div class="petal" style="left:14%;width:5px;height:5px;animation-duration:10.5s;animation-delay:-2.8s;"></div>
-<div class="petal" style="left:28%;width:8px;height:8px;animation-duration:9.1s;animation-delay:-5.5s;"></div>
-<div class="petal" style="left:47%;width:6px;height:6px;animation-duration:13.2s;animation-delay:-1.2s;"></div>
-<div class="petal" style="left:61%;width:5px;height:5px;animation-duration:10.8s;animation-delay:-4.2s;"></div>
-<div class="petal" style="left:76%;width:7px;height:7px;animation-duration:12s;animation-delay:-7.1s;"></div>
-<div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s;animation-delay:-2.4s;"></div>
-<div id="time-display">第1年 1月 1日</div>
 
-<!-- 合戦画面 -->
+<!-- 合戦画面（ピクセルアートバトル） -->
 <div id="battle-screen">
-  <div class="bh">
-    <div class="bt" id="battle-family">織田軍 出陣</div>
-    <div class="bc" onclick="endBattle()">✕</div>
-  </div>
-  <div class="bf">
-    <div class="army our-army"><div class="army-title">我が軍</div><div id="our-warriors"></div></div>
-    <div style="font-size:clamp(30px,9vw,42px);color:var(--gold);align-self:center;margin-top:-40px;font-weight:900;">VS</div>
-    <div class="army enemy-army"><div class="army-title">敵軍</div><div id="enemy-warriors"></div></div>
-  </div>
-  <div class="blog" id="battle-log"></div>
-  <div class="bfooter">
-    <button class="bbtn" onclick="startBattleSimulation()">⚔ 戦闘開始</button>
-    <button class="bbtn" onclick="endBattle()" style="background:linear-gradient(#4a1010,#180606);">撤退</button>
-  </div>
-</div>
-
-<!-- 家系図モーダル -->
-<div id="pedigree-modal">
-  <div class="pg-wrap">
-    <div class="pg-header">
-      <div>
-        <div class="pg-title">家系図の系譜</div>
-        <div class="pg-subtitle" id="pg-warrior-sub">─</div>
+  <div id="bscr-inner">
+    <div id="bscr-frame">
+      <canvas id="bg-canvas"></canvas>
+      <canvas id="battle-main-canvas"></canvas>
+      <div id="battle-result-panel">
+        <div id="result-box">
+          <span class="bres-title" id="bres-title-text"></span>
+          <div class="bres-detail" id="bres-detail-text"></div>
+          <button class="bres-btn" onclick="closeBattle()">帰城する</button>
+        </div>
       </div>
-      <div class="pg-close" onclick="closePedigreeModal()">✕</div>
     </div>
-    <div class="pg-bonus-card" id="pg-bonus-card"></div>
-    <div class="pg-tree-label">── 血の系譜 ──</div>
-    <div class="pg-tree-section" id="pg-tree-body"></div>
-    <div class="pg-meter-wrap" id="pg-meter-wrap"></div>
-    <div class="pg-footer">
-      <button class="pg-footer-btn" onclick="closePedigreeModal()">城に戻る</button>
+    <div id="battle-log-bar">戦闘開始！</div>
+    <div id="battle-ui-panel">
+      <div class="bunit-panel">
+        <div class="bunit-top">
+          <span class="bunit-name" id="bunit-pname">我が軍</span>
+          <div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-player">120</span></div>
+        </div>
+        <div class="bpower-label">POWER</div>
+        <div class="bpower-wrap">
+          <div class="bpower-bar" id="bbar-player" style="width:100%"></div>
+          <div class="bpower-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="bunit-panel">
+        <div class="bunit-top">
+          <span class="bunit-name" id="bunit-ename">敵　軍</span>
+          <div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-enemy">120</span></div>
+        </div>
+        <div class="bpower-label">POWER</div>
+        <div class="bpower-wrap">
+          <div class="bpower-bar bpower-bar-enemy" id="bbar-enemy" style="width:100%"></div>
+          <div class="bpower-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 武将モーダル -->
-<div id="warrior-modal" class="modal">
-  <div class="modal-content">
-    <div class="wm-close-btn" onclick="closeWarriorModal()">×</div>
-    <div class="wm-name" id="wm-name">─</div>
-    <div class="wm-meta" id="wm-meta">─</div>
-    <div class="wm-status">
-      <div class="wm-stat-item pow" id="wm-pow">武力 ─</div>
-      <div class="wm-stat-item wis" id="wm-wis">知力 ─</div>
+<!-- 系譜モーダル -->
+<div id="pedigree-modal">
+  <div class="ped-shell">
+    <div class="ped-head">
+      <div class="ped-title">⚔ 武将系譜</div>
+      <button class="close-btn" onclick="closePedigree()">閉じる</button>
     </div>
-    <div class="wm-hp-wrap">
-      <div class="wm-hp-label"><span>体力</span><span id="wm-hp-text">─</span></div>
-      <div class="wm-hp-track"><div class="wm-hp-fill" id="wm-hp-fill" style="width:100%"></div></div>
+    <div id="pedigree-content"></div>
+  </div>
+</div>
+
+<!-- 武将詳細モーダル -->
+<div id="warrior-modal">
+  <div class="wm-shell">
+    <div class="wm-head">
+      <div class="wm-name" id="wm-name-text"></div>
+      <div class="wm-role" id="wm-role-text"></div>
     </div>
-    <div class="wm-section-title">所持スキル</div>
-    <div class="wm-skill-block">
-      <div class="wm-skill-list" id="wm-skills">─</div>
+    <div class="wm-body">
+      <div class="wm-stat"><span class="wsk">武力</span><span class="wsv" id="wm-power"></span></div>
+      <div class="wm-stat"><span class="wsk">知力</span><span class="wsv" id="wm-wisdom"></span></div>
+      <div class="wm-stat"><span class="wsk">体力</span><span class="wsv" id="wm-hp"></span></div>
+      <div class="wm-hp-bar"><div class="wm-hp-fill" id="wm-hp-fill"></div></div>
+      <div class="wm-stat"><span class="wsk">忠誠</span><span class="wsv" id="wm-loyalty"></span></div>
+      <div class="wm-stat"><span class="wsk">レベル</span><span class="wsv" id="wm-level"></span></div>
+      <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location"></span></div>
+      <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage"></span></div>
+      <button class="wm-close" onclick="closeWarriorModal()">閉じる</button>
     </div>
-    <div class="wm-section-title">血統 (父 × 母)</div>
-    <div class="wm-bloodline-block">
-      <div class="wm-bloodline-pair" id="wm-bloodline">─</div>
-      <button class="wm-pedigree-btn" onclick="openPedigreeFromModal()">🌳 家系図の系譜を表示</button>
-    </div>
-    <div class="wm-section-title">人間関係</div>
-    <div class="wm-relation-block" id="wm-relations"></div>
-    <button class="wm-back-btn" onclick="closeWarriorModal()">城に戻る</button>
   </div>
 </div>
 
 <!-- 縁組モーダル -->
 <div id="engumi-modal">
   <div class="modal-shell">
-    <div class="eng-header">
-      <div class="eng-header-top">
-        <div>
-          <div class="eng-title">縁組</div>
-          <div class="eng-subtitle">── 血脈の系譜 ──</div>
-        </div>
-        <div class="eng-close" onclick="closeEngumiModal()">✕</div>
-      </div>
+    <div class="modal-deco-top"></div>
+    <div class="modal-header">
+      <div class="modal-kamon">⚜️</div>
+      <div class="modal-title">縁　組</div>
+      <div class="modal-subtitle">血脈を紡ぎ、新たな将を育む</div>
     </div>
-    <div class="step-tabs">
-      <div class="step-tab active" id="tab-1" onclick="goEngumiStep(1)"><span class="tab-num">1</span>父母を選ぶ</div>
-      <div class="step-tab" id="tab-2" onclick="goEngumiStep(2)"><span class="tab-num">2</span>縁結び確認</div>
-    </div>
-    <div class="eng-body" id="eng-body">
-      <div id="step-1">
-        <div class="dual-select">
-          <div class="role-toggle">
-            <button class="role-btn active" id="rbtn-father" onclick="switchEngumiRole('father')">
-              <span class="rbtn-tick">✓</span><span class="rbtn-main">⚔ 父</span>
-              <span class="rbtn-sel" id="rbtn-father-sel">未選択</span>
-            </button>
-            <button class="role-btn" id="rbtn-mother" onclick="switchEngumiRole('mother')">
-              <span class="rbtn-tick">✓</span><span class="rbtn-main">🌸 母</span>
-              <span class="rbtn-sel" id="rbtn-mother-sel">未選択</span>
-            </button>
-          </div>
-          <div id="engumi-selected-summary"></div>
-          <div class="parent-label" id="engumi-list-label">── 父となる武将を選択</div>
-          <div class="filter-row" id="engumi-filter-row"></div>
-          <div class="candidates-wrap" id="engumi-candidates-wrap"></div>
-        </div>
+    <div class="modal-body" id="engumi-body">
+      <div class="modal-step-indicator">
+        <div class="step-dot active" id="sdot0"></div>
+        <div class="step-dot" id="sdot1"></div>
+        <div class="step-dot" id="sdot2"></div>
       </div>
-      <div id="step-2" style="display:none;">
-        <div class="preview-wrap">
-          <div class="parents-row">
-            <div class="pr-card" onclick="goEngumiStep(1);switchEngumiRole('father')">
-              <div class="pr-role">⚔ 父</div>
-              <div class="pr-name" id="prev-father-name">─</div>
-              <div class="pr-clan" id="prev-father-clan">─</div>
-              <div class="pr-change">▸ 変更</div>
-            </div>
-            <div class="pr-arrow"><div class="pr-line"></div><div class="pr-heart">💕</div><div class="pr-line"></div></div>
-            <div class="pr-card" onclick="goEngumiStep(1);switchEngumiRole('mother')">
-              <div class="pr-role">🌸 母</div>
-              <div class="pr-name" id="prev-mother-name">─</div>
-              <div class="pr-clan" id="prev-mother-clan">─</div>
-              <div class="pr-change">▸ 変更</div>
-            </div>
-          </div>
-          <div class="blood-preview">
-            <div class="bp-header">
-              <div class="bp-title">生まれる子の予測</div>
-              <div class="bp-badge" id="bp-badge">─</div>
-            </div>
-            <div class="child-stats-grid" id="child-stats-grid"></div>
-            <div class="child-skills" id="child-skills-wrap"></div>
-            <div class="battle-row">
-              <span style="color:rgba(245,232,200,.55);">⚔ 合戦ボーナス</span>
-              <span class="br-val" id="br-val">─</span>
-            </div>
-            <div class="facility-row">
-              <span>🏯 施設効率</span>
-              <span class="fac-val" id="fac-val">─</span>
-            </div>
-          </div>
-        </div>
-        <div class="cost-note">縁組には <span>800石</span> 必要です</div>
-      </div>
+      <div id="engumi-step-content"></div>
     </div>
-    <div class="eng-footer">
-      <button class="execute-btn" id="execute-btn" disabled onclick="handleEngumiFooterBtn()">
-        <span id="execute-label">縁結び確認へ</span>
-      </button>
-      <button class="sub-btn" onclick="closeEngumiModal()">閉じる</button>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn" onclick="closeEngumi()">取消</button>
+      <button class="modal-btn modal-btn-exec" id="engumi-next-btn" onclick="engumiNext()">次へ →</button>
     </div>
   </div>
 </div>
 
 <!-- 成功オーバーレイ -->
 <div id="success-overlay">
-  <div class="so-kanji">縁</div>
-  <div class="so-text">縁組が成立した</div>
-  <div class="so-child">
-    <div class="so-child-name" id="so-child-name">─</div>
-    <div class="so-child-blood" id="so-child-blood">─</div>
-    <div class="so-stats-grid" id="so-stats-grid"></div>
-    <div class="so-skills" id="so-skills"></div>
-  </div>
-  <button class="so-dismiss" onclick="dismissSuccess()">城へ戻る</button>
+  <div class="suc-kamon">👶</div>
+  <div class="suc-title">縁組成立</div>
+  <div class="suc-name" id="suc-name"></div>
+  <div class="suc-stats" id="suc-stats"></div>
+  <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
 </div>
 
-<!-- 内政モーダル -->
-<div id="dev-modal" class="modal">
-  <div class="modal-content">
-    <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:14px;font-size:20px;letter-spacing:.15em;">内政 ─ 施設整備</h2>
-    <div id="facilities-list" style="max-height:360px;overflow-y:auto;"></div>
-    <button onclick="closeDevModal()" style="margin-top:16px;width:100%;padding:12px;background:rgba(139,0,0,.6);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;">閉じる</button>
-  </div>
-</div>
-
-<!-- 歴史モーダル -->
-<div id="history-modal" class="modal">
-  <div class="modal-content" style="max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">
-    <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:12px;font-size:20px;letter-spacing:.15em;">戦国記録</h2>
-    <div id="history-list" style="flex:1;overflow-y:auto;font-size:13px;line-height:1.6;padding-right:4px;"></div>
-    <button onclick="closeHistory()" style="margin-top:14px;padding:12px;background:var(--gold);color:#0e0800;font-weight:700;border:none;border-radius:10px;font-size:14px;cursor:pointer;">閉じる</button>
+<!-- 開発者モーダル -->
+<div id="dev-modal">
+  <div class="dev-shell">
+    <div class="dev-head">
+      <div class="dev-title">⚙ 開発者メニュー</div>
+      <button class="close-btn" onclick="closeModal('dev-modal')">閉じる</button>
+    </div>
+    <div class="dev-body">
+      <button class="dev-btn" onclick="devAddKoku()">石高 +5000</button>
+      <button class="dev-btn" onclick="devAddPower()">全武将 武力+20</button>
+      <button class="dev-btn" onclick="devLevelUp()">全武将 レベル+5</button>
+      <button class="dev-btn" onclick="devRestoreHp()">全武将 体力全回復</button>
+      <button class="dev-btn" onclick="devSetUnification()">統一度 +30%</button>
+      <button class="dev-btn" onclick="devAddWarrior()">新武将招募</button>
+    </div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- 履歴モーダル -->
+<div id="history-modal">
+  <div class="hist-shell">
+    <div class="hist-head">
+      <div class="hist-title">📜 戦記履歴</div>
+      <button class="close-btn" onclick="closeModal('history-modal')">閉じる</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+<!-- トースト -->
 <div id="toast"></div>
 
-<!-- メインUI -->
+<!-- タップ背景でモーダル閉じる -->
+<div id="modal-bg" style="display:none;position:fixed;inset:0;z-index:550;" onclick="closeAllModals()"></div>
+
+<!-- メイン -->
 <div id="main">
   <div id="header">
-    <div id="game-title">戦国血脈<span class="sub">〜 覇道の系譜 〜</span></div>
+    <div id="game-title">
+      戦国血脈
+      <span class="sub">〜覇道の系譜〜</span>
+    </div>
     <div id="status-panel">
-      <div class="stat-chip"><span class="sl">天下統一</span><span class="sv" id="unification-pct">12</span><span class="su">%</span></div>
-      <div class="stat-chip"><span class="sl">第</span><span class="sv" id="gen-num">1</span><span class="su">世代</span></div>
+      <div class="stat-chip">
+        <span class="sl">石高</span>
+        <span class="sv" id="koku-val">0</span>
+        <span class="su">石</span>
+      </div>
+      <div class="stat-chip">
+        <span class="sl">統一</span>
+        <span class="sv" id="uni-val">0.0</span>
+        <span class="su">%</span>
+      </div>
     </div>
   </div>
   <div id="iso-field">
@@ -522,16 +693,24 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
   </div>
   <div id="bottom-ui">
     <div id="nation-bar">
-      <span class="nl">国力</span>
-      <div class="nt"><div class="nf" id="nfill" style="width:42%"></div></div>
-      <span class="np" id="koku-display">4,200</span><span class="nl" style="margin-left:1px">石</span>
+      <span class="nl">天下統一</span>
+      <div class="nt"><div class="nf" id="uni-bar" style="width:0%"></div></div>
+      <span class="np" id="uni-pct">0%</span>
     </div>
     <div id="party-row"></div>
     <div id="action-row">
-      <button class="act-btn primary" onclick="openBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
-      <button class="act-btn" onclick="openEngumiModal()"><span class="ico">🌸</span><span class="lbl">縁組</span></button>
-      <button class="act-btn" onclick="showHistory()"><span class="ico">📜</span><span class="lbl">歴史</span></button>
-      <button class="act-btn" onclick="showDev()"><span class="ico">🏯</span><span class="lbl">内政</span></button>
+      <button class="act-btn primary" onclick="openBattle()">
+        <span class="ico">⚔️</span><span class="lbl">合戦</span>
+      </button>
+      <button class="act-btn" onclick="openEngumi()">
+        <span class="ico">⚜️</span><span class="lbl">縁組</span>
+      </button>
+      <button class="act-btn" onclick="openPedigree()">
+        <span class="ico">📜</span><span class="lbl">系譜</span>
+      </button>
+      <button class="act-btn" onclick="openModal('dev-modal')">
+        <span class="ico">⚙️</span><span class="lbl">設定</span>
+      </button>
     </div>
   </div>
 </div>
@@ -539,1698 +718,1444 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════
-   Canvas エンジン
-═══════════════════════════════════════════ */
-const canvas = document.getElementById('iso-canvas');
-const ctx    = canvas.getContext('2d');
-const TILE   = 44;
-const ISO_ANG = Math.PI / 6;
-let CX = 0, CY = 0;
+// ============================================================
+//  定数・設定
+// ============================================================
+const ENGUMI_COST = 600;
 
-function isoToScreen(tx, ty, tz) {
-  return {
-    x: (tx - ty) * Math.cos(ISO_ANG) * TILE,
-    y: (tx + ty) * Math.sin(ISO_ANG) * TILE - tz * TILE * 0.88
-  };
-}
-function toSX(tx, ty, tz) { return CX + isoToScreen(tx, ty, tz).x; }
-function toSY(tx, ty, tz) { return CY + isoToScreen(tx, ty, tz).y; }
-
-function resizeCanvas() {
-  const f = document.getElementById('iso-field');
-  canvas.width  = f.clientWidth;
-  canvas.height = f.clientHeight;
-  CX = canvas.width  / 2;
-  CY = canvas.height * 0.72;
-}
-
-/* ── Canvas吹き出し ── */
-let canvasBubbles = [];
-
-function addCanvasBubble(warrior, text, duration = 150) {
-  canvasBubbles = canvasBubbles.filter(b => b.warrior !== warrior);
-  canvasBubbles.push({ warrior, text, life: duration, maxLife: duration, popT: 0 });
-}
-
-function tickCanvasBubbles() {
-  for (let i = canvasBubbles.length - 1; i >= 0; i--) {
-    const b = canvasBubbles[i];
-    b.life--;
-    b.popT = Math.min(1, b.popT + 0.12);
-    if (b.life <= 0) canvasBubbles.splice(i, 1);
-  }
-}
-
-function drawCanvasBubbles() {
-  for (const b of canvasBubbles) {
-    const w = b.warrior;
-    if (!w.visible && w.state !== 'exiting') continue;
-    const H  = Math.round(canvas.height * 0.09);
-    const sx = toSX(w.tileX + 0.5, w.tileY + 0.5, 0.25);
-    const sy = toSY(w.tileX + 0.5, w.tileY + 0.5, 0.25);
-    const fadeRatio = b.life / b.maxLife;
-    const alpha = Math.min(1, fadeRatio * 3) * b.popT;
-    if (alpha <= 0) continue;
-    const scale = 0.6 + 0.4 * b.popT;
-    const bx = sx;
-    const by = sy - H * 1.55;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(bx, by); ctx.scale(scale, scale); ctx.translate(-bx, -by);
-    ctx.font = "bold 12px 'Noto Serif JP', serif";
-    const tw  = ctx.measureText(b.text).width;
-    const pad = 8;
-    const bw  = tw + pad * 2;
-    const bh  = 22;
-    const rx  = bx - bw / 2;
-    const ry  = by - bh / 2;
-    ctx.beginPath();
-    ctx.roundRect(rx, ry, bw, bh, 6);
-    ctx.fillStyle   = 'rgba(245,232,178,0.96)';
-    ctx.fill();
-    ctx.strokeStyle = '#c8960c';
-    ctx.lineWidth   = 1.5;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(bx - 5, ry + bh);
-    ctx.lineTo(bx + 5, ry + bh);
-    ctx.lineTo(bx,     ry + bh + 7);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(245,232,178,0.96)';
-    ctx.fill();
-    ctx.strokeStyle = '#c8960c';
-    ctx.lineWidth   = 1.5;
-    ctx.stroke();
-    ctx.fillStyle    = '#2a1800';
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(b.text, bx, by);
-    ctx.restore();
-  }
-}
-
-/* ── 施設アクティビティ ── */
-const bubbleLayer = document.getElementById('bubble-layer');
-
-function showFacilityActivity(facKey, text, color) {
-  const f  = FACILITY_MAP[facKey];
-  if (!f) return;
-  const sx = toSX(f.x + 0.5, f.y + 0.5, 1.4);
-  const sy = toSY(f.x + 0.5, f.y + 0.5, 1.4);
-  const fR = document.getElementById('iso-field').getBoundingClientRect();
-  const cR = canvas.getBoundingClientRect();
-  const el = document.createElement('div');
-  el.className   = 'facility-activity';
-  el.textContent = text;
-  el.style.left  = (cR.left - fR.left + sx) + 'px';
-  el.style.top   = (cR.top  - fR.top  + sy) + 'px';
-  el.style.color = color || '#ffdd88';
-  bubbleLayer.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = 'opacity .5s,transform .5s';
-    el.style.opacity    = '0';
-    el.style.transform  = 'translateX(-50%) translateY(-18px)';
-    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 520);
-  }, 1800);
-}
-
-/* ═══════════════════════════════════════════
-   施設データ
-═══════════════════════════════════════════ */
-const FACILITY_MAP = {
-  training: { name:'訓練場', icon:'⚔',  x:-3.8, y:-3.2, level:1, type:'power'   },
-  forge:    { name:'鍛冶場', icon:'🔥', x:-0.5, y:-3.8, level:1, type:'power'   },
-  academy:  { name:'学問所', icon:'📖', x: 2.8, y:-3.2, level:1, type:'wisdom'  },
-  tea:      { name:'茶室',   icon:'🍵', x:-3.8, y: 0.2, level:1, type:'social'  },
-  garden:   { name:'庭園',   icon:'🌸', x:-0.5, y: 2.8, level:1, type:'heal'    },
-  loyalty:  { name:'忠誠殿', icon:'🌟', x: 2.8, y: 2.8, level:1, type:'loyalty' },
-};
-const FACILITY_ENTRANCE = {
-  training: { x:-3.2, y:-2.8 }, forge:   { x:-0.2, y:-3.2 }, academy: { x: 2.5, y:-2.8 },
-  tea:      { x:-3.2, y: 0.4 }, garden:  { x:-0.2, y: 2.5 }, loyalty: { x: 2.5, y: 2.5 },
-};
 const FACILITY_EFFECT = {
-  training: { stat:'power',   label:'武力', color:'#ffcc44', range:[4,9]  },
-  forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[3,7]  },
-  academy:  { stat:'wisdom',  label:'知力', color:'#aaddff', range:[4,8]  },
-  tea:      { stat:'hp',      label:'体力', color:'#88ffcc', range:[3,8]  },
-  garden:   { stat:'hp',      label:'体力', color:'#ff88cc', range:[5,12] },
-  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[6,12] }, // 忠誠は隠し
-};
-const FACILITY_SPEECH = {
-  training: ['うりゃーっ！','もっと強く！','千本素振り！','気合だ！'],
-  forge:    ['いい刃だ…','熱い…','業物になるぞ','打ち直すか'],
-  academy:  ['ふむふむ…','なるほど！','兵法書か','これは深い'],
-  tea:      ['心が安らぐ…','一服どうぞ','静かじゃ','よい茶だ'],
-  garden:   ['美しい…','心洗われる','花が咲いた','英気を養う'],
-  loyalty:  ['お館様の御為に！','命を捧げん','忠義を尽くす'],
-};
-const COST_BASE = { training:450, forge:380, academy:520, tea:310, garden:280, loyalty:680 };
-
-/* 武将スキルテーブル */
-const SKILL_TABLE = {
-  bukan:  [['武者震い','一騎討ち','突撃','馬術'],['槍術','剣術','弓術']],
-  hime:   [['外交術','和歌','茶道'],['占い','祈祷']],
-  bunkan: [['謀略','算術','建築'],['外交術','和歌','兵法']],
+  training: { stat:'power',   label:'武力', color:'#ffcc44', range:[5,11], costHp:-6 },
+  forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[4,9],  costHp:-5 },
+  academy:  { stat:'wisdom',  label:'知力', color:'#aaddff', range:[5,10], costHp:-4 },
+  tea:      { stat:'hp',      label:'体力', color:'#88ffcc', range:[12,18],costHp:8  },
+  garden:   { stat:'hp',      label:'体力', color:'#ff88cc', range:[18,25],costHp:15 },
+  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[7,14], costHp:-3 },
 };
 
-function getSkills(jobId, power, wisdom) {
-  const table = SKILL_TABLE[jobId] || SKILL_TABLE.bukan;
-  const result = [];
-  const primary   = table[0];
-  const secondary = table[1] || [];
-  result.push(primary[Math.floor((power / 30)) % primary.length] || primary[0]);
-  if (wisdom > 60) result.push(secondary[0] || '─');
-  if (wisdom > 80) result.push(secondary[1] || '─');
-  return result.length ? result : ['─'];
-}
-
-/* ═══════════════════════════════════════════
-   ゲーム状態
-═══════════════════════════════════════════ */
-let state    = { unification:12, genNum:1, koku:4200 };
-let gameTime = { year:1, month:1, day:1 };
-let gameLog  = [];
-
-function updateTime() {
-  if (++gameTime.day > 30)  { gameTime.day = 1; gameTime.month++; }
-  if (gameTime.month > 12)  { gameTime.month = 1; gameTime.year++; }
-  document.getElementById('time-display').textContent =
-    `第${gameTime.year}年 ${gameTime.month}月 ${gameTime.day}日`;
-}
-
-function addLog(text, type = 'normal') {
-  gameLog.push({ text, type, time: `${gameTime.year}年${gameTime.month}月` });
-  if (gameLog.length > 60) gameLog.shift();
-}
-
-/* ═══════════════════════════════════════════
-   関係システム
-═══════════════════════════════════════════ */
-let relations = {};
-
-function initRelations(ws) {
-  relations = {};
-  ws.forEach((_, i) => ws.forEach((_, j) => {
-    if (i === j) return;
-    const k = relKey(i, j);
-    if (relations[k] === undefined)
-      relations[k] = Math.floor(-20 + Math.random() * 60);
-  }));
-}
-
-function relKey(i, j) { return i < j ? `${i}_${j}` : `${j}_${i}`; }
-function getRel(i, j)  { return relations[relKey(i, j)] ?? 0; }
-function changeRel(i, j, d) {
-  const k = relKey(i, j);
-  relations[k] = Math.max(-100, Math.min(100, (relations[k] ?? 0) + d));
-}
-function relLabel(v) {
-  if (v >= 70) return '莫逆の友'; if (v >= 40) return '友好';
-  if (v >= 10) return '普通';     if (v >= -20) return 'やや対立';
-  if (v >= -50) return '反目';    return '宿敵';
-}
-function relColor(v) {
-  if (v >= 40)  return '#88ffaa'; if (v >= 10) return '#aaddff';
-  if (v >= -20) return '#ffdd88'; return '#ff8888';
-}
-
-/* ═══════════════════════════════════════════
-   セリフ
-═══════════════════════════════════════════ */
-const SPEECHES = {
-  bukan:  { idle:['参れ！','うぬ…','天下一！','鍛えねば'],           train:['武を磨く！','訓練だ！'],        highLoyalty:['この命、殿に！'],    lowLoyalty:['うぬ…','不満じゃ'],   friendly:['頼もしい奴だ'],   rival:['邪魔するな！'],   levelUp:['成長したぞ！'] },
-  hime:   { idle:['桜よ散れ','風が優しい','月が綺麗'],               train:['心を鎮めよう'],                  highLoyalty:['ずっとそばに'],      lowLoyalty:['悲しい…'],           friendly:['仲良くしましょ'], rival:['困った方ね…'],    levelUp:['また強くなった♪'] },
-  bunkan: { idle:['謀略が要る','算段通り'],                          train:['書を読まねば'],                  highLoyalty:['殿の御為に'],        lowLoyalty:['再考の余地あり'],    friendly:['良い判断だ'],     rival:['浅慮な輩め'],     levelUp:['知を極めた'] },
+const FACILITY_MAP = {
+  training:{ name:'鍛錬場', color:'#cc8800', icon:'🏋️' },
+  forge:   { name:'鍛冶場', color:'#aa6600', icon:'⚒️' },
+  academy: { name:'学問所', color:'#4488cc', icon:'📚' },
+  tea:     { name:'茶室',   color:'#88cc88', icon:'🍵' },
+  garden:  { name:'庭園',   color:'#cc88aa', icon:'🌸' },
+  loyalty: { name:'忠義堂', color:'#ccaa44', icon:'🏮' },
 };
-function getSpeech(w, sit) {
-  const p = SPEECHES[w.jobId] || SPEECHES.bukan;
-  const a = p[sit] || p.idle;
-  return a[Math.floor(Math.random() * a.length)];
+
+const ROLES = {
+  0:'当主', 1:'家老', 2:'侍大将', 3:'足軽頭', 4:'兵糧奉行',
+  5:'忍頭', 6:'軍師', 7:'外交官', 8:'鉄砲頭', 9:'武者',
+};
+
+const SURNAMES = ['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条',
+  '今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
+const GIVEN_NAMES_M = ['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康',
+  '義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎',
+  '勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
+const GIVEN_NAMES_F = ['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督'];
+
+const FACILITY_POSITIONS = [
+  {key:'training', tx:0,  ty:1},
+  {key:'forge',    tx:1,  ty:2},
+  {key:'academy',  tx:-1, ty:2},
+  {key:'tea',      tx:2,  ty:0},
+  {key:'garden',   tx:-2, ty:0},
+  {key:'loyalty',  tx:0,  ty:3},
+];
+
+// ============================================================
+//  ゲーム状態
+// ============================================================
+const state = {
+  koku: 1200,
+  unification: 0,
+  turn: 0,
+  generation: 1,
+  log: [],
+  pedigree: [],
+};
+
+let gWarriors = [];
+let battleAnim = null;
+let idleTimer = null;
+let engumiStep = 0;
+let engumiSelectedFather = null;
+let engumiSelectedMother = null;
+
+// ============================================================
+//  ユーティリティ
+// ============================================================
+function rnd(lo, hi) { return Math.floor(lo + Math.random() * (hi - lo + 1)); }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function showToast(msg, duration) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration || 2200);
 }
 
-/* ── 浮遊テキスト ── */
-let floatingTexts = [];
+function addLog(text) {
+  const now = new Date();
+  const ts = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  state.log.unshift({ time: ts, text });
+  if (state.log.length > 80) state.log.pop();
+}
 
-function createFloatText(warrior, text, color) {
-  if (!warrior) return;
-  floatingTexts.push({
-    sx:    toSX(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2) + (Math.random() * 24 - 12),
-    sy:    toSY(warrior.tileX + 0.5, warrior.tileY + 0.5, 1.2) - 20,
-    text,
-    color: color || '#ffdd88',
-    vy:    -1.4 - Math.random() * 0.7,
-    life:  60,
-    alpha: 1,
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+  const bg = document.getElementById('modal-bg');
+  if (bg) bg.style.display = 'block';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  // 全モーダルが閉じたらBGも消す
+  const allModals = document.querySelectorAll('#pedigree-modal.show,#warrior-modal.show,#engumi-modal.show,#dev-modal.show,#history-modal.show');
+  if (allModals.length === 0) {
+    const bg = document.getElementById('modal-bg');
+    if (bg) bg.style.display = 'none';
+  }
+}
+function closeAllModals() {
+  ['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal'].forEach(id => {
+    document.getElementById(id)?.classList.remove('show');
   });
+  const bg = document.getElementById('modal-bg');
+  if (bg) bg.style.display = 'none';
 }
 
-function drawFloatingTexts() {
-  for (let i = floatingTexts.length - 1; i >= 0; i--) {
-    const f = floatingTexts[i];
-    f.sy   += f.vy;
-    f.vy   *= 0.975;
-    f.life--;
-    f.alpha = (f.life / 60) * 0.9;
-    if (f.life <= 0) { floatingTexts.splice(i, 1); continue; }
-    ctx.save();
-    ctx.globalAlpha  = f.alpha;
-    ctx.shadowColor  = '#000';
-    ctx.shadowBlur   = 8;
-    ctx.font         = `bold ${Math.round(16 + f.life / 10)}px 'Noto Serif JP',serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle    = f.color;
-    ctx.fillText(f.text, f.sx, f.sy);
-    ctx.restore();
+// ============================================================
+//  星・花びら生成
+// ============================================================
+function spawnStars() {
+  const sky = document.getElementById('sky');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*70}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;animation-duration:${2+Math.random()*4}s;animation-delay:${-Math.random()*6}s;`;
+    sky.appendChild(s);
   }
 }
 
-/* ═══════════════════════════════════════════
-   描画プリミティブ
-═══════════════════════════════════════════ */
-function drawBox(tx, ty, tz, w, d, h, cT, cL, cR2) {
-  const p = (x, y, z) => [toSX(x, y, z), toSY(x, y, z)];
-  const [ax,ay] = p(tx,ty,tz+h),     [bx,by] = p(tx+w,ty,tz+h);
-  const [cx,cy] = p(tx+w,ty+d,tz+h), [dx,dy] = p(tx,ty+d,tz+h);
-  const [ex,ey] = p(tx,ty,tz),       [fx,fy] = p(tx+w,ty,tz);
-  const [gx,gy] = p(tx+w,ty+d,tz),   [hx,hy] = p(tx,ty+d,tz);
-  const face = (pts, fill) => {
-    ctx.beginPath();
-    pts.forEach(([px,py], i) => i ? ctx.lineTo(px,py) : ctx.moveTo(px,py));
-    ctx.closePath();
-    ctx.fillStyle = fill; ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,.32)'; ctx.lineWidth = 0.5; ctx.stroke();
-  };
-  face([[ax,ay],[bx,by],[cx,cy],[dx,dy]], cT);
-  face([[ax,ay],[ex,ey],[hx,hy],[dx,dy]], cL);
-  face([[bx,by],[fx,fy],[gx,gy],[cx,cy]], cR2);
-}
-
-function drawRoof(tx, ty, tz, w, d, rh, c1, c2) {
-  const p  = (x, y, z) => [toSX(x, y, z), toSY(x, y, z)];
-  const mx = tx + w / 2, my = ty + d / 2;
-  const [ax,ay] = p(tx,ty,tz),       [bx,by] = p(tx+w,ty,tz);
-  const [cx,cy] = p(tx+w,ty+d,tz),   [dx,dy] = p(tx,ty+d,tz);
-  const [px2,py2] = p(mx, my, tz+rh);
-  [[ax,ay,px2,py2,dx,dy,c2],[bx,by,px2,py2,cx,cy,c1],
-   [ax,ay,bx,by,px2,py2,c2],[dx,dy,cx,cy,px2,py2,c1]].forEach(([x1,y1,x2,y2,x3,y3,c]) => {
-    ctx.beginPath();
-    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3);
-    ctx.closePath();
-    ctx.fillStyle = c; ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,.32)'; ctx.lineWidth = 0.5; ctx.stroke();
-  });
-}
-
-function drawFlag(tx, ty, tz, t) {
-  const bx = toSX(tx,ty,tz),   by = toSY(tx,ty,tz);
-  const tx2 = toSX(tx,ty,tz+0.9), ty2 = toSY(tx,ty,tz+0.9);
-  ctx.strokeStyle = '#c8960c'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(bx,by); ctx.lineTo(tx2,ty2); ctx.stroke();
-  const wave = Math.sin(t * 0.07) * 4;
-  ctx.fillStyle = '#8b0000';
-  ctx.beginPath();
-  ctx.moveTo(tx2, ty2); ctx.lineTo(tx2+14+wave, ty2+6); ctx.lineTo(tx2+12, ty2+13);
-  ctx.closePath(); ctx.fill();
-}
-
-/* ═══════════════════════════════════════════
-   施設描画
-═══════════════════════════════════════════ */
-function drawFacilities(tick) {
-  Object.entries(FACILITY_MAP).forEach(([key, f]) => {
-    drawFacility(key, f, tick);
-    if (gWarriors.some(w => w.insideFacility === key)) drawGlow(f.x+0.5, f.y+0.5, tick);
-  });
-}
-
-function drawGlow(cx, cy, tick) {
-  const r = 10 + 4 * Math.sin(tick * 0.1);
-  ctx.save();
-  ctx.globalAlpha = 0.35 + 0.12 * Math.sin(tick * 0.1);
-  ctx.beginPath();
-  ctx.arc(toSX(cx,cy,0.4), toSY(cx,cy,0.4), r, 0, Math.PI*2);
-  ctx.fillStyle = '#ffd700'; ctx.fill();
-  ctx.restore();
-}
-
-function drawFacility(key, f, tick) {
-  const { x, y, level: lv } = f;
-  if (key === 'training') {
-    drawBox(x-.45,y-.45,.25,.9,.9,.6+lv*.15,'#7a3a1e','#4a2010','#5a2e12');
-    drawRoof(x-.55,y-.55,.85+lv*.15,1.1,1.1,.38,'#2a1208','#100600');
-    if (lv >= 2) drawFlag(x, y, .85+lv*.15+.35, tick);
-  }
-  if (key === 'forge') {
-    drawBox(x-.38,y-.38,.25,.76,.76,.65,'#505040','#303028','#404038');
-    drawRoof(x-.45,y-.45,.9,.9,.9,.28,'#252520','#121210');
-    for (let i = 0; i < lv+1; i++) {
-      const t = (tick*.02 + i*.7) % 1;
-      ctx.save(); ctx.globalAlpha = .22*(1-t);
-      ctx.beginPath();
-      ctx.arc(toSX(x+.3,y+.3,.95+t*.6), toSY(x+.3,y+.3,.95+t*.6), 4+t*8, 0, Math.PI*2);
-      ctx.fillStyle = '#cccccc'; ctx.fill(); ctx.restore();
-    }
-  }
-  if (key === 'academy') {
-    drawBox(x-.45,y-.45,.25,.9,.9,.75,'#3a3a5a','#202040','#2a2a48');
-    drawRoof(x-.55,y-.55,1,1.1,1.1,.38,'#1a1a30','#0a0a1a');
-    if (lv >= 2) {
-      ctx.fillStyle = '#ffddaa';
-      ctx.beginPath();
-      ctx.roundRect(toSX(x+.5,y+.5,1.1)-7, toSY(x+.5,y+.5,1.1), 14, 4, 1);
-      ctx.fill();
-    }
-  }
-  if (key === 'tea') {
-    drawBox(x-.38,y-.38,.2,.76,.76,.38,'#7a5030','#4a3018','#5a3c20');
-    drawRoof(x-.45,y-.45,.58,.9,.9,.28,'#3a2010','#1a0e08');
-    for (let i = 0; i < 2; i++) {
-      const t = (tick*.018 + i*.5) % 1;
-      ctx.save(); ctx.globalAlpha = .18*(1-t);
-      ctx.beginPath();
-      ctx.arc(toSX(x+.3+i*.2,y+.3,.75+t*.5), toSY(x+.3+i*.2,y+.3,.75+t*.5), 3+t*6, 0, Math.PI*2);
-      ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.restore();
-    }
-  }
-  if (key === 'garden') {
-    drawBox(x-.45,y-.45,.2,.9,.9,.1,'#2a5a1a','#183a10','#204a14');
-    [{ox:-.15,oy:-.1},{ox:.3,oy:.1},{ox:0,oy:.3}].slice(0, Math.min(lv+1,3)).forEach((t, i) => {
-      const sw = Math.sin(tick*.015 + i*1.2) * .012;
-      drawBox(x+t.ox+sw, y+t.oy, .3, .2,.2,.35,'#3a6a22','#244a14','#2e5a1a');
-    });
-  }
-  if (key === 'loyalty') {
-    drawBox(x-.45,y-.45,.25,.9,.9,.65,'#8a2828','#501818','#6a2020');
-    drawRoof(x-.55,y-.55,.9,1.1,1.1,.38,'#400808','#1e0404');
-    const pulse = .2 + .12*Math.sin(tick*.06);
-    ctx.save(); ctx.globalAlpha = pulse;
-    ctx.beginPath();
-    ctx.arc(toSX(x+.5,y+.5,1.1), toSY(x+.5,y+.5,1.1), 10+lv*3, 0, Math.PI*2);
-    ctx.fillStyle = '#ffcc44'; ctx.fill(); ctx.restore();
-  }
-  ctx.font         = `bold ${Math.round(canvas.width*.023)}px 'Noto Serif JP',serif`;
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle    = 'rgba(240,192,64,.82)';
-  ctx.shadowColor  = '#000';
-  ctx.shadowBlur   = 5;
-  ctx.fillText(f.name + ' Lv' + lv, toSX(x+.5,y+.5,1.15), toSY(x+.5,y+.5,1.15));
-  ctx.shadowBlur   = 0;
-}
-
-/* ═══════════════════════════════════════════
-   地形
-═══════════════════════════════════════════ */
-const TERRAIN = [];
-function buildTerrain() {
-  TERRAIN.length = 0;
-  for (let r = 0; r < 10; r++) for (let c = 0; c < 10; c++) {
-    const cx = c - 4.5, ry = r - 4.5;
-    const dist = Math.sqrt(cx*cx + ry*ry);
-    TERRAIN.push({ c, r, type: dist < 4 ? 'stone' : 'grass' });
+function spawnPetals() {
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const sz = 4 + Math.random() * 8;
+    p.style.cssText = `left:${Math.random()*100}%;width:${sz}px;height:${sz*0.7}px;animation-duration:${6+Math.random()*8}s;animation-delay:${-Math.random()*14}s;`;
+    document.body.appendChild(p);
   }
 }
 
-/* ═══════════════════════════════════════════
-   血統システム
-═══════════════════════════════════════════ */
-class Clan {
-  constructor(name) { this.name = name; }
-}
-
-class Busho {
-  constructor(name, clan, father = null, mother = null) {
-    this.name   = name;
-    this.clan   = clan;
-    this.father = father;
-    this.mother = mother;
-  }
-
-  getBloodline(generation = 1) {
-    if (generation > 3) return null;
-    const info = { name: this.name, clan: this.clan.name };
-    if (this.father || this.mother) {
-      info.father = this.father ? this.father.getBloodline(generation + 1) : null;
-      info.mother = this.mother ? this.mother.getBloodline(generation + 1) : null;
-    }
-    return info;
-  }
-
-  _collectClans(node, out = []) {
-    if (!node) return out;
-    out.push(node.clan);
-    if (node.father) this._collectClans(node.father, out);
-    if (node.mother) this._collectClans(node.mother, out);
-    return out;
-  }
-
-  pureScore() {
-    const clans = this._collectClans(this.getBloodline());
-    if (!clans.length) return 0;
-    const freq = {};
-    clans.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
-    return Math.max(...Object.values(freq)) / clans.length;
-  }
-
-  mixScore() {
-    const clans = this._collectClans(this.getBloodline());
-    if (!clans.length) return 0;
-    const unique = new Set(clans).size;
-    return Math.min(1, (unique - 1) / Math.max(1, clans.length - 1));
-  }
-
-  calcBonus() {
-    const pure = this.pureScore();
-    const mix  = this.mixScore();
-    return {
-      pure, mix,
-      power:    Math.floor(pure * 18),
-      wisdom:   Math.floor(mix  * 16),
-      facility: Math.floor(mix  * 0.3 * 100) / 100,
-      battle:   Math.floor((pure * 0.6 + mix * 0.4) * 20),
-      type:     pure >= 0.75 ? '純血' : mix >= 0.5 ? '混血' : '標準',
-    };
-  }
-}
-
-const CLANS = {
-  oda:      new Clan('織田家'),
-  saito:    new Clan('齋藤家'),
-  azai:     new Clan('浅井家'),
-  takeda:   new Clan('武田家'),
-  uesugi:   new Clan('上杉家'),
-  mouri:    new Clan('毛利家'),
-  tokugawa: new Clan('徳川家'),
-};
-
-const CLAN_COLORS = {
-  '織田家':'#ff8888','齋藤家':'#88aaff','浅井家':'#88ffaa',
-  '武田家':'#ffaa44','上杉家':'#dd88ff','毛利家':'#44dddd','徳川家':'#ffdd44'
-};
-function clanColor(name) { return CLAN_COLORS[name] || '#ffcc88'; }
-
-const warriorBushoMap = new WeakMap();
-function getBusho(warrior) { return warriorBushoMap.get(warrior) || null; }
-function setBusho(warrior, busho) { warriorBushoMap.set(warrior, busho); }
-
-function applyBloodlineBonus(warrior) {
-  const busho = getBusho(warrior);
-  if (!busho) return;
-  const bonus = busho.calcBonus();
-  warrior.bloodlineBonus = bonus;
-  if (!warrior._bloodlineApplied) {
-    warrior._bloodlineApplied = true;
-    warrior.stats.power   += bonus.power;
-    warrior.stats.wisdom   = Math.min(99,  warrior.stats.wisdom  + bonus.wisdom);
-    if (bonus.power > 0 || bonus.wisdom > 0) {
-      createFloatText(warrior, `血統 +${bonus.power + bonus.wisdom}`, '#ffcc88');
-      addLog(`${warrior.name}の血統ボーナス発動！（${bonus.type}）`, 'success');
-    }
-  }
-}
-
-function bloodlineFacilityMul(warrior) {
-  return warrior.bloodlineBonus ? 1 + warrior.bloodlineBonus.facility : 1;
-}
-
-function bloodlineBattleBonus() {
-  return gWarriors.reduce((s, w) => s + (w.bloodlineBonus ? w.bloodlineBonus.battle : 0), 0);
-}
-
-/* ═══════════════════════════════════════════
-   家系図モーダル
-═══════════════════════════════════════════ */
-window.openPedigreeModal = function(warrior) {
-  const busho  = getBusho(warrior);
-  const bl     = busho ? busho.getBloodline() : null;
-  const bonus  = busho ? busho.calcBonus() : null;
-  const ROLES  = { bukan:'武官', hime:'姫', bunkan:'文官' };
-
-  document.getElementById('pg-warrior-sub').textContent =
-    `${ROLES[warrior.jobId] || '武将'} ／ ${warrior.name}の家系`;
-
-  const badgeColors = {
-    '純血': { fg:'#ffaaaa', bg:'rgba(255,80,80,.15)', border:'rgba(255,100,100,.4)' },
-    '混血': { fg:'#aaddff', bg:'rgba(80,160,255,.15)', border:'rgba(100,160,255,.4)' },
-    '標準': { fg:'#ffdd88', bg:'rgba(200,150,12,.12)', border:'rgba(200,150,12,.35)' },
-  };
-  const bc = bonus ? (badgeColors[bonus.type] || badgeColors['標準']) : badgeColors['標準'];
-
-  document.getElementById('pg-bonus-card').innerHTML = bonus ? `
-    <div class="pg-bonus-warrior">${warrior.name}</div>
-    <div class="pg-bonus-badge" style="color:${bc.fg};background:${bc.bg};border-color:${bc.border};">
-      ${bonus.type === '純血' ? '🔴' : bonus.type === '混血' ? '🔵' : '⭐'} ${bonus.type}の血脈
-    </div>
-    <div class="pg-bonus-grid">
-      <div class="pg-bonus-item"><div class="pbi-val" style="color:#ffcc66;">+${bonus.power}</div><div class="pbi-lbl">⚔ 武力</div></div>
-      <div class="pg-bonus-item"><div class="pbi-val" style="color:#aaddff;">+${bonus.wisdom}</div><div class="pbi-lbl">📖 知力</div></div>
-      <div class="pg-bonus-item"><div class="pbi-val" style="color:#ffaaaa;">+${bonus.battle}%</div><div class="pbi-lbl">⚔ 合戦</div></div>
-    </div>
-    <div class="pg-bonus-battle">
-      <span style="color:rgba(245,232,200,.6);">⚔ 合戦ボーナス</span>
-      <span class="pbb-val">+${bonus.battle}%</span>
-    </div>
-  ` : `<div style="color:rgba(245,232,200,.4);text-align:center;padding:10px;">血統情報なし</div>`;
-
-  const treeEl = document.getElementById('pg-tree-body');
-  treeEl.innerHTML = bl ? buildPgTree(bl, warrior, bonus) : '<div style="color:rgba(245,232,200,.35);text-align:center;padding:20px 0;">血統記録なし</div>';
-
-  const meterEl = document.getElementById('pg-meter-wrap');
-  if (bonus) {
-    const pureW  = Math.round(bonus.pure * 100);
-    const mixW   = Math.round(bonus.mix  * 100);
-    const battleW = Math.min(100, bonus.battle * 5);
-    meterEl.innerHTML = `
-      <div class="pg-meter-title">── 血統分析 ──</div>
-      <div class="pg-meter-row"><div class="pg-meter-lbl">純血度</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${pureW}%;background:linear-gradient(90deg,#8b0000,#ffaaaa);"></div></div><div class="pg-meter-val" style="color:#ffaaaa;">${pureW}%</div></div>
-      <div class="pg-meter-row"><div class="pg-meter-lbl">混血度</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${mixW}%;background:linear-gradient(90deg,#1a3a8b,#aaddff);"></div></div><div class="pg-meter-val" style="color:#aaddff;">${mixW}%</div></div>
-      <div class="pg-meter-row"><div class="pg-meter-lbl">合戦力</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${battleW}%;background:linear-gradient(90deg,#5a1a00,#ffcc44);"></div></div><div class="pg-meter-val" style="color:#ffcc44;">+${bonus.battle}%</div></div>`;
-  } else { meterEl.innerHTML = ''; }
-
-  const modal = document.getElementById('pedigree-modal');
-  modal.classList.add('show');
-  modal.scrollTop = 0;
-};
-
-function buildPgTree(bl, warrior, bonus) {
-  const selfClan = bl.clan;
-  const selfColor = clanColor(selfClan);
-  const ROLES = { bukan:'武官', hime:'姫', bunkan:'文官' };
-
-  const selfNode = `
-    <div class="pgn">
-      <div class="pgn-box self" style="border-color:${selfColor};box-shadow:0 0 18px ${selfColor}40;">
-        <div class="pgn-name">${bl.name}</div>
-        <div class="pgn-clan" style="color:${selfColor};">${selfClan}</div>
-        <div class="pgn-role">${ROLES[warrior.jobId] || '武将'}</div>
-      </div>
-    </div>`;
-
-  if (!bl.father && !bl.mother) {
-    return selfNode + `<div style="margin-top:16px;color:rgba(245,232,200,.3);font-size:12px;text-align:center;">─ 祖先の記録なし ─</div>`;
-  }
-
-  const vlineDown = (h=20) => `<div class="pg-vline" style="height:${h}px;margin:0 auto;"></div>`;
-
-  function parentNode(node, side) {
-    if (!node) return `<div class="pgn-box unknown" style="margin:0 auto;"><div class="pgn-name">不明</div><div class="pgn-clan" style="color:rgba(200,150,12,.3);">─</div></div>`;
-    const cc = clanColor(node.clan);
-    return `<div class="pgn-box parent" style="border-color:${cc}60;margin:0 auto;"><div class="pgn-name">${node.name}</div><div class="pgn-clan" style="color:${cc};">${node.clan}</div><div class="pgn-role">${side === 'father' ? '父' : '母'}</div></div>`;
-  }
-
-  function grandNode(node, label) {
-    if (!node) return `<div class="pgn-box grand unknown" style="margin:0 auto;opacity:.35;"><div class="pgn-name" style="font-size:10px;">不明</div></div>`;
-    const cc = clanColor(node.clan);
-    return `<div class="pgn-box grand" style="border-color:${cc}50;margin:0 auto;"><div class="pgn-name">${node.name}</div><div class="pgn-clan" style="color:${cc};font-size:8px;">${node.clan}</div><div class="pgn-role">${label}</div></div>`;
-  }
-
-  const fNode = bl.father;
-  const mNode = bl.mother;
-  const ffGrand = fNode?.father ? grandNode(fNode.father, '父方祖父') : grandNode(null,'');
-  const fmGrand = fNode?.mother ? grandNode(fNode.mother, '父方祖母') : grandNode(null,'');
-  const mfGrand = mNode?.father ? grandNode(mNode.father, '母方祖父') : grandNode(null,'');
-  const mmGrand = mNode?.mother ? grandNode(mNode.mother, '母方祖母') : grandNode(null,'');
-  const showGrandFather = fNode && (fNode.father || fNode.mother);
-  const showGrandMother = mNode && (mNode.father || mNode.mother);
-
-  let grandRowHtml = '';
-  if (showGrandFather || showGrandMother) {
-    grandRowHtml = `
-      <div class="pg-grand-row" style="width:100%;margin-bottom:4px;">
-        <div class="pg-grand-col">
-          ${showGrandFather ? `<div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;">父方の家</div><div style="display:flex;gap:6px;width:100%;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${ffGrand}</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${fmGrand}</div></div>` : '<div style="flex:1;"></div>'}
-        </div>
-        <div style="width:12px;flex-shrink:0;"></div>
-        <div class="pg-grand-col">
-          ${showGrandMother ? `<div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;">母方の家</div><div style="display:flex;gap:6px;width:100%;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${mfGrand}</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${mmGrand}</div></div>` : '<div style="flex:1;"></div>'}
-        </div>
-      </div>
-      <div class="pg-hline" style="width:80%;margin:0 auto 0;"></div>
-      ${vlineDown(10)}`;
-  }
-
-  return `
-    ${selfNode}
-    ${vlineDown(16)}
-    <div class="pg-hline" style="width:70%;margin:0 auto;"></div>
-    <div class="pg-parent-row" style="margin-top:0;width:100%;">
-      <div class="pg-parent-col">${vlineDown(10)}${parentNode(fNode,'father')}</div>
-      <div class="pg-parent-divider"></div>
-      <div class="pg-parent-col">${vlineDown(10)}${parentNode(mNode,'mother')}</div>
-    </div>
-    ${grandRowHtml ? vlineDown(14) + grandRowHtml : ''}`;
-}
-
-window.closePedigreeModal = function() {
-  document.getElementById('pedigree-modal').classList.remove('show');
-};
-
-/* ═══════════════════════════════════════════
-   武将クラス
-═══════════════════════════════════════════ */
-const COLOR_SETS = {
-  c_red:  { armor:'#8b0000', sub:'#4a0000', skin:'#d4a574', acc:'#ff4444', dark:'#6a1010' },
-  c_blue: { armor:'#1a3a5c', sub:'#0a1e30', skin:'#c8a87a', acc:'#4488cc', dark:'#0a2a4a' },
-  c_pink: { armor:'#8b3060', sub:'#5a1040', skin:'#e8c0a0', acc:'#ff88cc', dark:'#6a1050' },
-};
-let gWarriors = [], currentHouseHead = null, currentModalIndex = -1;
-const ROLES = { bukan:'武官', hime:'姫', bunkan:'文官' };
-
+// ============================================================
+//  IsoWarrior クラス
+// ============================================================
 class IsoWarrior {
-  constructor(name, jobId, power, tx, ty) {
-    this.name   = name;
-    this.jobId  = jobId;
-    this.tileX  = tx;
-    this.tileY  = ty;
-    this.color  = jobId === 'hime' ? 'c_pink' : jobId === 'bunkan' ? 'c_blue' : 'c_red';
-    // 体力を stats に追加
-    const baseHp = 80 + Math.floor(Math.random() * 20);
-    this.stats  = {
-      power,
-      wisdom:  jobId === 'bunkan' ? 84 : jobId === 'hime' ? 58 : 52,
-      hp:      baseHp,   // 現在体力
-      maxHp:   baseHp,   // 最大体力
-      level: 1,
-      exp:   0,
+  constructor(name, jobId, power, offsetX, speed, gender) {
+    this.name    = name;
+    this.jobId   = jobId;
+    this.gender  = gender || (Math.random() < 0.75 ? 'male' : 'female');
+    this.offsetX = offsetX || 0;
+    this.speed   = speed || (2 + Math.random() * 3);
+    this.stats   = {
+      power:  clamp(power || rnd(20,45), 1, 99),
+      wisdom: rnd(15, 45),
+      hp:     100,
+      maxHp:  100,
+      level:  1,
+      exp:    0,
     };
-    // 忠誠度は隠しパラメータ (_loyalty)
-    this._loyalty = jobId === 'hime' ? 92 : jobId === 'bunkan' ? 72 : 65;
-    this.destX  = tx;
-    this.destY  = ty;
-    this.moveSpeed    = 0.013 + Math.random() * 0.005;
-    this.idleTicks    = Math.floor(Math.random() * 120);
-    this.idleMax      = 120 + Math.floor(Math.random() * 140);
-    this.walkFrame    = 0;
-    this.frameCount   = 0;
-    this.state        = 'idle';
-    this.target       = null;
-    this.insideFacility = null;
-    this.wait         = 0;
-    this.anim         = { type: null, t: 0 };
-    this.visible      = true;
-    this.speechTimer  = Math.floor(Math.random() * 200);
-    this.bloodlineBonus       = null;
-    this._bloodlineApplied    = false;
-    gWarriors.push(this);
+    this._loyalty    = rnd(60, 95);
+    this._generation = 1;
+    this._parents    = null;
+    this._birthTurn  = state.turn;
+
+    // ISO座標
+    this.isoX = (Math.random() - 0.5) * 4;
+    this.isoY = (Math.random() - 0.5) * 4;
+    this.dirX = (Math.random() > 0.5 ? 1 : -1);
+    this.dirY = (Math.random() > 0.5 ? 1 : -1);
+
+    this._currentFacility = null;
+    this._facilityTimer   = 0;
+    this._facilityStayMax = 0;
+    this._moveTimer       = rnd(60, 180);
+    this._color = this._pickColor();
   }
 
-  tick(myIdx) {
-    this._moveTick();
-    this._aiTick(myIdx);
+  _pickColor() {
+    const cols = ['#c8960c','#cc4444','#4488cc','#44cc88','#cc88cc','#ccaa44','#44aacc','#cc6644'];
+    return cols[Math.floor(Math.random() * cols.length)];
   }
 
-  _moveTick() {
-    switch (this.state) {
-      case 'idle':
-        if (++this.idleTicks > this.idleMax) {
-          this.idleTicks = 0;
-          this.idleMax   = 120 + Math.floor(Math.random() * 140);
-          this._pickDest();
-        }
-        break;
+  get loyalty() { return this._loyalty; }
 
-      case 'moving': {
-        const dx   = this.destX - this.tileX;
-        const dy   = this.destY - this.tileY;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 0.07) {
-          this.tileX = this.destX;
-          this.tileY = this.destY;
-          if (this.target) {
-            this.state = 'entering';
-            this.anim  = { type:'enter', t:0 };
-            const sp = FACILITY_SPEECH[this.target] || ['…'];
-            addCanvasBubble(this, sp[Math.floor(Math.random() * sp.length)], 130);
-          } else {
-            this.state = 'idle';
-          }
-        } else {
-          this.tileX += dx / dist * this.moveSpeed;
-          this.tileY += dy / dist * this.moveSpeed;
-          if (++this.frameCount >= 10) { this.frameCount = 0; this.walkFrame = (this.walkFrame + 1) % 4; }
-        }
-        break;
+  locationLabel() {
+    if (!this._currentFacility) return '巡回中';
+    const f = FACILITY_MAP[this._currentFacility];
+    return f ? f.name : '巡回中';
+  }
+
+  tick() {
+    if (this._currentFacility) {
+      this._facilityTimer++;
+      if (this._facilityTimer >= this._facilityStayMax) {
+        this._leaveFacility();
+      } else if (this._facilityTimer % 90 === 45) {
+        this._applyEffect(this._currentFacility, false);
       }
-
-      case 'entering':
-        this.anim.t += 0.04;
-        if (this.anim.t >= 1) {
-          this.visible        = false;
-          this.state          = 'acting';
-          this.insideFacility = this.target;
-          this.wait           = 110 + Math.random() * 130;
-          this._applyEffect(this.target, true);
-        }
-        break;
-
-      case 'acting':
-        if (Math.random() < 0.035) this._applyEffect(this.insideFacility, false);
-        if (--this.wait <= 0) {
-          this.state  = 'exiting';
-          this.anim   = { type:'exit', t:0 };
-          this.visible = true;
-          const e = FACILITY_ENTRANCE[this.insideFacility];
-          if (e) { this.tileX = e.x; this.tileY = e.y; }
-          this.insideFacility = null;
-          this.target = null;
-        }
-        break;
-
-      case 'exiting':
-        this.anim.t += 0.04;
-        if (this.anim.t >= 1) { this.state = 'idle'; this.anim = { type:null, t:0 }; }
-        break;
-    }
-  }
-
-  _pickDest() {
-    if (Math.random() < 0.5) {
-      const keys = Object.keys(FACILITY_ENTRANCE);
-      const key  = keys[Math.floor(Math.random() * keys.length)];
-      const e    = FACILITY_ENTRANCE[key];
-      this.destX  = e.x + (Math.random() * .3 - .15);
-      this.destY  = e.y + (Math.random() * .3 - .15);
-      this.target = key;
-      this.state  = 'moving';
     } else {
-      const others = gWarriors.filter(w => w !== this);
-      if (others.length && Math.random() < 0.5) {
-        const t     = others[Math.floor(Math.random() * others.length)];
-        this.destX  = t.tileX + (Math.random() - 0.5);
-        this.destY  = t.tileY + (Math.random() - 0.5);
-      } else {
-        this.destX  = Math.random() * 6 - 3;
-        this.destY  = Math.random() * 6 - 3;
+      this._moveTimer--;
+      if (this._moveTimer <= 0) {
+        this._tryEnterFacility();
+        this._moveTimer = rnd(40, 120);
       }
-      this.target = null;
-      this.state  = 'moving';
+      this._walk();
     }
+    this._checkLevelUp();
+  }
+
+  _walk() {
+    const spd = this.speed * 0.012;
+    this.isoX += this.dirX * spd;
+    this.isoY += this.dirY * spd;
+    const bound = 3.5;
+    if (this.isoX > bound)  { this.isoX =  bound;  this.dirX = -1; }
+    if (this.isoX < -bound) { this.isoX = -bound; this.dirX =  1; }
+    if (this.isoY > bound)  { this.isoY =  bound;  this.dirY = -1; }
+    if (this.isoY < -bound) { this.isoY = -bound; this.dirY =  1; }
+    if (Math.random() < 0.005) this.dirX *= -1;
+    if (Math.random() < 0.005) this.dirY *= -1;
+  }
+
+  _tryEnterFacility() {
+    // 体力が低いなら回復施設を優先
+    const hpPct = this.stats.hp / this.stats.maxHp;
+    let candidates;
+    if (hpPct < 0.4) {
+      candidates = ['tea','garden','tea']; // 回復優先
+    } else {
+      candidates = Object.keys(FACILITY_MAP);
+    }
+    const key = candidates[Math.floor(Math.random() * candidates.length)];
+    const fp = FACILITY_POSITIONS.find(f => f.key === key);
+    if (!fp) return;
+    this._currentFacility  = key;
+    this.isoX              = fp.tx + (Math.random() - 0.5) * 0.4;
+    this.isoY              = fp.ty + (Math.random() - 0.5) * 0.4;
+    this._facilityTimer    = 0;
+    this._facilityStayMax  = rnd(120, 300);
+    this._applyEffect(key, true);
+  }
+
+  _leaveFacility() {
+    this._currentFacility = null;
+    this._facilityTimer   = 0;
+    this.dirX = (Math.random() > 0.5 ? 1 : -1);
+    this.dirY = (Math.random() > 0.5 ? 1 : -1);
   }
 
   _applyEffect(key, isEntry) {
-    if (!key) return;
     const eff = FACILITY_EFFECT[key];
     if (!eff) return;
+
     const [lo, hi] = eff.range;
-    const base = isEntry ? Math.floor(lo + Math.random() * (hi - lo)) : Math.floor(1 + Math.random() * 2);
+    const base = isEntry
+      ? Math.floor(lo + Math.random() * (hi - lo))
+      : Math.floor(1 + Math.random() * 2);
     const mul  = bloodlineFacilityMul(this);
     const gain = Math.floor(base * mul);
-    if (eff.stat === 'power')   this.stats.power   += gain;
-    if (eff.stat === 'wisdom')  this.stats.wisdom   = Math.min(99,  this.stats.wisdom  + gain);
-    if (eff.stat === 'hp')      this.stats.hp       = Math.min(this.stats.maxHp, this.stats.hp + gain);
-    if (eff.stat === 'loyalty') this._loyalty       = Math.min(100, this._loyalty + gain); // 隠し
-    if (gain > 0) {
-      if (eff.stat !== 'loyalty') { // 忠誠は表示しない
-        createFloatText(this, `+${gain}${eff.label}`, eff.color);
-      }
-      if (isEntry) {
-        showFacilityActivity(key, `${this.name}が${FACILITY_MAP[key].name}で鍛練！`, eff.color);
-        if (eff.stat !== 'loyalty') addLog(`${this.name}が${FACILITY_MAP[key].name}で${eff.label}+${gain}`);
-      }
+
+    // 体力消費 / 回復 (costHp: 正=回復, 負=消費)
+    let hpChange = 0;
+    if (isEntry) {
+      hpChange = eff.costHp > 0
+        ? Math.floor(eff.costHp * (0.8 + Math.random() * 0.4))
+        : Math.floor(eff.costHp * (0.7 + Math.random() * 0.6));
     }
+
+    // ステータス変化
+    if (eff.stat === 'power') {
+      this.stats.power = clamp(this.stats.power + gain, 1, 99);
+    } else if (eff.stat === 'wisdom') {
+      this.stats.wisdom = clamp(this.stats.wisdom + gain, 1, 99);
+    } else if (eff.stat === 'hp') {
+      this.stats.hp = clamp(this.stats.hp + gain, 1, this.stats.maxHp);
+    } else if (eff.stat === 'loyalty') {
+      this._loyalty = clamp(this._loyalty + gain, 0, 100);
+    }
+
+    // 体力変動
+    this.stats.hp = clamp(this.stats.hp + hpChange, 1, this.stats.maxHp);
+
+    // フロートテキスト
+    if (isEntry && (gain > 0 || hpChange !== 0)) {
+      let text = '';
+      if (eff.stat === 'hp') {
+        text = `体力 +${gain}`;
+      } else if (hpChange < 0) {
+        text = `${eff.label}+${gain} 疲労${hpChange}`;
+      } else {
+        text = `${eff.label} +${gain}`;
+      }
+      createFloatText(this, text, eff.color);
+      showFacilityActivity(this, `${this.name}が${FACILITY_MAP[key].name}を使用`, eff.color);
+      addLog(`${this.name}が${FACILITY_MAP[key].name}（${eff.label}+${gain} / HP${hpChange >= 0 ? '+' + hpChange : hpChange}）`);
+    }
+
     updatePartyRow();
     updateStatusUI();
   }
 
-  _aiTick(myIdx) {
-    this.speechTimer = Math.max(0, this.speechTimer - 1);
-    if (this.speechTimer === 0 && Math.random() < 0.005) {
-      let sit = 'idle';
-      if (this._loyalty > 80 && Math.random() < .3) sit = 'highLoyalty';
-      else if (this._loyalty < 35 && Math.random() < .4) sit = 'lowLoyalty';
-      addCanvasBubble(this, getSpeech(this, sit));
-      this.speechTimer = 200 + Math.floor(Math.random() * 280);
+  _checkLevelUp() {
+    const needed = this.stats.level * 120 + 80;
+    if (this.stats.exp >= needed) {
+      this.stats.exp -= needed;
+      this.stats.level++;
+      this.stats.power   = clamp(this.stats.power   + rnd(2,5), 1, 99);
+      this.stats.wisdom  = clamp(this.stats.wisdom  + rnd(1,3), 1, 99);
+      this.stats.maxHp  += rnd(5, 12);
+      this.stats.hp      = Math.min(this.stats.maxHp, this.stats.hp + rnd(10,20));
+      createFloatText(this, `Lv${this.stats.level} UP!`, '#ffffaa');
+      addLog(`${this.name}がLv${this.stats.level}に上昇！`);
+      updatePartyRow();
     }
-    if (this.state !== 'acting' && Math.random() < 0.004) {
-      gWarriors.forEach((other, j) => {
-        if (j === myIdx) return;
-        const dx = this.tileX - other.tileX, dy = this.tileY - other.tileY;
-        if (Math.sqrt(dx*dx + dy*dy) < 1.6) this._interact(myIdx, j, other);
-      });
-    }
-  }
-
-  _interact(mi, oi, other) {
-    const rel = getRel(mi, oi);
-    let delta, sitA, sitB;
-    if (rel >= 20 && Math.random() < .65)      { delta = Math.floor(3 + Math.random()*8);  sitA = sitB = 'friendly'; }
-    else if (rel < -20 && Math.random() < .55) { delta = -Math.floor(3 + Math.random()*8); sitA = sitB = 'rival';    }
-    else { delta = Math.floor(-4 + Math.random()*9); sitA = sitB = delta >= 0 ? 'friendly' : 'rival'; }
-
-    changeRel(mi, oi, delta);
-    const nv = getRel(mi, oi);
-    addCanvasBubble(this, getSpeech(this, sitA), 130);
-    setTimeout(() => addCanvasBubble(other, getSpeech(other, sitB), 130), 700);
-
-    if (Math.abs(delta) >= 5) {
-      const sign = delta > 0 ? '▲' : '▼';
-      const midX = (this.tileX + other.tileX) / 2 + 0.5;
-      const midY = (this.tileY + other.tileY) / 2 + 0.5;
-      const fR   = document.getElementById('iso-field').getBoundingClientRect();
-      const cR   = canvas.getBoundingClientRect();
-      const el   = document.createElement('div');
-      el.className = 'relation-label';
-      el.style.left  = (cR.left - fR.left + toSX(midX, midY, 1)) + 'px';
-      el.style.top   = (cR.top  - fR.top  + toSY(midX, midY, 1) - 30) + 'px';
-      el.style.color = relColor(nv);
-      el.textContent = `${sign} ${relLabel(nv)}`;
-      bubbleLayer.appendChild(el);
-      setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 2800);
-      if (Math.abs(delta) >= 8)
-        addLog(`${this.name}と${other.name}の仲が${delta > 0 ? '深まった' : '険悪になった'}（${relLabel(nv)}）`, delta > 0 ? 'success' : 'betrayal');
-    }
-    updatePartyRow();
-  }
-
-  draw() {
-    if (!this.visible && this.state !== 'exiting') return;
-    const c  = COLOR_SETS[this.color];
-    const fx = toSX(this.tileX + .5, this.tileY + .5, .25);
-    const fy = toSY(this.tileX + .5, this.tileY + .5, .25);
-    const H  = Math.round(canvas.height * .09);
-    const W  = H * .55;
-    const s  = this.walkFrame % 4;
-    let scale = 1, alpha = 1;
-    if (this.state === 'entering') { scale = 1 - this.anim.t; alpha = 1 - this.anim.t; }
-    if (this.state === 'exiting')  { scale = this.anim.t;     alpha = this.anim.t; }
-    if (scale <= 0 || alpha <= 0) return;
-
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(fx, fy); ctx.scale(scale, scale); ctx.translate(-fx, -fy);
-
-    if (this.jobId === 'bukan')      this._drawBukan(fx, fy, H, W, s, c);
-    else if (this.jobId === 'hime')  this._drawHime(fx, fy, H, W, s, c);
-    else                              this._drawBunkan(fx, fy, H, W, c);
-
-    ctx.font         = `${Math.round(canvas.width * .026)}px 'Noto Serif JP',serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle    = 'rgba(240,192,64,.95)';
-    ctx.shadowColor  = '#000';
-    ctx.shadowBlur   = 5;
-    ctx.fillText(this.name, fx, fy - H * 1.22);
-    ctx.shadowBlur   = 0;
-
-    if (this.state === 'moving' && this.target) {
-      ctx.font      = `${Math.round(canvas.width * .02)}px 'Noto Serif JP',serif`;
-      ctx.fillStyle = 'rgba(180,200,255,.8)';
-      ctx.fillText('→' + FACILITY_MAP[this.target].name, fx, fy - H * 1.44);
-    }
-
-    if (this.state === 'entering') {
-      ctx.save();
-      ctx.globalAlpha = .4 * (1 - this.anim.t);
-      ctx.beginPath();
-      ctx.arc(fx, fy, 22 * (1 + this.anim.t), 0, Math.PI * 2);
-      ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth   = 2;
-      ctx.stroke();
-      ctx.restore();
-    }
-    ctx.restore();
-  }
-
-  _drawBukan(fx, fy, H, W, s, c) {
-    const legW = W*.28, legSw=[0,H*.06,0,-H*.06][s], armSw=[H*.05,0,-H*.05,0][s];
-    const bob  = Math.abs([0,1,0,-1][s])*1.5, bY=fy-bob;
-    const hH=H*.22, bH=H*.32, lH=H*.38, aH=H*.28;
-    const headY=bY-lH-bH-hH, bodyY=bY-lH-bH;
-    ctx.beginPath(); ctx.ellipse(fx,bY+2,W*.6,H*.05,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fill();
-    ctx.fillStyle=c.sub;
-    ctx.save(); ctx.translate(fx-legW*.6,bY-lH/2); ctx.rotate(legSw*.04); ctx.beginPath(); ctx.roundRect(-legW/2,0,legW,lH,3); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.translate(fx+legW*.6,bY-lH/2); ctx.rotate(-legSw*.04); ctx.beginPath(); ctx.roundRect(-legW/2,0,legW,lH,3); ctx.fill(); ctx.restore();
-    ctx.fillStyle=c.dark;
-    ctx.beginPath(); ctx.roundRect(fx-W*.32,bY-3,W*.28,5,2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(fx+W*.04,bY-3,W*.28,5,2); ctx.fill();
-    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.roundRect(fx-W*.44,bodyY,W*.88,bH,3); ctx.fill();
-    ctx.fillStyle=c.dark;  ctx.beginPath(); ctx.roundRect(fx-W*.38,bodyY+2,W*.76,bH-4,2); ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.save(); ctx.translate(fx-W*.52,bodyY+4); ctx.rotate(armSw*.05); ctx.beginPath(); ctx.roundRect(-W*.18,0,W*.22,aH,4); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.translate(fx+W*.52,bodyY+4); ctx.rotate(-armSw*.05); ctx.beginPath(); ctx.roundRect(-W*.04,0,W*.22,aH,4); ctx.fill();
-    ctx.strokeStyle='#b8b8b8'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(W*.1,aH*.5); ctx.lineTo(W*.4,-aH*.5); ctx.stroke();
-    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.arc(W*.12,aH*.45,3,0,Math.PI*2); ctx.fill(); ctx.restore();
-    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.ellipse(fx,headY+hH*.45,W*.38,hH*.55,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=c.skin;  ctx.beginPath(); ctx.ellipse(fx,headY+hH*.55,W*.28,hH*.42,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#3a2010';
-    ctx.beginPath(); ctx.arc(fx-W*.1,headY+hH*.5,1.5,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(fx+W*.1,headY+hH*.5,1.5,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle=c.acc; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(fx,headY); ctx.lineTo(fx,headY-hH*.4); ctx.stroke();
-    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.moveTo(fx-4,headY-hH*.2); ctx.lineTo(fx+4,headY-hH*.2); ctx.lineTo(fx,headY-hH*.5); ctx.fill();
-  }
-
-  _drawHime(fx, fy, H, W, s, c) {
-    const bob=Math.abs([0,1,0,-1][s])*1.2, bY=fy-bob;
-    ctx.beginPath(); ctx.ellipse(fx,bY+2,W*.55,H*.045,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
-    const grd=ctx.createLinearGradient(fx-W*.55,0,fx+W*.55,0);
-    grd.addColorStop(0,c.dark); grd.addColorStop(.5,c.armor); grd.addColorStop(1,c.dark);
-    ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(fx-W*.22,bY-H*.55); ctx.lineTo(fx+W*.22,bY-H*.55); ctx.lineTo(fx+W*.5,bY); ctx.lineTo(fx-W*.5,bY); ctx.closePath(); ctx.fill();
-    ctx.fillStyle=c.acc; ctx.beginPath(); ctx.roundRect(fx-W*.22,bY-H*.42,W*.44,H*.1,2); ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.save(); ctx.translate(fx-W*.28,bY-H*.52); ctx.rotate(-.2); ctx.beginPath(); ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.translate(fx+W*.28,bY-H*.52); ctx.rotate(.2);  ctx.beginPath(); ctx.ellipse(0,0,W*.15,H*.2,0,0,Math.PI*2); ctx.fill(); ctx.restore();
-    ctx.fillStyle='#1a0a00'; ctx.beginPath(); ctx.ellipse(fx,bY-H*.78,W*.3,H*.18,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=c.skin;    ctx.beginPath(); ctx.ellipse(fx,bY-H*.73,W*.22,H*.15,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#8b3060';
-    ctx.beginPath(); ctx.arc(fx-W*.09,bY-H*.74,1.4,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(fx+W*.09,bY-H*.74,1.4,0,Math.PI*2); ctx.fill();
-    for(let i=-1;i<=1;i++){ ctx.fillStyle=i===0?c.acc:'rgba(255,140,200,.8)'; ctx.beginPath(); ctx.arc(fx+i*W*.18,bY-H*.9,3.5,0,Math.PI*2); ctx.fill(); }
-  }
-
-  _drawBunkan(fx, fy, H, W, c) {
-    ctx.beginPath(); ctx.ellipse(fx,fy+2,W*.5,H*.04,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fill();
-    ctx.fillStyle=c.armor; ctx.beginPath(); ctx.roundRect(fx-W*.32,fy-H*.65,W*.64,H*.65,3); ctx.fill();
-    ctx.fillStyle=c.sub;   ctx.beginPath(); ctx.roundRect(fx-W*.25,fy-H*.6, W*.5, H*.5, 2); ctx.fill();
-    ctx.fillStyle=c.armor;
-    ctx.beginPath(); ctx.ellipse(fx-W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(fx+W*.42,fy-H*.48,W*.16,H*.22,0,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='#c8a850'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(fx+W*.28,fy-H*.55); ctx.lineTo(fx+W*.2,fy-H*.2); ctx.stroke();
-    ctx.fillStyle=c.skin; ctx.beginPath(); ctx.ellipse(fx,fy-H*.76,W*.25,H*.16,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#1a0a00';
-    ctx.beginPath(); ctx.moveTo(fx-W*.2,fy-H*.82); ctx.lineTo(fx+W*.2,fy-H*.82); ctx.lineTo(fx+W*.05,fy-H*1); ctx.lineTo(fx-W*.05,fy-H*1); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(fx-W*.2,fy-H*.85,W*.4,H*.07,1); ctx.fill();
-    ctx.fillStyle='#4a3a2a';
-    ctx.beginPath(); ctx.arc(fx-W*.07,fy-H*.77,1.3,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(fx+W*.07,fy-H*.77,1.3,0,Math.PI*2); ctx.fill();
   }
 }
 
-/* ═══════════════════════════════════════════
-   シーン描画
-═══════════════════════════════════════════ */
-function drawScene(tick) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  [...TERRAIN].sort((a,b) => (a.r+a.c)-(b.r+b.c)).forEach(t => {
-    const tx = t.c - 4.5, ty = t.r - 4.5;
-    if (t.type === 'grass') drawBox(tx,ty,0,1,1,.18,'#2d4a1e','#1c3010','#233c16');
-    else { const e=(t.c+t.r)%2; drawBox(tx,ty,0,1,1,.25,e?'#4e4032':'#443828','#2e2416','#382e1c'); }
-  });
-
-  [[-3,-3],[-2,-3],[-1,-3],[0,-3],[1,-3],[2,-3],[3,-3],
-   [3,-2],[3,-1],[3,0],[3,1],[3,2],[3,3],
-   [2,3],[1,3],[0,3],[-1,3],[-2,3],[-3,3],
-   [-3,2],[-3,1],[-3,0],[-3,-1],[-3,-2]].forEach(([mc,mr]) => {
-    ctx.beginPath();
-    [[mc,mr],[mc+1,mr],[mc+1,mr+1],[mc,mr+1]].forEach(([x,y],i) =>
-      i ? ctx.lineTo(toSX(x,y,0),toSY(x,y,0)) : ctx.moveTo(toSX(x,y,0),toSY(x,y,0))
-    );
-    ctx.closePath();
-    ctx.fillStyle   = `rgba(12,28,52,${.5 + .12*Math.sin(tick*.04 + mc*.5 + mr*.3)})`;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(20,50,90,.5)';
-    ctx.lineWidth   = .5;
-    ctx.stroke();
-  });
-
-  for (let i=-2; i<=2; i++) {
-    drawBox(i,-2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
-    drawBox(i, 2,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
-  }
-  for (let i=-1; i<=1; i++) {
-    drawBox(-2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
-    drawBox( 2,i,.25,1,1,.5,'#4a3a28','#322514','#5c4a34');
-  }
-
-  drawFacilities(tick);
-
-  drawBox(-1,-1,.75,2,2,.9, '#5a4a35','#3a2c1a','#4a3a25');
-  drawBox(-.8,-.8,1.65,1.6,1.6,1.4, '#4a3826','#3a2a18','#4a3826');
-  drawBox(-.6,-.6,1.65,.7,.7,.9,   '#4a3826','#3a2a18','#4a3826');
-  drawRoof(-1.1,-1.1,2.65+1.4,2.2,2.2,.9, '#241608','#1a0e04');
-  drawRoof(-.9,-.9,2.65+1.4+.7,1.8,1.8,.7,'#1a0e04','#120900');
-  drawRoof(-.65,-.65,2.65+1.4+1.1,1.3,1.3,.55,'#241608','#1a0e04');
-  drawRoof(-.4,-.4,2.65+1.4+1.5,.8,.8,.4,'#1a0e04','#100800');
-  drawFlag(-.05,-.05,2.65+1.4+1.85,tick);
-
-  ctx.font         = `bold ${Math.round(canvas.width*.036)}px 'Noto Serif JP',serif`;
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle    = `rgba(240,192,64,${.7 + .3*Math.sin(tick*.03)})`;
-  ctx.shadowColor  = 'rgba(200,150,12,.8)';
-  ctx.shadowBlur   = 10;
-  ctx.fillText('安土城', toSX(0,0,2.65+1.4+2.3), toSY(0,0,2.65+1.4+2.3));
-  ctx.shadowBlur   = 0;
-
-  [...gWarriors].sort((a,b) => (a.tileX+a.tileY) - (b.tileX+b.tileY)).forEach(w => w.draw());
-  drawCanvasBubbles();
-  drawFloatingTexts();
+// ============================================================
+//  補助関数
+// ============================================================
+function bloodlineFacilityMul(w) {
+  if (!w._parents) return 1.0;
+  const gen = w._generation || 1;
+  return 1 + (gen - 1) * 0.08; // 世代が上がるごとにわずかにボーナス
 }
 
-/* ═══════════════════════════════════════════
-   UI 更新
-═══════════════════════════════════════════ */
+function randName(gender) {
+  const sn = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+  const gn = gender === 'female'
+    ? GIVEN_NAMES_F[Math.floor(Math.random() * GIVEN_NAMES_F.length)]
+    : GIVEN_NAMES_M[Math.floor(Math.random() * GIVEN_NAMES_M.length)];
+  return `${sn}${gn}`;
+}
+
+function createChildStats(father, mother) {
+  const p = clamp(Math.round(father.stats.power * 0.65 + mother.stats.power * 0.45) + rnd(5,12), 10, 98);
+  const w = clamp(Math.round(father.stats.wisdom * 0.45 + mother.stats.wisdom * 0.65) + rnd(8,14), 10, 98);
+  const maxHp = clamp(Math.round((father.stats.maxHp + mother.stats.maxHp) / 1.8) + rnd(10,20), 100, 200);
+  return { power: p, wisdom: w, hp: maxHp, maxHp };
+}
+
+// ============================================================
+//  フロートテキスト・施設アクティビティ
+// ============================================================
+function getWarriorScreenPos(warrior) {
+  const canvas = document.getElementById('iso-canvas');
+  if (!canvas) return { x: 0, y: 0 };
+  const rect  = canvas.getBoundingClientRect();
+  const cx    = canvas.width / 2;
+  const cy    = canvas.height * 0.55;
+  const tileW = Math.min(canvas.width, canvas.height) * 0.18;
+  const tileH = tileW * 0.5;
+  const sx    = cx + (warrior.isoX - warrior.isoY) * tileW * 0.5;
+  const sy    = cy + (warrior.isoX + warrior.isoY) * tileH * 0.5;
+  return { x: rect.left + sx, y: rect.top + sy };
+}
+
+function createFloatText(warrior, text, color) {
+  const layer = document.getElementById('bubble-layer');
+  if (!layer) return;
+  const pos = getWarriorScreenPos(warrior);
+  const layerRect = layer.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color || '#ffffff';
+  el.style.left  = (pos.x - layerRect.left) + 'px';
+  el.style.top   = (pos.y - layerRect.top - 20) + 'px';
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 1900);
+}
+
+function showFacilityActivity(warrior, text, color) {
+  const layer = document.getElementById('bubble-layer');
+  if (!layer) return;
+  const pos = getWarriorScreenPos(warrior);
+  const layerRect = layer.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'facility-activity';
+  el.textContent = text;
+  el.style.color = color || '#ffdd88';
+  el.style.left  = (pos.x - layerRect.left) + 'px';
+  el.style.top   = (pos.y - layerRect.top - 40) + 'px';
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+// ============================================================
+//  UI 更新
+// ============================================================
 function updateStatusUI() {
-  document.getElementById('unification-pct').textContent = Math.floor(state.unification);
-  document.getElementById('gen-num').textContent         = state.genNum;
-  document.getElementById('koku-display').textContent    = state.koku.toLocaleString('ja-JP');
-  document.getElementById('nfill').style.width           = Math.min(100, Math.floor(state.koku / 100)) + '%';
-}
+  document.getElementById('koku-val').textContent = Math.floor(state.koku).toLocaleString();
+  const uni = Math.min(99.9, state.unification);
+  document.getElementById('uni-val').textContent  = uni.toFixed(1);
+  document.getElementById('uni-bar').style.width  = uni + '%';
+  document.getElementById('uni-pct').textContent  = uni.toFixed(1) + '%';
 
-function locationLabel(w) {
-  if (w.insideFacility) return FACILITY_MAP[w.insideFacility].name + 'で鍛練中';
-  if (w.target && w.state === 'moving') return (FACILITY_MAP[w.target]?.name || '') + 'へ向かう中';
-  return '城内';
+  if (state.unification >= 100) {
+    state.unification = 100;
+    showToast('🎉 天下統一を達成せり！', 5000);
+  }
 }
 
 function updatePartyRow() {
   const row = document.getElementById('party-row');
+  if (!row) return;
   row.innerHTML = '';
   gWarriors.forEach((w, i) => {
     const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
+    const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
     const card = document.createElement('div');
     card.className = 'party-card' + (i === 0 ? ' head' : '');
-    let relText = '';
-    let bestAbs = 0;
-    gWarriors.forEach((_, j) => {
-      if (j === i) return;
-      const rv = getRel(i, j);
-      if (Math.abs(rv) > bestAbs) {
-        bestAbs  = Math.abs(rv);
-        const shortName = gWarriors[j].name.split(' ')[1] || gWarriors[j].name;
-        relText = `${shortName}：${relLabel(rv)}`;
-      }
-    });
-    card.innerHTML =
-      `<span class="pc-role">${ROLES[w.jobId] || '武将'}</span>` +
-      `<span class="pc-name">${w.name}</span>` +
-      `<span class="pc-pow">武${w.stats.power} Lv${w.stats.level}</span>` +
-      `<span class="pc-hp">体${hpPct}%</span>` +
-      `<span class="pc-loc">${locationLabel(w)}</span>` +
-      (relText ? `<span class="pc-rel">${relText}</span>` : '');
+    card.innerHTML = `
+      <span class="pc-role">${ROLES[w.jobId] || '武将'}</span>
+      <span class="pc-name">${w.name}</span>
+      <span class="pc-pow">武${w.stats.power} Lv${w.stats.level}</span>
+      <span class="pc-hp" style="color:${hpColor}">体 ${hpPct}%</span>
+      <span class="pc-loc">${w.locationLabel()}</span>
+    `;
     card.onclick = () => showWarriorModal(i);
     row.appendChild(card);
   });
 }
 
-/* ═══════════════════════════════════════════
-   武将モーダル
-═══════════════════════════════════════════ */
-function showWarriorModal(i) {
-  currentModalIndex = i;
-  const w     = gWarriors[i];
-  const busho = getBusho(w);
-  const bl    = busho ? busho.getBloodline() : null;
-  const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
+// ============================================================
+//  武将モーダル
+// ============================================================
+function showWarriorModal(idx) {
+  const w = gWarriors[idx];
+  if (!w) return;
+  const hpPct = (w.stats.hp / w.stats.maxHp) * 100;
+  const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
+  document.getElementById('wm-name-text').textContent = w.name;
+  document.getElementById('wm-role-text').textContent = ROLES[w.jobId] || '武将';
+  document.getElementById('wm-power').textContent   = w.stats.power;
+  document.getElementById('wm-wisdom').textContent  = w.stats.wisdom;
+  document.getElementById('wm-hp').textContent      = `${w.stats.hp} / ${w.stats.maxHp}`;
+  document.getElementById('wm-loyalty').textContent = w._loyalty;
+  document.getElementById('wm-level').textContent   = w.stats.level;
+  document.getElementById('wm-location').textContent= w.locationLabel();
+  document.getElementById('wm-lineage').textContent = w._parents
+    ? `${w._parents.father} × ${w._parents.mother}の子` : '初代';
+  const fill = document.getElementById('wm-hp-fill');
+  fill.style.width = hpPct + '%';
+  fill.style.background = hpColor;
+  openModal('warrior-modal');
+}
 
-  document.getElementById('wm-name').textContent = w.name;
-  document.getElementById('wm-meta').textContent =
-    `${ROLES[w.jobId] || '武将'}　Lv.${w.stats.level}　／　第${state.genNum}世代`;
+function closeWarriorModal() { closeModal('warrior-modal'); }
 
-  document.getElementById('wm-pow').textContent = `武力 ${w.stats.power}`;
-  document.getElementById('wm-wis').textContent = `知力 ${w.stats.wisdom}`;
-  // 忠誠度は表示しない
+// ============================================================
+//  系譜モーダル
+// ============================================================
+function openPedigree() {
+  const content = document.getElementById('pedigree-content');
+  if (!content) return;
 
-  document.getElementById('wm-hp-text').textContent = `${w.stats.hp} / ${w.stats.maxHp}`;
-  const hpFill = document.getElementById('wm-hp-fill');
-  hpFill.style.width = hpPct + '%';
-  const hpColor = hpPct > 60 ? '#44dd44' : hpPct > 30 ? '#ffaa44' : '#dd4444';
-  hpFill.style.background = hpColor;
+  // 現役武将
+  let html = '<div class="gen-block"><div class="gen-label">◆ 現役武将</div><div class="gen-list">';
+  gWarriors.forEach(w => {
+    html += `<div class="gen-card">
+      <div class="gn">${w.name}</div>
+      <div class="gp">武${w.stats.power} 知${w.stats.wisdom} Lv${w.stats.level}</div>
+      <div>${w._parents ? `${w._parents.father}の子` : '初代'}</div>
+    </div>`;
+  });
+  html += '</div></div>';
 
-  const skills = getSkills(w.jobId, w.stats.power, w.stats.wisdom);
-  document.getElementById('wm-skills').innerHTML =
-    skills.map(s => `<span style="margin:0 6px;">・${s}</span>`).join('');
-
-  const fatherName = bl?.father?.name || '不明';
-  const motherName = bl?.mother?.name || '不明';
-  const fClan = bl?.father?.clan || '─';
-  const mClan = bl?.mother?.clan || '─';
-  document.getElementById('wm-bloodline').innerHTML =
-    `${fatherName}<span style="font-size:11px;color:#c8960c;">(${fClan})</span>` +
-    ` × ${motherName}<span style="font-size:11px;color:#c8960c;">(${mClan})</span>`;
-
-  let relHtml = '';
-  if (gWarriors.length <= 1) {
-    relHtml = '<div style="color:rgba(255,255,255,.35);font-size:12px;text-align:center;">まだ仲間がいない</div>';
-  } else {
-    gWarriors.forEach((other, j) => {
-      if (j === i) return;
-      const rv = getRel(i, j);
-      relHtml += `<div class="wm-rel-item">
-        <span>${other.name}</span>
-        <span style="color:${relColor(rv)};">${relLabel(rv)}（${rv >= 0 ? '+' : ''}${rv}）</span>
+  // 縁組履歴
+  if (state.pedigree.length > 0) {
+    html += '<div class="gen-block"><div class="gen-label">◆ 縁組履歴</div><div class="gen-list">';
+    state.pedigree.slice().reverse().forEach(p => {
+      html += `<div class="gen-card">
+        <div class="gn">${p.childName}</div>
+        <div>${p.father} × ${p.mother}</div>
+        <div class="gp">武${p.power} 知${p.wisdom}</div>
       </div>`;
     });
+    html += '</div></div>';
   }
-  document.getElementById('wm-relations').innerHTML = relHtml;
 
-  document.getElementById('warrior-modal').style.display = 'flex';
+  content.innerHTML = html;
+  openModal('pedigree-modal');
 }
 
-function closeWarriorModal() {
-  document.getElementById('warrior-modal').style.display = 'none';
-  currentModalIndex = -1;
+function closePedigree() { closeModal('pedigree-modal'); }
+
+// ============================================================
+//  縁組モーダル
+// ============================================================
+function openEngumi() {
+  engumiStep = 0;
+  engumiSelectedFather = null;
+  engumiSelectedMother = null;
+  renderEngumiStep();
+  openModal('engumi-modal');
 }
 
-window.openPedigreeFromModal = function () {
-  const i = currentModalIndex;
-  if (i < 0 || i >= gWarriors.length) return;
-  const warrior = gWarriors[i];
-  closeWarriorModal();
-  setTimeout(() => openPedigreeModal(warrior), 80);
-};
+function closeEngumi() { closeModal('engumi-modal'); }
 
-/* ═══════════════════════════════════════════
-   縁組モーダル (新規・完全動作版)
-═══════════════════════════════════════════ */
-const ENGUMI_FATHERS = [
-  { id:'f1', name:'武田 信玄', clan:'武田家', emoji:'🐴', stats:{power:94,wisdom:82,maxHp:90}, bonus:{power:8,wisdom:5,hp:10}, skills:['騎馬隊','智謀'] },
-  { id:'f2', name:'上杉 謙信', clan:'上杉家', emoji:'🦅', stats:{power:98,wisdom:75,maxHp:95}, bonus:{power:12,wisdom:3,hp:12}, skills:['騎馬隊','弓隊'] },
-  { id:'f3', name:'毛利 元就', clan:'毛利家', emoji:'🌸', stats:{power:70,wisdom:97,maxHp:75}, bonus:{power:3,wisdom:10,hp:8},  skills:['智謀','火計'] },
-  { id:'f4', name:'北条 氏康', clan:'北条家', emoji:'🗡️', stats:{power:78,wisdom:85,maxHp:85}, bonus:{power:6,wisdom:7,hp:9},  skills:['築城','槍隊'] },
-  { id:'f5', name:'今川 義元', clan:'今川家', emoji:'🌊', stats:{power:65,wisdom:80,maxHp:70}, bonus:{power:4,wisdom:8,hp:7},  skills:['商才','仁政'] },
-  { id:'f6', name:'島津 義久', clan:'島津家', emoji:'⚡', stats:{power:88,wisdom:72,maxHp:92}, bonus:{power:10,wisdom:4,hp:11}, skills:['騎馬隊','火計'] },
-];
-const ENGUMI_MOTHERS = [
-  { id:'m1', name:'帰蝶',         clan:'齋藤家', emoji:'🌸', stats:{power:30,wisdom:88,maxHp:65}, bonus:{wisdom:12,hp:8,  battle:15}, skills:['智謀','仁政'] },
-  { id:'m2', name:'お市',         clan:'織田家', emoji:'🌺', stats:{power:25,wisdom:82,maxHp:60}, bonus:{wisdom:10,hp:7,  battle:12}, skills:['仁政','商才'] },
-  { id:'m3', name:'三条の方',     clan:'三条家', emoji:'🍂', stats:{power:20,wisdom:90,maxHp:68}, bonus:{wisdom:14,hp:9,  battle:10}, skills:['智謀','築城'] },
-  { id:'m4', name:'築山殿',       clan:'今川家', emoji:'🌙', stats:{power:22,wisdom:85,maxHp:62}, bonus:{wisdom:11,hp:8,  battle:13}, skills:['商才','弓隊'] },
-  { id:'m5', name:'松姫',         clan:'武田家', emoji:'🦋', stats:{power:18,wisdom:92,maxHp:70}, bonus:{wisdom:15,hp:10, battle:8},  skills:['智謀','仁政'] },
-  { id:'m6', name:'細川 ガラシャ', clan:'明智家', emoji:'✨', stats:{power:28,wisdom:95,maxHp:72}, bonus:{wisdom:16,hp:11, battle:14}, skills:['智謀','商才'] },
-];
-
-let eng = {
-  selectedFather: null,
-  selectedMother: null,
-  step: 1,
-  role: 'father',
-  fatherFilter: 'all',
-  motherFilter: 'all',
-};
-
-window.openEngumiModal = function() {
-  eng = { selectedFather:null, selectedMother:null, step:1, role:'father', fatherFilter:'all', motherFilter:'all' };
-  document.getElementById('rbtn-father').classList.add('active');
-  document.getElementById('rbtn-mother').classList.remove('active');
-  document.getElementById('rbtn-father').classList.remove('has-sel');
-  document.getElementById('rbtn-mother').classList.remove('has-sel');
-  document.getElementById('rbtn-father-sel').textContent = '未選択';
-  document.getElementById('rbtn-mother-sel').textContent = '未選択';
-  document.getElementById('engumi-modal').style.display = 'flex';
-  renderEngumiStep1();
-  updateEngumiFooter();
-};
-
-window.closeEngumiModal = function() {
-  document.getElementById('engumi-modal').style.display = 'none';
-};
-
-window.switchEngumiRole = function(role) {
-  eng.role = role;
-  document.getElementById('rbtn-father').classList.toggle('active', role === 'father');
-  document.getElementById('rbtn-mother').classList.toggle('active', role === 'mother');
-  document.getElementById('engumi-list-label').textContent = role === 'father' ? '── 父となる武将を選択' : '── 母となる姫を選択';
-  renderEngumiStep1();
-};
-
-window.goEngumiStep = function(n) {
-  if (n === 2 && (!eng.selectedFather || !eng.selectedMother)) { showToast('父と母を両方選んでください'); return; }
-  eng.step = n;
-  document.getElementById('step-1').style.display = n === 1 ? 'block' : 'none';
-  document.getElementById('step-2').style.display = n === 2 ? 'block' : 'none';
-  const t1 = document.getElementById('tab-1');
-  const t2 = document.getElementById('tab-2');
-  t1.classList.toggle('active', n === 1);
-  t2.classList.toggle('active', n === 2);
-  if (eng.selectedFather && eng.selectedMother) t1.classList.add('done');
-  if (n === 2) renderEngumiPreview();
-  updateEngumiFooter();
-};
-
-function updateEngumiFooter() {
-  const btn = document.getElementById('execute-btn');
-  const lbl = document.getElementById('execute-label');
-  if (eng.step === 1) {
-    btn.disabled = !(eng.selectedFather && eng.selectedMother);
-    lbl.textContent = '縁結び確認へ →';
-  } else {
-    btn.disabled = state.koku < 800;
-    lbl.textContent = btn.disabled ? '石高不足' : '⚔ 縁組を結ぶ';
+function renderEngumiStep() {
+  // ステップドット更新
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById('sdot' + i);
+    if (dot) dot.classList.toggle('active', i === engumiStep);
   }
-}
 
-window.handleEngumiFooterBtn = function() {
-  if (eng.step === 1) goEngumiStep(2);
-  else doEngumi();
-};
+  const nextBtn   = document.getElementById('engumi-next-btn');
+  const cancelBtn = document.getElementById('engumi-cancel-btn');
+  const content   = document.getElementById('engumi-step-content');
 
-function renderEngumiStep1() {
-  const isFather = eng.role === 'father';
-  const list = isFather ? ENGUMI_FATHERS : ENGUMI_MOTHERS;
-  const filter = isFather ? eng.fatherFilter : eng.motherFilter;
-  const selected = isFather ? eng.selectedFather : eng.selectedMother;
-  const filtered = filter === 'all' ? list : list.filter(p => p.clan === filter);
+  if (engumiStep === 0) {
+    // 父を選ぶ
+    nextBtn.textContent = '次へ →';
+    nextBtn.disabled    = !engumiSelectedFather;
+    cancelBtn.textContent = '取消';
 
-  // フィルタ
-  const clans = ['all', ...new Set(list.map(p => p.clan))];
-  document.getElementById('engumi-filter-row').innerHTML = clans.map(c =>
-    `<button class="filter-btn ${filter === c ? 'active' : ''}" onclick="setEngumiFilter('${c}')">${c === 'all' ? '全て' : c}</button>`
-  ).join('');
-
-  // 相手サマリー
-  const other = isFather ? eng.selectedMother : eng.selectedFather;
-  const summary = document.getElementById('engumi-selected-summary');
-  if (other) {
-    summary.innerHTML = `
-      <div class="selected-mini">
-        <div class="sm-avatar">${other.emoji}</div>
-        <div class="sm-info">
-          <div class="sm-role">${isFather ? '母（選択済）' : '父（選択済）'}</div>
-          <div class="sm-name">${other.name}</div>
-          <div class="sm-stats">
-            <div class="sm-stat"><div class="sm-stat-val" style="color:#ffaa44;">${other.stats.power}</div><div class="sm-stat-lbl">武力</div></div>
-            <div class="sm-stat"><div class="sm-stat-val" style="color:#88aaff;">${other.stats.wisdom}</div><div class="sm-stat-lbl">智謀</div></div>
-            <div class="sm-stat"><div class="sm-stat-val" style="color:#88dd88;">${other.stats.maxHp}</div><div class="sm-stat-lbl">体力</div></div>
-          </div>
-        </div>
-      </div>`;
-  } else { summary.innerHTML = ''; }
-
-  // 候補リスト
-  document.getElementById('engumi-candidates-wrap').innerHTML = filtered.map(p => {
-    const isSelected = selected && selected.id === p.id;
-    const compat = engumiCompat(isFather ? p : eng.selectedFather, isFather ? eng.selectedMother : p);
-    const compatColor = compat >= 80 ? '#88ffaa' : compat >= 50 ? '#ffdd44' : '#ff8888';
-    return `
-      <div class="candidate-card ${isSelected ? 'selected' : ''}" onclick="selectEngumiPerson('${p.id}')">
-        <div class="c-avatar">${p.emoji}</div>
-        <div class="c-info">
-          <div class="c-name">${p.name}</div>
-          <div class="c-clan">${p.clan}</div>
-          <div class="c-mini-stats">
-            <div class="c-mstat">武<span>${p.stats.power}</span></div>
-            <div class="c-mstat">智<span>${p.stats.wisdom}</span></div>
-            <div class="c-mstat">体<span>${p.stats.maxHp}</span></div>
-          </div>
-        </div>
-        <div class="compat-mini">
-          <div class="compat-track"><div class="compat-fill" style="width:${compat}%;background:${compatColor};"></div></div>
-          <div class="compat-lbl" style="color:${compatColor};">${compat}%</div>
-        </div>
-        <div class="selected-tick">✓</div>
-      </div>`;
-  }).join('');
-}
-
-function engumiCompat(f, m) {
-  if (!f || !m) return 50;
-  return Math.max(20, Math.min(99, 80 - Math.floor(Math.abs(f.stats.power - m.stats.wisdom) / 4)));
-}
-
-window.selectEngumiPerson = function(id) {
-  const isFather = eng.role === 'father';
-  const list = isFather ? ENGUMI_FATHERS : ENGUMI_MOTHERS;
-  const p = list.find(x => x.id === id);
-  if (!p) return;
-  if (isFather) {
-    eng.selectedFather = p;
-    document.getElementById('rbtn-father-sel').textContent = p.name;
-    document.getElementById('rbtn-father').classList.add('has-sel');
-  } else {
-    eng.selectedMother = p;
-    document.getElementById('rbtn-mother-sel').textContent = p.name;
-    document.getElementById('rbtn-mother').classList.add('has-sel');
-  }
-  renderEngumiStep1();
-  updateEngumiFooter();
-};
-
-window.setEngumiFilter = function(filter) {
-  if (eng.role === 'father') eng.fatherFilter = filter;
-  else eng.motherFilter = filter;
-  renderEngumiStep1();
-};
-
-function renderEngumiPreview() {
-  const f = eng.selectedFather, m = eng.selectedMother;
-  if (!f || !m) return;
-
-  document.getElementById('prev-father-name').textContent = f.name;
-  document.getElementById('prev-father-clan').textContent = f.clan;
-  document.getElementById('prev-mother-name').textContent = m.name;
-  document.getElementById('prev-mother-clan').textContent = m.clan;
-
-  const childPow = Math.min(99, Math.round(f.stats.power * 0.6 + m.stats.power * 0.4 + (f.bonus?.power || 0)));
-  const childWis = Math.min(99, Math.round(f.stats.wisdom * 0.4 + m.stats.wisdom * 0.6 + (f.bonus?.wisdom || 0) + (m.bonus?.wisdom || 0)));
-  const childHp  = Math.min(150, Math.round((f.stats.maxHp + m.stats.maxHp) / 2 + (f.bonus?.hp || 0) + (m.bonus?.hp || 0)));
-
-  const compat = engumiCompat(f, m);
-  const badge = compat >= 80 ? '大吉' : compat >= 60 ? '吉' : compat >= 40 ? '中吉' : '小吉';
-  const badgeColor = compat >= 80 ? '#88ffaa' : compat >= 60 ? '#ffdd44' : '#ffaa44';
-  document.getElementById('bp-badge').textContent = badge;
-  document.getElementById('bp-badge').style.cssText = `color:${badgeColor};border-color:${badgeColor};`;
-
-  document.getElementById('child-stats-grid').innerHTML = [
-    { lbl:'武力', val:childPow, color:'#ffaa44', bar:'#c8640c' },
-    { lbl:'智謀', val:childWis, color:'#88aaff', bar:'#3344cc' },
-    { lbl:'体力', val:childHp,  color:'#88dd88', bar:'#226622' },
-  ].map(s => `
-    <div class="cs-block">
-      <div class="cs-label">${s.lbl}</div>
-      <div class="cs-val" style="color:${s.color};">${s.val}</div>
-      <div class="cs-bar" style="background:rgba(255,255,255,.05);">
-        <div style="width:${Math.min(s.val,100)}%;height:100%;border-radius:2px;background:${s.bar};"></div>
+    const males = gWarriors.filter(w => w.gender !== 'female');
+    let html = `
+      <div class="engumi-cost">
+        <div class="ec-label">縁組費用</div>
+        <span class="ec-val">${ENGUMI_COST.toLocaleString()}</span>
+        <span class="ec-unit">石</span>
       </div>
-    </div>`).join('');
+      <div class="modal-section">
+        <div class="modal-section-title">父となる武将を選べ</div>
+        <div class="warrior-select-grid">`;
+    males.forEach((w, i) => {
+      const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
+      const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
+      const idx = gWarriors.indexOf(w);
+      html += `<div class="warrior-sel-card ${engumiSelectedFather === idx ? 'selected' : ''}" onclick="selectFather(${idx})">
+        <div class="wsc-name">${w.name}</div>
+        <div class="wsc-stats">武${w.stats.power} 知${w.stats.wisdom}</div>
+        <div class="wsc-hp" style="color:${hpColor}">体 ${hpPct}%</div>
+      </div>`;
+    });
+    html += '</div></div>';
+    content.innerHTML = html;
+  } else if (engumiStep === 1) {
+    // 母を選ぶ
+    nextBtn.textContent = '縁組 →';
+    nextBtn.disabled    = !engumiSelectedMother;
+    cancelBtn.textContent = '← 戻る';
 
-  const battleBonus = m.bonus?.battle || 12;
-  const facBonus = Math.round((f.stats.wisdom + m.stats.wisdom) / 20);
-  document.getElementById('br-val').textContent = `+${battleBonus}`;
-  document.getElementById('fac-val').textContent = `×${(1 + facBonus * 0.1).toFixed(1)}`;
+    const females = gWarriors.filter((w, idx) => idx !== engumiSelectedFather);
+    let html = `
+      <div class="modal-section">
+        <div class="modal-section-title">母となる武将を選べ</div>
+        <div class="warrior-select-grid">`;
+    females.forEach(w => {
+      const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
+      const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
+      const idx = gWarriors.indexOf(w);
+      html += `<div class="warrior-sel-card ${engumiSelectedMother === idx ? 'selected' : ''}" onclick="selectMother(${idx})">
+        <div class="wsc-name">${w.name}</div>
+        <div class="wsc-stats">武${w.stats.power} 知${w.stats.wisdom}</div>
+        <div class="wsc-hp" style="color:${hpColor}">体 ${hpPct}%</div>
+      </div>`;
+    });
+    html += '</div></div>';
 
-  // スキルプレビュー
-  const allSkills = [...new Set([...f.skills, ...m.skills])];
-  const SKILL_STYLES = { '騎馬隊':'#ff8844','弓隊':'#44bbff','槍隊':'#ffdd44','火計':'#ff4444','智謀':'#aa88ff','仁政':'#88ffaa','築城':'#ffaa44','商才':'#44ffee' };
-  document.getElementById('child-skills-wrap').innerHTML = allSkills.filter(() => Math.random() < 0.6).map(sk =>
-    `<div class="skill-tag" style="background:rgba(200,150,12,.12);border:1px solid rgba(200,150,12,.3);color:${SKILL_STYLES[sk]||'#ffcc88'};">${sk}</div>`
-  ).join('');
+    if (engumiSelectedFather !== null && engumiSelectedMother !== null) {
+      const f = gWarriors[engumiSelectedFather];
+      const m = gWarriors[engumiSelectedMother];
+      const cs = createChildStats(f, m);
+      html += `<div class="modal-section">
+        <div class="modal-section-title">子の予測能力</div>
+        <div class="confirm-pair">
+          <div class="confirm-w"><div class="cw-name">${f.name}</div><div class="cw-role">父</div></div>
+          <div class="confirm-heart">❤</div>
+          <div class="confirm-w"><div class="cw-name">${m.name}</div><div class="cw-role">母</div></div>
+        </div>
+        <div class="child-preview">
+          <div class="cp-title">子の予測ステータス</div>
+          <div class="cp-stat"><span>武力</span><span class="cpv">~${cs.power}</span></div>
+          <div class="cp-stat"><span>知力</span><span class="cpv">~${cs.wisdom}</span></div>
+          <div class="cp-stat"><span>体力上限</span><span class="cpv">~${cs.maxHp}</span></div>
+        </div>
+      </div>`;
+    }
+    content.innerHTML = html;
+  } else if (engumiStep === 2) {
+    // 確認
+    nextBtn.textContent = '成立させる';
+    nextBtn.disabled    = false;
+    cancelBtn.textContent = '← 戻る';
+
+    const f  = gWarriors[engumiSelectedFather];
+    const m  = gWarriors[engumiSelectedMother];
+    const cs = createChildStats(f, m);
+    content.innerHTML = `
+      <div class="modal-section">
+        <div class="modal-section-title">縁組の確認</div>
+        <div class="confirm-panel">
+          <div class="confirm-pair">
+            <div class="confirm-w"><div class="cw-name">${f.name}</div><div class="cw-role">父</div></div>
+            <div class="confirm-heart">❤</div>
+            <div class="confirm-w"><div class="cw-name">${m.name}</div><div class="cw-role">母</div></div>
+          </div>
+          <div class="child-preview">
+            <div class="cp-title">誕生する子の予測値</div>
+            <div class="cp-stat"><span>武力</span><span class="cpv">~${cs.power}</span></div>
+            <div class="cp-stat"><span>知力</span><span class="cpv">~${cs.wisdom}</span></div>
+            <div class="cp-stat"><span>体力</span><span class="cpv">~${cs.maxHp}</span></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:rgba(200,150,12,.6);text-align:center;letter-spacing:.2em;">
+          費用 ${ENGUMI_COST.toLocaleString()} 石を消費します
+        </div>
+      </div>`;
+  }
 }
+
+function selectFather(idx) {
+  engumiSelectedFather = idx;
+  if (engumiSelectedMother === idx) engumiSelectedMother = null;
+  const nextBtn = document.getElementById('engumi-next-btn');
+  if (nextBtn) nextBtn.disabled = false;
+  renderEngumiStep();
+}
+
+function selectMother(idx) {
+  if (idx === engumiSelectedFather) { showToast('父と同じ武将は選べません'); return; }
+  engumiSelectedMother = idx;
+  const nextBtn = document.getElementById('engumi-next-btn');
+  if (nextBtn) nextBtn.disabled = false;
+  renderEngumiStep();
+}
+
+function engumiNext() {
+  if (engumiStep === 0) {
+    if (engumiSelectedFather === null) { showToast('父を選んでください'); return; }
+    engumiStep = 1;
+    renderEngumiStep();
+  } else if (engumiStep === 1) {
+    if (engumiSelectedMother === null) {
+      // 戻るボタンとして機能
+      engumiStep = 0;
+      renderEngumiStep();
+      return;
+    }
+    const cancelBtn = document.getElementById('engumi-cancel-btn');
+    cancelBtn.onclick = () => { engumiStep = 1; renderEngumiStep(); };
+    engumiStep = 2;
+    renderEngumiStep();
+  } else if (engumiStep === 2) {
+    doEngumi();
+  }
+}
+
+// 縁組キャンセル・戻るロジックを修正
+document.addEventListener('DOMContentLoaded', () => {
+  const cancelBtn = document.getElementById('engumi-cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (engumiStep === 0) {
+        closeEngumi();
+      } else {
+        engumiStep--;
+        renderEngumiStep();
+      }
+    };
+  }
+});
 
 function doEngumi() {
-  const f = eng.selectedFather, m = eng.selectedMother;
-  if (!f || !m) return;
-  if (state.koku < 800) { showToast('石高が不足しています！'); return; }
-  state.koku -= 800;
-  state.genNum = Math.min(10, state.genNum + 1);
-
-  const childPow = Math.min(99, Math.round(f.stats.power * 0.6 + m.stats.power * 0.4 + (f.bonus?.power || 0) + (Math.random()*6-3)));
-  const childWis = Math.min(99, Math.round(f.stats.wisdom * 0.4 + m.stats.wisdom * 0.6 + (f.bonus?.wisdom || 0) + (m.bonus?.wisdom || 0) + (Math.random()*6-3)));
-  const childHp  = Math.min(150, Math.round((f.stats.maxHp + m.stats.maxHp) / 2 + (f.bonus?.hp || 0) + (m.bonus?.hp || 0) + (Math.random()*10-5)));
-
-  const givenNames = ['太郎','次郎','三郎','四郎','五郎','六郎','七郎','八郎'];
-  const surname = f.name.split(' ')[0];
-  const childName = surname + ' ' + givenNames[Math.floor(Math.random() * givenNames.length)];
-  const jobId = Math.random() < 0.15 ? 'bunkan' : 'bukan';
-
-  // ゲームに武将追加
-  const fClan = CLANS[Object.keys(CLANS).find(k => CLANS[k].name === f.clan)] || CLANS.oda;
-  const mClan = CLANS[Object.keys(CLANS).find(k => CLANS[k].name === m.clan)] || CLANS.saito;
-  const fBusho = new Busho(f.name, fClan);
-  const mBusho = new Busho(m.name, mClan);
-  const childBusho = new Busho(childName, fClan, fBusho, mBusho);
-
-  const nw = new IsoWarrior(childName, jobId, childPow, Math.random()*4-2, 3.5);
-  nw.stats.wisdom = childWis;
-  nw.stats.hp = childHp;
-  nw.stats.maxHp = childHp;
-  nw._loyalty = 85 + Math.floor(Math.random() * 15);
-  setBusho(nw, childBusho);
-  applyBloodlineBonus(nw);
-
-  // 関係初期化
-  const ni = gWarriors.indexOf(nw);
-  gWarriors.forEach((_, j) => {
-    if (j !== ni) {
-      const k = relKey(ni, j);
-      if (relations[k] === undefined) relations[k] = Math.floor(10 + Math.random() * 40);
-    }
-  });
-
-  addLog(`${f.name} × ${m.name} の縁組成立！${childName}が誕生`, 'success');
-  addCanvasBubble(nw, '参上！', 200);
-  closeEngumiModal();
-  updatePartyRow();
-  updateStatusUI();
-
-  // 成功オーバーレイ
-  document.getElementById('so-child-name').textContent = childName;
-  document.getElementById('so-child-blood').textContent = `${f.clan} × ${m.clan} の血脈`;
-  document.getElementById('so-stats-grid').innerHTML = [
-    { lbl:'武力', val:childPow, color:'#ffaa44' },
-    { lbl:'智謀', val:childWis, color:'#88aaff' },
-    { lbl:'体力', val:childHp,  color:'#88dd88' },
-  ].map(s => `<div class="so-stat"><div class="so-stat-val" style="color:${s.color};">${s.val}</div><div class="so-stat-lbl">${s.lbl}</div></div>`).join('');
-  const SKILL_STYLES2 = { '騎馬隊':'#ff8844','弓隊':'#44bbff','槍隊':'#ffdd44','火計':'#ff4444','智謀':'#aa88ff','仁政':'#88ffaa','築城':'#ffaa44','商才':'#44ffee' };
-  const inheritedSkills = [...new Set([...f.skills, ...m.skills])].filter(() => Math.random() < 0.6);
-  document.getElementById('so-skills').innerHTML = inheritedSkills.map(sk =>
-    `<div class="so-skill-tag" style="background:rgba(200,150,12,.12);border:1px solid rgba(200,150,12,.3);color:${SKILL_STYLES2[sk]||'#ffcc88'};">${sk}</div>`
-  ).join('');
-  document.getElementById('success-overlay').classList.add('show');
-}
-
-window.dismissSuccess = function() {
-  document.getElementById('success-overlay').classList.remove('show');
-};
-
-/* ═══════════════════════════════════════════
-   内政
-═══════════════════════════════════════════ */
-function showDev() { document.getElementById('dev-modal').style.display = 'flex'; renderFacilities(); }
-function closeDevModal() { document.getElementById('dev-modal').style.display = 'none'; }
-
-function renderFacilities() {
-  document.getElementById('facilities-list').innerHTML = Object.entries(FACILITY_MAP).map(([key, f]) => {
-    const cost = Math.floor((COST_BASE[key] || 400) * Math.pow(1.65, f.level - 1));
-    return `<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);padding:12px 14px;border-radius:12px;margin-bottom:10px;">
-      <div style="font-size:28px;width:40px;text-align:center;">${f.icon}</div>
-      <div style="flex:1;">
-        <div style="font-size:16px;font-weight:700;">${f.name} <span style="font-size:12px;color:#c8960c;">Lv.${f.level}</span></div>
-        <div style="font-size:11px;color:rgba(245,232,200,.7);">${FACILITY_EFFECT[key]?.label || ''}が強化される施設</div>
-      </div>
-      <button onclick="upgradeFacility('${key}',${cost})"
-        style="background:var(--gold);color:#0e0800;padding:7px 13px;border:none;border-radius:9999px;white-space:nowrap;font-weight:700;cursor:pointer;font-size:12px;">
-        ${cost}石<br>強化
-      </button>
-    </div>`;
-  }).join('');
-}
-
-window.upgradeFacility = function (key, cost) {
-  if (state.koku < cost) { alert('国力が不足しています！'); return; }
-  state.koku -= cost;
-  FACILITY_MAP[key].level++;
-  gWarriors.forEach(w => {
-    const b = Math.floor(2 + Math.random() * 4);
-    w.stats.power += b;
-    createFloatText(w, `施設+${b}`, '#ffdd88');
-    addCanvasBubble(w, getSpeech(w, 'train'), 120);
-  });
-  addLog(`${FACILITY_MAP[key].name}が強化された！`, 'success');
-  updateStatusUI();
-  updatePartyRow();
-  renderFacilities();
-};
-
-/* ═══════════════════════════════════════════
-   歴史
-═══════════════════════════════════════════ */
-window.showHistory = function () {
-  document.getElementById('history-list').innerHTML = gameLog.length
-    ? gameLog.slice().reverse().map(l => {
-        let col = '#ddd';
-        if (l.type === 'awakening') col = '#ff6666';
-        if (l.type === 'betrayal')  col = '#ff3333';
-        if (l.type === 'success')   col = '#ffcc66';
-        return `<div style="margin-bottom:6px;color:${col};border-bottom:1px solid rgba(200,150,12,.1);padding-bottom:4px;">` +
-          `<span style="color:var(--gold-d);font-size:11px;">【${l.time}】</span> ${l.text}</div>`;
-      }).join('')
-    : '<div style="color:rgba(245,232,200,.5);text-align:center;padding:20px;">まだ歴史は刻まれていない…</div>';
-  document.getElementById('history-modal').style.display = 'flex';
-};
-window.closeHistory = function () { document.getElementById('history-modal').style.display = 'none'; };
-
-/* ═══════════════════════════════════════════
-   合戦
-═══════════════════════════════════════════ */
-window.openBattle = function () {
-  document.getElementById('battle-screen').classList.add('show');
-  document.getElementById('battle-family').textContent =
-    (currentHouseHead ? currentHouseHead.familyName : '織田') + '軍 出陣';
-  document.getElementById('our-warriors').innerHTML =
-    gWarriors.map(w => `<span class="wi">${w.jobId === 'hime' ? '🌸' : '⚔️'}</span>`).join('');
-  document.getElementById('enemy-warriors').innerHTML =
-    '<span class="wi">⚔️</span><span class="wi">⚔️</span><span class="wi">⚔️</span>';
-  document.getElementById('battle-log').innerHTML =
-    '<div class="ll ally">敵軍が城に迫っています！</div>';
-};
-
-window.startBattleSimulation = function () {
-  const log = document.getElementById('battle-log');
-  const firstName = gWarriors[0]?.name || '武将';
-  log.innerHTML += `<div class="ll ally">${firstName}が先陣を切った！</div>`;
-  const battleBonus = bloodlineBattleBonus();
-  const winChance   = Math.min(0.95, 0.65 + battleBonus * 0.005);
-  const isWin       = Math.random() < winChance;
-  setTimeout(() => {
-    if (isWin) {
-      log.innerHTML += `<div class="ll ally" style="color:#ffdd88">大勝利！${battleBonus > 0 ? `（血統ボーナス+${battleBonus}%）` : ''}</div>`;
-      state.koku         += 1680;
-      state.unification   = Math.min(100, state.unification + 4.5);
-      gWarriors.forEach((w, i) => {
-        w.stats.power   += 5;
-        w._loyalty       = Math.min(100, w._loyalty + 8);
-        createFloatText(w, '+5武力', '#ffdd88');
-        addCanvasBubble(w, getSpeech(w, 'highLoyalty'), 140);
-        gWarriors.forEach((_, j) => { if (i !== j) changeRel(i, j, Math.floor(3 + Math.random()*5)); });
-      });
-      addLog('合戦大勝利！', 'success');
-    } else {
-      log.innerHTML += '<div class="ll ally" style="color:#ff8888">惜しくも敗戦…</div>';
-      state.koku = Math.max(0, state.koku - 500);
-      gWarriors.forEach(w => {
-        w._loyalty = Math.max(0, w._loyalty - 5);
-        // 体力にもダメージ
-        const dmg = Math.floor(5 + Math.random() * 15);
-        w.stats.hp = Math.max(1, w.stats.hp - dmg);
-      });
-      addLog('合戦敗北…', 'betrayal');
-    }
-    log.scrollTop = log.scrollHeight;
-    updateStatusUI();
-    updatePartyRow();
-  }, 1400);
-};
-
-window.endBattle = function () { document.getElementById('battle-screen').classList.remove('show'); };
-
-/* ═══════════════════════════════════════════
-   Toast
-═══════════════════════════════════════════ */
-let toastTimer = null;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
-}
-
-/* ═══════════════════════════════════════════
-   アイドルティック・イベント
-═══════════════════════════════════════════ */
-function performIdleTick() {
-  gWarriors.forEach(w => {
-    w.stats.exp += Math.floor(5 + Math.random() * 11);
-    let leveledUp = false;
-    while (w.stats.exp >= 100) {
-      w.stats.exp -= 100;
-      w.stats.level++;
-      leveledUp = true;
-      const pu = Math.floor(2 + Math.random() * 3);
-      w.stats.power += pu;
-      // レベルアップで体力も少し増加
-      const hpUp = Math.floor(3 + Math.random() * 5);
-      w.stats.maxHp += hpUp;
-      w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + hpUp);
-      createFloatText(w, `+${pu}武力`, '#ffcc66');
-    }
-    if (leveledUp) {
-      createFloatText(w, `Lv${w.stats.level}↑`, '#ffeeaa');
-      addCanvasBubble(w, getSpeech(w, 'levelUp'), 140);
-      addLog(`${w.name}がLv${w.stats.level}に！`);
-    }
-    if (Math.random() < .6)  w.stats.power++;
-    if (Math.random() < .35) w.stats.wisdom = Math.min(99, w.stats.wisdom + 1);
-    // 体力は自然回復
-    if (Math.random() < .4)  w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + Math.floor(1 + Math.random()*3));
-  });
-  state.koku          += Math.floor(62 + Math.random() * 98);
-  state.unification    = Math.min(99.9, state.unification + .12);
-  updateStatusUI();
-  updatePartyRow();
-}
-
-function triggerEvent() {
-  if (Math.random() > .35) return;
-  const w    = gWarriors[Math.floor(Math.random() * gWarriors.length)];
-  if (!w) return;
-  const roll = Math.random();
-  if (roll < .15) {
-    const up = 10 + Math.floor(Math.random() * 10);
-    w.stats.power += up;
-    createFloatText(w, `覚醒 +${up}`, '#ff4444');
-    addCanvasBubble(w, '目覚めた…！', 140);
-    addLog(`${w.name}が覚醒した！`, 'awakening');
-  } else if (roll < .25) {
-    w._loyalty = Math.max(0, w._loyalty - 30);
-    createFloatText(w, '不満の兆候', '#ff6666');
-    addCanvasBubble(w, getSpeech(w, 'lowLoyalty'), 140);
-    addLog(`${w.name}に不満の兆し…`, 'betrayal');
-  } else if (roll < .5) {
-    const g = 500 + Math.floor(Math.random() * 500);
-    state.koku += g;
-    addLog(`内政大成功！ +${g}石`, 'success');
-  } else {
-    w.stats.power += 3;
-    createFloatText(w, '+3', '#ffdd88');
-    addLog(`${w.name}が成長した`);
+  if (state.koku < ENGUMI_COST) {
+    showToast(`石高が足りません（必要：${ENGUMI_COST}石）`);
+    return;
   }
-  updateStatusUI();
-  updatePartyRow();
-}
+  if (engumiSelectedFather === null || engumiSelectedMother === null) {
+    showToast('父母を選択してください');
+    return;
+  }
 
-/* ═══════════════════════════════════════════
-   メインループ
-═══════════════════════════════════════════ */
-let tick = 0;
-function gameLoop() {
-  tick++;
-  gWarriors.forEach((w, i) => w.tick(i));
-  tickCanvasBubbles();
-  drawScene(tick);
-  requestAnimationFrame(gameLoop);
-}
+  const f  = gWarriors[engumiSelectedFather];
+  const m  = gWarriors[engumiSelectedMother];
+  const cs = createChildStats(f, m);
 
-/* ═══════════════════════════════════════════
-   初期化
-═══════════════════════════════════════════ */
-function initGame() {
-  gWarriors = [];
-  buildTerrain();
-  resizeCanvas();
+  state.koku -= ENGUMI_COST;
+  state.generation++;
 
-  const w0 = new IsoWarrior('織田 信廣', 'bukan',  88,  0.2, 3.5);
-  const w1 = new IsoWarrior('お 市',     'hime',   72, -1.8, 3.2);
-  const w2 = new IsoWarrior('明智 光忠', 'bunkan', 65,  1.8, 3.0);
+  const gender   = Math.random() < 0.5 ? 'male' : 'female';
+  const childName = randName(gender);
+  const jobId    = Math.floor(Math.random() * Object.keys(ROLES).length);
 
-  setBusho(w0, new Busho('織田 信廣', CLANS.oda));
-  setBusho(w1, new Busho('お 市',     CLANS.oda));
-  setBusho(w2, new Busho('明智 光忠', CLANS.azai));
-  applyBloodlineBonus(w0);
-  applyBloodlineBonus(w1);
-  applyBloodlineBonus(w2);
+  const child = new IsoWarrior(childName, jobId, cs.power, (Math.random()-0.5)*2, 2.5+Math.random()*2, gender);
+  child.stats.wisdom = cs.wisdom;
+  child.stats.hp     = cs.hp;
+  child.stats.maxHp  = cs.maxHp;
+  child._generation  = Math.max(f._generation, m._generation) + 1;
+  child._parents     = { father: f.name, mother: m.name };
 
-  currentHouseHead = { warrior: w0, familyName: '織田' };
-  initRelations(gWarriors);
+  gWarriors.push(child);
 
-  setTimeout(() => addCanvasBubble(gWarriors[0], '天下を取るぞ！',  180), 1200);
-  setTimeout(() => addCanvasBubble(gWarriors[1], '桜が綺麗ですね…', 180), 2200);
-  setTimeout(() => addCanvasBubble(gWarriors[2], '謀略が要りますな', 180), 3100);
-
-  updatePartyRow();
-  updateStatusUI();
-
-  canvas.style.pointerEvents = 'auto';
-  canvas.addEventListener('click', () => {
-    const w = gWarriors[Math.floor(Math.random() * gWarriors.length)];
-    if (!w) return;
-    const g = 1 + Math.floor(Math.random() * 3);
-    w.stats.power += g;
-    createFloatText(w, `+${g}`, '#ffaa44');
-    addCanvasBubble(w, getSpeech(w, 'train'), 120);
-    addLog(`${w.name}を強化`);
-    updatePartyRow();
+  state.pedigree.push({
+    childName, father: f.name, mother: m.name,
+    power: cs.power, wisdom: cs.wisdom,
+    generation: child._generation,
   });
 
-  setInterval(performIdleTick, 1800);
-  setInterval(() => { updateTime(); triggerEvent(); }, 2200);
+  addLog(`縁組成立：${f.name} × ${m.name} → ${childName}（第${child._generation}世代）`);
+  closeEngumi();
 
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      for (let i = 0; i < 5; i++) performIdleTick();
-      addLog('放置ボーナス発生！', 'success');
+  // 成功オーバーレイ表示
+  document.getElementById('suc-name').textContent = childName;
+  document.getElementById('suc-stats').innerHTML =
+    `武力 ${cs.power}　知力 ${cs.wisdom}　体力 ${cs.maxHp}<br>` +
+    `${ROLES[jobId]}　第${child._generation}世代<br>${f.name} × ${m.name}の子`;
+  openModal('success-overlay');
+
+  updateStatusUI();
+  updatePartyRow();
+}
+
+function closeSuccessOverlay() { closeModal('success-overlay'); }
+
+// ============================================================
+//  合戦
+// ============================================================
+//  合戦システム（ピクセルアートバトルエンジン）
+// ============================================================
+
+// ── 定数 ────────────────────────────────────────────────
+const BW = 480, BH = 300;
+const B_FIELD_Y_MIN = 68, B_FIELD_Y_MAX = BH - 18;
+const B_ATTACK_RANGE = 20, B_GEN_ATK_RANGE = 30;
+const B_GEN_CHARGE_SPEED = 1.8;
+const B_LOG_HOLD = 90;
+const B_MAX_HP = 120;
+
+// パレット（味方=青紫、敵=赤）
+const PAL_P = { armor:'#6040b0', skin:'#f0c890', helm:'#4830a0', eye:'#201040', acc:'#c8a020', shadow:'#2a1860' };
+const PAL_E = { armor:'#c04080', skin:'#f0c890', helm:'#a02060', eye:'#200010', acc:'#c8a020', shadow:'#601030' };
+
+// 将軍セリフ
+const LINES_P    = ['かかれーっ！','討ち取れ！','引くな！','者ども続け！','前へ！'];
+const LINES_E    = ['押せ押せ！','蹴散らせ！','逃がすな！','突き崩せ！','進め！'];
+const DUEL_LINES = ['一騎討ち！','尋常に勝負！','逃げるな！','受けてみよ！'];
+
+// ── ピクセル描画ヘルパー ─────────────────────────────────
+function bpx(c, color, x, y, w=1, h=1) { c.fillStyle = color; c.fillRect(x, y, w, h); }
+
+// ── 背景描画 ─────────────────────────────────────────────
+function bDrawBackground(bgCtx) {
+  bgCtx.clearRect(0, 0, BW, BH);
+  // 城壁
+  bgCtx.fillStyle = '#c8bca8'; bgCtx.fillRect(0, 0, BW, 52);
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 18; col++) {
+      const ox = (row % 2) * 15, x = col * 30 + ox - 5, y = row * 16 + 4;
+      bgCtx.fillStyle = (col + row) % 2 === 0 ? '#c0b49a' : '#b8ac94';
+      bgCtx.fillRect(x + 1, y + 1, 28, 14);
+      bgCtx.fillStyle = '#a89880'; bgCtx.fillRect(x + 1, y + 1, 28, 1);
+      bgCtx.fillStyle = '#d4c8b0'; bgCtx.fillRect(x + 1, y + 13, 28, 1);
+    }
+  }
+  bgCtx.fillStyle = '#b0a490';
+  for (let i = 0; i < 33; i++) if (i % 2 === 0) bgCtx.fillRect(i * 15, 0, 14, 6);
+  // 旗・木
+  [60, 150, 240, 330].forEach(cx => {
+    bgCtx.fillStyle = '#2a6030'; bgCtx.fillRect(cx, 0, 20, 46);
+    bgCtx.fillStyle = '#3a7840'; bgCtx.fillRect(cx + 4, 0, 4, 46); bgCtx.fillRect(cx + 13, 0, 3, 46);
+    bgCtx.fillStyle = '#4a9050'; bgCtx.fillRect(cx + 8, 0, 3, 46);
+  });
+  [[18, 24], [BW - 18, 24]].forEach(([tx, ty]) => {
+    bgCtx.fillStyle = '#c8a828'; bgCtx.fillRect(tx - 3, ty, 7, 18);
+    bgCtx.fillStyle = '#a08020'; bgCtx.fillRect(tx - 5, ty + 14, 11, 5);
+    bgCtx.fillStyle = '#ff6010'; bgCtx.fillRect(tx - 2, ty - 10, 4, 11);
+    bgCtx.fillStyle = '#ffa010'; bgCtx.fillRect(tx - 1, ty - 12, 2, 8);
+    bgCtx.fillStyle = '#ffee40'; bgCtx.fillRect(tx, ty - 14, 1, 5);
+  });
+  // 中央本陣紋
+  const mx = BW / 2, my = 26;
+  bgCtx.fillStyle = '#c8a020'; bgCtx.fillRect(mx - 16, my - 14, 32, 28);
+  bgCtx.fillStyle = '#e8c040'; bgCtx.fillRect(mx - 12, my - 10, 24, 24);
+  bgCtx.fillStyle = '#7040a0'; bgCtx.fillRect(mx - 2, my - 8, 4, 20); bgCtx.fillRect(mx - 10, my - 2, 20, 4);
+  // 地面
+  bgCtx.fillStyle = '#909898'; bgCtx.fillRect(0, 52, BW, 8);
+  bgCtx.fillStyle = '#a8b0b0'; bgCtx.fillRect(0, 52, BW, 3);
+  bgCtx.fillStyle = '#606868'; bgCtx.fillRect(0, 57, BW, 3);
+  // 戦場タイル
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 14; col++) {
+      const ox = (row % 2) * 26, x = col * 36 + ox - 18, y = 60 + row * 32;
+      bgCtx.fillStyle = (col + row) % 2 === 0 ? '#6080b8' : '#5878b0';
+      bgCtx.fillRect(x + 1, y + 1, 34, 30);
+      bgCtx.fillStyle = '#6888c0';
+      for (let lx = 0; lx < 3; lx++) for (let ly = 0; ly < 2; ly++)
+        if (((col * 3 + row * 7 + lx * 5 + ly * 11) % 5) < 2) bgCtx.fillRect(x + 4 + lx * 10, y + 4 + ly * 11, 5, 5);
+      bgCtx.fillStyle = '#4060a0'; bgCtx.fillRect(x + 1, y + 1, 34, 1);
+      bgCtx.fillStyle = '#7090c8'; bgCtx.fillRect(x + 1, y + 29, 34, 1);
+    }
+  }
+}
+
+// ── キャラクター描画 ─────────────────────────────────────
+function bDrawSoldier(c, x, y, pal, dir, wf, st) {
+  c.save();
+  if (dir < 0) { c.translate(x + 8, y); c.scale(-1, 1); c.translate(-8, 0); } else c.translate(x, y);
+  const bob = (st === 'walk' && wf === 1) ? 1 : 0;
+  bpx(c, pal.armor,  2,  8 + bob, 12, 8); bpx(c, pal.shadow, 2, 14 + bob, 12, 2); bpx(c, pal.acc, 4,  8 + bob, 8, 1);
+  bpx(c, pal.skin,   3,  2 + bob, 10, 8);
+  bpx(c, pal.helm,   2,  0 + bob, 12, 4); bpx(c, pal.helm, 1, 1 + bob, 14, 2);
+  bpx(c, pal.acc,    6, -1 + bob,  4, 2);
+  bpx(c, pal.eye,    5,  5 + bob,  2, 2); bpx(c, pal.eye, 9, 5 + bob, 2, 2);
+  if (wf === 0) { bpx(c, pal.armor, 3, 16 + bob, 4, 4); bpx(c, pal.armor, 9, 14 + bob, 4, 5); }
+  else          { bpx(c, pal.armor, 3, 14 + bob, 4, 5); bpx(c, pal.armor, 9, 16 + bob, 4, 4); }
+  if (st === 'attack') { bpx(c, pal.skin, 14, 9 + bob, 5, 3); bpx(c, pal.acc, 17, 8 + bob, 3, 5); bpx(c, pal.armor, 0, 10 + bob, 3, 3); }
+  else { bpx(c, pal.armor, 0, 10 + bob, 3, 4); bpx(c, pal.armor, 13, 10 + bob, 3, 4); }
+  if (st === 'hit') { c.fillStyle = '#ffffff88'; c.fillRect(0, 0, 16, 20); }
+  c.restore();
+}
+
+function bDrawGeneral(c, x, y, pal, dir, wf, st) {
+  c.save();
+  if (dir < 0) { c.translate(x + 12, y); c.scale(-1, 1); c.translate(-12, 0); } else c.translate(x, y);
+  const bob = wf === 1 ? 1 : 0;
+  bpx(c, pal.armor,  2, 12 + bob, 20, 12); bpx(c, pal.shadow, 2, 22 + bob, 20, 2); bpx(c, pal.acc, 4, 12 + bob, 16, 2);
+  bpx(c, pal.acc,    0, 14 + bob,  3, 10); bpx(c, pal.acc, 21, 14 + bob, 3, 10);
+  bpx(c, pal.skin,   4,  4 + bob, 16, 10);
+  bpx(c, pal.helm,   2,  0 + bob, 20,  6); bpx(c, pal.helm, 1, 1 + bob, 22, 4);
+  bpx(c, pal.acc,    9, -2 + bob,  6,  3); bpx(c, pal.acc, 8, -3 + bob, 8, 2);
+  bpx(c, pal.eye,    7,  8 + bob,  3,  2); bpx(c, pal.eye, 14, 8 + bob, 3, 2);
+  bpx(c, pal.shadow, 8, 11 + bob,  8,  1);
+  if (wf === 0) { bpx(c, pal.armor, 4, 24 + bob, 7, 6); bpx(c, pal.armor, 14, 20 + bob, 7, 9); }
+  else          { bpx(c, pal.armor, 4, 20 + bob, 7, 9); bpx(c, pal.armor, 14, 24 + bob, 7, 6); }
+  if (st === 'attack') { bpx(c, pal.skin, 22, 13 + bob, 5, 5); bpx(c, pal.acc, 24, 8 + bob, 3, 16); bpx(c, pal.shadow, 0, 13 + bob, 3, 5); }
+  else { bpx(c, pal.armor, 0, 13 + bob, 3, 10); bpx(c, pal.armor, 21, 13 + bob, 3, 10); }
+  if (st === 'hit') { c.fillStyle = '#ffffff88'; c.fillRect(0, 0, 24, 30); }
+  c.restore();
+}
+
+// ── 吹き出し描画 ─────────────────────────────────────────
+function bDrawSpeechBubble(c, gx, gy, text, side, alpha) {
+  if (!text || alpha <= 0) return;
+  c.save(); c.globalAlpha = Math.min(1, alpha);
+  const FONT = 'bold 9px DotGothic16,monospace';
+  c.font = FONT;
+  const tw = c.measureText(text).width, pad = 5;
+  const bw = tw + pad * 2, bh = 14, tailH = 5;
+  let bx = gx + 12 - bw / 2;
+  let by = gy - bh - tailH - 6;
+  bx = Math.max(2, Math.min(BW - bw - 2, bx));
+  by = Math.max(62, by);
+  const r = 3, tailX = Math.max(bx + 8, Math.min(bx + bw - 8, gx + 12));
+  c.shadowColor = '#0008'; c.shadowBlur = 3; c.shadowOffsetY = 1;
+  c.fillStyle = side === 'p' ? '#f0ecff' : '#fff0f4';
+  c.beginPath();
+  c.moveTo(bx + r, by); c.lineTo(bx + bw - r, by);
+  c.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+  c.lineTo(bx + bw, by + bh - r);
+  c.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
+  c.lineTo(tailX + 4, by + bh); c.lineTo(tailX, by + bh + tailH); c.lineTo(tailX - 4, by + bh);
+  c.lineTo(bx + r, by + bh);
+  c.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
+  c.lineTo(bx, by + r); c.quadraticCurveTo(bx, by, bx + r, by);
+  c.closePath(); c.fill();
+  c.shadowBlur = 0; c.shadowOffsetY = 0;
+  c.strokeStyle = side === 'p' ? '#4830a0' : '#a02060'; c.lineWidth = 1.5; c.stroke();
+  c.fillStyle = '#1a0800'; c.font = FONT;
+  c.fillText(text, bx + pad, by + bh - 3);
+  c.restore();
+}
+
+// ── バトル状態 ───────────────────────────────────────────
+let bSoldiers, bGenerals, bParticles, bDamageNums;
+let bGameState, bTickCount, bLoopId;
+let bLogText = '', bLogTimer = 0;
+let bBubbles = [];
+
+function bSetLog(t)         { if (bLogTimer <= 0) { bLogText = t; bLogTimer = B_LOG_HOLD; } }
+function bForceLog(t, h=B_LOG_HOLD) { bLogText = t; bLogTimer = h; }
+function bTickLog()         { if (bLogTimer > 0) bLogTimer--; document.getElementById('battle-log-bar').textContent = bLogText; }
+function bAddBubble(side, text, life = 130) {
+  bBubbles = bBubbles.filter(b => b.side !== side);
+  bBubbles.push({ side, text, life, maxLife: life });
+}
+function bTickBubbles() { bBubbles = bBubbles.filter(b => (b.life--, b.life > 0)); }
+
+function bAddPt(x, y, color, n = 6) {
+  for (let i = 0; i < n; i++) bParticles.push({
+    x, y, vx: (Math.random() - .5) * 5, vy: (Math.random() - .9) * 5,
+    life: 18 + Math.random() * 14 | 0, maxLife: 32, color, size: 2 + Math.random() * 3 | 0,
+  });
+}
+function bAddDmg(x, y, dmg, color = '#ffee40') {
+  bDamageNums.push({ x, y, vy: -2.2, life: 44, text: String(dmg), color });
+}
+function bUpdateParticles() {
+  bParticles = bParticles.filter(p => p.life > 0);
+  bParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.life--; });
+  bDamageNums = bDamageNums.filter(d => d.life > 0);
+  bDamageNums.forEach(d => { d.y += d.vy; d.vy *= .92; d.life--; });
+}
+
+function bUpdateBattleUI() {
+  const ph = Math.max(0, bGenerals.p.hp), eh = Math.max(0, bGenerals.e.hp);
+  document.getElementById('bhp-player').textContent = ph;
+  document.getElementById('bhp-enemy').textContent  = eh;
+  document.getElementById('bbar-player').style.width = (ph / B_MAX_HP * 100).toFixed(1) + '%';
+  document.getElementById('bbar-enemy').style.width  = (eh / B_MAX_HP * 100).toFixed(1) + '%';
+}
+
+function bNearest(list, x, y) {
+  return list.reduce((b, t) => Math.hypot(t.x - x, t.y - y) < Math.hypot(b.x - x, b.y - y) ? t : b);
+}
+function bFindTarget(s) {
+  const foes = bSoldiers.filter(t => t.side !== s.side && !t.dead);
+  return foes.length ? bNearest(foes, s.x, s.y) : null;
+}
+
+// ── 兵士AI ───────────────────────────────────────────────
+function bUpdateSoldiers() {
+  bSoldiers.forEach(s => {
+    if (s.dead) return;
+    if (s.stateTimer > 0) { s.stateTimer--; return; }
+    if (!s.target || s.target.dead) s.target = bFindTarget(s);
+
+    if (!s.target) {
+      const gen = bGenerals[s.side === 'p' ? 'e' : 'p'];
+      if (gen.dead) return;
+      const dx = (gen.x + 12) - (s.x + 8), dy = (gen.y + 15) - (s.y + 10);
+      const dist = Math.hypot(dx, dy) || 1;
+      if (dist < B_ATTACK_RANGE + 8) {
+        s.state = 'attack'; s.stateTimer = 22;
+        const dmg = 2 + Math.random() * 3 | 0;
+        gen.hp -= dmg; gen.state = 'hit'; gen.stateTimer = 14;
+        bAddPt(gen.x + 12, gen.y + 10, '#ffaaaa');
+        bAddDmg(gen.x + 6, gen.y - 4, dmg, '#ff5050');
+        bSetLog(`${s.side === 'p' ? '我が軍' : '敵軍'}が大将に${dmg}撃！`);
+      } else {
+        s.state = 'walk';
+        s.x += dx / dist * 1.3; s.y += dy / dist * 1.3;
+        s.y = Math.max(B_FIELD_Y_MIN, Math.min(B_FIELD_Y_MAX, s.y));
+      }
+      return;
+    }
+
+    const t = s.target;
+    const dx = t.x - s.x, dy = t.y - s.y, dist = Math.hypot(dx, dy) || 1;
+    if (dist < B_ATTACK_RANGE) {
+      s.state = 'attack'; s.stateTimer = 16;
+      const dmg = 3 + Math.random() * 4 | 0;
+      t.hp -= dmg; t.state = 'hit'; t.stateTimer = 10;
+      bAddPt(t.x + 8, t.y + 8, '#ffddaa'); bAddDmg(t.x + 4, t.y - 2, dmg);
+      if (t.hp <= 0) {
+        t.dead = true; bAddPt(t.x + 8, t.y + 8, '#ffd040', 10);
+        bSetLog(`${s.side === 'p' ? '敵軍' : '我が軍'}の兵士が倒れた！`);
+      }
+    } else {
+      s.state = 'walk';
+      const spd = 1.0 + Math.random() * .3;
+      s.x += dx / dist * spd; s.y += dy / dist * spd;
+      s.y = Math.max(B_FIELD_Y_MIN, Math.min(B_FIELD_Y_MAX, s.y));
     }
   });
-
-  gameLoop();
 }
 
-window.onload    = initGame;
-window.addEventListener('resize', resizeCanvas);
+// ── 将軍AI ───────────────────────────────────────────────
+function bUpdateGenerals() {
+  ['p', 'e'].forEach(side => {
+    const g = bGenerals[side], foe = bGenerals[side === 'p' ? 'e' : 'p'];
+    if (g.dead) return;
+    if (g.stateTimer > 0) { g.stateTimer--; return; }
+    g.state = 'charge';
+
+    const interval = side === 'p' ? 0 : 80;
+    if (bTickCount % 160 === interval) {
+      const arr = side === 'p' ? LINES_P : LINES_E;
+      bAddBubble(side, arr[Math.floor(Math.random() * arr.length)], 130);
+    }
+
+    const foeTroops = bSoldiers.filter(s => s.side !== side && !s.dead);
+    if (foeTroops.length) {
+      const tgt = bNearest(foeTroops, g.x + 12, g.y + 15);
+      const tx = tgt.x + 8, ty = tgt.y + 10;
+      const dist = Math.hypot(tx - (g.x + 12), ty - (g.y + 15)) || 1;
+      if (dist < B_GEN_ATK_RANGE) {
+        g.state = 'attack'; g.stateTimer = 18;
+        const dmg = 8 + Math.random() * 8 | 0;
+        tgt.hp -= dmg; tgt.state = 'hit'; tgt.stateTimer = 12;
+        bAddPt(tgt.x + 8, tgt.y + 8, '#fff060', 8); bAddDmg(tgt.x, tgt.y - 6, dmg, '#ffdd20');
+        if (tgt.hp <= 0) { tgt.dead = true; bSetLog('大将が敵兵を薙ぎ払った！'); }
+      } else {
+        g.x += ((tx - (g.x + 12)) / dist) * B_GEN_CHARGE_SPEED;
+        g.y += ((ty - (g.y + 15)) / dist) * B_GEN_CHARGE_SPEED;
+        g.y = Math.max(B_FIELD_Y_MIN - 10, Math.min(B_FIELD_Y_MAX + 10, g.y));
+      }
+    } else {
+      const tx = foe.x + 12, ty = foe.y + 15;
+      const dist = Math.hypot(tx - (g.x + 12), ty - (g.y + 15)) || 1;
+      if (dist < B_GEN_ATK_RANGE) {
+        g.state = 'attack'; g.stateTimer = 26;
+        const dmg = 10 + Math.random() * 10 | 0;
+        foe.hp -= dmg; foe.state = 'hit'; foe.stateTimer = 22;
+        bAddPt(foe.x + 12, foe.y + 15, '#ff8040', 12); bAddDmg(foe.x + 6, foe.y - 8, dmg, '#ff4020');
+        const dl = DUEL_LINES[Math.floor(Math.random() * DUEL_LINES.length)];
+        bAddBubble(side, dl, 110);
+        bForceLog(`大将同士の一騎討ち！ ${dmg}ダメージ！`, B_LOG_HOLD * 2 | 0);
+      } else {
+        g.x += ((tx - (g.x + 12)) / dist) * B_GEN_CHARGE_SPEED;
+        g.y += ((ty - (g.y + 15)) / dist) * B_GEN_CHARGE_SPEED;
+        g.y = Math.max(B_FIELD_Y_MIN - 10, Math.min(B_FIELD_Y_MAX + 10, g.y));
+      }
+    }
+  });
+}
+
+// ── 合戦メインループ ─────────────────────────────────────
+function bGameLoop(bgCtx, ctx) {
+  bTickCount++;
+  const animFrame = (bTickCount >> 3) & 1;
+
+  if (bGameState === 'battle') {
+    bUpdateSoldiers();
+    bUpdateGenerals();
+    bUpdateParticles();
+    bTickLog();
+    bTickBubbles();
+
+    // 勝敗判定
+    if (bGenerals.p.hp <= 0 || bGenerals.e.hp <= 0) {
+      bGameState = 'end';
+      const pWin = bGenerals.p.hp > 0;
+      bAddBubble(pWin ? 'p' : 'e', '勝ったぞ！', 400);
+      bEndBattle(pWin);
+    }
+  }
+
+  // 描画
+  ctx.clearRect(0, 0, BW, BH);
+  const allUnits = [
+    ...bSoldiers.filter(s => !s.dead).map(s => ({
+      type: 'soldier', side: s.side, x: s.x, y: s.y, state: s.state,
+      wf: (bTickCount + s.walkOffset) >> 3 & 1,
+    })),
+    ...['p', 'e'].filter(sd => !bGenerals[sd].dead).map(sd => ({
+      type: 'general', side: sd, x: bGenerals[sd].x, y: bGenerals[sd].y,
+      state: bGenerals[sd].state, wf: animFrame,
+    })),
+  ];
+  allUnits.sort((a, b) => a.y - b.y);
+  allUnits.forEach(u => {
+    const pal = u.side === 'p' ? PAL_P : PAL_E;
+    const dir = u.side === 'p' ? 1 : -1;
+    if (u.type === 'soldier') bDrawSoldier(ctx, u.x | 0, u.y | 0, pal, dir, u.wf, u.state);
+    else                      bDrawGeneral(ctx, u.x | 0, u.y | 0, pal, dir, u.wf, u.state);
+  });
+
+  bParticles.forEach(p => {
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x | 0, p.y | 0, p.size, p.size);
+  });
+  ctx.globalAlpha = 1;
+
+  bDamageNums.forEach(d => {
+    ctx.font = 'bold 11px DotGothic16,monospace';
+    ctx.strokeStyle = '#0009'; ctx.lineWidth = 3;
+    ctx.strokeText(d.text, d.x, d.y);
+    ctx.fillStyle = d.color;
+    ctx.fillText(d.text, d.x, d.y);
+  });
+
+  bBubbles.forEach(b => {
+    const g = bGenerals[b.side];
+    if (!g || g.dead) return;
+    bDrawSpeechBubble(ctx, g.x, g.y, b.text, b.side, Math.min(1, b.life / 20));
+  });
+
+  bUpdateBattleUI();
+
+  if (bGameState !== 'end') bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
+}
+
+// ── 合戦終了処理 ─────────────────────────────────────────
+function bEndBattle(isWin) {
+  const titleEl  = document.getElementById('bres-title-text');
+  const detailEl = document.getElementById('bres-detail-text');
+
+  if (isWin) {
+    const reward  = rnd(1800, 2400);
+    const uniGain = 4 + Math.random() * 3;
+    state.koku += reward;
+    state.unification = Math.min(100, state.unification + uniGain);
+    gWarriors.forEach(w => {
+      w.stats.power = clamp(w.stats.power + rnd(3, 7), 1, 99);
+      w.stats.exp  += rnd(60, 120);
+      w.stats.hp    = Math.min(w.stats.maxHp, w.stats.hp + rnd(8, 15));
+    });
+    titleEl.textContent  = '勝利！';
+    detailEl.textContent = `石高 +${reward.toLocaleString()}\n統一度 +${uniGain.toFixed(1)}%`;
+    addLog(`合戦勝利（報酬${reward}石）`);
+  } else {
+    const loss = rnd(400, 700);
+    state.koku = Math.max(0, state.koku - loss);
+    gWarriors.forEach(w => { w.stats.hp = Math.max(1, w.stats.hp - rnd(15, 25)); });
+    titleEl.textContent  = '敗北…';
+    detailEl.textContent = `石高 -${loss.toLocaleString()}\n武将が負傷した`;
+    addLog(`合戦敗北（損失${loss}石）`);
+  }
+
+  document.getElementById('battle-result-panel').classList.add('show');
+  updateStatusUI();
+  updatePartyRow();
+}
+
+// ── openBattle / closeBattle ─────────────────────────────
+function openBattle() {
+  if (gWarriors.length === 0) { showToast('武将がいません'); return; }
+
+  // 前回のループを止める
+  if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
+
+  document.getElementById('battle-screen').classList.add('show');
+  document.getElementById('battle-result-panel').classList.remove('show');
+  document.getElementById('battle-log-bar').textContent = '両軍、突撃開始！';
+
+  // Canvas 取得とリサイズ
+  const bgCv  = document.getElementById('bg-canvas');
+  const mainCv = document.getElementById('battle-main-canvas');
+  const frame  = document.getElementById('bscr-frame');
+
+  function resizeBattle() {
+    const rw = frame.clientWidth, rh = frame.clientHeight;
+    [bgCv, mainCv].forEach(cv => {
+      cv.width = BW; cv.height = BH;
+      cv.style.width = rw + 'px'; cv.style.height = rh + 'px';
+    });
+  }
+  resizeBattle();
+
+  const bgCtx  = bgCv.getContext('2d');
+  const ctx    = mainCv.getContext('2d');
+  [bgCtx, ctx].forEach(c => c.imageSmoothingEnabled = false);
+  bDrawBackground(bgCtx);
+
+  // 状態初期化
+  bGameState = 'battle'; bTickCount = 0;
+  bLogText = '両軍、突撃開始！'; bLogTimer = B_LOG_HOLD * 2;
+  bParticles = []; bDamageNums = []; bBubbles = [];
+
+  // 武将名を UI に反映
+  const leader = gWarriors[0];
+  document.getElementById('bunit-pname').textContent = leader ? leader.name.slice(-3) : '我が軍';
+
+  // 将軍HP は我が軍の総合戦力に基づく
+  const playerPower = clamp(
+    gWarriors.reduce((s, w) => s + w.stats.power + w.stats.wisdom, 0) / gWarriors.length,
+    60, 150
+  ) | 0;
+  const enemyPower = clamp(B_MAX_HP + Math.floor(state.unification * 0.4), 60, 180) | 0;
+
+  // 兵士生成
+  bSoldiers = [];
+  const soldierCount = Math.min(8, 4 + gWarriors.length);
+  for (let i = 0; i < soldierCount; i++) {
+    const col = i % 2, row = Math.floor(i / 2);
+    bSoldiers.push({
+      side: 'p', x: 18 + col * 26, y: B_FIELD_Y_MIN + 14 + row * 42,
+      state: 'walk', stateTimer: 0, hp: 20, maxHp: 20, target: null, dead: false,
+      walkOffset: (i * 7) % 12,
+    });
+  }
+  const enemyCount = 3 + Math.floor(state.unification / 20);
+  for (let i = 0; i < Math.min(enemyCount, 8); i++) {
+    const col = i % 2, row = Math.floor(i / 2);
+    bSoldiers.push({
+      side: 'e', x: BW - 22 - col * 26, y: B_FIELD_Y_MIN + 14 + row * 42,
+      state: 'walk', stateTimer: 0, hp: 20, maxHp: 20, target: null, dead: false,
+      walkOffset: (i * 11) % 12,
+    });
+  }
+
+  // 将軍生成
+  bGenerals = {
+    p: { x: 30,      y: BH / 2 - 15, hp: playerPower, maxHp: playerPower, state: 'charge', stateTimer: 0, dead: false },
+    e: { x: BW - 54, y: BH / 2 - 15, hp: enemyPower,  maxHp: enemyPower,  state: 'charge', stateTimer: 0, dead: false },
+  };
+  // HPバーの最大値を動的に設定
+  document.getElementById('bhp-player').textContent = playerPower;
+  document.getElementById('bhp-enemy').textContent  = enemyPower;
+
+  // 開幕セリフ
+  bAddBubble('p', LINES_P[0], 150);
+  bAddBubble('e', LINES_E[0], 150);
+  bAddPt(bGenerals.p.x + 12, bGenerals.p.y + 15, '#ffe060', 10);
+  bAddPt(bGenerals.e.x + 12, bGenerals.e.y + 15, '#ffe060', 10);
+
+  bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
+}
+
+function closeBattle() {
+  if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
+  document.getElementById('battle-screen').classList.remove('show');
+}
+
+// ============================================================
+//  アイドルティック（自動成長）
+// ============================================================
+function performIdleTick() {
+  state.turn++;
+  gWarriors.forEach(w => {
+    w.stats.exp += rnd(3, 8);
+    if (Math.random() < 0.4)  w.stats.power  = clamp(w.stats.power  + 1, 1, 99);
+    if (Math.random() < 0.25) w.stats.wisdom  = clamp(w.stats.wisdom + 1, 1, 99);
+    // 自然回復（体力が低いほど回復しやすい）
+    const hpPct = w.stats.hp / w.stats.maxHp;
+    if (hpPct < 0.9) {
+      const naturalRec = Math.floor((1 - hpPct) * 4 + 1);
+      w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + naturalRec);
+    }
+  });
+  state.koku       += rnd(70, 120);
+  state.unification = Math.min(100, state.unification + 0.08);
+  updateStatusUI();
+  updatePartyRow();
+}
+
+// ============================================================
+//  ISO キャンバス描画
+// ============================================================
+let isoAnimFrame = null;
+
+function initIsoCanvas() {
+  const canvas = document.getElementById('iso-canvas');
+  const field  = document.getElementById('iso-field');
+  if (!canvas || !field) return;
+
+  function resize() {
+    canvas.width  = field.clientWidth  || window.innerWidth;
+    canvas.height = field.clientHeight || Math.floor(window.innerHeight * 0.5);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ctx = canvas.getContext('2d');
+
+  function isoToScreen(ix, iy) {
+    const w     = canvas.width;
+    const h     = canvas.height;
+    const cx    = w / 2;
+    const cy    = h * 0.5;
+    // 縦画面は幅基準でタイルを計算
+    const tileW = w * 0.22;
+    const tileH = tileW * 0.5;
+    return {
+      x: cx + (ix - iy) * tileW * 0.5,
+      y: cy + (ix + iy) * tileH * 0.5,
+    };
+  }
+
+  function drawTile(ix, iy, topColor, leftColor, rightColor) {
+    const tileW = canvas.width * 0.22;
+    const tileH = tileW * 0.5;
+    const th    = tileW * 0.3;
+    const { x, y } = isoToScreen(ix, iy);
+
+    // 上面
+    ctx.fillStyle = topColor;
+    ctx.beginPath();
+    ctx.moveTo(x,           y - tileH / 2);
+    ctx.lineTo(x + tileW/2, y);
+    ctx.lineTo(x,           y + tileH / 2);
+    ctx.lineTo(x - tileW/2, y);
+    ctx.closePath();
+    ctx.fill();
+
+    // 左面
+    ctx.fillStyle = leftColor;
+    ctx.beginPath();
+    ctx.moveTo(x - tileW/2, y);
+    ctx.lineTo(x,           y + tileH / 2);
+    ctx.lineTo(x,           y + tileH / 2 + th);
+    ctx.lineTo(x - tileW/2, y + th);
+    ctx.closePath();
+    ctx.fill();
+
+    // 右面
+    ctx.fillStyle = rightColor;
+    ctx.beginPath();
+    ctx.moveTo(x,           y + tileH / 2);
+    ctx.lineTo(x + tileW/2, y);
+    ctx.lineTo(x + tileW/2, y + th);
+    ctx.lineTo(x,           y + tileH / 2 + th);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawFacility(fp) {
+    const fm = FACILITY_MAP[fp.key];
+    if (!fm) return;
+    const { x, y } = isoToScreen(fp.tx, fp.ty);
+    const tileW = canvas.width * 0.22;
+    const iconSz = Math.max(14, Math.round(tileW * 0.55));
+    ctx.save();
+    ctx.font = `${iconSz}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fm.icon, x, y - 8);
+    ctx.font = `${Math.max(7, Math.round(tileW * 0.22))}px Noto Serif JP`;
+    ctx.fillStyle = fm.color;
+    ctx.fillText(fm.name, x, y + 8);
+    ctx.restore();
+  }
+
+  function drawWarrior(w) {
+    const { x, y } = isoToScreen(w.isoX, w.isoY);
+    const hpPct = w.stats.hp / w.stats.maxHp;
+    const r = Math.max(7, Math.round(canvas.width * 0.028)); // タイル比率でサイズ
+    const bw = r * 2.6;
+    ctx.save();
+    // 影
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 0.3, r * 1.1, r * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 体
+    ctx.fillStyle = w._color;
+    ctx.beginPath();
+    ctx.arc(x, y - r * 0.7, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // HP バー
+    ctx.fillStyle = 'rgba(0,0,0,.5)';
+    ctx.fillRect(x - bw/2, y + r * 0.5, bw, 3);
+    ctx.fillStyle = hpPct > 0.6 ? '#44ff88' : hpPct > 0.3 ? '#ffaa44' : '#ff4444';
+    ctx.fillRect(x - bw/2, y + r * 0.5, bw * hpPct, 3);
+    // 名前
+    ctx.fillStyle = 'rgba(245,232,200,.9)';
+    ctx.font = `${Math.max(7, r - 1)}px Noto Serif JP`;
+    ctx.textAlign = 'center';
+    ctx.fillText(w.name.slice(-1), x, y - r * 0.35);
+    ctx.restore();
+  }
+
+  let lastTime = 0;
+  function loop(ts) {
+    const dt = ts - lastTime;
+    if (dt > 50) { // 約20fps
+      lastTime = ts;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // タイル描画（5×5グリッド）
+      for (let iy = -2; iy <= 3; iy++) {
+        for (let ix = -2; ix <= 2; ix++) {
+          const isPath = (ix === 0 || iy === 0);
+          const top   = isPath ? 'rgba(120,90,40,.5)' : 'rgba(60,40,15,.6)';
+          const left  = isPath ? 'rgba(80,55,20,.6)'  : 'rgba(35,20,5,.7)';
+          const right = isPath ? 'rgba(100,70,30,.5)' : 'rgba(45,28,8,.6)';
+          drawTile(ix, iy, top, left, right);
+        }
+      }
+
+      // 施設描画
+      FACILITY_POSITIONS.forEach(fp => drawFacility(fp));
+
+      // 武将 tick & 描画（Y深さでソート）
+      gWarriors.forEach(w => w.tick());
+      const sorted = [...gWarriors].sort((a, b) => (a.isoX + a.isoY) - (b.isoX + b.isoY));
+      sorted.forEach(w => drawWarrior(w));
+    }
+    isoAnimFrame = requestAnimationFrame(loop);
+  }
+  isoAnimFrame = requestAnimationFrame(loop);
+}
+
+// ============================================================
+//  開発者コマンド
+// ============================================================
+function devAddKoku()        { state.koku += 5000; updateStatusUI(); showToast('石高 +5000'); }
+function devAddPower()       { gWarriors.forEach(w => { w.stats.power = clamp(w.stats.power+20,1,99); }); updatePartyRow(); showToast('全武将 武力+20'); }
+function devLevelUp()        { gWarriors.forEach(w => { for(let i=0;i<5;i++) { w.stats.exp += w.stats.level*120+80; w._checkLevelUp(); } }); updatePartyRow(); showToast('全武将 Lv+5'); }
+function devRestoreHp()      { gWarriors.forEach(w => { w.stats.hp = w.stats.maxHp; }); updatePartyRow(); showToast('全武将 体力全回復'); }
+function devSetUnification() { state.unification = Math.min(99.9, state.unification + 30); updateStatusUI(); showToast('統一度 +30%'); }
+function devAddWarrior() {
+  const gender = Math.random() < 0.5 ? 'male' : 'female';
+  const name   = randName(gender);
+  const jobId  = Math.floor(Math.random() * Object.keys(ROLES).length);
+  const w = new IsoWarrior(name, jobId, rnd(35,65), (Math.random()-0.5)*2, 2+Math.random()*3, gender);
+  gWarriors.push(w);
+  updatePartyRow();
+  showToast(`${name} が加入！`);
+  closeModal('dev-modal');
+}
+
+// 履歴表示
+function openHistoryFromDev() {
+  const list = document.getElementById('hist-list');
+  list.innerHTML = '';
+  state.log.forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'hist-item';
+    d.innerHTML = `<span class="hi-time">${item.time}</span> ${item.text}`;
+    list.appendChild(d);
+  });
+  openModal('history-modal');
+}
+
+// ============================================================
+//  初期化
+// ============================================================
+function initGame() {
+  spawnStars();
+  spawnPetals();
+
+  // 初期武将生成
+  const initialWarriors = [
+    { name: '織田信長', jobId: 0, power: 72, gender:'male' },
+    { name: '豊臣秀吉', jobId: 1, power: 58, gender:'male' },
+    { name: '徳川家康', jobId: 2, power: 65, gender:'male' },
+    { name: '帰蝶',     jobId: 7, power: 45, gender:'female' },
+  ];
+
+  initialWarriors.forEach((cfg, i) => {
+    const w = new IsoWarrior(cfg.name, cfg.jobId, cfg.power, (i-1.5)*0.8, 2.5+Math.random()*2, cfg.gender);
+    if (cfg.gender === 'female') { w.stats.wisdom = rnd(50,70); }
+    gWarriors.push(w);
+  });
+
+  // キャンバス初期化
+  initIsoCanvas();
+
+  // 縁組キャンセルボタン設定
+  const cancelBtn = document.getElementById('engumi-cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (engumiStep === 0) {
+        closeEngumi();
+      } else {
+        engumiStep--;
+        renderEngumiStep();
+      }
+    };
+  }
+
+  // アイドル更新
+  idleTimer = setInterval(performIdleTick, 3000);
+
+  updateStatusUI();
+  updatePartyRow();
+  addLog('ゲーム開始。天下統一を目指せ！');
+
+  showToast('戦国血脈 〜覇道の系譜〜 開始！', 3000);
+}
+
+window.onload = initGame;
 </script>
 </body>
 </html>
