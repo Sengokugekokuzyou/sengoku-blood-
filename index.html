@@ -1,1492 +1,1599 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-  <title>戦国血脈 〜覇道の系譜〜</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>戦国血脈 〜覇道の系譜〜</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');
+:root{
+  --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
+  --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);
+  --crimson:#8b0000;
+  --spring:#7CFC00;--summer:#00BFFF;--autumn:#FFA500;--winter:#d8d8d8;
+  --h-header:58px;
+  --h-nationbar:30px;
+  --h-partyrow:78px;
+  --h-actionrow:64px;
+  --h-bottom-pad:max(env(safe-area-inset-bottom,0px),8px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{
+  width:100%;height:100%;
+  background:var(--ink);
+  font-family:'Noto Serif JP',serif;
+  overflow:hidden;color:var(--parchment);
+  user-select:none;-webkit-user-select:none;
+  position:fixed;touch-action:none;
+}
+button{font:inherit;}
 
-    :root{
-      --gold:#c8960c;
-      --gold-l:#f0c040;
-      --gold-d:rgba(200,150,12,.4);
-      --parchment:#f5e8c8;
-      --ink:#0e0800;
-      --panel:rgba(8,4,0,.88);
-      --crimson:#8b0000;
-      --spring:#7CFC00;
-      --summer:#00BFFF;
-      --autumn:#FFA500;
-      --winter:#d8d8d8;
+/* ── 背景 ── */
+#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);}
+.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.75}}
+.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none;}
+.mist:nth-child(1){height:42px;top:30%;animation-duration:32s;}
+.mist:nth-child(2){height:54px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
+.mist:nth-child(3){height:36px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
+@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
+.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);animation:petalFall linear infinite;pointer-events:none;}
+@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
 
-      --h-header:74px;
-      --h-nationbar:30px;
-      --h-partyrow:84px;
-      --h-actionrow:68px;
-      --h-bottom-pad:max(env(safe-area-inset-bottom,0px),8px);
-    }
+/* ── メインレイアウト ── */
+#main{position:fixed;inset:0;z-index:10;display:grid;grid-template-rows:var(--h-header) 1fr auto;width:100%;height:100%;}
 
-    *,*::before,*::after{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
+/* ── ヘッダー ── */
+#header{
+  height:var(--h-header);
+  padding:max(env(safe-area-inset-top,0px),8px) 12px 6px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-shrink:0;
+}
+#game-title{color:var(--gold);font-size:clamp(14px,4.2vw,18px);font-weight:900;letter-spacing:.18em;text-shadow:0 0 16px rgba(200,150,12,.7);line-height:1.25;white-space:nowrap;}
+#game-title .sub{display:block;font-size:clamp(7px,1.8vw,9px);letter-spacing:.34em;color:var(--gold-d);font-weight:400;margin-top:2px;}
+#status-panel{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:66%;}
+.stat-chip{display:flex;align-items:center;gap:4px;min-height:26px;background:var(--panel);border:1px solid var(--gold-d);border-radius:16px;padding:4px 8px;}
+.sl{font-size:8px;color:rgba(245,232,200,.5);letter-spacing:.08em;}
+.sv{font-size:13px;font-weight:700;color:var(--gold-l);}
+.su{font-size:8px;color:var(--gold-d);}
+.season-chip.spring .sv{color:var(--spring);}
+.season-chip.summer .sv{color:var(--summer);}
+.season-chip.autumn .sv{color:var(--autumn);}
+.season-chip.winter .sv{color:var(--winter);}
 
-    html,body{
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:var(--ink);
-      color:var(--parchment);
-      font-family:'Noto Serif JP',serif;
-      user-select:none;
-      -webkit-user-select:none;
-      position:fixed;
-      touch-action:none;
-    }
+/* ── ISOフィールド ── */
+#iso-field{position:relative;overflow:hidden;min-height:0;}
+#iso-canvas{position:absolute;top:0;left:0;width:100%;height:100%;}
+#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden;}
+.facility-activity{position:absolute;font-size:9px;color:#ffdd88;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop .3s ease-out;}
+@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+.float-text{position:absolute;font-size:10px;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:floatUp 1.8s ease-out forwards;}
+@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}
 
-    button{font:inherit}
+/* ── ボトムUI ── */
+#bottom-ui{flex-shrink:0;padding:0 10px var(--h-bottom-pad);background:linear-gradient(0deg,rgba(6,3,0,.98) 0%,rgba(6,3,0,.82) 80%,transparent 100%);}
+#nation-bar{display:flex;align-items:center;gap:7px;height:var(--h-nationbar);padding:5px 2px 4px;border-bottom:1px solid rgba(200,150,12,.12);}
+.nl{font-size:8px;color:var(--gold-d);letter-spacing:.18em;white-space:nowrap;}
+.nt{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;}
+.nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
+.np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:42px;text-align:right;}
 
-    #sky{
-      position:fixed;
-      inset:0;
-      z-index:0;
-      background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);
-    }
+#party-row{display:flex;gap:5px;height:var(--h-partyrow);align-items:center;padding:5px 0 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;}
+#party-row::-webkit-scrollbar{display:none;}
+.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:84px;padding:5px 8px;border-radius:8px;border:1px solid rgba(200,150,12,.2);background:rgba(255,255,255,.04);cursor:pointer;transition:border-color .2s,background .2s;touch-action:manipulation;}
+.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
+.party-card.young{opacity:.72;border-color:rgba(200,150,12,.14);}
+.party-card.mutant{border-color:#ff44ff;background:rgba(255,0,255,.08);}
+.party-card:active{background:rgba(200,150,12,.18);}
+.pc-role{font-size:7px;color:var(--gold-d);letter-spacing:.08em;}
+.pc-name{font-size:9px;color:var(--parchment);font-weight:700;}
+.pc-pow{font-size:8px;color:#ffaa44;}
+.pc-hp{font-size:7px;}
+.pc-loc{font-size:7px;color:#aaddff;text-align:center;}
+.pc-skill{font-size:6px;color:#ff88ff;text-align:center;}
 
-    .star{
-      position:fixed;
-      border-radius:50%;
-      background:#fff;
-      opacity:0;
-      animation:twinkle ease-in-out infinite;
-    }
-    @keyframes twinkle{
-      0%,100%{opacity:0}
-      50%{opacity:.75}
-    }
+#action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;height:var(--h-actionrow);padding:3px 0 2px;}
+.act-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;padding:0 2px;border-radius:10px;border:1px solid var(--gold-d);background:var(--panel);color:var(--parchment);cursor:pointer;transition:background .15s,border-color .15s,transform .1s;touch-action:manipulation;}
+.act-btn:active{transform:scale(.92);background:rgba(200,150,12,.16);border-color:var(--gold);}
+.act-btn .ico{font-size:18px;line-height:1;}
+.act-btn .lbl{font-size:8px;letter-spacing:.1em;color:rgba(245,232,200,.72);}
+.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45);}
+.act-btn.primary .lbl{color:var(--gold-l);}
 
-    .mist{
-      position:fixed;
-      left:-20%;
-      width:140%;
-      border-radius:50%;
-      background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);
-      animation:drift linear infinite;
-      pointer-events:none;
-    }
-    .mist:nth-child(1){height:42px;top:30%;animation-duration:32s;}
-    .mist:nth-child(2){height:54px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65;}
-    .mist:nth-child(3){height:36px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45;}
-    @keyframes drift{
-      0%{transform:translateX(-8%) scaleY(1)}
-      50%{transform:translateX(7%) scaleY(1.4)}
-      100%{transform:translateX(-8%) scaleY(1)}
-    }
+/* ── 合戦画面 ── */
+#battle-screen{position:fixed;inset:0;z-index:500;background:#0e0600;display:none;flex-direction:column;font-family:'DotGothic16',monospace;}
+#battle-screen.show{display:flex;}
+#bscr-inner{display:flex;flex-direction:column;width:100%;height:100%;}
+#bscr-frame{position:relative;flex:1;min-height:0;border-bottom:3px solid #8b6914;box-shadow:0 4px 20px #c8960033;overflow:hidden;}
+#bg-canvas,#battle-main-canvas{position:absolute;top:0;left:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+#battle-log-bar{flex-shrink:0;height:26px;background:#0a0600;border-bottom:1px solid #4a3000;color:#e8c060;font-size:clamp(9px,2.8vw,13px);display:flex;align-items:center;padding:0 10px;letter-spacing:.06em;overflow:hidden;white-space:nowrap;}
+#battle-ui-panel{flex-shrink:0;height:72px;display:flex;gap:3px;padding:4px;background:#1a0800;}
+.bunit-panel{flex:1;background:linear-gradient(180deg,#e8dcc0,#d4c090 40%,#c0a860);border:2px solid #7a5800;border-radius:4px;padding:4px 8px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 1px 0 #fff8,inset 0 -1px 0 #0004;}
+.bunit-top{display:flex;align-items:baseline;justify-content:space-between;}
+.bunit-name{font-size:clamp(10px,3.5vw,14px);color:#1a0800;letter-spacing:.04em;}
+.bhp-group{display:flex;align-items:baseline;gap:3px;}
+.bhp-label{font-size:clamp(7px,1.8vw,9px);color:#6a4000;}
+.bhp-value{font-size:clamp(14px,4vw,20px);color:#1a0800;letter-spacing:.08em;min-width:30px;text-align:right;}
+.bpower-label{font-size:clamp(7px,2vw,9px);color:#5a3800;line-height:1;}
+.bpower-wrap{width:100%;height:clamp(8px,2.5vw,13px);background:#2a1800;border:1px solid #5a3000;border-radius:2px;overflow:hidden;position:relative;}
+.bpower-bar{height:100%;background:linear-gradient(90deg,#2060c0,#2080e0 40%,#40a0ff);transition:width .35s ease;}
+.bpower-bar-enemy{background:linear-gradient(90deg,#c01010,#e82020 40%,#ff4040);}
+.bpower-ticks{position:absolute;inset:0;display:flex;pointer-events:none;}
+.bpower-ticks span{flex:1;border-right:1px solid #0003;}
+#battle-result-panel{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;background:#000b;z-index:10;}
+#battle-result-panel.show{display:flex;}
+#result-box{background:linear-gradient(180deg,#f4e080,#c89020);border:3px solid #7a5000;border-radius:10px;padding:18px 32px;text-align:center;box-shadow:0 8px 40px #00000099;max-width:90vw;}
+.bres-title{font-family:'DotGothic16',monospace;font-size:clamp(14px,5vw,20px);color:#1a0800;letter-spacing:.2em;margin-bottom:12px;display:block;}
+.bres-detail{font-family:'DotGothic16',monospace;font-size:clamp(10px,3vw,13px);color:#3a1400;text-align:center;line-height:1.9;white-space:pre-line;margin-bottom:14px;}
+.bres-btn{font-family:'DotGothic16',monospace;font-size:clamp(11px,3.2vw,14px);background:linear-gradient(180deg,#e05010,#a02808);color:#fff8e0;border:2px solid #601000;border-radius:6px;padding:8px 24px;cursor:pointer;touch-action:manipulation;}
 
-    .petal{
-      position:fixed;
-      border-radius:50% 0 50% 0;
-      background:radial-gradient(ellipse,rgba(255,200,200,.9) 0%,rgba(255,130,130,.25) 100%);
-      animation:petalFall linear infinite;
-      pointer-events:none;
-    }
-    @keyframes petalFall{
-      0%{transform:translateY(-10px) rotate(0deg) translateX(0);opacity:0}
-      7%{opacity:.9}
-      93%{opacity:.5}
-      100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}
-    }
+/* ── モーダル共通 ── */
+.modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
+.modal.show{display:flex;}
+.modal-shell{width:100%;max-width:480px;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;box-shadow:0 -20px 60px rgba(0,0,0,.45);}
+.modal-tall{height:88%;}
+.modal-mid{height:78%;}
+@keyframes slideUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+.modal-deco-top{height:3px;background:linear-gradient(90deg,transparent,var(--gold),rgba(200,150,12,.4),var(--gold),transparent);flex-shrink:0;}
+.modal-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.modal-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.28em;}
+.close-btn{background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:inherit;touch-action:manipulation;}
+.modal-body{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-y;}
+.modal-body::-webkit-scrollbar{display:none;}
+.modal-footer{flex-shrink:0;display:flex;gap:8px;padding:10px 16px max(env(safe-area-inset-bottom,0px),12px);border-top:1px solid rgba(200,150,12,.1);}
+.modal-btn{flex:1;padding:13px;border-radius:10px;font-family:inherit;font-size:12px;letter-spacing:.25em;cursor:pointer;transition:all .2s;touch-action:manipulation;}
+.modal-btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:rgba(200,150,12,.6);}
+.modal-btn-exec{background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-weight:700;}
+.modal-btn-exec:disabled{opacity:.38;cursor:not-allowed;}
 
-    #main{
-      position:fixed;
-      inset:0;
-      z-index:10;
-      display:grid;
-      grid-template-rows:var(--h-header) 1fr auto;
-      width:100%;
-      height:100%;
-    }
+/* ── 系譜モーダル ── */
+.blood-skill-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.bsk-row{display:flex;align-items:flex-start;gap:8px;padding:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;}
+.bsk-icon{font-size:16px;flex-shrink:0;}
+.bsk-name{font-size:11px;font-weight:700;color:var(--parchment);}
+.bsk-desc{font-size:9px;color:rgba(245,228,180,.55);margin-top:1px;}
+.gen-block{margin-bottom:14px;}
+.gen-label{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-bottom:6px;}
+.gen-list{display:flex;flex-wrap:wrap;gap:6px;}
+.gen-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:8px;padding:8px 10px;font-size:9px;color:var(--parchment);line-height:1.6;min-width:140px;}
+.gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l);}
+.gen-card .gp{color:#ffaa44;}
+.gen-card .gskill{color:#ff88ff;font-size:8px;}
+.gen-card .gcomp{color:#88ffcc;font-size:8px;}
+.gen-card.mutant-card{border-color:#ff44ff;background:rgba(255,0,255,.06);}
 
-    #header{
-      height:var(--h-header);
-      padding:max(env(safe-area-inset-top,0px),8px) 12px 6px;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:8px;
-    }
+/* ── 武将モーダル ── */
+#warrior-modal.modal{z-index:700;}
+.wm-shell{width:100%;max-width:480px;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;}
+.wm-head{padding:16px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);}
+.wm-name{font-size:18px;font-weight:900;color:var(--gold-l);letter-spacing:.14em;}
+.wm-role{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-top:2px;}
+.wm-body{padding:10px 16px max(env(safe-area-inset-bottom,0px),16px);}
+.wm-stat{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;}
+.wsk{color:rgba(245,228,180,.6);}
+.wsv{color:var(--parchment);font-weight:700;text-align:right;}
+.wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px;}
+.wm-hp-fill{height:100%;border-radius:3px;transition:width .4s;}
+.wm-close{display:block;width:100%;margin-top:10px;padding:11px;border-radius:8px;border:1px solid rgba(200,150,12,.3);background:none;color:var(--gold);letter-spacing:.3em;cursor:pointer;touch-action:manipulation;}
 
-    #game-title{
-      color:var(--gold);
-      font-size:clamp(14px,4.2vw,18px);
-      font-weight:900;
-      letter-spacing:.18em;
-      text-shadow:0 0 16px rgba(200,150,12,.7);
-      line-height:1.25;
-      white-space:nowrap;
-    }
-    #game-title .sub{
-      display:block;
-      font-size:clamp(7px,1.8vw,9px);
-      letter-spacing:.34em;
-      color:var(--gold-d);
-      font-weight:400;
-      margin-top:2px;
-    }
+/* ── 縁組モーダル ── */
+.modal-kamon{font-size:28px;text-align:center;margin-bottom:4px;text-shadow:0 0 24px rgba(200,150,12,.4);}
+.modal-main-title{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:.5em;text-align:center;}
+.modal-subtitle{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.35em;text-align:center;margin-top:3px;}
+.modal-step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:12px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(200,150,12,.22);transition:all .3s;}
+.step-dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,150,12,.5);}
+.engumi-cost{text-align:center;padding:8px;background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);border-radius:8px;margin-bottom:12px;}
+.ec-label{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.3em;}
+.ec-val{display:block;font-size:20px;font-weight:900;color:var(--gold-l);margin-top:2px;}
+.ec-unit{font-size:9px;color:rgba(200,150,12,.6);}
+.modal-section-title{font-size:9px;color:rgba(200,150,12,.6);letter-spacing:.3em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(200,150,12,.12);}
+.warrior-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.warrior-sel-card{min-height:78px;padding:10px;border-radius:10px;border:1px solid rgba(200,150,12,.15);background:rgba(255,255,255,.03);cursor:pointer;transition:all .2s;touch-action:manipulation;}
+.warrior-sel-card.selected,.warrior-sel-card:active{background:rgba(200,150,12,.12);border-color:var(--gold);}
+.warrior-sel-card.mutant-card{border-color:rgba(255,100,255,.3);}
+.warrior-sel-card.mutant-card.selected{border-color:#ff44ff;background:rgba(255,0,255,.1);}
+.wsc-name{font-size:12px;font-weight:700;color:var(--parchment);}
+.wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px;}
+.wsc-hp{font-size:9px;margin-top:2px;}
+.wsc-skill{font-size:8px;color:#ff88ff;margin-top:2px;}
+.confirm-panel{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px;}
+.confirm-pair{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.confirm-w{text-align:center;}
+.cw-name{font-size:13px;font-weight:700;color:var(--parchment);}
+.cw-role{font-size:9px;color:var(--gold-d);}
+.confirm-heart{font-size:22px;color:var(--crimson);text-shadow:0 0 12px rgba(139,0,0,.5);}
+.child-preview{background:rgba(255,255,255,.03);border-radius:8px;padding:9px;margin-top:7px;}
+.cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px;}
+.cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0;}
+.cpv{color:var(--gold-l);font-weight:700;}
+.cp-compat{font-size:10px;color:#88ffcc;text-align:center;margin-top:5px;padding:4px;background:rgba(0,255,100,.05);border-radius:4px;}
 
-    #status-panel{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      gap:5px;
-      max-width:66%;
-    }
+/* ── 成功オーバーレイ ── */
+#success-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:20px;background:rgba(8,4,0,.96);}
+#success-overlay.show{display:flex;animation:fadeIn .4s ease;}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+.suc-kamon{font-size:52px;animation:sucPulse 2s ease infinite;}
+@keyframes sucPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center;}
+.suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.18em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center;}
+.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:1.9;white-space:pre-line;}
+.suc-skill{font-size:13px;color:#ff88ff;text-align:center;letter-spacing:.08em;text-shadow:0 0 12px rgba(255,100,255,.5);}
+.suc-compat{font-size:11px;color:#88ffcc;text-align:center;}
+.suc-btn{margin-top:6px;padding:13px 28px;border-radius:10px;border:1px solid rgba(200,150,12,.4);background:rgba(200,150,12,.15);color:var(--gold-l);font-family:inherit;font-size:13px;letter-spacing:.35em;cursor:pointer;touch-action:manipulation;}
+.mutant-flash{animation:mutantFlash .5s ease 3;}
+@keyframes mutantFlash{0%,100%{box-shadow:none}50%{box-shadow:0 0 40px rgba(255,0,255,.8)}}
 
-    .stat-chip{
-      display:flex;
-      align-items:center;
-      gap:4px;
-      min-height:26px;
-      background:var(--panel);
-      border:1px solid var(--gold-d);
-      border-radius:16px;
-      padding:4px 8px;
-    }
-    .sl{font-size:8px;color:rgba(245,232,200,.5);letter-spacing:.08em;}
-    .sv{font-size:13px;font-weight:700;color:var(--gold-l);}
-    .su{font-size:8px;color:var(--gold-d);}
-    .season-chip.spring .sv{color:var(--spring);}
-    .season-chip.summer .sv{color:var(--summer);}
-    .season-chip.autumn .sv{color:var(--autumn);}
-    .season-chip.winter .sv{color:var(--winter);}
+/* ── 開発者 ── */
+.dev-body{padding:12px 16px max(env(safe-area-inset-bottom,0px),16px);display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.dev-btn{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:var(--parchment);font-size:11px;padding:12px 6px;border-radius:8px;cursor:pointer;letter-spacing:.15em;touch-action:manipulation;}
+.dev-btn:active{background:rgba(200,150,12,.14);}
 
-    #iso-field{
-      position:relative;
-      overflow:hidden;
-      min-height:0;
-    }
+/* ── 履歴 ── */
+.hist-item{display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(200,150,12,.1);font-size:11px;line-height:1.5;color:rgba(245,228,180,.8);}
+.hi-time{color:rgba(200,150,12,.55);font-size:9px;white-space:nowrap;flex-shrink:0;}
+.hi-text{flex:1;}
+.hist-item.hi-mutant .hi-text{color:#ff88ff;}
+.hist-empty{text-align:center;padding:32px 16px;color:rgba(200,150,12,.35);font-size:11px;letter-spacing:.3em;}
 
-    #iso-canvas{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-    }
-
-    #bubble-layer{
-      position:absolute;
-      inset:0;
-      z-index:30;
-      pointer-events:none;
-      overflow:hidden;
-    }
-
-    .facility-activity{
-      position:absolute;
-      font-size:9px;
-      color:#ffdd88;
-      text-shadow:0 1px 3px #000;
-      white-space:nowrap;
-      transform:translateX(-50%);
-      animation:actPop .3s ease-out;
-    }
-    @keyframes actPop{
-      0%{opacity:0;transform:translateX(-50%) scale(.5)}
-      100%{opacity:1;transform:translateX(-50%) scale(1)}
-    }
-
-    .float-text{
-      position:absolute;
-      font-size:10px;
-      text-shadow:0 1px 3px #000;
-      white-space:nowrap;
-      transform:translateX(-50%);
-      animation:floatUp 1.8s ease-out forwards;
-    }
-    @keyframes floatUp{
-      0%{opacity:1;transform:translateX(-50%) translateY(0)}
-      100%{opacity:0;transform:translateX(-50%) translateY(-36px)}
-    }
-
-    #bottom-ui{
-      padding:0 10px var(--h-bottom-pad);
-      background:linear-gradient(0deg,rgba(6,3,0,.98) 0%,rgba(6,3,0,.82) 80%,transparent 100%);
-    }
-
-    #nation-bar{
-      display:flex;
-      align-items:center;
-      gap:7px;
-      height:var(--h-nationbar);
-      padding:5px 2px 4px;
-      border-bottom:1px solid rgba(200,150,12,.12);
-    }
-    .nl{font-size:8px;color:var(--gold-d);letter-spacing:.18em;white-space:nowrap;}
-    .nt{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;}
-    .nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s;}
-    .np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:42px;text-align:right;}
-
-    #party-row{
-      display:flex;
-      gap:5px;
-      height:var(--h-partyrow);
-      align-items:center;
-      padding:5px 0 4px;
-      overflow-x:auto;
-      scrollbar-width:none;
-      -webkit-overflow-scrolling:touch;
-      touch-action:pan-x;
-    }
-    #party-row::-webkit-scrollbar{display:none;}
-
-    .party-card{
-      flex-shrink:0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:1px;
-      min-width:84px;
-      padding:5px 8px;
-      border-radius:8px;
-      border:1px solid rgba(200,150,12,.2);
-      background:rgba(255,255,255,.04);
-      cursor:pointer;
-      transition:border-color .2s,background .2s;
-      touch-action:manipulation;
-    }
-    .party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
-    .party-card.training{opacity:.72;border-color:rgba(200,150,12,.14);}
-    .party-card.mutant{border-color:#ff44ff;background:rgba(255,0,255,.08);}
-    .party-card:active{background:rgba(200,150,12,.18);}
-    .pc-role{font-size:7px;color:var(--gold-d);letter-spacing:.08em;}
-    .pc-name{font-size:9px;color:var(--parchment);font-weight:700;}
-    .pc-pow{font-size:8px;color:#ffaa44;}
-    .pc-hp{font-size:7px;}
-    .pc-loc{font-size:7px;color:#aaddff;text-align:center;}
-    .pc-skill{font-size:6px;color:#ff88ff;text-align:center;}
-
-    #action-row{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:4px;
-      height:var(--h-actionrow);
-      padding:3px 0 2px;
-    }
-
-    .act-btn{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:2px;
-      min-height:56px;
-      padding:0 2px;
-      border-radius:10px;
-      border:1px solid var(--gold-d);
-      background:var(--panel);
-      color:var(--parchment);
-      cursor:pointer;
-      transition:background .15s,border-color .15s,transform .1s;
-      touch-action:manipulation;
-    }
-    .act-btn:active{
-      transform:scale(.92);
-      background:rgba(200,150,12,.16);
-      border-color:var(--gold);
-    }
-    .act-btn .ico{font-size:18px;line-height:1;}
-    .act-btn .lbl{font-size:8px;letter-spacing:.1em;color:rgba(245,232,200,.72);}
-    .act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45);}
-    .act-btn.primary .lbl{color:var(--gold-l);}
-
-    .modal{
-      position:fixed;
-      inset:0;
-      z-index:600;
-      display:none;
-      align-items:flex-end;
-      justify-content:center;
-      background:rgba(8,4,0,.92);
-    }
-    .modal.show{display:flex;}
-
-    .modal-shell{
-      width:100%;
-      max-width:480px;
-      background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));
-      border:1px solid rgba(200,150,12,.35);
-      border-radius:18px 18px 0 0;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
-      box-shadow:0 -20px 60px rgba(0,0,0,.45);
-    }
-    .modal-tall{height:88%;}
-    .modal-mid{height:78%;}
-
-    @keyframes slideUp{
-      0%{transform:translateY(100%)}
-      100%{transform:translateY(0)}
-    }
-
-    .modal-head{
-      padding:14px 16px 10px;
-      border-bottom:1px solid rgba(200,150,12,.15);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      flex-shrink:0;
-    }
-    .modal-title{
-      font-size:14px;
-      color:var(--gold);
-      font-weight:700;
-      letter-spacing:.28em;
-    }
-
-    .close-btn{
-      background:none;
-      border:1px solid rgba(200,150,12,.3);
-      color:var(--gold);
-      font-size:12px;
-      padding:6px 14px;
-      border-radius:20px;
-      cursor:pointer;
-    }
-
-    .modal-body{
-      flex:1;
-      overflow-y:auto;
-      padding:12px 14px;
-      -webkit-overflow-scrolling:touch;
-      scrollbar-width:none;
-      touch-action:pan-y;
-    }
-    .modal-body::-webkit-scrollbar{display:none;}
-
-    .blood-skill-list{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      margin-bottom:12px;
-    }
-    .bsk-row{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      padding:7px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:8px;
-    }
-    .bsk-icon{font-size:16px;flex-shrink:0;}
-    .bsk-name{font-size:11px;font-weight:700;color:var(--parchment);}
-    .bsk-desc{font-size:9px;color:rgba(245,228,180,.55);margin-top:1px;}
-
-    .gen-block{margin-bottom:14px;}
-    .gen-label{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-bottom:6px;}
-    .gen-list{display:flex;flex-wrap:wrap;gap:6px;}
-    .gen-card{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(200,150,12,.18);
-      border-radius:8px;
-      padding:8px 10px;
-      font-size:9px;
-      color:var(--parchment);
-      line-height:1.6;
-      min-width:140px;
-    }
-    .gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l);}
-    .gen-card .gp{color:#ffaa44;}
-    .gen-card .gskill{color:#ff88ff;font-size:8px;}
-    .gen-card .gcomp{color:#88ffcc;font-size:8px;}
-    .gen-card .gage{color:#aaddff;font-size:8px;}
-    .gen-card.mutant-card{border-color:#ff44ff;background:rgba(255,0,255,.06);}
-
-    .wm-shell{
-      width:100%;
-      max-width:480px;
-      background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));
-      border:1px solid rgba(200,150,12,.35);
-      border-radius:18px 18px 0 0;
-      overflow:hidden;
-      animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both;
-    }
-    .wm-head{padding:16px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);}
-    .wm-name{font-size:18px;font-weight:900;color:var(--gold-l);letter-spacing:.14em;}
-    .wm-role{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-top:2px;}
-    .wm-body{padding:10px 16px max(env(safe-area-inset-bottom,0px),16px);}
-    .wm-stat{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:6px 0;
-      border-bottom:1px solid rgba(255,255,255,.05);
-      font-size:12px;
-    }
-    .wsk{color:rgba(245,228,180,.6);}
-    .wsv{color:var(--parchment);font-weight:700;text-align:right;}
-    .wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px;}
-    .wm-hp-fill{height:100%;border-radius:3px;transition:width .4s;}
-    .wm-close{
-      display:block;
-      width:100%;
-      margin-top:10px;
-      padding:11px;
-      border-radius:8px;
-      border:1px solid rgba(200,150,12,.3);
-      background:none;
-      color:var(--gold);
-      letter-spacing:.3em;
-      cursor:pointer;
-    }
-
-    .modal-step-indicator{
-      display:flex;
-      justify-content:center;
-      gap:6px;
-      margin-bottom:12px;
-    }
-    .step-dot{
-      width:6px;
-      height:6px;
-      border-radius:50%;
-      background:rgba(200,150,12,.22);
-      transition:all .3s;
-    }
-    .step-dot.active{
-      background:var(--gold);
-      box-shadow:0 0 8px rgba(200,150,12,.5);
-    }
-
-    .engumi-cost{
-      text-align:center;
-      padding:8px;
-      background:rgba(200,150,12,.06);
-      border:1px solid rgba(200,150,12,.15);
-      border-radius:8px;
-      margin-bottom:12px;
-    }
-    .ec-label{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.3em;}
-    .ec-val{display:block;font-size:20px;font-weight:900;color:var(--gold-l);margin-top:2px;}
-    .ec-unit{font-size:9px;color:rgba(200,150,12,.6);}
-
-    .warrior-select-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:7px;
-    }
-
-    .warrior-sel-card{
-      min-height:78px;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid rgba(200,150,12,.15);
-      background:rgba(255,255,255,.03);
-      cursor:pointer;
-      transition:all .2s;
-      touch-action:manipulation;
-    }
-    .warrior-sel-card.selected,
-    .warrior-sel-card:active{
-      background:rgba(200,150,12,.12);
-      border-color:var(--gold);
-    }
-    .warrior-sel-card.mutant-card{border-color:rgba(255,100,255,.3);}
-    .warrior-sel-card.mutant-card.selected{border-color:#ff44ff;background:rgba(255,0,255,.1);}
-    .wsc-name{font-size:12px;font-weight:700;color:var(--parchment);}
-    .wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px;}
-    .wsc-hp{font-size:9px;margin-top:2px;}
-    .wsc-skill{font-size:8px;color:#ff88ff;margin-top:2px;}
-    .wsc-compat{font-size:8px;color:#88ffcc;margin-top:2px;}
-
-    .confirm-panel{
-      background:rgba(200,150,12,.05);
-      border:1px solid rgba(200,150,12,.18);
-      border-radius:10px;
-      padding:12px;
-    }
-    .confirm-pair{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .confirm-w{text-align:center;}
-    .cw-name{font-size:13px;font-weight:700;color:var(--parchment);}
-    .cw-role{font-size:9px;color:var(--gold-d);}
-    .confirm-heart{
-      font-size:22px;
-      color:var(--crimson);
-      text-shadow:0 0 12px rgba(139,0,0,.5);
-    }
-    .child-preview{
-      background:rgba(255,255,255,.03);
-      border-radius:8px;
-      padding:9px;
-      margin-top:7px;
-    }
-    .cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px;}
-    .cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0;}
-    .cpv{color:var(--gold-l);font-weight:700;}
-    .cp-compat{
-      font-size:10px;
-      color:#88ffcc;
-      text-align:center;
-      margin-top:5px;
-      padding:4px;
-      background:rgba(0,255,100,.05);
-      border-radius:4px;
-    }
-
-    .modal-footer{
-      flex-shrink:0;
-      display:flex;
-      gap:8px;
-      padding:10px 16px max(env(safe-area-inset-bottom,0px),12px);
-      border-top:1px solid rgba(200,150,12,.1);
-    }
-    .modal-btn{
-      flex:1;
-      padding:13px;
-      border-radius:10px;
-      font-size:12px;
-      letter-spacing:.25em;
-      cursor:pointer;
-      transition:all .2s;
-      touch-action:manipulation;
-    }
-    .modal-btn-cancel{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(200,150,12,.2);
-      color:rgba(200,150,12,.6);
-    }
-    .modal-btn-exec{
-      background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));
-      border:1px solid rgba(200,150,12,.5);
-      color:var(--gold-l);
-      font-weight:700;
-    }
-    .modal-btn-exec:disabled{opacity:.38;cursor:not-allowed;}
-
-    #success-overlay{
-      position:fixed;
-      inset:0;
-      z-index:900;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:12px;
-      padding:20px;
-      background:rgba(8,4,0,.96);
-    }
-    #success-overlay.show{display:flex;animation:fadeIn .4s ease;}
-    @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-    .suc-kamon{font-size:52px;animation:pulse 2s ease infinite;}
-    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-    .suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center;}
-    .suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.18em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center;}
-    .suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:1.9;white-space:pre-line;}
-    .suc-skill{font-size:13px;color:#ff88ff;text-align:center;letter-spacing:.08em;text-shadow:0 0 12px rgba(255,100,255,.5);}
-    .suc-compat{font-size:11px;color:#88ffcc;text-align:center;}
-    .suc-btn{
-      margin-top:6px;
-      padding:13px 28px;
-      border-radius:10px;
-      border:1px solid rgba(200,150,12,.4);
-      background:rgba(200,150,12,.15);
-      color:var(--gold-l);
-      font-size:13px;
-      letter-spacing:.35em;
-      cursor:pointer;
-    }
-
-    .mutant-flash{animation:mutantFlash .5s ease 3;}
-    @keyframes mutantFlash{
-      0%,100%{box-shadow:none}
-      50%{box-shadow:0 0 40px rgba(255,0,255,.8)}
-    }
-
-    .dev-body{
-      padding:12px 16px max(env(safe-area-inset-bottom,0px),16px);
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:7px;
-    }
-    .dev-btn{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(200,150,12,.2);
-      color:var(--parchment);
-      font-size:11px;
-      padding:12px 6px;
-      border-radius:8px;
-      cursor:pointer;
-      letter-spacing:.15em;
-    }
-    .dev-btn:active{background:rgba(200,150,12,.14);}
-
-    .hist-item{
-      display:flex;
-      gap:8px;
-      align-items:baseline;
-      padding:7px 0;
-      border-bottom:1px solid rgba(200,150,12,.1);
-      font-size:11px;
-      line-height:1.5;
-      color:rgba(245,228,180,.8);
-    }
-    .hi-time{color:rgba(200,150,12,.55);font-size:9px;white-space:nowrap;flex-shrink:0;}
-    .hi-text{flex:1;}
-    .hist-item.hi-mutant .hi-text{color:#ff88ff;}
-    .hist-empty{text-align:center;padding:32px 16px;color:rgba(200,150,12,.35);font-size:11px;letter-spacing:.3em;}
-
-    #battle-screen{
-      position:fixed;
-      inset:0;
-      z-index:500;
-      display:none;
-      flex-direction:column;
-      background:#0e0600;
-      font-family:'DotGothic16',monospace;
-    }
-    #battle-screen.show{display:flex;}
-
-    #battle-log-bar{
-      height:26px;
-      display:flex;
-      align-items:center;
-      padding:0 10px;
-      border-bottom:1px solid #4a3000;
-      background:#0a0600;
-      color:#e8c060;
-      font-size:clamp(10px,2.8vw,13px);
-      letter-spacing:.06em;
-      white-space:nowrap;
-      overflow:hidden;
-    }
-
-    #battle-arena{
-      position:relative;
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:
-        radial-gradient(circle at center,rgba(255,220,140,.08),transparent 50%),
-        linear-gradient(180deg,#2a1400 0%,#120800 100%);
-      overflow:hidden;
-    }
-
-    .battle-unit{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:126px;
-      height:128px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      border:2px solid #7a5800;
-      border-radius:12px;
-      background:linear-gradient(180deg,#e8dcc0,#d4c090 40%,#c0a860);
-      color:#1a0800;
-      box-shadow:inset 0 1px 0 #fff8,inset 0 -1px 0 #0004;
-      transition:transform .25s ease,box-shadow .25s ease;
-      text-align:center;
-      padding:8px;
-    }
-    .battle-unit.player{left:8%;}
-    .battle-unit.enemy{right:8%;}
-    .battle-unit.hit{box-shadow:0 0 24px rgba(255,80,80,.7);transform:translateY(-50%) scale(1.04);}
-    .battle-icon{font-size:34px;}
-    .battle-name{font-size:14px;font-weight:700;}
-    .battle-hp{font-size:12px;margin-top:6px;}
-
-    #battle-vs{
-      font-size:32px;
-      color:#f0c040;
-      text-shadow:0 0 20px rgba(240,192,64,.5);
-    }
-
-    #battle-result-panel{
-      position:absolute;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background:#000b;
-      z-index:10;
-    }
-    #battle-result-panel.show{display:flex;}
-
-    #result-box{
-      background:linear-gradient(180deg,#f4e080,#c89020);
-      border:3px solid #7a5000;
-      border-radius:10px;
-      padding:18px 32px;
-      text-align:center;
-      color:#1a0800;
-      box-shadow:0 8px 40px #00000099;
-      max-width:90vw;
-    }
-    .bres-title{display:block;font-size:clamp(14px,5vw,20px);letter-spacing:.2em;margin-bottom:12px;}
-    .bres-detail{font-size:clamp(10px,3vw,13px);line-height:1.8;white-space:pre-line;margin-bottom:14px;}
-    .bres-btn{
-      font-family:'DotGothic16',monospace;
-      font-size:clamp(11px,3.2vw,14px);
-      background:linear-gradient(180deg,#e05010,#a02808);
-      color:#fff8e0;
-      border:2px solid #601000;
-      border-radius:6px;
-      padding:8px 24px;
-      cursor:pointer;
-    }
-
-    #toast{
-      position:fixed;
-      left:50%;
-      bottom:calc(var(--h-actionrow) + var(--h-partyrow) + var(--h-nationbar) + var(--h-bottom-pad) + 10px);
-      transform:translateX(-50%);
-      z-index:999;
-      max-width:90vw;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      padding:8px 18px;
-      border-radius:18px;
-      border:1px solid var(--gold-d);
-      background:rgba(14,8,2,.97);
-      color:var(--parchment);
-      font-size:11px;
-      letter-spacing:.1em;
-      opacity:0;
-      transition:opacity .3s;
-      pointer-events:none;
-    }
-    #toast.show{opacity:1;}
-    #toast.mutant-toast{
-      border-color:#ff44ff;
-      background:rgba(60,0,60,.97);
-      color:#ff88ff;
-    }
-  </style>
+/* ── トースト ── */
+#toast{
+  position:fixed;left:50%;
+  bottom:calc(var(--h-actionrow) + var(--h-partyrow) + var(--h-nationbar) + var(--h-bottom-pad) + 10px);
+  transform:translateX(-50%);z-index:999;
+  max-width:90vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:8px 18px;border-radius:18px;border:1px solid var(--gold-d);
+  background:rgba(14,8,2,.97);color:var(--parchment);font-size:11px;letter-spacing:.1em;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1;}
+#toast.mutant-toast{border-color:#ff44ff;background:rgba(60,0,60,.97);color:#ff88ff;}
+</style>
 </head>
 <body>
-  <div id="sky">
-    <div class="mist"></div>
-    <div class="mist"></div>
-    <div class="mist"></div>
-  </div>
 
-  <div id="main">
-    <header id="header">
-      <div id="game-title">
-        戦国血脈
-        <span class="sub">〜覇道の系譜〜</span>
-      </div>
+<div id="sky"></div>
+<div class="mist"></div><div class="mist"></div><div class="mist"></div>
 
-      <div id="status-panel">
-        <div class="stat-chip">
-          <span class="sl">石高</span>
-          <span class="sv" id="koku-val">0</span>
-          <span class="su">石</span>
-        </div>
-        <div class="stat-chip">
-          <span class="sl">統一</span>
-          <span class="sv" id="uni-val">0.0</span>
-          <span class="su">%</span>
-        </div>
-        <div class="stat-chip">
-          <span class="sl">暦</span>
-          <span class="sv" id="date-val">0年1月</span>
-        </div>
-        <div class="stat-chip season-chip winter" id="season-chip">
-          <span class="sl">季節</span>
-          <span class="sv" id="season-val">冬</span>
-        </div>
-      </div>
-    </header>
-
-    <section id="iso-field">
-      <canvas id="iso-canvas"></canvas>
-      <div id="bubble-layer"></div>
-    </section>
-
-    <div id="bottom-ui">
-      <div id="nation-bar">
-        <div class="nl">天下統一</div>
-        <div class="nt"><div class="nf" id="uni-bar" style="width:0%"></div></div>
-        <div class="np" id="uni-pct">0.0%</div>
-      </div>
-
-      <div id="party-row"></div>
-
-      <div id="action-row">
-        <button class="act-btn primary" onclick="openBattle()">
-          <div class="ico">⚔️</div>
-          <div class="lbl">合戦</div>
-        </button>
-        <button class="act-btn" onclick="openEngumi()">
-          <div class="ico">⚜️</div>
-          <div class="lbl">縁組</div>
-        </button>
-        <button class="act-btn" onclick="openPedigree()">
-          <div class="ico">🌳</div>
-          <div class="lbl">系譜</div>
-        </button>
-        <button class="act-btn" onclick="openHistory()">
-          <div class="ico">📜</div>
-          <div class="lbl">戦記</div>
-        </button>
-        <button class="act-btn" onclick="openModal('dev-modal')">
-          <div class="ico">⚙️</div>
-          <div class="lbl">設定</div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="battle-screen">
-    <div id="battle-log-bar">両軍、陣を整える…</div>
-    <div id="battle-arena">
-      <div class="battle-unit player" id="battle-player-card">
-        <div class="battle-icon">🛡️</div>
-        <div class="battle-name" id="battle-player-name">我が軍</div>
-        <div class="battle-hp" id="battle-player-power">戦力 0</div>
-      </div>
-
-      <div id="battle-vs">VS</div>
-
-      <div class="battle-unit enemy" id="battle-enemy-card">
-        <div class="battle-icon">⚔️</div>
-        <div class="battle-name" id="battle-enemy-name">敵軍</div>
-        <div class="battle-hp" id="battle-enemy-power">戦力 0</div>
-      </div>
-
+<!-- ── 合戦画面 ── -->
+<div id="battle-screen">
+  <div id="bscr-inner">
+    <div id="bscr-frame">
+      <canvas id="bg-canvas"></canvas>
+      <canvas id="battle-main-canvas"></canvas>
       <div id="battle-result-panel">
         <div id="result-box">
-          <span class="bres-title" id="bres-title-text">勝利！</span>
+          <span class="bres-title" id="bres-title-text"></span>
           <div class="bres-detail" id="bres-detail-text"></div>
           <button class="bres-btn" onclick="closeBattle()">帰城する</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <div id="pedigree-modal" class="modal">
-    <div class="modal-shell modal-tall">
-      <div class="modal-head">
-        <div class="modal-title">⚔ 武将系譜・血統図</div>
-        <button class="close-btn" onclick="closeModal('pedigree-modal')">閉じる</button>
-      </div>
-      <div class="modal-body" id="pedigree-content"></div>
-    </div>
-  </div>
-
-  <div id="warrior-modal" class="modal">
-    <div class="wm-shell">
-      <div class="wm-head">
-        <div class="wm-name" id="wm-name-text">武将名</div>
-        <div class="wm-role" id="wm-role-text">役職</div>
-      </div>
-      <div class="wm-body">
-        <div class="wm-stat"><span class="wsk">武力</span><span class="wsv" id="wm-power">0</span></div>
-        <div class="wm-stat"><span class="wsk">知力</span><span class="wsv" id="wm-wisdom">0</span></div>
-        <div class="wm-stat"><span class="wsk">体力</span><span class="wsv" id="wm-hp">0 / 0</span></div>
-        <div class="wm-hp-bar"><div class="wm-hp-fill" id="wm-hp-fill" style="width:0%"></div></div>
-        <div class="wm-stat"><span class="wsk">忠誠</span><span class="wsv" id="wm-loyalty">0</span></div>
-        <div class="wm-stat"><span class="wsk">状態</span><span class="wsv" id="wm-status">待機中</span></div>
-        <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location">巡回中</span></div>
-        <div class="wm-stat"><span class="wsk">年齢</span><span class="wsv" id="wm-age">0歳</span></div>
-        <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage">初代</span></div>
-        <div class="wm-stat"><span class="wsk">血統スキル</span><span class="wsv" id="wm-skill">—</span></div>
-        <div class="wm-stat"><span class="wsk">世代</span><span class="wsv" id="wm-generation">第1世代</span></div>
-        <button class="wm-close" onclick="closeModal('warrior-modal')">閉じる</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="engumi-modal" class="modal">
-    <div class="modal-shell modal-tall">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title">⚜️ 縁 組</div>
-          <div class="wm-role">血脈を紡ぎ、新たな将を育む</div>
+    <div id="battle-log-bar">戦闘開始！</div>
+    <div id="battle-ui-panel">
+      <div class="bunit-panel">
+        <div class="bunit-top">
+          <span class="bunit-name" id="bunit-pname">我が軍</span>
+          <div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-player">120</span></div>
         </div>
-        <button class="close-btn" onclick="closeModal('engumi-modal')">閉じる</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-step-indicator">
-          <div class="step-dot" id="step-dot-0"></div>
-          <div class="step-dot" id="step-dot-1"></div>
-          <div class="step-dot" id="step-dot-2"></div>
+        <div class="bpower-label">POWER</div>
+        <div class="bpower-wrap">
+          <div class="bpower-bar" id="bbar-player" style="width:100%"></div>
+          <div class="bpower-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         </div>
-        <div id="engumi-content"></div>
       </div>
-      <div class="modal-footer">
-        <button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn">取消</button>
-        <button class="modal-btn modal-btn-exec" id="engumi-next-btn">次へ →</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="success-overlay">
-    <div class="suc-kamon">👶</div>
-    <div class="suc-title">縁組成立</div>
-    <div class="suc-name" id="suc-name"></div>
-    <div class="suc-stats" id="suc-stats"></div>
-    <div class="suc-skill" id="suc-skill"></div>
-    <div class="suc-compat" id="suc-compat"></div>
-    <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
-  </div>
-
-  <div id="dev-modal" class="modal">
-    <div class="modal-shell">
-      <div class="modal-head">
-        <div class="modal-title">⚙ 開発者メニュー</div>
-        <button class="close-btn" onclick="closeModal('dev-modal')">閉じる</button>
-      </div>
-      <div class="dev-body">
-        <button class="dev-btn" onclick="devAddKoku()">石高 +5000</button>
-        <button class="dev-btn" onclick="devAddPower()">全武将 武力+10</button>
-        <button class="dev-btn" onclick="devFinishTraining()">育成 即完了</button>
-        <button class="dev-btn" onclick="devRestoreHp()">全武将 体力全回復</button>
-        <button class="dev-btn" onclick="devSetUnification()">統一度 +20%</button>
-        <button class="dev-btn" onclick="devAddWarrior()">新武将招募</button>
+      <div class="bunit-panel">
+        <div class="bunit-top">
+          <span class="bunit-name" id="bunit-ename">敵　軍</span>
+          <div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-enemy">120</span></div>
+        </div>
+        <div class="bpower-label">POWER</div>
+        <div class="bpower-wrap">
+          <div class="bpower-bar bpower-bar-enemy" id="bbar-enemy" style="width:100%"></div>
+          <div class="bpower-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div id="history-modal" class="modal">
-    <div class="modal-shell modal-mid">
-      <div class="modal-head">
-        <div class="modal-title">📜 戦記履歴</div>
-        <button class="close-btn" onclick="closeModal('history-modal')">閉じる</button>
-      </div>
-      <div class="modal-body" id="hist-list"></div>
+<!-- ── 系譜モーダル ── -->
+<div id="pedigree-modal" class="modal">
+  <div class="modal-shell modal-tall">
+    <div class="modal-deco-top"></div>
+    <div class="modal-head">
+      <div class="modal-title">⚔ 武将系譜・血統図</div>
+      <button class="close-btn" onclick="closeModal('pedigree-modal')">閉じる</button>
+    </div>
+    <div class="modal-body" id="pedigree-content"></div>
+  </div>
+</div>
+
+<!-- ── 武将詳細モーダル ── -->
+<div id="warrior-modal" class="modal" style="z-index:700;">
+  <div class="wm-shell">
+    <div class="wm-head">
+      <div class="wm-name" id="wm-name-text"></div>
+      <div class="wm-role" id="wm-role-text"></div>
+    </div>
+    <div class="wm-body">
+      <div class="wm-stat"><span class="wsk">武力</span><span class="wsv" id="wm-power"></span></div>
+      <div class="wm-stat"><span class="wsk">知力</span><span class="wsv" id="wm-wisdom"></span></div>
+      <div class="wm-stat"><span class="wsk">体力</span><span class="wsv" id="wm-hp"></span></div>
+      <div class="wm-hp-bar"><div class="wm-hp-fill" id="wm-hp-fill"></div></div>
+      <div class="wm-stat"><span class="wsk">忠誠</span><span class="wsv" id="wm-loyalty"></span></div>
+      <div class="wm-stat"><span class="wsk">状態</span><span class="wsv" id="wm-status"></span></div>
+      <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location"></span></div>
+      <div class="wm-stat"><span class="wsk">年齢</span><span class="wsv" id="wm-age"></span></div>
+      <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage"></span></div>
+      <div class="wm-stat"><span class="wsk">血統スキル</span><span class="wsv" id="wm-skill"></span></div>
+      <div class="wm-stat"><span class="wsk">世代</span><span class="wsv" id="wm-generation"></span></div>
+      <button class="wm-close" onclick="closeModal('warrior-modal')">閉じる</button>
     </div>
   </div>
+</div>
 
-  <div id="toast"></div>
+<!-- ── 縁組モーダル ── -->
+<div id="engumi-modal" class="modal">
+  <div class="modal-shell modal-tall">
+    <div class="modal-deco-top"></div>
+    <div class="modal-head" style="flex-direction:column;gap:4px;align-items:center;">
+      <div class="modal-kamon">⚜️</div>
+      <div class="modal-main-title">縁　組</div>
+      <div class="modal-subtitle">血脈を紡ぎ、新たな将を育む</div>
+    </div>
+    <div class="modal-body" id="engumi-body">
+      <div class="modal-step-indicator">
+        <div class="step-dot active" id="sdot0"></div>
+        <div class="step-dot" id="sdot1"></div>
+        <div class="step-dot" id="sdot2"></div>
+      </div>
+      <div id="engumi-step-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn">取消</button>
+      <button class="modal-btn modal-btn-exec" id="engumi-next-btn" onclick="engumiNext()">次へ →</button>
+    </div>
+  </div>
+</div>
 
-  <script>
-    'use strict';
+<!-- ── 成功オーバーレイ ── -->
+<div id="success-overlay">
+  <div class="suc-kamon" id="suc-kamon">👶</div>
+  <div class="suc-title">縁組成立</div>
+  <div class="suc-name" id="suc-name"></div>
+  <div class="suc-stats" id="suc-stats"></div>
+  <div class="suc-skill" id="suc-skill"></div>
+  <div class="suc-compat" id="suc-compat"></div>
+  <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
+</div>
 
-    const $ = id => document.getElementById(id);
+<!-- ── 開発者モーダル ── -->
+<div id="dev-modal" class="modal">
+  <div class="modal-shell">
+    <div class="modal-head">
+      <div class="modal-title">⚙ 開発者メニュー</div>
+      <button class="close-btn" onclick="closeModal('dev-modal')">閉じる</button>
+    </div>
+    <div class="dev-body">
+      <button class="dev-btn" onclick="devAddKoku()">石高 +5000</button>
+      <button class="dev-btn" onclick="devAddPower()">全武将 武力+20</button>
+      <button class="dev-btn" onclick="devAgeUp()">全武将 年齢+10</button>
+      <button class="dev-btn" onclick="devRestoreHp()">全武将 体力全回復</button>
+      <button class="dev-btn" onclick="devSetUnification()">統一度 +30%</button>
+      <button class="dev-btn" onclick="devAddWarrior()">新武将招募</button>
+    </div>
+  </div>
+</div>
 
-    const ENGUMI_COST = 600;
-    const CHILD_TRAINING_MONTHS = 4;
-    const MONTH_ADVANCE_EVERY_TURNS = 2;
+<!-- ── 戦記履歴モーダル ── -->
+<div id="history-modal" class="modal">
+  <div class="modal-shell modal-mid">
+    <div class="modal-head">
+      <div class="modal-title">📜 戦記履歴</div>
+      <button class="close-btn" onclick="closeModal('history-modal')">閉じる</button>
+    </div>
+    <div class="modal-body" id="hist-list"></div>
+  </div>
+</div>
 
-    const BLOOD_SKILLS = [
-      { id:'brave',    name:'猛将の血',   icon:'🔥', desc:'武力×1.3倍（攻撃型）', effect:u=>{ u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.3)); } },
-      { id:'wise',     name:'軍師の血',   icon:'📖', desc:'知力×1.3倍（施設効果+）', effect:u=>{ u.stats.wisdom = Math.min(99, Math.floor(u.stats.wisdom * 1.3)); } },
-      { id:'berserk',  name:'狂戦士の血', icon:'💀', desc:'武力×1.5倍・体力上限-30', effect:u=>{ u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.5)); u.stats.maxHp = Math.max(60, u.stats.maxHp - 30); u.stats.hp = Math.min(u.stats.hp, u.stats.maxHp); } },
-      { id:'iron',     name:'鉄壁の血',   icon:'🛡️', desc:'体力上限+40', effect:u=>{ u.stats.maxHp += 40; u.stats.hp = Math.min(u.stats.maxHp, u.stats.hp + 40); } },
-      { id:'loyal',    name:'義将の血',   icon:'⛩️', desc:'忠誠+25・施設効果+', effect:u=>{ u._loyalty = Math.min(100, u._loyalty + 25); } },
-      { id:'swift',    name:'迅雷の血',   icon:'⚡', desc:'武力+12・移動速度+', effect:u=>{ u.stats.power = Math.min(99, u.stats.power + 12); u.speed *= 1.35; } },
-      { id:'sage',     name:'天才の血',   icon:'✨', desc:'武力・知力+8', effect:u=>{ u.stats.power = Math.min(99, u.stats.power + 8); u.stats.wisdom = Math.min(99, u.stats.wisdom + 8); } }
-    ];
+<!-- ── トースト ── -->
+<div id="toast"></div>
 
-    const FACILITY_EFFECT = {
-      training:{ stat:'power',   label:'武力', color:'#ffcc44', range:[4,8],  costHp:-5 },
-      forge:   { stat:'power',   label:'武力', color:'#ffaa44', range:[3,7],  costHp:-4 },
-      academy: { stat:'wisdom',  label:'知力', color:'#aaddff', range:[4,8],  costHp:-3 },
-      tea:     { stat:'hp',      label:'体力', color:'#88ffcc', range:[10,15], costHp:6  },
-      garden:  { stat:'hp',      label:'体力', color:'#ff88cc', range:[14,20], costHp:10 },
-      loyalty: { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[5,10],  costHp:-2 }
-    };
+<!-- ── メイン ── -->
+<div id="main">
+  <header id="header">
+    <div id="game-title">
+      戦国血脈
+      <span class="sub">〜覇道の系譜〜</span>
+    </div>
+    <div id="status-panel">
+      <div class="stat-chip">
+        <span class="sl">石高</span>
+        <span class="sv" id="koku-val">0</span>
+        <span class="su">石</span>
+      </div>
+      <div class="stat-chip">
+        <span class="sl">統一</span>
+        <span class="sv" id="uni-val">0.0</span>
+        <span class="su">%</span>
+      </div>
+      <div class="stat-chip">
+        <span class="sl">暦</span>
+        <span class="sv" id="date-val">0年1月</span>
+      </div>
+      <div class="stat-chip season-chip winter" id="season-chip">
+        <span class="sl">季節</span>
+        <span class="sv" id="season-val">冬</span>
+      </div>
+    </div>
+  </header>
 
-    const FACILITY_MAP = {
-      training:{ name:'鍛錬場', color:'#cc8800', icon:'🏋️' },
-      forge:   { name:'鍛冶場', color:'#aa6600', icon:'⚒️'  },
-      academy: { name:'学問所', color:'#4488cc', icon:'📚'  },
-      tea:     { name:'茶室',   color:'#88cc88', icon:'🍵'  },
-      garden:  { name:'庭園',   color:'#cc88aa', icon:'🌸'  },
-      loyalty: { name:'忠義堂', color:'#ccaa44', icon:'🏮'  }
-    };
+  <section id="iso-field">
+    <canvas id="iso-canvas"></canvas>
+    <div id="bubble-layer"></div>
+  </section>
 
-    const FACILITY_POSITIONS = [
-      { key:'training', tx:0,  ty:1 },
-      { key:'forge',    tx:1,  ty:2 },
-      { key:'academy',  tx:-1, ty:2 },
-      { key:'tea',      tx:2,  ty:0 },
-      { key:'garden',   tx:-2, ty:0 },
-      { key:'loyalty',  tx:0,  ty:3 }
-    ];
+  <div id="bottom-ui">
+    <div id="nation-bar">
+      <div class="nl">天下統一</div>
+      <div class="nt"><div class="nf" id="uni-bar" style="width:0%"></div></div>
+      <div class="np" id="uni-pct">0.0%</div>
+    </div>
+    <div id="party-row"></div>
+    <div id="action-row">
+      <button class="act-btn primary" onclick="openBattle()">
+        <div class="ico">⚔️</div><div class="lbl">合戦</div>
+      </button>
+      <button class="act-btn" onclick="openEngumi()">
+        <div class="ico">⚜️</div><div class="lbl">縁組</div>
+      </button>
+      <button class="act-btn" onclick="openPedigree()">
+        <div class="ico">🌳</div><div class="lbl">系譜</div>
+      </button>
+      <button class="act-btn" onclick="openHistory()">
+        <div class="ico">📜</div><div class="lbl">戦記</div>
+      </button>
+      <button class="act-btn" onclick="openModal('dev-modal')">
+        <div class="ico">⚙️</div><div class="lbl">設定</div>
+      </button>
+    </div>
+  </div>
+</div>
 
-    const ROLES = {
-      0:'当主', 1:'家老', 2:'侍大将', 3:'足軽頭', 4:'兵糧奉行',
-      5:'忍頭', 6:'軍師', 7:'外交官', 8:'鉄砲頭', 9:'武者'
-    };
+<script>
+'use strict';
+// ============================================================
+//  定数
+// ============================================================
+const ENGUMI_COST = 600;
+const MATURE_AGE  = 20;
+const MONTH_ADVANCE_EVERY = 2; // ティック数/月
 
-    const ROLE_ICONS = {
-      0:'👑',1:'🪭',2:'⚔️',3:'🛡️',4:'🍚',5:'🥷',6:'📜',7:'🤝',8:'🔫',9:'🏹'
-    };
+const BLOOD_SKILLS = [
+  { id:'brave',   name:'猛将の血',   icon:'🔥', desc:'武力×1.3倍（攻撃に特化）',    effect: u => { u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.3)); } },
+  { id:'wise',    name:'軍師の血',   icon:'📖', desc:'知力×1.3倍（施設効果+）',      effect: u => { u.stats.wisdom = Math.min(99, Math.floor(u.stats.wisdom * 1.3)); } },
+  { id:'berserk', name:'狂戦士の血', icon:'💀', desc:'武力×1.5倍・体力-30',          effect: u => { u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.5)); u.stats.maxHp = Math.max(60, u.stats.maxHp - 30); u.stats.hp = Math.min(u.stats.hp, u.stats.maxHp); } },
+  { id:'iron',    name:'鉄壁の血',   icon:'🛡️', desc:'体力上限+40（耐久型）',        effect: u => { u.stats.maxHp += 40; u.stats.hp = Math.min(u.stats.maxHp, u.stats.hp + 40); } },
+  { id:'loyal',   name:'義将の血',   icon:'⛩️', desc:'忠誠+25・施設効果+',          effect: u => { u._loyalty = Math.min(100, u._loyalty + 25); } },
+  { id:'swift',   name:'迅雷の血',   icon:'⚡', desc:'武力+15・移動速度+',           effect: u => { u.stats.power = Math.min(99, u.stats.power + 15); u.speed *= 1.4; } },
+  { id:'sage',    name:'天才の血',   icon:'✨', desc:'武力・知力それぞれ+10',         effect: u => { u.stats.power = Math.min(99, u.stats.power + 10); u.stats.wisdom = Math.min(99, u.stats.wisdom + 10); } },
+];
 
-    const SURNAMES = ['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
-    const GIVEN_NAMES_M = ['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
-    const GIVEN_NAMES_F = ['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督'];
+function getSkillById(id){ return BLOOD_SKILLS.find(s=>s.id===id)||null; }
 
-    const state = {
-      koku: 1200,
-      unification: 0,
-      turn: 0,
-      year: 0,
-      month: 1,
-      season: 'winter',
-      log: [],
-      gameCleared: false
-    };
+const FACILITY_EFFECT = {
+  training:{ stat:'power',   label:'武力', color:'#ffcc44', range:[5,11], costHp:-6 },
+  forge:   { stat:'power',   label:'武力', color:'#ffaa44', range:[4,9],  costHp:-5 },
+  academy: { stat:'wisdom',  label:'知力', color:'#aaddff', range:[5,10], costHp:-4 },
+  tea:     { stat:'hp',      label:'体力', color:'#88ffcc', range:[12,18],costHp:8  },
+  garden:  { stat:'hp',      label:'体力', color:'#ff88cc', range:[18,25],costHp:15 },
+  loyalty: { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[7,14], costHp:-3 },
+};
+const FACILITY_MAP = {
+  training:{ name:'鍛錬場', color:'#cc8800', icon:'🏋️' },
+  forge:   { name:'鍛冶場', color:'#aa6600', icon:'⚒️'  },
+  academy: { name:'学問所', color:'#4488cc', icon:'📚'  },
+  tea:     { name:'茶室',   color:'#88cc88', icon:'🍵'  },
+  garden:  { name:'庭園',   color:'#cc88aa', icon:'🌸'  },
+  loyalty: { name:'忠義堂', color:'#ccaa44', icon:'🏮'  },
+};
+const FACILITY_POSITIONS = [
+  {key:'training', tx:0,  ty:1},
+  {key:'forge',    tx:1,  ty:2},
+  {key:'academy',  tx:-1, ty:2},
+  {key:'tea',      tx:2,  ty:0},
+  {key:'garden',   tx:-2, ty:0},
+  {key:'loyalty',  tx:0,  ty:3},
+];
+const ROLES = {
+  0:'当主',1:'家老',2:'侍大将',3:'足軽頭',4:'兵糧奉行',
+  5:'忍頭',6:'軍師',7:'外交官',8:'鉄砲頭',9:'武者',
+};
+const SURNAMES     = ['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
+const GIVEN_NAMES_M = ['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
+const GIVEN_NAMES_F = ['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督'];
 
-    let gWarriors = [];
-    let toastTimer = null;
-    let isoAnimFrame = null;
-    let battleTimeouts = [];
-    let engumiStep = 0;
-    let engumiSelectedFather = null;
-    let engumiSelectedMother = null;
-    let lastBornChild = null;
+// ============================================================
+//  ゲーム状態
+// ============================================================
+const state = {
+  koku:1200, unification:0, turn:0,
+  year:0, month:1, season:'winter',
+  log:[], pedigree:[], gameCleared:false,
+};
+let gWarriors = [];
+let idleTimer = null, ageTickCounter = 0, isoAnimFrame = null;
+let engumiStep = 0, engumiSelectedFather = null, engumiSelectedMother = null;
 
-    function rnd(lo, hi){ return Math.floor(lo + Math.random() * (hi - lo + 1)); }
-    function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
-    function getSkillById(id){ return BLOOD_SKILLS.find(s => s.id === id) || null; }
+// ============================================================
+//  ユーティリティ
+// ============================================================
+function rnd(lo,hi){ return Math.floor(lo+Math.random()*(hi-lo+1)); }
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
 
-    function seasonLabel(season){
-      return ({ spring:'春', summer:'夏', autumn:'秋', winter:'冬' })[season] || '春';
+let toastTimer=null;
+function showToast(msg,duration,isMutant){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.toggle('mutant-toast',!!isMutant);
+  t.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.classList.remove('show');toastTimer=null;},duration??2200);
+}
+function addLog(text,isMutant){
+  const now=new Date();
+  const ts=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  state.log.unshift({time:ts,text,mutant:!!isMutant});
+  if(state.log.length>120) state.log.pop();
+}
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function seasonLabel(s){ return {spring:'春',summer:'夏',autumn:'秋',winter:'冬'}[s]||'春'; }
+function getSeason(m){ if(m>=3&&m<=5)return 'spring'; if(m>=6&&m<=8)return 'summer'; if(m>=9&&m<=11)return 'autumn'; return 'winter'; }
+function compatLabel(score){
+  if(score>=45) return '❤️ 運命の縁（最大ボーナス）';
+  if(score>=30) return '💛 良縁（中ボーナス）';
+  if(score>=15) return '🤝 普通の縁（小ボーナス）';
+  return '💔 相性不良';
+}
+function randName(gender){
+  const sn=SURNAMES[Math.floor(Math.random()*SURNAMES.length)];
+  const gn=gender==='female'
+    ?GIVEN_NAMES_F[Math.floor(Math.random()*GIVEN_NAMES_F.length)]
+    :GIVEN_NAMES_M[Math.floor(Math.random()*GIVEN_NAMES_M.length)];
+  return sn+gn;
+}
+
+// ============================================================
+//  相性・子ステータス計算
+// ============================================================
+function calcCompatibility(a,b){
+  let s=0;
+  if(a._skillId&&b._skillId&&a._skillId===b._skillId) s+=20;
+  if(Math.abs(a.stats.power-b.stats.power)<10) s+=10;
+  if(Math.abs(a.stats.wisdom-b.stats.wisdom)>15) s+=8;
+  if(Math.abs(a.age-b.age)<8) s+=7;
+  s+=Math.floor((a._loyalty+b._loyalty)/20);
+  return clamp(s,0,60);
+}
+function createChildStats(father,mother){
+  const compat=calcCompatibility(father,mother);
+  const bonus=Math.floor(compat/6);
+  const power=clamp(Math.round(father.stats.power*0.65+mother.stats.power*0.45)+rnd(5,12)+bonus,10,98);
+  const wisdom=clamp(Math.round(father.stats.wisdom*0.45+mother.stats.wisdom*0.65)+rnd(8,14)+bonus,10,98);
+  const maxHp=clamp(Math.round((father.stats.maxHp+mother.stats.maxHp)/1.8)+rnd(10,20)+bonus,100,200);
+  return{power,wisdom,hp:maxHp,maxHp,compat,bonus};
+}
+function inheritSkill(father,mother,compat){
+  let skillId=null,isMutant=false;
+  const mutantChance=0.05+compat*0.002;
+  if(Math.random()<mutantChance){
+    skillId=BLOOD_SKILLS[Math.floor(Math.random()*BLOOD_SKILLS.length)].id;
+    isMutant=true;
+  } else {
+    if(father._skillId&&Math.random()<0.5) skillId=father._skillId;
+    if(mother._skillId&&Math.random()<0.5) skillId=mother._skillId;
+    if(!skillId&&Math.random()<0.05) skillId=BLOOD_SKILLS[Math.floor(Math.random()*BLOOD_SKILLS.length)].id;
+  }
+  return{skillId,isMutant};
+}
+function bloodlineFacilityMul(w){
+  let mul=1.0;
+  if(w._parents) mul+=(w._generation||1-1)*0.08;
+  if(w._skillId==='wise'||w._skillId==='loyal') mul*=1.2;
+  return mul;
+}
+
+// ============================================================
+//  IsoWarrior クラス
+// ============================================================
+class IsoWarrior{
+  constructor(name,jobId,power,offsetX,speed,gender,age){
+    this.name=name; this.jobId=jobId;
+    this.gender=gender||(Math.random()<0.75?'male':'female');
+    this.offsetX=offsetX||0;
+    this.speed=speed||(2+Math.random()*3);
+    this.age=(age!==undefined)?age:25;
+    this.stats={power:clamp(power||rnd(20,45),1,99),wisdom:rnd(15,45),hp:100,maxHp:100};
+    this._loyalty=rnd(60,95);
+    this._generation=1;
+    this._parents=null;
+    this._skillId=null;
+    this._isMutant=false;
+    this._compatibility=0;
+    this.isoX=(Math.random()-0.5)*4;
+    this.isoY=(Math.random()-0.5)*4;
+    this.dirX=Math.random()>0.5?1:-1;
+    this.dirY=Math.random()>0.5?1:-1;
+    this._currentFacility=null;
+    this._facilityTimer=0;
+    this._facilityStayMax=0;
+    this._moveTimer=rnd(60,180);
+    this._color=this._pickColor();
+  }
+  _pickColor(){
+    if(this._isMutant) return '#ff44ff';
+    const c=['#c8960c','#cc4444','#4488cc','#44cc88','#cc88cc','#ccaa44','#44aacc','#cc6644'];
+    return c[Math.floor(Math.random()*c.length)];
+  }
+  get loyalty(){return this._loyalty;}
+  isMature(){return this.age>=MATURE_AGE;}
+  statusLabel(){return this.isMature()?'実戦可':'育成中（'+this.age+'歳）';}
+  skillName(){
+    if(!this._skillId) return '—';
+    const sk=getSkillById(this._skillId);
+    return sk?sk.icon+' '+sk.name:'—';
+  }
+  locationLabel(){
+    if(!this._currentFacility) return '巡回中';
+    return FACILITY_MAP[this._currentFacility]?.name||'巡回中';
+  }
+  applyBloodSkill(){
+    if(!this._skillId) return;
+    const sk=getSkillById(this._skillId);
+    if(sk) sk.effect(this);
+  }
+  tick(){
+    if(this._currentFacility){
+      this._facilityTimer++;
+      if(this._facilityTimer>=this._facilityStayMax) this._leaveFacility();
+      else if(this._facilityTimer%90===45) this._applyEffect(this._currentFacility,false);
+    } else {
+      this._moveTimer--;
+      if(this._moveTimer<=0){ this._tryEnterFacility(); this._moveTimer=rnd(40,120); }
+      this._walk();
     }
-
-    function getSeason(month){
-      if (month >= 3 && month <= 5) return 'spring';
-      if (month >= 6 && month <= 8) return 'summer';
-      if (month >= 9 && month <= 11) return 'autumn';
-      return 'winter';
+  }
+  _walk(){
+    const spd=this.speed*0.012;
+    this.isoX+=this.dirX*spd; this.isoY+=this.dirY*spd;
+    const b=3.5;
+    if(this.isoX>b){this.isoX=b;this.dirX=-1;}
+    if(this.isoX<-b){this.isoX=-b;this.dirX=1;}
+    if(this.isoY>b){this.isoY=b;this.dirY=-1;}
+    if(this.isoY<-b){this.isoY=-b;this.dirY=1;}
+    if(Math.random()<0.005) this.dirX*=-1;
+    if(Math.random()<0.005) this.dirY*=-1;
+  }
+  _tryEnterFacility(){
+    const hpPct=this.stats.hp/this.stats.maxHp;
+    if(this._skillId==='wise'&&Math.random()<0.4){this._enterFacility('academy');return;}
+    if((this._skillId==='brave'||this._skillId==='berserk')&&Math.random()<0.4&&hpPct>0.5){this._enterFacility('training');return;}
+    const cands=hpPct<0.4?['tea','garden','tea']:Object.keys(FACILITY_MAP);
+    this._enterFacility(cands[Math.floor(Math.random()*cands.length)]);
+  }
+  _enterFacility(key){
+    const fp=FACILITY_POSITIONS.find(f=>f.key===key);
+    if(!fp) return;
+    this._currentFacility=key;
+    this.isoX=fp.tx+(Math.random()-0.5)*0.4;
+    this.isoY=fp.ty+(Math.random()-0.5)*0.4;
+    this._facilityTimer=0;
+    this._facilityStayMax=rnd(120,300);
+    this._applyEffect(key,true);
+  }
+  _leaveFacility(){
+    this._currentFacility=null;
+    this._facilityTimer=0;
+    this.dirX=Math.random()>0.5?1:-1;
+    this.dirY=Math.random()>0.5?1:-1;
+  }
+  _applyEffect(key,isEntry){
+    const eff=FACILITY_EFFECT[key];
+    if(!eff) return;
+    const[lo,hi]=eff.range;
+    const base=isEntry?Math.floor(lo+Math.random()*(hi-lo)):Math.floor(1+Math.random()*2);
+    const mul=bloodlineFacilityMul(this);
+    const gain=Math.max(1,Math.floor(base*mul));
+    let hpChange=0;
+    if(isEntry){
+      hpChange=eff.costHp>0
+        ?Math.floor(eff.costHp*(0.8+Math.random()*0.4))
+        :Math.floor(eff.costHp*(0.7+Math.random()*0.6));
     }
-
-    function compatLabel(score){
-      if (score >= 45) return '❤️ 運命の縁';
-      if (score >= 30) return '💛 良縁';
-      if (score >= 15) return '🤝 普通の縁';
-      return '💔 相性不良';
+    if(eff.stat==='power')   this.stats.power=clamp(this.stats.power+gain,1,99);
+    if(eff.stat==='wisdom')  this.stats.wisdom=clamp(this.stats.wisdom+gain,1,99);
+    if(eff.stat==='hp')      this.stats.hp=clamp(this.stats.hp+gain,1,this.stats.maxHp);
+    if(eff.stat==='loyalty') this._loyalty=clamp(this._loyalty+gain,0,100);
+    this.stats.hp=clamp(this.stats.hp+hpChange,1,this.stats.maxHp);
+    if(isEntry&&(gain>0||hpChange!==0)){
+      const text=eff.stat==='hp'?'体力 +'+gain:eff.label+' +'+gain+(hpChange!==0?' / HP'+(hpChange>0?'+':'')+hpChange:'');
+      createFloatText(this,text,eff.color);
+      updatePartyRow(); updateStatusUI();
     }
+  }
+}
 
-    function randName(gender){
-      const sn = SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
-      const gn = gender === 'female'
-        ? GIVEN_NAMES_F[Math.floor(Math.random() * GIVEN_NAMES_F.length)]
-        : GIVEN_NAMES_M[Math.floor(Math.random() * GIVEN_NAMES_M.length)];
-      return sn + gn;
+// ============================================================
+//  フロートテキスト
+// ============================================================
+function getWarriorScreenPos(w){
+  const canvas=document.getElementById('iso-canvas');
+  if(!canvas) return{x:0,y:0};
+  const rect=canvas.getBoundingClientRect();
+  const cx=canvas.width/2, cy=canvas.height*0.45;
+  const tileW=Math.min(canvas.width*0.22,canvas.height*0.28);
+  const tileH=tileW*0.5;
+  const sx=cx+(w.isoX-w.isoY)*tileW*0.5;
+  const sy=cy+(w.isoX+w.isoY)*tileH*0.5;
+  return{x:rect.left+sx,y:rect.top+sy};
+}
+function createFloatText(w,text,color){
+  const layer=document.getElementById('bubble-layer');
+  if(!layer) return;
+  const pos=getWarriorScreenPos(w);
+  const lr=layer.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='float-text'; el.textContent=text;
+  el.style.color=color||'#fff';
+  el.style.left=(pos.x-lr.left)+'px';
+  el.style.top=(pos.y-lr.top-20)+'px';
+  layer.appendChild(el);
+  setTimeout(()=>el.remove(),1900);
+}
+
+// ============================================================
+//  UI 更新
+// ============================================================
+function updateStatusUI(){
+  document.getElementById('koku-val').textContent=Math.floor(state.koku).toLocaleString();
+  document.getElementById('uni-val').textContent=state.unification.toFixed(1);
+  document.getElementById('uni-bar').style.width=Math.min(100,state.unification)+'%';
+  document.getElementById('uni-pct').textContent=state.unification.toFixed(1)+'%';
+  document.getElementById('date-val').textContent=state.year+'年'+state.month+'月';
+  document.getElementById('season-val').textContent=seasonLabel(state.season);
+  document.getElementById('season-chip').className='stat-chip season-chip '+state.season;
+  if(state.unification>=100&&!state.gameCleared){
+    state.gameCleared=true;
+    showToast('🎉 天下統一を達成せり！',5000);
+    addLog('天下統一を達成した');
+  }
+}
+function updatePartyRow(){
+  const row=document.getElementById('party-row');
+  if(!row) return;
+  row.innerHTML='';
+  gWarriors.forEach((w,i)=>{
+    const hpPct=Math.round((w.stats.hp/w.stats.maxHp)*100);
+    const hpColor=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';
+    const card=document.createElement('div');
+    card.className='party-card'+(i===0?' head':'')+(w.isMature()?'':' young')+(w._isMutant?' mutant':'');
+    card.innerHTML=
+      '<div class="pc-role">'+(ROLES[w.jobId]||'武者')+(w.isMature()?'':'（育成中）')+'</div>'+
+      '<div class="pc-name">'+w.name+'</div>'+
+      '<div class="pc-pow">武'+w.stats.power+' 知'+w.stats.wisdom+'</div>'+
+      '<div class="pc-hp" style="color:'+hpColor+'">体'+hpPct+'%</div>'+
+      '<div class="pc-loc">'+w.locationLabel()+'・'+w.age+'歳</div>'+
+      (w._skillId?'<div class="pc-skill">'+w.skillName()+'</div>':'');
+    card.onclick=()=>openWarriorModal(w);
+    row.appendChild(card);
+  });
+}
+
+// ============================================================
+//  武将モーダル
+// ============================================================
+function openWarriorModal(w){
+  const hpPct=(w.stats.hp/w.stats.maxHp)*100;
+  const hpColor=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';
+  document.getElementById('wm-name-text').textContent=w.name+(w._isMutant?' ✨':'');
+  document.getElementById('wm-role-text').textContent=ROLES[w.jobId]||'武将';
+  document.getElementById('wm-power').textContent=w.stats.power;
+  document.getElementById('wm-wisdom').textContent=w.stats.wisdom;
+  document.getElementById('wm-hp').textContent=w.stats.hp+' / '+w.stats.maxHp;
+  document.getElementById('wm-hp-fill').style.width=hpPct+'%';
+  document.getElementById('wm-hp-fill').style.background=hpColor;
+  document.getElementById('wm-loyalty').textContent=w._loyalty;
+  document.getElementById('wm-status').textContent=w.statusLabel();
+  document.getElementById('wm-location').textContent=w.locationLabel();
+  document.getElementById('wm-age').textContent=w.age+'歳';
+  document.getElementById('wm-lineage').textContent=w._parents?w._parents.father+' × '+w._parents.mother:'初代';
+  document.getElementById('wm-skill').textContent=w.skillName()+(w._isMutant?'（突然変異！）':'');
+  document.getElementById('wm-generation').textContent='第'+w._generation+'世代';
+  openModal('warrior-modal');
+}
+
+// ============================================================
+//  系譜モーダル
+// ============================================================
+function openPedigree(){
+  const content=document.getElementById('pedigree-content');
+  let html='<div class="gen-block"><div class="gen-label">◆ 血統スキル一覧</div><div class="blood-skill-list">';
+  BLOOD_SKILLS.forEach(sk=>{
+    html+='<div class="bsk-row"><div class="bsk-icon">'+sk.icon+'</div><div><div class="bsk-name">'+sk.name+'</div><div class="bsk-desc">'+sk.desc+'</div></div></div>';
+  });
+  html+='</div></div>';
+  html+='<div class="gen-block"><div class="gen-label">◆ 現役武将</div><div class="gen-list">';
+  gWarriors.forEach(w=>{
+    html+='<div class="gen-card'+(w._isMutant?' mutant-card':'')+'">'+
+      '<div class="gn">'+w.name+(w._isMutant?' ✨':'')+'　'+w.age+'歳</div>'+
+      '<div class="gp">武'+w.stats.power+'　知'+w.stats.wisdom+'　体'+w.stats.maxHp+'</div>'+
+      '<div>'+(w._parents?w._parents.father+' × '+w._parents.mother+'の子':'初代')+'</div>'+
+      '<div>第'+w._generation+'世代</div>'+
+      (w._skillId?'<div class="gskill">'+w.skillName()+'</div>':'')+
+      (w._compatibility?'<div class="gcomp">親相性: '+w._compatibility+'pt</div>':'')+
+      '</div>';
+  });
+  html+='</div></div>';
+  if(state.pedigree.length>0){
+    html+='<div class="gen-block"><div class="gen-label">◆ 縁組履歴</div><div class="gen-list">';
+    state.pedigree.slice().reverse().forEach(p=>{
+      html+='<div class="gen-card'+(p.isMutant?' mutant-card':'')+'">'+
+        '<div class="gn">'+p.childName+(p.isMutant?' ✨突然変異':'')+'</div>'+
+        '<div>'+p.father+' × '+p.mother+'</div>'+
+        '<div class="gp">武'+p.power+'　知'+p.wisdom+'</div>'+
+        (p.skillName?'<div class="gskill">'+p.skillName+'</div>':'')+
+        '<div class="gcomp">相性: '+p.compat+'pt</div>'+
+        '</div>';
+    });
+    html+='</div></div>';
+  }
+  content.innerHTML=html;
+  content.scrollTop=0;
+  openModal('pedigree-modal');
+}
+
+// ============================================================
+//  戦記履歴モーダル
+// ============================================================
+function openHistory(){
+  const list=document.getElementById('hist-list');
+  if(state.log.length===0){
+    list.innerHTML='<div class="hist-empty">まだ記録がありません</div>';
+  } else {
+    list.innerHTML=state.log.map(e=>
+      '<div class="hist-item'+(e.mutant?' hi-mutant':'')+'">'+
+        '<div class="hi-time">'+e.time+'</div>'+
+        '<div class="hi-text">'+(e.mutant?'🔥 ':'')+e.text+'</div>'+
+      '</div>'
+    ).join('');
+  }
+  list.scrollTop=0;
+  openModal('history-modal');
+}
+
+// ============================================================
+//  縁組モーダル
+// ============================================================
+function openEngumi(){
+  engumiStep=0; engumiSelectedFather=null; engumiSelectedMother=null;
+  renderEngumiStep();
+  openModal('engumi-modal');
+}
+function renderEngumiStep(){
+  for(let i=0;i<3;i++){
+    const dot=document.getElementById('sdot'+i);
+    if(dot) dot.classList.toggle('active',i===engumiStep);
+  }
+  const nextBtn=document.getElementById('engumi-next-btn');
+  const cancelBtn=document.getElementById('engumi-cancel-btn');
+  const content=document.getElementById('engumi-step-content');
+  if(engumiStep===0){
+    cancelBtn.textContent='取消'; cancelBtn.onclick=()=>closeModal('engumi-modal');
+  } else {
+    cancelBtn.textContent='← 戻る'; cancelBtn.onclick=()=>{engumiStep--;renderEngumiStep();};
+  }
+  if(engumiStep===0){
+    nextBtn.textContent='次へ →'; nextBtn.disabled=(engumiSelectedFather===null);
+    const males=gWarriors.filter(w=>w.isMature());
+    if(males.length===0){
+      content.innerHTML='<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">成人した武将がいません（'+MATURE_AGE+'歳以上）</div>';
+      nextBtn.disabled=true; return;
     }
-
-    function extractSurname(name){
-      const found = SURNAMES.find(sn => name.startsWith(sn));
-      return found || SURNAMES[Math.floor(Math.random() * SURNAMES.length)];
+    let html='<div class="engumi-cost"><div class="ec-label">縁組費用</div><span class="ec-val">'+ENGUMI_COST.toLocaleString()+'</span><span class="ec-unit"> 石</span></div>';
+    html+='<div class="modal-section-title">父となる武将を選べ（'+MATURE_AGE+'歳以上）</div><div class="warrior-select-grid">';
+    males.forEach(w=>{
+      const hpPct=Math.round((w.stats.hp/w.stats.maxHp)*100);
+      const hpColor=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';
+      const idx=gWarriors.indexOf(w);
+      html+='<div class="warrior-sel-card'+(engumiSelectedFather===idx?' selected':'')+(w._isMutant?' mutant-card':'')+'" onclick="selectFather('+idx+')">'+
+        '<div class="wsc-name">'+w.name+(w._isMutant?' ✨':'')+'　'+w.age+'歳</div>'+
+        '<div class="wsc-stats">武'+w.stats.power+'　知'+w.stats.wisdom+'</div>'+
+        '<div class="wsc-hp" style="color:'+hpColor+'">体'+hpPct+'%</div>'+
+        (w._skillId?'<div class="wsc-skill">'+w.skillName()+'</div>':'')+
+        '</div>';
+    });
+    html+='</div>'; content.innerHTML=html;
+  } else if(engumiStep===1){
+    nextBtn.textContent='次へ →'; nextBtn.disabled=(engumiSelectedMother===null);
+    const candidates=gWarriors.filter((_,i)=>i!==engumiSelectedFather&&gWarriors[i].isMature());
+    if(candidates.length===0){
+      content.innerHTML='<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">成人した母となる武将がいません</div>';
+      nextBtn.disabled=true; return;
     }
-
-    function randomGiven(gender){
-      return gender === 'female'
-        ? GIVEN_NAMES_F[Math.floor(Math.random() * GIVEN_NAMES_F.length)]
-        : GIVEN_NAMES_M[Math.floor(Math.random() * GIVEN_NAMES_M.length)];
+    let html='<div class="modal-section-title">母となる武将を選べ（'+MATURE_AGE+'歳以上）</div><div class="warrior-select-grid">';
+    candidates.forEach(w=>{
+      const hpPct=Math.round((w.stats.hp/w.stats.maxHp)*100);
+      const hpColor=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';
+      const idx=gWarriors.indexOf(w);
+      const comp=engumiSelectedFather!==null&&gWarriors[engumiSelectedFather]?calcCompatibility(gWarriors[engumiSelectedFather],w):0;
+      html+='<div class="warrior-sel-card'+(engumiSelectedMother===idx?' selected':'')+(w._isMutant?' mutant-card':'')+'" onclick="selectMother('+idx+')">'+
+        '<div class="wsc-name">'+w.name+(w._isMutant?' ✨':'')+'　'+w.age+'歳</div>'+
+        '<div class="wsc-stats">武'+w.stats.power+'　知'+w.stats.wisdom+'</div>'+
+        '<div class="wsc-hp" style="color:'+hpColor+'">体'+hpPct+'%</div>'+
+        (w._skillId?'<div class="wsc-skill">'+w.skillName()+'</div>':'')+
+        '<div style="font-size:9px;color:#88ffcc;margin-top:2px;">相性: '+comp+'pt</div>'+
+        '</div>';
+    });
+    html+='</div>';
+    if(engumiSelectedMother!==null&&gWarriors[engumiSelectedMother]){
+      const f=gWarriors[engumiSelectedFather],m=gWarriors[engumiSelectedMother];
+      const cs=createChildStats(f,m);
+      html+='<div style="margin-top:12px;"><div class="modal-section-title">子の予測値</div>'+
+        '<div class="child-preview"><div class="cp-title">誕生する子の予測ステータス</div>'+
+        '<div class="cp-stat"><span>武力</span><span class="cpv">〜'+cs.power+'</span></div>'+
+        '<div class="cp-stat"><span>知力</span><span class="cpv">〜'+cs.wisdom+'</span></div>'+
+        '<div class="cp-stat"><span>体力上限</span><span class="cpv">〜'+cs.maxHp+'</span></div>'+
+        '<div class="cp-compat">'+compatLabel(cs.compat)+'（+'+cs.bonus+'ボーナス）</div>'+
+        '</div></div>';
     }
+    content.innerHTML=html;
+  } else if(engumiStep===2){
+    nextBtn.textContent='成立させる'; nextBtn.disabled=false;
+    const f=gWarriors[engumiSelectedFather],m=gWarriors[engumiSelectedMother];
+    if(!f||!m){showToast('選択が無効です');engumiStep=0;renderEngumiStep();return;}
+    const cs=createChildStats(f,m);
+    const{skillId,isMutant}=inheritSkill(f,m,cs.compat);
+    const sk=skillId?getSkillById(skillId):null;
+    const mutantPct=(0.05+cs.compat*0.002*100).toFixed(0);
+    content.innerHTML=
+      '<div class="modal-section-title">縁組の確認</div>'+
+      '<div class="confirm-panel">'+
+        '<div class="confirm-pair">'+
+          '<div class="confirm-w"><div class="cw-name">'+f.name+'</div><div class="cw-role">父</div>'+(f._skillId?'<div style="font-size:9px;color:#ff88ff">'+f.skillName()+'</div>':'')+'</div>'+
+          '<div class="confirm-heart">❤</div>'+
+          '<div class="confirm-w"><div class="cw-name">'+m.name+'</div><div class="cw-role">母</div>'+(m._skillId?'<div style="font-size:9px;color:#ff88ff">'+m.skillName()+'</div>':'')+'</div>'+
+        '</div>'+
+        '<div class="child-preview">'+
+          '<div class="cp-title">誕生する子の予測値</div>'+
+          '<div class="cp-stat"><span>武力</span><span class="cpv">〜'+cs.power+'</span></div>'+
+          '<div class="cp-stat"><span>知力</span><span class="cpv">〜'+cs.wisdom+'</span></div>'+
+          '<div class="cp-stat"><span>体力</span><span class="cpv">〜'+cs.maxHp+'</span></div>'+
+          '<div class="cp-compat">'+compatLabel(cs.compat)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="margin-top:10px;padding:8px;background:rgba(255,100,255,.06);border:1px solid rgba(255,100,255,.2);border-radius:8px;font-size:10px;color:rgba(255,150,255,.8);text-align:center;letter-spacing:.15em;">突然変異確率: '+mutantPct+'%　血統スキル継承あり</div>'+
+      '<div style="margin-top:8px;font-size:11px;color:rgba(200,150,12,.6);text-align:center;">費用 '+ENGUMI_COST.toLocaleString()+' 石を消費します</div>';
+  }
+}
+function selectFather(idx){
+  engumiSelectedFather=idx;
+  if(engumiSelectedMother===idx) engumiSelectedMother=null;
+  renderEngumiStep();
+}
+function selectMother(idx){
+  if(idx===engumiSelectedFather){showToast('父と同じ武将は選べません');return;}
+  engumiSelectedMother=idx; renderEngumiStep();
+}
+function engumiNext(){
+  if(engumiStep===0){
+    if(engumiSelectedFather===null){showToast('父を選んでください');return;}
+    engumiStep=1; renderEngumiStep();
+  } else if(engumiStep===1){
+    if(engumiSelectedMother===null){showToast('母を選んでください');return;}
+    engumiStep=2; renderEngumiStep();
+  } else {
+    doEngumi();
+  }
+}
+function doEngumi(){
+  if(state.koku<ENGUMI_COST){showToast('石高が足りません（必要：'+ENGUMI_COST+'石）');return;}
+  const f=gWarriors[engumiSelectedFather],m=gWarriors[engumiSelectedMother];
+  if(!f||!m){showToast('選択が無効です');closeModal('engumi-modal');return;}
+  const cs=createChildStats(f,m);
+  const{skillId,isMutant}=inheritSkill(f,m,cs.compat);
+  const sk=skillId?getSkillById(skillId):null;
+  state.koku-=ENGUMI_COST;
+  const gender=Math.random()<0.5?'male':'female';
+  const childName=randName(gender);
+  const jobId=Math.floor(Math.random()*Object.keys(ROLES).length);
+  const child=new IsoWarrior(childName,jobId,cs.power,0,2.5+Math.random()*2,gender,0);
+  child.stats.wisdom=cs.wisdom; child.stats.hp=cs.hp; child.stats.maxHp=cs.maxHp;
+  child._generation=Math.max(f._generation,m._generation)+1;
+  child._parents={father:f.name,mother:m.name};
+  child._skillId=skillId; child._isMutant=isMutant; child._compatibility=cs.compat;
+  if(skillId) child.applyBloodSkill();
+  if(isMutant) child._color='#ff44ff';
+  gWarriors.push(child);
+  state.pedigree.push({childName,father:f.name,mother:m.name,power:child.stats.power,wisdom:child.stats.wisdom,generation:child._generation,skillId,skillName:child.skillName(),compat:cs.compat,isMutant});
+  addLog('縁組成立：'+f.name+' × '+m.name+' → '+childName+'（第'+child._generation+'世代・0歳）'+(skillId?'　血統:'+child.skillName():'')+(isMutant?'　★突然変異！':''),isMutant);
+  closeModal('engumi-modal');
+  // 成功オーバーレイ
+  document.getElementById('suc-kamon').textContent=isMutant?'🔥':'👶';
+  document.getElementById('suc-name').textContent=childName+(isMutant?' ✨':'');
+  document.getElementById('suc-stats').innerHTML='武力 '+child.stats.power+'　知力 '+child.stats.wisdom+'　体力 '+child.stats.maxHp+'<br>'+ROLES[jobId]+'　第'+child._generation+'世代　0歳<br>'+f.name+' × '+m.name+'の子<br>親相性: '+cs.compat+'pt（+'+cs.bonus+'ボーナス）';
+  document.getElementById('suc-skill').textContent=sk?(isMutant?'🔥 突然変異！ ':'血統継承: ')+sk.icon+' '+sk.name:'';
+  document.getElementById('suc-compat').textContent=compatLabel(cs.compat);
+  if(isMutant){showToast('🔥 突然変異血統発現！ '+sk.name,4000,true);document.getElementById('success-overlay').classList.add('mutant-flash');setTimeout(()=>document.getElementById('success-overlay').classList.remove('mutant-flash'),2000);}
+  openModal('success-overlay');
+  updateStatusUI(); updatePartyRow();
+}
+function closeSuccessOverlay(){ closeModal('success-overlay'); }
 
-    function showToast(msg, duration = 2200, mutant = false){
-      const t = $('toast');
-      t.textContent = msg;
-      t.classList.toggle('mutant-toast', !!mutant);
-      t.classList.add('show');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        t.classList.remove('show');
-        toastTimer = null;
-      }, duration);
-    }
+// ============================================================
+//  合戦システム（ピクセルアート戦闘）
+// ============================================================
+const BW=480,BH=300;
+const B_FIELD_Y_MIN=68,B_FIELD_Y_MAX=BH-18;
+const B_ATTACK_RANGE=20,B_GEN_ATK_RANGE=30,B_GEN_CHARGE_SPEED=1.8,B_LOG_HOLD=90;
+const PAL_P={armor:'#6040b0',skin:'#f0c890',helm:'#4830a0',eye:'#201040',acc:'#c8a020',shadow:'#2a1860'};
+const PAL_E={armor:'#c04080',skin:'#f0c890',helm:'#a02060',eye:'#200010',acc:'#c8a020',shadow:'#601030'};
+const LINES_P=['かかれーっ！','討ち取れ！','引くな！','者ども続け！','前へ！'];
+const LINES_E=['押せ押せ！','蹴散らせ！','逃がすな！','突き崩せ！','進め！'];
+const DUEL_LINES=['一騎討ち！','尋常に勝負！','逃げるな！','受けてみよ！'];
+function bpx(c,color,x,y,w,h){c.fillStyle=color;c.fillRect(x,y,w===undefined?1:w,h===undefined?1:h);}
+function bDrawBackground(bgCtx){
+  bgCtx.clearRect(0,0,BW,BH);
+  bgCtx.fillStyle='#c8bca8';bgCtx.fillRect(0,0,BW,52);
+  for(let row=0;row<3;row++) for(let col=0;col<18;col++){
+    const ox=(row%2)*15,x=col*30+ox-5,y=row*16+4;
+    bgCtx.fillStyle=(col+row)%2===0?'#c0b49a':'#b8ac94';bgCtx.fillRect(x+1,y+1,28,14);
+    bgCtx.fillStyle='#a89880';bgCtx.fillRect(x+1,y+1,28,1);
+    bgCtx.fillStyle='#d4c8b0';bgCtx.fillRect(x+1,y+13,28,1);
+  }
+  bgCtx.fillStyle='#b0a490';
+  for(let i=0;i<33;i++) if(i%2===0) bgCtx.fillRect(i*15,0,14,6);
+  [60,150,240,330].forEach(cx=>{
+    bgCtx.fillStyle='#2a6030';bgCtx.fillRect(cx,0,20,46);
+    bgCtx.fillStyle='#3a7840';bgCtx.fillRect(cx+4,0,4,46);bgCtx.fillRect(cx+13,0,3,46);
+    bgCtx.fillStyle='#4a9050';bgCtx.fillRect(cx+8,0,3,46);
+  });
+  [[18,24],[BW-18,24]].forEach(([tx,ty])=>{
+    bgCtx.fillStyle='#c8a828';bgCtx.fillRect(tx-3,ty,7,18);
+    bgCtx.fillStyle='#a08020';bgCtx.fillRect(tx-5,ty+14,11,5);
+    bgCtx.fillStyle='#ff6010';bgCtx.fillRect(tx-2,ty-10,4,11);
+    bgCtx.fillStyle='#ffa010';bgCtx.fillRect(tx-1,ty-12,2,8);
+    bgCtx.fillStyle='#ffee40';bgCtx.fillRect(tx,ty-14,1,5);
+  });
+  const mx=BW/2,my=26;
+  bgCtx.fillStyle='#c8a020';bgCtx.fillRect(mx-16,my-14,32,28);
+  bgCtx.fillStyle='#e8c040';bgCtx.fillRect(mx-12,my-10,24,24);
+  bgCtx.fillStyle='#7040a0';bgCtx.fillRect(mx-2,my-8,4,20);bgCtx.fillRect(mx-10,my-2,20,4);
+  bgCtx.fillStyle='#909898';bgCtx.fillRect(0,52,BW,8);
+  bgCtx.fillStyle='#a8b0b0';bgCtx.fillRect(0,52,BW,3);
+  bgCtx.fillStyle='#606868';bgCtx.fillRect(0,57,BW,3);
+  for(let row=0;row<8;row++) for(let col=0;col<14;col++){
+    const ox=(row%2)*26,x=col*36+ox-18,y=60+row*32;
+    bgCtx.fillStyle=(col+row)%2===0?'#6080b8':'#5878b0';bgCtx.fillRect(x+1,y+1,34,30);
+    bgCtx.fillStyle='#6888c0';
+    for(let lx=0;lx<3;lx++) for(let ly=0;ly<2;ly++)
+      if(((col*3+row*7+lx*5+ly*11)%5)<2) bgCtx.fillRect(x+4+lx*10,y+4+ly*11,5,5);
+    bgCtx.fillStyle='#4060a0';bgCtx.fillRect(x+1,y+1,34,1);
+    bgCtx.fillStyle='#7090c8';bgCtx.fillRect(x+1,y+29,34,1);
+  }
+}
+function bDrawSoldier(c,x,y,pal,dir,wf,st){
+  c.save();
+  if(dir<0){c.translate(x+8,y);c.scale(-1,1);c.translate(-8,0);}else c.translate(x,y);
+  const bob=(st==='walk'&&wf===1)?1:0;
+  bpx(c,pal.armor,2,8+bob,12,8);bpx(c,pal.shadow,2,14+bob,12,2);bpx(c,pal.acc,4,8+bob,8,1);
+  bpx(c,pal.skin,3,2+bob,10,8);
+  bpx(c,pal.helm,2,0+bob,12,4);bpx(c,pal.helm,1,1+bob,14,2);
+  bpx(c,pal.acc,6,-1+bob,4,2);
+  bpx(c,pal.eye,5,5+bob,2,2);bpx(c,pal.eye,9,5+bob,2,2);
+  if(wf===0){bpx(c,pal.armor,3,16+bob,4,4);bpx(c,pal.armor,9,14+bob,4,5);}
+  else{bpx(c,pal.armor,3,14+bob,4,5);bpx(c,pal.armor,9,16+bob,4,4);}
+  if(st==='attack'){bpx(c,pal.skin,14,9+bob,5,3);bpx(c,pal.acc,17,8+bob,3,5);bpx(c,pal.armor,0,10+bob,3,3);}
+  else{bpx(c,pal.armor,0,10+bob,3,4);bpx(c,pal.armor,13,10+bob,3,4);}
+  if(st==='hit'){c.fillStyle='#ffffff88';c.fillRect(0,0,16,20);}
+  c.restore();
+}
+function bDrawGeneral(c,x,y,pal,dir,wf,st,isMutant){
+  c.save();
+  if(dir<0){c.translate(x+12,y);c.scale(-1,1);c.translate(-12,0);}else c.translate(x,y);
+  const bob=wf===1?1:0;
+  if(isMutant){c.shadowColor='#ff00ff';c.shadowBlur=10;}
+  bpx(c,pal.armor,2,12+bob,20,12);bpx(c,pal.shadow,2,22+bob,20,2);bpx(c,pal.acc,4,12+bob,16,2);
+  bpx(c,pal.acc,0,14+bob,3,10);bpx(c,pal.acc,21,14+bob,3,10);
+  bpx(c,pal.skin,4,4+bob,16,10);
+  bpx(c,pal.helm,2,0+bob,20,6);bpx(c,pal.helm,1,1+bob,22,4);
+  bpx(c,pal.acc,9,-2+bob,6,3);bpx(c,pal.acc,8,-3+bob,8,2);
+  bpx(c,pal.eye,7,8+bob,3,2);bpx(c,pal.eye,14,8+bob,3,2);
+  bpx(c,pal.shadow,8,11+bob,8,1);
+  if(wf===0){bpx(c,pal.armor,4,24+bob,7,6);bpx(c,pal.armor,14,20+bob,7,9);}
+  else{bpx(c,pal.armor,4,20+bob,7,9);bpx(c,pal.armor,14,24+bob,7,6);}
+  if(st==='attack'){bpx(c,pal.skin,22,13+bob,5,5);bpx(c,pal.acc,24,8+bob,3,16);bpx(c,pal.shadow,0,13+bob,3,5);}
+  else{bpx(c,pal.armor,0,13+bob,3,10);bpx(c,pal.armor,21,13+bob,3,10);}
+  if(st==='hit'){c.fillStyle='#ffffff88';c.fillRect(0,0,24,30);}
+  c.restore();
+}
+function bDrawSpeechBubble(c,gx,gy,text,side,alpha){
+  if(!text||alpha<=0) return;
+  c.save();c.globalAlpha=Math.min(1,alpha);
+  const FONT='bold 9px DotGothic16,monospace';c.font=FONT;
+  const tw=c.measureText(text).width,pad=5;
+  const bw=tw+pad*2,bh=14,tailH=5;
+  let bx=gx+12-bw/2,by=gy-bh-tailH-6;
+  bx=Math.max(2,Math.min(BW-bw-2,bx));by=Math.max(62,by);
+  const r=3,tailX=Math.max(bx+8,Math.min(bx+bw-8,gx+12));
+  c.shadowColor='#0008';c.shadowBlur=3;c.shadowOffsetY=1;
+  c.fillStyle=side==='p'?'#f0ecff':'#fff0f4';
+  c.beginPath();
+  c.moveTo(bx+r,by);c.lineTo(bx+bw-r,by);c.quadraticCurveTo(bx+bw,by,bx+bw,by+r);
+  c.lineTo(bx+bw,by+bh-r);c.quadraticCurveTo(bx+bw,by+bh,bx+bw-r,by+bh);
+  c.lineTo(tailX+4,by+bh);c.lineTo(tailX,by+bh+tailH);c.lineTo(tailX-4,by+bh);
+  c.lineTo(bx+r,by+bh);c.quadraticCurveTo(bx,by+bh,bx,by+bh-r);
+  c.lineTo(bx,by+r);c.quadraticCurveTo(bx,by,bx+r,by);
+  c.closePath();c.fill();
+  c.shadowBlur=0;c.shadowOffsetY=0;
+  c.strokeStyle=side==='p'?'#4830a0':'#a02060';c.lineWidth=1.5;c.stroke();
+  c.fillStyle='#1a0800';c.font=FONT;c.fillText(text,bx+pad,by+bh-3);
+  c.restore();
+}
 
-    function addLog(text, mutant = false){
-      const now = new Date();
-      const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      state.log.unshift({ time:ts, text, mutant:!!mutant });
-      if (state.log.length > 120) state.log.pop();
-    }
-
-    function openModal(id){ $(id).classList.add('show'); }
-    function closeModal(id){ $(id).classList.remove('show'); }
-
-    function spawnStars(){
-      const sky = $('sky');
-      for (let i = 0; i < 55; i++) {
-        const s = document.createElement('div');
-        s.className = 'star';
-        const size = Math.random() * 2.2 + 0.8;
-        s.style.width = `${size}px`;
-        s.style.height = `${size}px`;
-        s.style.left = `${Math.random() * 100}vw`;
-        s.style.top = `${Math.random() * 100}vh`;
-        s.style.animationDuration = `${Math.random() * 4 + 2}s`;
-        s.style.animationDelay = `${Math.random() * -6}s`;
-        sky.appendChild(s);
-      }
-    }
-
-    function spawnPetals(){
-      const sky = $('sky');
-      for (let i = 0; i < 18; i++) {
-        const p = document.createElement('div');
-        p.className = 'petal';
-        const sz = rnd(8, 14);
-        p.style.width = `${sz}px`;
-        p.style.height = `${Math.round(sz * 0.85)}px`;
-        p.style.left = `${Math.random() * 100}vw`;
-        p.style.animationDuration = `${Math.random() * 10 + 12}s`;
-        p.style.animationDelay = `${Math.random() * -16}s`;
-        sky.appendChild(p);
-      }
-    }
-
-    function calcCompatibility(a, b){
-      let score = 0;
-      if (a._skillId && b._skillId && a._skillId === b._skillId) score += 18;
-      if (Math.abs(a.stats.power - b.stats.power) <= 15) score += 10;
-      if (Math.abs(a.stats.wisdom - b.stats.wisdom) <= 15) score += 10;
-      if (a.gender !== b.gender) score += 8;
-      if (a._isMutant || b._isMutant) score += 4;
-      if (a._generation === b._generation) score += 4;
-      return clamp(score, 0, 60);
-    }
-
-    function createChildStats(father, mother){
-      const compat = calcCompatibility(father, mother);
-      const bonus = Math.floor(compat / 8);
-      const power  = clamp(Math.round(father.stats.power * 0.58 + mother.stats.power * 0.38) + rnd(3,8) + bonus, 10, 96);
-      const wisdom = clamp(Math.round(father.stats.wisdom * 0.38 + mother.stats.wisdom * 0.58) + rnd(4,9) + bonus, 10, 96);
-      const maxHp  = clamp(Math.round((father.stats.maxHp + mother.stats.maxHp) / 2.1) + rnd(8,16) + bonus, 90, 210);
-      return { power, wisdom, hp:maxHp, maxHp, compat, bonus };
-    }
-
-    function inheritSkill(father, mother, compat){
-      let skillId = null;
-      let isMutant = false;
-
-      const mutantChance = 0.04 + compat * 0.0018;
-      if (Math.random() < mutantChance) {
-        isMutant = true;
-        skillId = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)].id;
-        return { skillId, isMutant };
-      }
-
-      const pool = [];
-      if (father._skillId) pool.push(father._skillId);
-      if (mother._skillId) pool.push(mother._skillId);
-
-      if (pool.length > 0) {
-        const inheritRate = 0.32 + compat * 0.008;
-        if (Math.random() < inheritRate) {
-          skillId = pool[Math.floor(Math.random() * pool.length)];
-        }
-      } else if (Math.random() < 0.08) {
-        skillId = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)].id;
-      }
-
-      return { skillId, isMutant };
-    }
-
-    function bloodlineFacilityMul(w){
-      let mul = 1.0;
-      if (w._parents) mul += ((w._generation || 1) - 1) * 0.06;
-      if (w._skillId === 'wise' || w._skillId === 'loyal') mul *= 1.18;
-      return mul;
-    }
-
-    class IsoWarrior{
-      constructor(name, jobId, power, wisdom, gender='male', trainingMonths=0, ageMonths=null){
-        this.name = name;
-        this.jobId = jobId;
-        this.gender = gender;
-
-        this.stats = {
-          power: clamp(power, 1, 99),
-          wisdom: clamp(wisdom, 1, 99),
-          maxHp: rnd(90, 130),
-          hp: 0
-        };
-        this.stats.hp = this.stats.maxHp;
-
-        this.speed = 0.016 + Math.random() * 0.01;
-        this.isoX = (Math.random() - .5) * 3.8;
-        this.isoY = 1.0 + Math.random() * 2.5;
-        this.dirX = Math.random() > .5 ? 1 : -1;
-        this.dirY = Math.random() > .5 ? 1 : -1;
-
-        this._loyalty = rnd(55, 88);
-        this._currentFacility = null;
-        this._facilityTimer = 0;
-        this._facilityStayMax = 0;
-        this._moveTimer = rnd(60, 180);
-
-        this._parents = null;
-        this._generation = 1;
-        this._skillId = null;
-        this._isMutant = false;
-        this._compatibility = 0;
-        this._trainingMonths = trainingMonths;
-        this._ageMonths = ageMonths ?? rnd(192, 360); // 16〜30歳
-        this._color = this.pickColor();
-      }
-
-      pickColor(){
-        if (this._isMutant) return '#ff44ff';
-        const cols = ['#c8960c','#cc4444','#4488cc','#44cc88','#cc88cc','#ccaa44','#44aacc','#cc6644'];
-        return cols[Math.floor(Math.random() * cols.length)];
-      }
-
-      get loyalty(){ return this._loyalty; }
-      get ageYears(){ return Math.floor(this._ageMonths / 12); }
-      ageLabel(){ return `${this.ageYears}歳`; }
-      isReady(){ return this._trainingMonths <= 0; }
-      canParent(){ return this.isReady(); }
-
-      statusLabel(){
-        return this.isReady() ? '実戦可' : `育成中 あと${this._trainingMonths}月`;
-      }
-
-      skillName(){
-        const sk = this._skillId ? getSkillById(this._skillId) : null;
-        return sk ? `${sk.icon} ${sk.name}` : '—';
-      }
-
-      locationLabel(){
-        if (!this._currentFacility) return '巡回中';
-        return FACILITY_MAP[this._currentFacility]?.name || '巡回中';
-      }
-
-      applyBloodSkill(){
-        if (!this._skillId) return;
-        const sk = getSkillById(this._skillId);
-        if (sk) sk.effect(this);
-        this._color = this.pickColor();
-      }
-
-      tick(){
-        if (this._currentFacility) {
-          this._facilityTimer++;
-          if (this._facilityTimer >= this._facilityStayMax) {
-            this.leaveFacility();
-          } else if (this._facilityTimer % 90 === 45) {
-            this.applyFacilityEffect(this._currentFacility, false);
-          }
-        } else {
-          this._moveTimer--;
-          if (this._moveTimer <= 0) {
-            if (Math.random() < (this.isReady() ? 0.72 : 0.35)) {
-              const f = FACILITY_POSITIONS[Math.floor(Math.random() * FACILITY_POSITIONS.length)].key;
-              this.enterFacility(f);
-            }
-            this._moveTimer = rnd(70, 180);
-          }
-
-          this.isoX += this.dirX * this.speed;
-          this.isoY += this.dirY * this.speed * .8;
-
-          const bx = 3.2, byMin = -0.2, byMax = 3.9;
-          if (this.isoX < -bx){ this.isoX = -bx; this.dirX = 1; }
-          if (this.isoX >  bx){ this.isoX =  bx; this.dirX = -1; }
-          if (this.isoY < byMin){ this.isoY = byMin; this.dirY = 1; }
-          if (this.isoY > byMax){ this.isoY = byMax; this.dirY = -1; }
-        }
-      }
-
-      enterFacility(key){
-        const fp = FACILITY_POSITIONS.find(v => v.key === key);
-        if (!fp) return;
-        this._currentFacility = key;
-        this.isoX = fp.tx + (Math.random() - .5) * 0.35;
-        this.isoY = fp.ty + (Math.random() - .5) * 0.35;
-        this._facilityTimer = 0;
-        this._facilityStayMax = rnd(120, 300);
-        this.applyFacilityEffect(key, true);
-      }
-
-      leaveFacility(){
-        this._currentFacility = null;
-        this._facilityTimer = 0;
-        this.dirX = Math.random() > .5 ? 1 : -1;
-        this.dirY = Math.random() > .5 ? 1 : -1;
-      }
-
-      applyFacilityEffect(key, isEntry){
-        const eff = FACILITY_EFFECT[key];
-        if (!eff) return;
-
-        const base = isEntry ? rnd(eff.range[0], eff.range[1]) : rnd(1, 2);
-        const trainingPenalty = this.isReady() ? 1 : 0.75;
-        const gain = Math.max(1, Math.floor(base * bloodlineFacilityMul(this) * trainingPenalty));
-
-        let hpChange = 0;
-        if (isEntry) {
-          hpChange = eff.costHp > 0
-            ? Math.floor(eff.costHp * (0.8 + Math.random() * 0.4))
-            : Math.floor(eff.costHp * (0.7 + Math.random() * 0.6));
-        }
-
-        if (eff.stat === 'power') this.stats.power = clamp(this.stats.power + gain, 1, 99);
-        if (eff.stat === 'wisdom') this.stats.wisdom = clamp(this.stats.wisdom + gain, 1, 99);
-        if (eff.stat === 'hp') this.stats.hp = clamp(this.stats.hp + gain, 1, this.stats.maxHp);
-        if (eff.stat === 'loyalty') this._loyalty = clamp(this._loyalty + gain, 0, 100);
-
-        this.stats.hp = clamp(this.stats.hp + hpChange, 1, this.stats.maxHp);
-
-        if (isEntry) {
-          let text = eff.stat === 'hp' ? `体力 +${gain}` : `${eff.label} +${gain}`;
-          if (hpChange !== 0) text += `（体力 ${hpChange > 0 ? '+' : ''}${hpChange}）`;
-          showFacilityActivity(this, text, eff.color);
-          updatePartyRow();
-          updateStatusUI();
-        }
-      }
-    }
-
-    function getWarriorScreenPos(w){
-      const canvas = $('iso-canvas');
-      const rect = canvas.getBoundingClientRect();
-      const tileW = Math.min(canvas.width * 0.18, canvas.height * 0.22);
-      const tileH = tileW * 0.5;
-      const cx = canvas.width / 2;
-      const cy = canvas.height * 0.28;
-      const x = cx + (w.isoX - w.isoY) * tileW * 0.5;
-      const y = cy + (w.isoX + w.isoY) * tileH * 0.5;
-      return {
-        x: rect.left + (x / canvas.width) * rect.width,
-        y: rect.top + (y / canvas.height) * rect.height
-      };
-    }
-
-    function showFacilityActivity(warrior, text, color){
-      const layer = $('bubble-layer');
-      const pos = getWarriorScreenPos(warrior);
-      const lr = layer.getBoundingClientRect();
-      const el = document.createElement('div');
-      el.className = 'facility-activity';
-      el.textContent = text;
-      el.style.color = color || '#ffdd88';
-      el.style.left = (pos.x - lr.left) + 'px';
-      el.style.top = (pos.y - lr.top - 40) + 'px';
-      layer.appendChild(el);
-      setTimeout(() => el.remove(), 2400);
-    }
-
-    function showFloatText(warrior, text, color){
-      const layer = $('bubble-layer');
-      const pos = getWarriorScreenPos(warrior);
-      const lr = layer.getBoundingClientRect();
-      const el = document.createElement('div');
-      el.className = 'float-text';
-      el.textContent = text;
-      el.style.color = color || '#fff';
-      el.style.left = (pos.x - lr.left) + 'px';
-      el.style.top = (pos.y - lr.top - 30) + 'px';
-      layer.appendChild(el);
-      setTimeout(() => el.remove(), 1800);
-    }
-
-    function updateStatusUI(){
-      $('koku-val').textContent = Math.floor(state.koku).toLocaleString();
-      $('uni-val').textContent = state.unification.toFixed(1);
-      $('uni-bar').style.width = `${Math.min(100, state.unification)}%`;
-      $('uni-pct').textContent = `${state.unification.toFixed(1)}%`;
-      $('date-val').textContent = `${state.year}年${state.month}月`;
-      $('season-val').textContent = seasonLabel(state.season);
-      $('season-chip').className = `stat-chip season-chip ${state.season}`;
-
-      if (state.unification >= 100 && !state.gameCleared) {
-        state.gameCleared = true;
-        showToast('🎉 天下統一を達成せり！', 5000);
-        addLog('天下統一を達成した');
-      }
-    }
-
-    function updatePartyRow(){
-      const row = $('party-row');
-      row.innerHTML = '';
-
-      gWarriors.forEach((w, i) => {
-        const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
-        const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
-
-        const card = document.createElement('div');
-        card.className = `party-card${i === 0 ? ' head' : ''}${!w.isReady() ? ' training' : ''}${w._isMutant ? ' mutant' : ''}`;
-        card.innerHTML = `
-          <div class="pc-role">${i === 0 ? '当主' : (ROLES[w.jobId] || '武者')}</div>
-          <div class="pc-name">${w.name}</div>
-          <div class="pc-pow">武 ${w.stats.power} / 知 ${w.stats.wisdom}</div>
-          <div class="pc-hp" style="color:${hpColor}">体力 ${w.stats.hp}/${w.stats.maxHp}</div>
-          <div class="pc-loc">${w.locationLabel()} ・ ${w.ageLabel()}</div>
-          <div class="pc-skill">${w.skillName()}</div>
-        `;
-        card.addEventListener('click', () => openWarrior(w));
-        row.appendChild(card);
-      });
-    }
-
-    function openWarrior(warrior){
-      $('wm-name-text').textContent = warrior.name;
-      $('wm-role-text').textContent = ROLES[warrior.jobId] || '武者';
-      $('wm-power').textContent = warrior.stats.power;
-      $('wm-wisdom').textContent = warrior.stats.wisdom;
-      $('wm-hp').textContent = `${warrior.stats.hp} / ${warrior.stats.maxHp}`;
-      $('wm-hp-fill').style.width = `${Math.round(warrior.stats.hp / warrior.stats.maxHp * 100)}%`;
-      $('wm-hp-fill').style.background = warrior.stats.hp / warrior.stats.maxHp > 0.6 ? '#88dd88' : warrior.stats.hp / warrior.stats.maxHp > 0.3 ? '#ffaa44' : '#ff6666';
-      $('wm-loyalty').textContent = warrior.loyalty;
-      $('wm-status').textContent = warrior.statusLabel();
-      $('wm-location').textContent = warrior.locationLabel();
-      $('wm-age').textContent = warrior.ageLabel();
-      $('wm-lineage').textContent = warrior._parents ? `${warrior._parents.father} × ${warrior._parents.mother}` : '初代';
-      $('wm-skill').textContent = warrior.skillName();
-      $('wm-generation').textContent = `第${warrior._generation}世代`;
-      openModal('warrior-modal');
-    }
-
-    function openHistory(){
-      const box = $('hist-list');
-      box.innerHTML = '';
-      if (state.log.length === 0) {
-        box.innerHTML = `<div class="hist-empty">記録なし</div>`;
+let bSoldiers,bGenerals,bParticles,bDamageNums;
+let bGameState,bTickCount,bLoopId;
+let bLogText='',bLogTimer=0;
+let bBubbles=[];
+let bGenMaxHp={p:120,e:120};
+function bSetLog(t){if(bLogTimer<=0){bLogText=t;bLogTimer=B_LOG_HOLD;}}
+function bForceLog(t,h){bLogText=t;bLogTimer=(h??B_LOG_HOLD);}
+function bTickLog(){if(bLogTimer>0)bLogTimer--;document.getElementById('battle-log-bar').textContent=bLogText;}
+function bAddBubble(side,text,life){
+  life=life??130;bBubbles=bBubbles.filter(b=>b.side!==side);
+  bBubbles.push({side,text,life,maxLife:life});
+}
+function bTickBubbles(){bBubbles=bBubbles.filter(b=>(b.life--,b.life>0));}
+function bAddPt(x,y,color,n){
+  n=n??6;
+  for(let i=0;i<n;i++) bParticles.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.9)*5,life:(18+Math.random()*14)|0,maxLife:32,color,size:(2+Math.random()*3)|0});
+}
+function bAddDmg(x,y,dmg,color){bDamageNums.push({x,y,vy:-2.2,life:44,text:String(dmg),color:color||'#ffee40'});}
+function bUpdateParticles(){
+  bParticles=bParticles.filter(p=>p.life>0);
+  bParticles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life--;});
+  bDamageNums=bDamageNums.filter(d=>d.life>0);
+  bDamageNums.forEach(d=>{d.y+=d.vy;d.vy*=.92;d.life--;});
+}
+function bUpdateBattleUI(){
+  const ph=Math.max(0,bGenerals.p.hp),eh=Math.max(0,bGenerals.e.hp);
+  document.getElementById('bhp-player').textContent=ph;
+  document.getElementById('bhp-enemy').textContent=eh;
+  document.getElementById('bbar-player').style.width=(ph/bGenMaxHp.p*100).toFixed(1)+'%';
+  document.getElementById('bbar-enemy').style.width=(eh/bGenMaxHp.e*100).toFixed(1)+'%';
+}
+function bNearest(list,x,y){return list.reduce((b,t)=>Math.hypot(t.x-x,t.y-y)<Math.hypot(b.x-x,b.y-y)?t:b);}
+function bFindTarget(s){const foes=bSoldiers.filter(t=>t.side!==s.side&&!t.dead);return foes.length?bNearest(foes,s.x,s.y):null;}
+function bUpdateSoldiers(){
+  bSoldiers.forEach(s=>{
+    if(s.dead) return;
+    if(s.stateTimer>0){s.stateTimer--;return;}
+    if(!s.target||s.target.dead) s.target=bFindTarget(s);
+    if(!s.target){
+      const gen=bGenerals[s.side==='p'?'e':'p'];
+      if(gen.dead) return;
+      const dx=(gen.x+12)-(s.x+8),dy=(gen.y+15)-(s.y+10),dist=Math.hypot(dx,dy)||1;
+      if(dist<B_ATTACK_RANGE+8){
+        s.state='attack';s.stateTimer=22;
+        const dmg=(2+Math.random()*3)|0;
+        gen.hp-=dmg;gen.state='hit';gen.stateTimer=14;
+        bAddPt(gen.x+12,gen.y+10,'#ffaaaa');bAddDmg(gen.x+6,gen.y-4,dmg,'#ff5050');
+        bSetLog((s.side==='p'?'我が軍':'敵軍')+'が大将に'+dmg+'撃！');
       } else {
-        state.log.forEach(item => {
-          const div = document.createElement('div');
-          div.className = `hist-item${item.mutant ? ' hi-mutant' : ''}`;
-          div.innerHTML = `<div class="hi-time">${item.time}</div><div class="hi-text">${item.text}</div>`;
-          box.appendChild(div);
-        });
+        s.state='walk';s.x+=dx/dist*1.3;s.y+=dy/dist*1.3;
+        s.y=Math.max(B_FIELD_Y_MIN,Math.min(B_FIELD_Y_MAX,s.y));
       }
-      openModal('history-modal');
+      return;
     }
+    const t=s.target,dx=t.x-s.x,dy=t.y-s.y,dist=Math.hypot(dx,dy)||1;
+    if(dist<B_ATTACK_RANGE){
+      s.state='attack';s.stateTimer=16;
+      const dmg=(3+Math.random()*4)|0;
+      t.hp-=dmg;t.state='hit';t.stateTimer=10;
+      bAddPt(t.x+8,t.y+8,'#ffddaa');bAddDmg(t.x+4,t.y-2,dmg);
+      if(t.hp<=0){t.dead=true;bAddPt(t.x+8,t.y+8,'#ffd040',10);bSetLog((s.side==='p'?'敵軍':'我が軍')+'の兵士が倒れた！');}
+    } else {
+      s.state='walk';const spd=1.0+Math.random()*.3;
+      s.x+=dx/dist*spd;s.y+=dy/dist*spd;
+      s.y=Math.max(B_FIELD_Y_MIN,Math.min(B_FIELD_Y_MAX,s.y));
+    }
+  });
+}
+function bUpdateGenerals(){
+  ['p','e'].forEach(side=>{
+    const g=bGenerals[side],foe=bGenerals[side==='p'?'e':'p'];
+    if(g.dead) return;
+    if(g.stateTimer>0){g.stateTimer--;return;}
+    g.state='charge';
+    const interval=side==='p'?0:80;
+    if(bTickCount%160===interval){
+      const arr=side==='p'?LINES_P:LINES_E;
+      bAddBubble(side,arr[Math.floor(Math.random()*arr.length)],130);
+    }
+    const foeTroops=bSoldiers.filter(s=>s.side!==side&&!s.dead);
+    if(foeTroops.length){
+      const tgt=bNearest(foeTroops,g.x+12,g.y+15);
+      const tx=tgt.x+8,ty=tgt.y+10,dist=Math.hypot(tx-(g.x+12),ty-(g.y+15))||1;
+      if(dist<B_GEN_ATK_RANGE){
+        g.state='attack';g.stateTimer=18;
+        const dmg=(8+Math.random()*8)|0;
+        tgt.hp-=dmg;tgt.state='hit';tgt.stateTimer=12;
+        bAddPt(tgt.x+8,tgt.y+8,'#fff060',8);bAddDmg(tgt.x,tgt.y-6,dmg,'#ffdd20');
+        if(tgt.hp<=0){tgt.dead=true;bSetLog('大将が敵兵を薙ぎ払った！');}
+      } else {
+        g.x+=((tx-(g.x+12))/dist)*B_GEN_CHARGE_SPEED;g.y+=((ty-(g.y+15))/dist)*B_GEN_CHARGE_SPEED;
+        g.y=Math.max(B_FIELD_Y_MIN-10,Math.min(B_FIELD_Y_MAX+10,g.y));
+      }
+    } else {
+      const tx=foe.x+12,ty=foe.y+15,dist=Math.hypot(tx-(g.x+12),ty-(g.y+15))||1;
+      if(dist<B_GEN_ATK_RANGE){
+        g.state='attack';g.stateTimer=26;
+        const dmg=(10+Math.random()*10)|0;
+        foe.hp-=dmg;foe.state='hit';foe.stateTimer=22;
+        bAddPt(foe.x+12,foe.y+15,'#ff8040',12);bAddDmg(foe.x+6,foe.y-8,dmg,'#ff4020');
+        bAddBubble(side,DUEL_LINES[Math.floor(Math.random()*DUEL_LINES.length)],110);
+        bForceLog('大将同士の一騎討ち！ '+dmg+'ダメージ！',(B_LOG_HOLD*2)|0);
+      } else {
+        g.x+=((tx-(g.x+12))/dist)*B_GEN_CHARGE_SPEED;g.y+=((ty-(g.y+15))/dist)*B_GEN_CHARGE_SPEED;
+        g.y=Math.max(B_FIELD_Y_MIN-10,Math.min(B_FIELD_Y_MAX+10,g.y));
+      }
+    }
+  });
+}
+function bGameLoop(bgCtx,ctx){
+  bTickCount++;
+  const animFrame=(bTickCount>>3)&1;
+  if(bGameState==='battle'){
+    bUpdateSoldiers();bUpdateGenerals();bUpdateParticles();bTickLog();bTickBubbles();
+    if(bGenerals.p.hp<=0||bGenerals.e.hp<=0){
+      bGameState='end';
+      const pWin=bGenerals.p.hp>0;
+      bAddBubble(pWin?'p':'e','勝ったぞ！',400);
+      bEndBattle(pWin); return;
+    }
+  }
+  ctx.clearRect(0,0,BW,BH);
+  const allUnits=[
+    ...bSoldiers.filter(s=>!s.dead).map(s=>({type:'soldier',side:s.side,x:s.x,y:s.y,state:s.state,wf:((bTickCount+s.walkOffset)>>3)&1})),
+    ...['p','e'].filter(sd=>!bGenerals[sd].dead).map(sd=>({type:'general',side:sd,x:bGenerals[sd].x,y:bGenerals[sd].y,state:bGenerals[sd].state,wf:animFrame,isMutant:bGenerals[sd].isMutant||false})),
+  ];
+  allUnits.sort((a,b)=>a.y-b.y);
+  allUnits.forEach(u=>{
+    const pal=u.side==='p'?PAL_P:PAL_E;
+    const dir=u.side==='p'?1:-1;
+    if(u.type==='soldier') bDrawSoldier(ctx,u.x|0,u.y|0,pal,dir,u.wf,u.state);
+    else bDrawGeneral(ctx,u.x|0,u.y|0,pal,dir,u.wf,u.state,u.isMutant);
+  });
+  bParticles.forEach(p=>{ctx.globalAlpha=p.life/p.maxLife;ctx.fillStyle=p.color;ctx.fillRect(p.x|0,p.y|0,p.size,p.size);});
+  ctx.globalAlpha=1;
+  bDamageNums.forEach(d=>{ctx.font='bold 11px DotGothic16,monospace';ctx.strokeStyle='#0009';ctx.lineWidth=3;ctx.strokeText(d.text,d.x,d.y);ctx.fillStyle=d.color;ctx.fillText(d.text,d.x,d.y);});
+  bBubbles.forEach(b=>{const g=bGenerals[b.side];if(!g||g.dead)return;bDrawSpeechBubble(ctx,g.x,g.y,b.text,b.side,Math.min(1,b.life/20));});
+  bUpdateBattleUI();
+  bLoopId=requestAnimationFrame(()=>bGameLoop(bgCtx,ctx));
+}
+function bEndBattle(isWin){
+  if(bLoopId){cancelAnimationFrame(bLoopId);bLoopId=null;}
+  const titleEl=document.getElementById('bres-title-text');
+  const detailEl=document.getElementById('bres-detail-text');
+  if(isWin){
+    const reward=rnd(1800,2400),uniGain=4+Math.random()*3;
+    state.koku+=reward;state.unification=Math.min(100,state.unification+uniGain);
+    gWarriors.forEach(w=>{
+      if(w.isMature()){
+        let powBonus=rnd(3,7);
+        if(w._skillId==='brave'||w._skillId==='berserk') powBonus+=3;
+        w.stats.power=clamp(w.stats.power+powBonus,1,99);
+        w.stats.hp=Math.min(w.stats.maxHp,w.stats.hp+rnd(8,15));
+      }
+    });
+    titleEl.textContent='勝利！';
+    detailEl.textContent='石高 +'+reward.toLocaleString()+'\n統一度 +'+uniGain.toFixed(1)+'%';
+    addLog('合戦勝利（報酬'+reward+'石）');
+  } else {
+    const loss=rnd(400,700);state.koku=Math.max(0,state.koku-loss);
+    gWarriors.forEach(w=>{w.stats.hp=Math.max(1,w.stats.hp-rnd(15,25));});
+    titleEl.textContent='敗北…';
+    detailEl.textContent='石高 -'+loss.toLocaleString()+'\n武将が負傷した';
+    addLog('合戦敗北（損失'+loss+'石）');
+  }
+  document.getElementById('battle-result-panel').classList.add('show');
+  updateStatusUI();updatePartyRow();
+}
+function openBattle(){
+  if(gWarriors.length===0){showToast('武将がいません');return;}
+  if(bLoopId){cancelAnimationFrame(bLoopId);bLoopId=null;}
+  document.getElementById('battle-screen').classList.add('show');
+  document.getElementById('battle-result-panel').classList.remove('show');
+  document.getElementById('battle-log-bar').textContent='両軍、突撃開始！';
+  const bgCv=document.getElementById('bg-canvas');
+  const mainCv=document.getElementById('battle-main-canvas');
+  const frame=document.getElementById('bscr-frame');
+  function resizeBattle(){
+    const rw=frame.clientWidth,rh=frame.clientHeight;
+    [bgCv,mainCv].forEach(cv=>{cv.width=BW;cv.height=BH;cv.style.width=rw+'px';cv.style.height=rh+'px';});
+  }
+  resizeBattle();
+  const bgCtx=bgCv.getContext('2d');
+  const ctx=mainCv.getContext('2d');
+  [bgCtx,ctx].forEach(c=>c.imageSmoothingEnabled=false);
+  bDrawBackground(bgCtx);
+  bGameState='battle';bTickCount=0;bLogText='両軍、突撃開始！';bLogTimer=B_LOG_HOLD*2;
+  bParticles=[];bDamageNums=[];bBubbles=[];
+  const matures=gWarriors.filter(w=>w.isMature());
+  const active=matures.length>0?matures:gWarriors;
+  const leader=active[0];
+  document.getElementById('bunit-pname').textContent=leader?leader.name.slice(-3):'我が軍';
+  let totalPower=active.reduce((s,w)=>{
+    let p=w.stats.power+w.stats.wisdom;
+    if(w._skillId==='brave'||w._skillId==='swift') p*=1.15;
+    if(w._skillId==='berserk') p*=1.3;
+    if(w._skillId==='sage') p*=1.1;
+    return s+p;
+  },0);
+  const playerPower=clamp(Math.floor(totalPower/active.length),60,180);
+  const enemyPower=clamp(120+Math.floor(state.unification*0.4),60,200)|0;
+  bGenMaxHp={p:playerPower,e:enemyPower};
+  bSoldiers=[];
+  const soldierCount=Math.min(8,4+gWarriors.length);
+  for(let i=0;i<soldierCount;i++){
+    const col=i%2,row=Math.floor(i/2);
+    bSoldiers.push({side:'p',x:18+col*26,y:B_FIELD_Y_MIN+14+row*42,state:'walk',stateTimer:0,hp:20,maxHp:20,target:null,dead:false,walkOffset:(i*7)%12});
+  }
+  const enemyCount=Math.min(3+Math.floor(state.unification/20),8);
+  for(let i=0;i<enemyCount;i++){
+    const col=i%2,row=Math.floor(i/2);
+    bSoldiers.push({side:'e',x:BW-22-col*26,y:B_FIELD_Y_MIN+14+row*42,state:'walk',stateTimer:0,hp:20,maxHp:20,target:null,dead:false,walkOffset:(i*11)%12});
+  }
+  bGenerals={
+    p:{x:30,y:BH/2-15,hp:playerPower,maxHp:playerPower,state:'charge',stateTimer:0,dead:false,isMutant:leader&&leader._isMutant},
+    e:{x:BW-54,y:BH/2-15,hp:enemyPower,maxHp:enemyPower,state:'charge',stateTimer:0,dead:false,isMutant:false},
+  };
+  document.getElementById('bhp-player').textContent=playerPower;
+  document.getElementById('bhp-enemy').textContent=enemyPower;
+  document.getElementById('bbar-player').style.width='100%';
+  document.getElementById('bbar-enemy').style.width='100%';
+  bAddBubble('p',LINES_P[0],150);bAddBubble('e',LINES_E[0],150);
+  bAddPt(bGenerals.p.x+12,bGenerals.p.y+15,'#ffe060',10);
+  bAddPt(bGenerals.e.x+12,bGenerals.e.y+15,'#ffe060',10);
+  bLoopId=requestAnimationFrame(()=>bGameLoop(bgCtx,ctx));
+}
+function closeBattle(){
+  if(bLoopId){cancelAnimationFrame(bLoopId);bLoopId=null;}
+  document.getElementById('battle-screen').classList.remove('show');
+}
 
-    function openPedigree(){
-      const content = $('pedigree-content');
+// ============================================================
+//  アイドルティック（ゲーム進行）
+// ============================================================
+function performIdleTick(){
+  state.turn++;
+  ageTickCounter++;
+  // 月・季節進行
+  if(state.turn%MONTH_ADVANCE_EVERY===0){
+    state.month++;
+    if(state.month>12){state.month=1;state.year++;}
+    state.season=getSeason(state.month);
+  }
+  gWarriors.forEach(w=>{
+    let powGain=Math.random()<0.4?1:0;
+    let wisGain=Math.random()<0.25?1:0;
+    if(w._skillId==='brave'&&Math.random()<0.2) powGain++;
+    if(w._skillId==='wise'&&Math.random()<0.2) wisGain++;
+    if(w._skillId==='sage'&&Math.random()<0.15){powGain++;wisGain++;}
+    w.stats.power=clamp(w.stats.power+powGain,1,99);
+    w.stats.wisdom=clamp(w.stats.wisdom+wisGain,1,99);
+    const hpPct=w.stats.hp/w.stats.maxHp;
+    if(hpPct<0.9){
+      let rec=Math.floor((1-hpPct)*4+1);
+      if(w._skillId==='iron') rec=Math.floor(rec*1.5);
+      w.stats.hp=Math.min(w.stats.maxHp,w.stats.hp+rec);
+    }
+  });
+  if(ageTickCounter%5===0){
+    gWarriors.forEach(w=>{
+      if(w.age<70){
+        w.age++;
+        if(w.age===MATURE_AGE){
+          showToast(w.name+' が成人しました！（縁組・合戦参加可能）',3000);
+          addLog(w.name+' が'+MATURE_AGE+'歳になり成人');
+        }
+      }
+    });
+  }
+  state.koku+=rnd(70,120);
+  state.unification=Math.min(100,state.unification+0.08);
+  updateStatusUI();
+  updatePartyRow();
+}
 
-      const skillHtml = BLOOD_SKILLS.map(sk => `
-        <div class="bsk-row">
-          <div class="bsk-icon">${sk.icon}</div>
-          <div>
-            <div class="bsk-name">${sk.name}</div>
-            <div class="bsk-desc">${sk.desc}</div>
-          </div>
-        </div>
-      `).join('');
+// ============================================================
+//  ISOキャンバス描画
+// ============================================================
+function initIsoCanvas(){
+  const canvas=document.getElementById('iso-canvas');
+  const field=document.getElementById('iso-field');
+  if(!canvas||!field) return;
+  function resize(){
+    canvas.width=field.clientWidth||window.innerWidth;
+    canvas.height=Math.max(field.clientHeight||200,200);
+  }
+  resize();
+  window.addEventListener('resize',resize);
+  const ctx=canvas.getContext('2d');
+  function isoToScreen(ix,iy){
+    const cx=canvas.width/2,cy=canvas.height*0.45;
+    const tileW=Math.min(canvas.width*0.22,canvas.height*0.28);
+    const tileH=tileW*0.5;
+    return{x:cx+(ix-iy)*tileW*0.5,y:cy+(ix+iy)*tileH*0.5};
+  }
+  function drawTile(ix,iy,topC,leftC,rightC){
+    const tileW=Math.min(canvas.width*0.22,canvas.height*0.28);
+    const tileH=tileW*0.5,th=tileW*0.3;
+    const{x,y}=isoToScreen(ix,iy);
+    ctx.fillStyle=topC;
+    ctx.beginPath();
+    ctx.moveTo(x,y-tileH/2);ctx.lineTo(x+tileW/2,y);ctx.lineTo(x,y+tileH/2);ctx.lineTo(x-tileW/2,y);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle=leftC;
+    ctx.beginPath();
+    ctx.moveTo(x-tileW/2,y);ctx.lineTo(x,y+tileH/2);ctx.lineTo(x,y+tileH/2+th);ctx.lineTo(x-tileW/2,y+th);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle=rightC;
+    ctx.beginPath();
+    ctx.moveTo(x,y+tileH/2);ctx.lineTo(x+tileW/2,y);ctx.lineTo(x+tileW/2,y+th);ctx.lineTo(x,y+tileH/2+th);
+    ctx.closePath();ctx.fill();
+  }
+  function drawFacility(fp){
+    const fm=FACILITY_MAP[fp.key];
+    if(!fm) return;
+    const{x,y}=isoToScreen(fp.tx,fp.ty);
+    if(x<-20||x>canvas.width+20||y<-20||y>canvas.height+20) return;
+    const tileW=Math.min(canvas.width*0.22,canvas.height*0.28);
+    const iconSz=Math.max(14,Math.round(tileW*0.55));
+    ctx.save();
+    ctx.font=iconSz+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(fm.icon,x,y-8);
+    ctx.font=Math.max(7,Math.round(tileW*0.22))+'px Noto Serif JP';
+    ctx.fillStyle=fm.color;ctx.fillText(fm.name,x,y+8);
+    ctx.restore();
+  }
+  function drawWarrior(w){
+    const{x,y}=isoToScreen(w.isoX,w.isoY);
+    const hpPct=w.stats.hp/w.stats.maxHp;
+    const r=Math.max(7,Math.round(canvas.width*0.028));
+    const bw=r*2.6;
+    ctx.save();
+    if(w._isMutant){ctx.shadowColor='#ff44ff';ctx.shadowBlur=8;}
+    ctx.fillStyle='rgba(0,0,0,.3)';
+    ctx.beginPath();ctx.ellipse(x,y+r*0.3,r*1.1,r*0.4,0,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=w._isMutant?8:0;
+    ctx.fillStyle=w._color;
+    ctx.beginPath();ctx.arc(x,y-r*0.7,r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=w._isMutant?'#ff88ff':'rgba(255,255,255,.4)';
+    ctx.lineWidth=w._isMutant?2:1;ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(x-bw/2,y+r*0.5,bw,3);
+    ctx.fillStyle=hpPct>0.6?'#44ff88':hpPct>0.3?'#ffaa44':'#ff4444';
+    ctx.fillRect(x-bw/2,y+r*0.5,bw*hpPct,3);
+    ctx.fillStyle='rgba(245,232,200,.9)';
+    ctx.font=Math.max(7,r-1)+'px Noto Serif JP';
+    ctx.textAlign='center';ctx.fillText(w.name.slice(-1),x,y-r*0.35);
+    if(!w.isMature()){
+      ctx.fillStyle='#ffdd88';ctx.font='6px sans-serif';ctx.fillText(w.age+'歳',x,y+r*1.0);
+    }
+    if(w._skillId&&w.isMature()){
+      const sk=getSkillById(w._skillId);
+      if(sk){ctx.font=Math.max(7,r)+'px serif';ctx.fillText(sk.icon,x+r*1.1,y-r*1.2);}
+    }
+    ctx.restore();
+  }
+  let lastTime=0;
+  function loop(ts){
+    const dt=ts-lastTime;
+    if(dt>50){
+      lastTime=ts;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(let iy=-2;iy<=3;iy++) for(let ix=-2;ix<=2;ix++){
+        const isPath=(ix===0||iy===0);
+        drawTile(ix,iy,
+          isPath?'rgba(120,90,40,.5)':'rgba(60,40,15,.6)',
+          isPath?'rgba(80,55,20,.6)':'rgba(35,20,5,.7)',
+          isPath?'rgba(100,70,30,.5)':'rgba(45,28,8,.6)'
+        );
+      }
+      FACILITY_POSITIONS.forEach(fp=>drawFacility(fp));
+      gWarriors.forEach(w=>w.tick());
+      const sorted=[...gWarriors].sort((a,b)=>(a.isoX+a.isoY)-(b.isoX+b.isoY));
+      sorted.forEach(w=>drawWarrior(w));
+    }
+    isoAnimFrame=requestAnimationFrame(loop);
+  }
+  isoAnimFrame=requestAnimationFrame(loop);
+}
 
-      const gens = [...new Set(gWarriors.map(w => w._generation))].sort((a,b)=>a-b);
-      let genHtml = '';
-      gens.forEach(gen => {
-        const list = gWarriors.filter(w => w._generation === gen);
-        genHtml += `
-          <div class="gen-block">
-            <div class="gen-label">第 ${gen} 世 代</div>
-            <div class="gen-list">
-              ${list.map(w => `
-                <div class="gen-card ${w._is
+// ============================================================
+//  開発者コマンド
+// ============================================================
+function devAddKoku(){state.koku+=5000;updateStatusUI();showToast('石高 +5000');closeModal('dev-modal');}
+function devAddPower(){gWarriors.forEach(w=>{w.stats.power=clamp(w.stats.power+20,1,99);});updatePartyRow();showToast('全武将 武力+20');closeModal('dev-modal');}
+function devRestoreHp(){gWarriors.forEach(w=>{w.stats.hp=w.stats.maxHp;});updatePartyRow();showToast('全武将 体力全回復');closeModal('dev-modal');}
+function devSetUnification(){state.unification=Math.min(99.9,state.unification+30);updateStatusUI();showToast('統一度 +30%');closeModal('dev-modal');}
+function devAgeUp(){gWarriors.forEach(w=>{w.age=Math.min(70,w.age+10);});updatePartyRow();showToast('全武将 年齢+10');closeModal('dev-modal');}
+function devAddWarrior(){
+  const gender=Math.random()<0.5?'male':'female';
+  const name=randName(gender);
+  const jobId=Math.floor(Math.random()*Object.keys(ROLES).length);
+  const age=rnd(20,35);
+  const w=new IsoWarrior(name,jobId,rnd(35,65),0,2+Math.random()*3,gender,age);
+  if(Math.random()<0.4){
+    const sk=BLOOD_SKILLS[Math.floor(Math.random()*BLOOD_SKILLS.length)];
+    w._skillId=sk.id;w.applyBloodSkill();
+  }
+  gWarriors.push(w);updatePartyRow();
+  showToast(name+' が加入！（'+age+'歳）'+(w._skillId?'　'+w.skillName():''));
+  closeModal('dev-modal');
+}
+
+// ============================================================
+//  星・花びら生成
+// ============================================================
+function spawnStars(){
+  const sky=document.getElementById('sky');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.cssText='left:'+(Math.random()*100)+'%;top:'+(Math.random()*70)+'%;'+
+      'width:'+(1+Math.random()*2.2)+'px;height:'+(1+Math.random()*2.2)+'px;'+
+      'animation-duration:'+(2+Math.random()*4)+'s;animation-delay:'+(-Math.random()*6)+'s;';
+    sky.appendChild(s);
+  }
+}
+function spawnPetals(){
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');p.className='petal';
+    const sz=8+Math.random()*6;
+    p.style.cssText='left:'+(Math.random()*100)+'%;width:'+sz+'px;height:'+(sz*0.85)+'px;'+
+      'animation-duration:'+(12+Math.random()*10)+'s;animation-delay:'+(-Math.random()*16)+'s;';
+    document.body.appendChild(p);
+  }
+}
+
+// ============================================================
+//  初期化
+// ============================================================
+function initGame(){
+  spawnStars();spawnPetals();
+  const initialWarriors=[
+    {name:'織田信長',jobId:0,power:72,gender:'male',  age:28,skillId:'brave' },
+    {name:'豊臣秀吉',jobId:1,power:58,gender:'male',  age:32,skillId:'wise'  },
+    {name:'徳川家康',jobId:2,power:65,gender:'male',  age:35,skillId:'iron'  },
+    {name:'帰蝶',    jobId:7,power:45,gender:'female',age:26,skillId:'loyal' },
+  ];
+  initialWarriors.forEach((cfg,i)=>{
+    const w=new IsoWarrior(cfg.name,cfg.jobId,cfg.power,(i-1.5)*0.8,2.5+Math.random()*2,cfg.gender,cfg.age);
+    w.stats.wisdom=cfg.gender==='female'?rnd(50,70):rnd(30,55);
+    if(cfg.skillId){w._skillId=cfg.skillId;w.applyBloodSkill();}
+    gWarriors.push(w);
+  });
+  initIsoCanvas();
+  idleTimer=setInterval(performIdleTick,3000);
+  updateStatusUI();updatePartyRow();
+  addLog('ゲーム開始。天下統一を目指せ！');
+  showToast('戦国血脈 〜覇道の系譜〜 開始！',3000);
+}
+
+window.onload=initGame;
+</script>
+</body>
+</html>
