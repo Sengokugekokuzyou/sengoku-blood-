@@ -73,12 +73,14 @@ html,body{
 .party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:4px 8px;min-width:58px;cursor:pointer;transition:border-color .2s,background .2s;touch-action:manipulation;}
 .party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
 .party-card.young{opacity:0.68;border-color:rgba(200,150,12,.1);}
+.party-card.mutant{border-color:#ff44ff;background:rgba(255,0,255,.08);}
 .party-card:active{background:rgba(200,150,12,.18);}
 .pc-role{font-size:7px;color:var(--gold-d);letter-spacing:.08em;}
 .pc-name{font-size:9px;color:var(--parchment);font-weight:700;}
 .pc-pow{font-size:8px;color:#ffaa44;}
 .pc-hp{font-size:7px;}
 .pc-loc{font-size:7px;color:#aaddff;margin-top:1px;}
+.pc-skill{font-size:6px;color:#ff88ff;margin-top:1px;}
 
 #action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:3px 0 2px;height:var(--h-actionrow);}
 .act-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;padding:0 2px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;touch-action:manipulation;min-height:52px;}
@@ -130,6 +132,14 @@ html,body{
 .gen-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:8px;padding:7px 10px;font-size:9px;color:var(--parchment);line-height:1.6;}
 .gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l);}
 .gen-card .gp{color:#ffaa44;}
+.gen-card .gskill{color:#ff88ff;font-size:8px;}
+.gen-card .gcomp{color:#88ffcc;font-size:8px;}
+.gen-card.mutant-card{border-color:#ff44ff;background:rgba(255,0,255,.06);}
+
+/* 血統スキル表示 */
+.skill-badge{display:inline-block;background:rgba(255,100,255,.18);border:1px solid rgba(255,100,255,.4);border-radius:4px;padding:1px 5px;font-size:8px;color:#ff88ff;margin-top:2px;}
+.skill-badge.strong{background:rgba(255,50,50,.18);border-color:rgba(255,80,80,.4);color:#ff6666;}
+.skill-badge.intel{background:rgba(100,150,255,.18);border-color:rgba(100,150,255,.4);color:#88aaff;}
 
 /* ─── 武将モーダル ─── */
 #warrior-modal{position:fixed;inset:0;z-index:700;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
@@ -145,6 +155,10 @@ html,body{
 .wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px;}
 .wm-hp-fill{height:100%;border-radius:3px;transition:width .4s;}
 .wm-close{display:block;width:100%;background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-family:inherit;font-size:12px;padding:11px;border-radius:8px;cursor:pointer;margin-top:10px;letter-spacing:.3em;touch-action:manipulation;}
+
+/* 相性表示 */
+.compat-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin:3px 0;}
+.compat-fill{height:100%;border-radius:2px;}
 
 /* ─── 縁組モーダル ─── */
 #engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
@@ -166,9 +180,12 @@ html,body{
 .warrior-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 .warrior-sel-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,150,12,.15);border-radius:10px;padding:10px;cursor:pointer;transition:all .2s;touch-action:manipulation;min-height:60px;}
 .warrior-sel-card:active,.warrior-sel-card.selected{background:rgba(200,150,12,.12);border-color:var(--gold);}
+.warrior-sel-card.mutant-card{border-color:rgba(255,100,255,.3);}
+.warrior-sel-card.mutant-card.selected{border-color:#ff44ff;background:rgba(255,0,255,.1);}
 .wsc-name{font-size:12px;font-weight:700;color:var(--parchment);}
 .wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px;}
 .wsc-hp{font-size:9px;margin-top:2px;}
+.wsc-skill{font-size:8px;color:#ff88ff;margin-top:2px;}
 .confirm-panel{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px;}
 .confirm-pair{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
 .confirm-w{text-align:center;}
@@ -179,6 +196,7 @@ html,body{
 .cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px;}
 .cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0;}
 .cp-stat .cpv{color:var(--gold-l);font-weight:700;}
+.cp-compat{font-size:10px;color:#88ffcc;text-align:center;margin-top:5px;padding:4px;background:rgba(0,255,100,.05);border-radius:4px;}
 .modal-footer{padding:10px 16px max(env(safe-area-inset-bottom,0px),12px);border-top:1px solid rgba(200,150,12,.1);display:flex;gap:8px;flex-shrink:0;}
 .modal-btn{flex:1;padding:13px;border-radius:10px;font-family:inherit;font-size:12px;letter-spacing:.25em;cursor:pointer;transition:all .2s;touch-action:manipulation;}
 .modal-btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:rgba(200,150,12,.6);}
@@ -190,6 +208,13 @@ html,body{
 .step-dot{width:6px;height:6px;border-radius:50%;background:rgba(200,150,12,.22);transition:all .3s;}
 .step-dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,150,12,.5);}
 
+/* ─── 血統スキル解説 ─── */
+.blood-skill-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.bsk-row{display:flex;align-items:flex-start;gap:8px;padding:7px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06);}
+.bsk-icon{font-size:16px;flex-shrink:0;}
+.bsk-info .bsk-name{font-size:11px;font-weight:700;color:var(--parchment);}
+.bsk-info .bsk-desc{font-size:9px;color:rgba(245,228,180,.55);margin-top:1px;}
+
 /* ─── 成功オーバーレイ ─── */
 #success-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96);flex-direction:column;gap:12px;padding:20px;}
 #success-overlay.show{display:flex;animation:fadeIn .4s ease;}
@@ -199,7 +224,13 @@ html,body{
 .suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center;}
 .suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.3em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center;}
 .suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2;}
+.suc-skill{font-size:13px;color:#ff88ff;text-align:center;letter-spacing:.2em;text-shadow:0 0 12px rgba(255,100,255,.5);}
+.suc-compat{font-size:11px;color:#88ffcc;text-align:center;}
 .suc-btn{background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold-l);font-family:inherit;font-size:13px;letter-spacing:.35em;padding:13px 28px;border-radius:10px;cursor:pointer;margin-top:6px;touch-action:manipulation;}
+
+/* 突然変異エフェクト */
+.mutant-flash{animation:mutantFlash 0.5s ease 3;}
+@keyframes mutantFlash{0%,100%{box-shadow:none}50%{box-shadow:0 0 40px rgba(255,0,255,.8)}}
 
 /* ─── 開発者・履歴モーダル ─── */
 #dev-modal,#history-modal{position:fixed;inset:0;z-index:800;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92);}
@@ -220,6 +251,7 @@ html,body{
 .hist-item{font-size:11px;color:rgba(245,228,180,.8);padding:7px 0;border-bottom:1px solid rgba(200,150,12,.1);line-height:1.5;display:flex;gap:8px;align-items:baseline;}
 .hist-item .hi-time{color:rgba(200,150,12,.55);font-size:9px;white-space:nowrap;flex-shrink:0;}
 .hist-item .hi-text{flex:1;}
+.hist-item.hi-mutant .hi-text{color:#ff88ff;}
 .hist-empty{text-align:center;padding:32px 16px;color:rgba(200,150,12,.35);font-size:11px;letter-spacing:.3em;}
 
 /* ─── トースト ─── */
@@ -234,6 +266,7 @@ html,body{
   max-width:90vw;overflow:hidden;text-overflow:ellipsis;
 }
 #toast.show{opacity:1;}
+#toast.mutant-toast{border-color:#ff44ff;background:rgba(60,0,60,.97);color:#ff88ff;}
 </style>
 </head>
 <body>
@@ -287,7 +320,7 @@ html,body{
 <div id="pedigree-modal">
   <div class="ped-shell">
     <div class="ped-head">
-      <div class="ped-title">⚔ 武将系譜</div>
+      <div class="ped-title">⚔ 武将系譜・血統図</div>
       <button class="close-btn" onclick="closePedigree()">閉じる</button>
     </div>
     <div id="pedigree-content"></div>
@@ -310,6 +343,8 @@ html,body{
       <div class="wm-stat"><span class="wsk">年齢</span><span class="wsv" id="wm-age"></span></div>
       <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location"></span></div>
       <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage"></span></div>
+      <div class="wm-stat"><span class="wsk">血統スキル</span><span class="wsv" id="wm-skill"></span></div>
+      <div class="wm-stat"><span class="wsk">世代</span><span class="wsv" id="wm-generation"></span></div>
       <button class="wm-close" onclick="closeWarriorModal()">閉じる</button>
     </div>
   </div>
@@ -341,10 +376,12 @@ html,body{
 
 <!-- 成功オーバーレイ -->
 <div id="success-overlay">
-  <div class="suc-kamon">👶</div>
+  <div class="suc-kamon" id="suc-kamon">👶</div>
   <div class="suc-title">縁組成立</div>
   <div class="suc-name" id="suc-name"></div>
   <div class="suc-stats" id="suc-stats"></div>
+  <div class="suc-skill" id="suc-skill"></div>
+  <div class="suc-compat" id="suc-compat"></div>
   <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
 </div>
 
@@ -443,6 +480,20 @@ html,body{
 const ENGUMI_COST = 600;
 const MATURE_AGE  = 20;
 
+// ── 血統スキル定義（拡張版） ──
+const BLOOD_SKILLS = [
+  { id:'brave',    name:'猛将の血',   icon:'🔥', desc:'武力×1.3倍（攻撃に特化）',  effect: u => { u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.3)); } },
+  { id:'wise',     name:'軍師の血',   icon:'📖', desc:'知力×1.3倍（施設効果+）',    effect: u => { u.stats.wisdom = Math.min(99, Math.floor(u.stats.wisdom * 1.3)); } },
+  { id:'berserk',  name:'狂戦士の血', icon:'💀', desc:'武力×1.5倍・体力-30（危険）', effect: u => { u.stats.power = Math.min(99, Math.floor(u.stats.power * 1.5)); u.stats.hp = Math.max(30, u.stats.hp - 30); u.stats.maxHp = Math.max(60, u.stats.maxHp - 30); } },
+  { id:'iron',     name:'鉄壁の血',   icon:'🛡️', desc:'体力上限+40（耐久に特化）',  effect: u => { u.stats.maxHp += 40; u.stats.hp = Math.min(u.stats.maxHp, u.stats.hp + 40); } },
+  { id:'loyal',    name:'義将の血',   icon:'⛩️', desc:'忠誠+25・施設効果+',        effect: u => { u._loyalty = Math.min(100, u._loyalty + 25); } },
+  { id:'swift',    name:'迅雷の血',   icon:'⚡', desc:'武力+15・移動速度+',         effect: u => { u.stats.power = Math.min(99, u.stats.power + 15); u.speed *= 1.4; } },
+  { id:'sage',     name:'天才の血',   icon:'✨', desc:'武力・知力それぞれ+10',       effect: u => { u.stats.power = Math.min(99, u.stats.power + 10); u.stats.wisdom = Math.min(99, u.stats.wisdom + 10); } },
+];
+
+function getSkillById(id) { return BLOOD_SKILLS.find(s => s.id === id) || null; }
+function getSkillByName(name) { return BLOOD_SKILLS.find(s => s.name === name) || null; }
+
 const FACILITY_EFFECT = {
   training: { stat:'power',   label:'武力', color:'#ffcc44', range:[5,11], costHp:-6 },
   forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[4,9],  costHp:-5 },
@@ -483,6 +534,31 @@ const FACILITY_POSITIONS = [
 ];
 
 // ============================================================
+//  相性システム
+// ============================================================
+function calcCompatibility(a, b) {
+  let score = 0;
+  // 同スキル加点
+  if (a._skillId && b._skillId && a._skillId === b._skillId) score += 20;
+  // 武力差が少ないほど相性良好
+  if (Math.abs(a.stats.power - b.stats.power) < 10) score += 10;
+  // 知力補完（差があると相補的）
+  if (Math.abs(a.stats.wisdom - b.stats.wisdom) > 15) score += 8;
+  // 年齢が近いと相性良好
+  if (Math.abs(a.age - b.age) < 8) score += 7;
+  // 忠誠が高いほど安定
+  score += Math.floor((a._loyalty + b._loyalty) / 20);
+  return Math.min(score, 60);
+}
+
+function compatLabel(score) {
+  if (score >= 45) return '❤️ 運命の縁（+最大ボーナス）';
+  if (score >= 30) return '💛 良縁（+中ボーナス）';
+  if (score >= 15) return '🤝 普通の縁（+小ボーナス）';
+  return '💔 相性不良（ボーナスなし）';
+}
+
+// ============================================================
 //  ゲーム状態
 // ============================================================
 const state = {
@@ -510,19 +586,19 @@ function rnd(lo, hi) { return Math.floor(lo + Math.random() * (hi - lo + 1)); }
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 let toastTimer = null;
-// [バグ7修正] duration=0 が無視される問題を修正（nullish coalescing 使用）
-function showToast(msg, duration) {
+function showToast(msg, duration, isMutant) {
   const t = document.getElementById('toast');
   t.textContent = msg;
+  t.classList.toggle('mutant-toast', !!isMutant);
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.classList.remove('show'); toastTimer = null; }, duration != null ? duration : 2200);
 }
 
-function addLog(text) {
+function addLog(text, isMutant) {
   const now = new Date();
   const ts = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-  state.log.unshift({ time: ts, text });
+  state.log.unshift({ time: ts, text, mutant: !!isMutant });
   if (state.log.length > 80) state.log.pop();
 }
 
@@ -543,8 +619,6 @@ function closeModal(id) {
     if (bg) bg.style.display = 'none';
   }
 }
-
-// [バグ2修正] closeAllModals に success-overlay を追加し、必ず modal-bg を非表示にする
 function closeAllModals() {
   ['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal','success-overlay'].forEach(id => {
     document.getElementById(id).classList.remove('show');
@@ -587,7 +661,7 @@ function spawnPetals() {
 }
 
 // ============================================================
-//  IsoWarrior クラス
+//  IsoWarrior クラス（血統スキル統合版）
 // ============================================================
 class IsoWarrior {
   constructor(name, jobId, power, offsetX, speed, gender, age) {
@@ -607,6 +681,9 @@ class IsoWarrior {
     this._generation = 1;
     this._parents    = null;
     this._birthTurn  = state.turn;
+    this._skillId    = null;   // 血統スキルID
+    this._isMutant   = false;  // 突然変異フラグ
+    this._compatibility = 0;   // 誕生時の親相性スコア
 
     this.isoX = (Math.random() - 0.5) * 4;
     this.isoY = (Math.random() - 0.5) * 4;
@@ -621,6 +698,7 @@ class IsoWarrior {
   }
 
   _pickColor() {
+    if (this._isMutant) return '#ff44ff';
     const cols = ['#c8960c','#cc4444','#4488cc','#44cc88','#cc88cc','#ccaa44','#44aacc','#cc6644'];
     return cols[Math.floor(Math.random() * cols.length)];
   }
@@ -628,10 +706,22 @@ class IsoWarrior {
   get loyalty() { return this._loyalty; }
   isMature()    { return this.age >= MATURE_AGE; }
 
+  skillName() {
+    if (!this._skillId) return '—';
+    const sk = getSkillById(this._skillId);
+    return sk ? sk.icon + ' ' + sk.name : '—';
+  }
+
   locationLabel() {
     if (!this._currentFacility) return '巡回中';
     const f = FACILITY_MAP[this._currentFacility];
     return f ? f.name : '巡回中';
+  }
+
+  applyBloodSkill() {
+    if (!this._skillId) return;
+    const sk = getSkillById(this._skillId);
+    if (sk) sk.effect(this);
   }
 
   tick() {
@@ -670,8 +760,20 @@ class IsoWarrior {
     const candidates = hpPct < 0.4
       ? ['tea','garden','tea']
       : Object.keys(FACILITY_MAP);
+    // 軍師の血：学問所優先
+    if (this._skillId === 'wise' && Math.random() < 0.4) {
+      this._enterFacility('academy'); return;
+    }
+    // 猛将・狂戦士：鍛錬場優先
+    if ((this._skillId === 'brave' || this._skillId === 'berserk') && Math.random() < 0.4 && hpPct > 0.5) {
+      this._enterFacility('training'); return;
+    }
     const key = candidates[Math.floor(Math.random() * candidates.length)];
-    const fp  = FACILITY_POSITIONS.find(f => f.key === key);
+    this._enterFacility(key);
+  }
+
+  _enterFacility(key) {
+    const fp = FACILITY_POSITIONS.find(f => f.key === key);
     if (!fp) return;
     this._currentFacility = key;
     this.isoX = fp.tx + (Math.random() - 0.5) * 0.4;
@@ -732,9 +834,14 @@ class IsoWarrior {
 //  補助関数
 // ============================================================
 function bloodlineFacilityMul(w) {
-  if (!w._parents) return 1.0;
-  const gen = w._generation || 1;
-  return 1 + (gen - 1) * 0.08;
+  let mul = 1.0;
+  if (w._parents) {
+    const gen = w._generation || 1;
+    mul += (gen - 1) * 0.08;
+  }
+  // 軍師の血は施設効果1.2倍
+  if (w._skillId === 'wise' || w._skillId === 'loyal') mul *= 1.2;
+  return mul;
 }
 
 function randName(gender) {
@@ -746,10 +853,38 @@ function randName(gender) {
 }
 
 function createChildStats(father, mother) {
-  const p     = clamp(Math.round(father.stats.power  * 0.65 + mother.stats.power  * 0.45) + rnd(5,12),  10, 98);
-  const w     = clamp(Math.round(father.stats.wisdom * 0.45 + mother.stats.wisdom * 0.65) + rnd(8,14),  10, 98);
-  const maxHp = clamp(Math.round((father.stats.maxHp + mother.stats.maxHp) / 1.8)         + rnd(10,20), 100, 200);
-  return { power: p, wisdom: w, hp: maxHp, maxHp };
+  const compat = calcCompatibility(father, mother);
+  const bonus  = Math.floor(compat / 6); // 相性ボーナス
+  const p     = clamp(Math.round(father.stats.power  * 0.65 + mother.stats.power  * 0.45) + rnd(5,12) + bonus, 10, 98);
+  const w     = clamp(Math.round(father.stats.wisdom * 0.45 + mother.stats.wisdom * 0.65) + rnd(8,14) + bonus, 10, 98);
+  const maxHp = clamp(Math.round((father.stats.maxHp + mother.stats.maxHp) / 1.8) + rnd(10,20) + bonus, 100, 200);
+  return { power: p, wisdom: w, hp: maxHp, maxHp, compat, bonus };
+}
+
+// 血統スキル継承ロジック
+function inheritSkill(father, mother, compat) {
+  let skillId = null;
+  let isMutant = false;
+
+  // 突然変異（相性が高いほど確率アップ）
+  const mutantChance = 0.05 + compat * 0.002;
+  if (Math.random() < mutantChance) {
+    const randSkill = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)];
+    skillId = randSkill.id;
+    isMutant = true;
+  } else {
+    // 父から継承（50%）
+    if (father._skillId && Math.random() < 0.5) skillId = father._skillId;
+    // 母から継承（50%）
+    if (mother._skillId && Math.random() < 0.5) skillId = mother._skillId;
+    // 両方がスキルなしの場合、5%でランダム発現
+    if (!skillId && Math.random() < 0.05) {
+      const randSkill = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)];
+      skillId = randSkill.id;
+    }
+  }
+
+  return { skillId, isMutant };
 }
 
 // ============================================================
@@ -819,13 +954,16 @@ function updatePartyRow() {
     const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
     const card   = document.createElement('div');
     const mature = w.isMature();
-    card.className = 'party-card' + (i === 0 ? ' head' : '') + (!mature ? ' young' : '');
+    let classes = 'party-card' + (i === 0 ? ' head' : '') + (!mature ? ' young' : '') + (w._isMutant ? ' mutant' : '');
+    card.className = classes;
+    const skillLabel = w._skillId ? '<span class="pc-skill">' + w.skillName() + '</span>' : '';
     card.innerHTML =
       '<span class="pc-role">' + (ROLES[w.jobId] || '武将') + (mature ? '' : '（育成中）') + '</span>' +
       '<span class="pc-name">' + w.name + '</span>' +
       '<span class="pc-pow">武' + w.stats.power + '　' + w.age + '歳</span>' +
       '<span class="pc-hp" style="color:' + hpColor + '">体 ' + hpPct + '%</span>' +
-      '<span class="pc-loc">' + w.locationLabel() + '</span>';
+      '<span class="pc-loc">' + w.locationLabel() + '</span>' +
+      skillLabel;
     card.onclick = () => showWarriorModal(i);
     row.appendChild(card);
   });
@@ -839,7 +977,7 @@ function showWarriorModal(idx) {
   if (!w) return;
   const hpPct  = (w.stats.hp / w.stats.maxHp) * 100;
   const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
-  document.getElementById('wm-name-text').textContent  = w.name;
+  document.getElementById('wm-name-text').textContent  = w.name + (w._isMutant ? ' ✨' : '');
   document.getElementById('wm-role-text').textContent  = ROLES[w.jobId] || '武将';
   document.getElementById('wm-power').textContent      = w.stats.power;
   document.getElementById('wm-wisdom').textContent     = w.stats.wisdom;
@@ -850,6 +988,8 @@ function showWarriorModal(idx) {
   document.getElementById('wm-lineage').textContent    = w._parents
     ? w._parents.father + ' × ' + w._parents.mother + 'の子'
     : '初代';
+  document.getElementById('wm-skill').textContent      = w.skillName() + (w._isMutant ? '（突然変異！）' : '');
+  document.getElementById('wm-generation').textContent = '第' + w._generation + '世代';
   const fill = document.getElementById('wm-hp-fill');
   fill.style.width      = hpPct + '%';
   fill.style.background = hpColor;
@@ -858,33 +998,52 @@ function showWarriorModal(idx) {
 function closeWarriorModal() { closeModal('warrior-modal'); }
 
 // ============================================================
-//  系譜モーダル
+//  系譜モーダル（血統スキル・相性・家系図拡張版）
 // ============================================================
 function openPedigree() {
   const content = document.getElementById('pedigree-content');
   if (!content) return;
-  let html = '<div class="gen-block"><div class="gen-label">◆ 現役武将</div><div class="gen-list">';
+
+  // 血統スキル一覧
+  let html = '<div class="gen-block"><div class="gen-label">◆ 血統スキル一覧</div>';
+  html += '<div class="blood-skill-list">';
+  BLOOD_SKILLS.forEach(sk => {
+    html += '<div class="bsk-row"><div class="bsk-icon">' + sk.icon + '</div>' +
+      '<div class="bsk-info"><div class="bsk-name">' + sk.name + '</div>' +
+      '<div class="bsk-desc">' + sk.desc + '</div></div></div>';
+  });
+  html += '</div></div>';
+
+  // 現役武将
+  html += '<div class="gen-block"><div class="gen-label">◆ 現役武将</div><div class="gen-list">';
   gWarriors.forEach(w => {
-    html += '<div class="gen-card">' +
-      '<div class="gn">' + w.name + '　' + w.age + '歳</div>' +
-      '<div class="gp">武' + w.stats.power + '　知' + w.stats.wisdom + '</div>' +
-      '<div>' + (w._parents ? w._parents.father + 'の子' : '初代') + '</div>' +
+    const isMutant = w._isMutant;
+    html += '<div class="gen-card' + (isMutant ? ' mutant-card' : '') + '">' +
+      '<div class="gn">' + w.name + (isMutant ? ' ✨' : '') + '　' + w.age + '歳</div>' +
+      '<div class="gp">武' + w.stats.power + '　知' + w.stats.wisdom + '　体' + w.stats.maxHp + '</div>' +
+      '<div>' + (w._parents ? w._parents.father + ' × ' + w._parents.mother + 'の子' : '初代') + '</div>' +
+      '<div>第' + w._generation + '世代</div>' +
+      (w._skillId ? '<div class="gskill">' + w.skillName() + '</div>' : '') +
+      (w._compatibility ? '<div class="gcomp">親相性: ' + w._compatibility + 'pt</div>' : '') +
       '</div>';
   });
   html += '</div></div>';
+
+  // 縁組履歴
   if (state.pedigree.length > 0) {
     html += '<div class="gen-block"><div class="gen-label">◆ 縁組履歴</div><div class="gen-list">';
     state.pedigree.slice().reverse().forEach(p => {
-      html += '<div class="gen-card">' +
-        '<div class="gn">' + p.childName + '</div>' +
+      html += '<div class="gen-card' + (p.isMutant ? ' mutant-card' : '') + '">' +
+        '<div class="gn">' + p.childName + (p.isMutant ? ' ✨突然変異' : '') + '</div>' +
         '<div>' + p.father + ' × ' + p.mother + '</div>' +
         '<div class="gp">武' + p.power + '　知' + p.wisdom + '</div>' +
+        (p.skillName ? '<div class="gskill">' + p.skillName + '</div>' : '') +
+        '<div class="gcomp">相性: ' + p.compat + 'pt</div>' +
         '</div>';
     });
     html += '</div></div>';
   }
   content.innerHTML = html;
-  // [バグ8修正] 履歴モーダル・系譜モーダルを開くたびに先頭へスクロール
   content.scrollTop = 0;
   openModal('pedigree-modal');
 }
@@ -900,19 +1059,18 @@ function openHistory() {
     list.innerHTML = '<div class="hist-empty">まだ記録がありません</div>';
   } else {
     list.innerHTML = state.log.map(entry =>
-      '<div class="hist-item">' +
+      '<div class="hist-item' + (entry.mutant ? ' hi-mutant' : '') + '">' +
         '<span class="hi-time">' + entry.time + '</span>' +
-        '<span class="hi-text">' + entry.text + '</span>' +
+        '<span class="hi-text">' + (entry.mutant ? '🔥 ' : '') + entry.text + '</span>' +
       '</div>'
     ).join('');
   }
-  // [バグ8修正] 開くたびに最新（先頭）へスクロール
   list.scrollTop = 0;
   openModal('history-modal');
 }
 
 // ============================================================
-//  縁組モーダル（成人武将のみ選択可能）
+//  縁組モーダル（相性・血統スキル継承システム拡張）
 // ============================================================
 function openEngumi() {
   engumiStep = 0;
@@ -940,7 +1098,6 @@ function renderEngumiStep() {
     cancelBtn.onclick = () => { engumiStep--; renderEngumiStep(); };
   }
 
-  // ── ステップ0：父選択 ──
   if (engumiStep === 0) {
     nextBtn.textContent = '次へ →';
     nextBtn.disabled    = (engumiSelectedFather === null);
@@ -959,36 +1116,31 @@ function renderEngumiStep() {
       const hpPct  = Math.round((w.stats.hp / w.stats.maxHp) * 100);
       const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
       const idx = gWarriors.indexOf(w);
-      html += '<div class="warrior-sel-card ' + (engumiSelectedFather === idx ? 'selected' : '') +
+      html += '<div class="warrior-sel-card' + (engumiSelectedFather === idx ? ' selected' : '') + (w._isMutant ? ' mutant-card' : '') +
         '" onclick="selectFather(' + idx + ')">' +
-        '<div class="wsc-name">' + w.name + '　' + w.age + '歳</div>' +
+        '<div class="wsc-name">' + w.name + (w._isMutant ? ' ✨' : '') + '　' + w.age + '歳</div>' +
         '<div class="wsc-stats">武' + w.stats.power + '　知' + w.stats.wisdom + '</div>' +
         '<div class="wsc-hp" style="color:' + hpColor + '">体 ' + hpPct + '%</div>' +
+        (w._skillId ? '<div class="wsc-skill">' + w.skillName() + '</div>' : '') +
         '</div>';
     });
     html += '</div></div>';
     content.innerHTML = html;
 
-  // ── ステップ1：母選択 ──
   } else if (engumiStep === 1) {
     nextBtn.textContent = '次へ →';
     nextBtn.disabled    = (engumiSelectedMother === null);
 
-    // [バグ3修正] ステップ1遷移時に父インデックスが有効か再確認
     if (engumiSelectedFather === null || !gWarriors[engumiSelectedFather]) {
       showToast('父の選択が無効です。最初からやり直してください');
-      engumiStep = 0;
-      engumiSelectedFather = null;
-      engumiSelectedMother = null;
-      renderEngumiStep();
-      return;
+      engumiStep = 0; engumiSelectedFather = null; engumiSelectedMother = null;
+      renderEngumiStep(); return;
     }
 
     const candidates = gWarriors.filter((w, idx) => idx !== engumiSelectedFather && w.isMature());
     if (candidates.length === 0) {
       content.innerHTML = '<div style="color:rgba(200,150,12,.6);text-align:center;padding:20px;font-size:12px;">成人した母となれる武将がいません</div>';
-      nextBtn.disabled = true;
-      return;
+      nextBtn.disabled = true; return;
     }
     let html = '<div class="modal-section"><div class="modal-section-title">母となる武将を選べ（' + MATURE_AGE + '歳以上）</div>' +
       '<div class="warrior-select-grid">';
@@ -996,15 +1148,19 @@ function renderEngumiStep() {
       const hpPct  = Math.round((w.stats.hp / w.stats.maxHp) * 100);
       const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
       const idx = gWarriors.indexOf(w);
-      html += '<div class="warrior-sel-card ' + (engumiSelectedMother === idx ? 'selected' : '') +
+      const comp = (engumiSelectedFather !== null && gWarriors[engumiSelectedFather])
+        ? calcCompatibility(gWarriors[engumiSelectedFather], w) : 0;
+      html += '<div class="warrior-sel-card' + (engumiSelectedMother === idx ? ' selected' : '') + (w._isMutant ? ' mutant-card' : '') +
         '" onclick="selectMother(' + idx + ')">' +
-        '<div class="wsc-name">' + w.name + '　' + w.age + '歳</div>' +
+        '<div class="wsc-name">' + w.name + (w._isMutant ? ' ✨' : '') + '　' + w.age + '歳</div>' +
         '<div class="wsc-stats">武' + w.stats.power + '　知' + w.stats.wisdom + '</div>' +
         '<div class="wsc-hp" style="color:' + hpColor + '">体 ' + hpPct + '%</div>' +
+        (w._skillId ? '<div class="wsc-skill">' + w.skillName() + '</div>' : '') +
+        '<div style="font-size:9px;color:#88ffcc;margin-top:2px;">相性: ' + comp + 'pt</div>' +
         '</div>';
     });
     html += '</div></div>';
-    // 両方選択済なら子の予測を表示
+
     if (engumiSelectedFather !== null && engumiSelectedMother !== null) {
       const f  = gWarriors[engumiSelectedFather];
       const m  = gWarriors[engumiSelectedMother];
@@ -1020,45 +1176,51 @@ function renderEngumiStep() {
           '<div class="cp-stat"><span>武力</span><span class="cpv">〜' + cs.power  + '</span></div>' +
           '<div class="cp-stat"><span>知力</span><span class="cpv">〜' + cs.wisdom + '</span></div>' +
           '<div class="cp-stat"><span>体力上限</span><span class="cpv">〜' + cs.maxHp + '</span></div>' +
+          '<div class="cp-compat">' + compatLabel(cs.compat) + '（+' + cs.bonus + 'ボーナス）</div>' +
         '</div></div>';
     }
     content.innerHTML = html;
 
-  // ── ステップ2：確認 ──
   } else if (engumiStep === 2) {
     nextBtn.textContent = '成立させる';
     nextBtn.disabled    = false;
 
-    // [バグ3修正] 確認画面でも父母インデックスを再検証
     if (engumiSelectedFather === null || engumiSelectedMother === null ||
         !gWarriors[engumiSelectedFather] || !gWarriors[engumiSelectedMother]) {
       showToast('選択が無効です。最初からやり直してください');
-      engumiStep = 0;
-      engumiSelectedFather = null;
-      engumiSelectedMother = null;
-      renderEngumiStep();
-      return;
+      engumiStep = 0; engumiSelectedFather = null; engumiSelectedMother = null;
+      renderEngumiStep(); return;
     }
 
     const f  = gWarriors[engumiSelectedFather];
     const m  = gWarriors[engumiSelectedMother];
     const cs = createChildStats(f, m);
+    const { skillId, isMutant } = inheritSkill(f, m, cs.compat);
+    const sk = skillId ? getSkillById(skillId) : null;
+    const mutantChance = (0.05 + cs.compat * 0.002 * 100).toFixed(0);
+
     content.innerHTML =
       '<div class="modal-section"><div class="modal-section-title">縁組の確認</div>' +
       '<div class="confirm-panel">' +
         '<div class="confirm-pair">' +
-          '<div class="confirm-w"><div class="cw-name">' + f.name + '</div><div class="cw-role">父</div></div>' +
+          '<div class="confirm-w"><div class="cw-name">' + f.name + '</div><div class="cw-role">父</div>' +
+            (f._skillId ? '<div style="font-size:9px;color:#ff88ff">' + f.skillName() + '</div>' : '') + '</div>' +
           '<div class="confirm-heart">❤</div>' +
-          '<div class="confirm-w"><div class="cw-name">' + m.name + '</div><div class="cw-role">母</div></div>' +
+          '<div class="confirm-w"><div class="cw-name">' + m.name + '</div><div class="cw-role">母</div>' +
+            (m._skillId ? '<div style="font-size:9px;color:#ff88ff">' + m.skillName() + '</div>' : '') + '</div>' +
         '</div>' +
         '<div class="child-preview">' +
           '<div class="cp-title">誕生する子の予測値</div>' +
           '<div class="cp-stat"><span>武力</span><span class="cpv">〜' + cs.power  + '</span></div>' +
           '<div class="cp-stat"><span>知力</span><span class="cpv">〜' + cs.wisdom + '</span></div>' +
           '<div class="cp-stat"><span>体力</span><span class="cpv">〜' + cs.maxHp  + '</span></div>' +
+          '<div class="cp-compat">' + compatLabel(cs.compat) + '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="margin-top:12px;font-size:11px;color:rgba(200,150,12,.6);text-align:center;letter-spacing:.2em;">' +
+      '<div style="margin-top:10px;padding:8px;background:rgba(255,100,255,.06);border:1px solid rgba(255,100,255,.2);border-radius:8px;font-size:10px;color:rgba(255,150,255,.8);text-align:center;letter-spacing:.15em;">' +
+        '突然変異確率: ' + mutantChance + '%　血統スキル継承あり' +
+      '</div>' +
+      '<div style="margin-top:8px;font-size:11px;color:rgba(200,150,12,.6);text-align:center;letter-spacing:.2em;">' +
         '費用 ' + ENGUMI_COST.toLocaleString() + ' 石を消費します' +
       '</div></div>';
   }
@@ -1090,16 +1252,17 @@ function engumiNext() {
 function doEngumi() {
   if (state.koku < ENGUMI_COST) { showToast('石高が足りません（必要：' + ENGUMI_COST + '石）'); return; }
   if (engumiSelectedFather === null || engumiSelectedMother === null) { showToast('父母を選択してください'); return; }
-  // [バグ3修正] 実行直前にもインデックス有効性を確認
   if (!gWarriors[engumiSelectedFather] || !gWarriors[engumiSelectedMother]) {
     showToast('選択が無効です。最初からやり直してください');
-    closeEngumi();
-    return;
+    closeEngumi(); return;
   }
 
   const f  = gWarriors[engumiSelectedFather];
   const m  = gWarriors[engumiSelectedMother];
   const cs = createChildStats(f, m);
+  const { skillId, isMutant } = inheritSkill(f, m, cs.compat);
+  const sk = skillId ? getSkillById(skillId) : null;
+
   state.koku -= ENGUMI_COST;
   state.generation++;
 
@@ -1112,28 +1275,55 @@ function doEngumi() {
   child.stats.maxHp  = cs.maxHp;
   child._generation  = Math.max(f._generation, m._generation) + 1;
   child._parents     = { father: f.name, mother: m.name };
+  child._skillId     = skillId;
+  child._isMutant    = isMutant;
+  child._compatibility = cs.compat;
+
+  // 血統スキル適用
+  if (skillId) child.applyBloodSkill();
+  child._color = child._isMutant ? '#ff44ff' : child._color;
 
   gWarriors.push(child);
   state.pedigree.push({
     childName, father: f.name, mother: m.name,
-    power: cs.power, wisdom: cs.wisdom, generation: child._generation,
+    power: child.stats.power, wisdom: child.stats.wisdom,
+    generation: child._generation,
+    skillId, skillName: child.skillName(),
+    compat: cs.compat, isMutant,
   });
 
-  addLog('縁組成立：' + f.name + ' × ' + m.name + ' → ' + childName + '（第' + child._generation + '世代・0歳）');
+  const logText = '縁組成立：' + f.name + ' × ' + m.name + ' → ' + childName +
+    '（第' + child._generation + '世代・0歳）' +
+    (skillId ? '　血統:' + child.skillName() : '') +
+    (isMutant ? '　★突然変異！' : '');
+  addLog(logText, isMutant);
+
   closeEngumi();
 
-  document.getElementById('suc-name').textContent  = childName;
+  // 成功オーバーレイ表示
+  document.getElementById('suc-kamon').textContent = isMutant ? '🔥' : '👶';
+  document.getElementById('suc-name').textContent  = childName + (isMutant ? ' ✨' : '');
   document.getElementById('suc-stats').innerHTML   =
-    '武力 ' + cs.power + '　知力 ' + cs.wisdom + '　体力 ' + cs.maxHp + '<br>' +
+    '武力 ' + child.stats.power + '　知力 ' + child.stats.wisdom + '　体力 ' + child.stats.maxHp + '<br>' +
     ROLES[jobId] + '　第' + child._generation + '世代　0歳<br>' +
-    f.name + ' × ' + m.name + 'の子';
-  openModal('success-overlay');
+    f.name + ' × ' + m.name + 'の子<br>' +
+    '親相性: ' + cs.compat + 'pt（+' + cs.bonus + 'ボーナス）';
+  document.getElementById('suc-skill').textContent = sk
+    ? (isMutant ? '🔥 突然変異！ ' : '血統継承: ') + sk.icon + ' ' + sk.name
+    : '';
+  document.getElementById('suc-compat').textContent = compatLabel(cs.compat);
 
+  if (isMutant) {
+    showToast('🔥 突然変異血統発現！ ' + sk.name, 4000, true);
+    document.getElementById('success-overlay').classList.add('mutant-flash');
+    setTimeout(() => document.getElementById('success-overlay').classList.remove('mutant-flash'), 2000);
+  }
+
+  openModal('success-overlay');
   updateStatusUI();
   updatePartyRow();
 }
 
-// [バグ1修正] closeSuccessOverlay を単純化：常に modal-bg を閉じる
 function closeSuccessOverlay() {
   document.getElementById('success-overlay').classList.remove('show');
   const bg = document.getElementById('modal-bg');
@@ -1222,10 +1412,15 @@ function bDrawSoldier(c, x, y, pal, dir, wf, st) {
   c.restore();
 }
 
-function bDrawGeneral(c, x, y, pal, dir, wf, st) {
+function bDrawGeneral(c, x, y, pal, dir, wf, st, isMutant) {
   c.save();
   if (dir < 0) { c.translate(x+12,y); c.scale(-1,1); c.translate(-12,0); } else c.translate(x,y);
   const bob = wf===1 ? 1 : 0;
+  // 突然変異は紫オーラ
+  if (isMutant) {
+    c.shadowColor = '#ff00ff';
+    c.shadowBlur  = 10;
+  }
   bpx(c,pal.armor, 2,12+bob,20,12); bpx(c,pal.shadow,2,22+bob,20,2); bpx(c,pal.acc,4,12+bob,16,2);
   bpx(c,pal.acc,   0,14+bob, 3,10); bpx(c,pal.acc,21,14+bob,3,10);
   bpx(c,pal.skin,  4, 4+bob,16,10);
@@ -1278,9 +1473,9 @@ let bLogText='', bLogTimer=0;
 let bBubbles=[];
 let bGenMaxHp={ p:120, e:120 };
 
-function bSetLog(t)   { if (bLogTimer<=0){ bLogText=t; bLogTimer=B_LOG_HOLD; } }
+function bSetLog(t)    { if (bLogTimer<=0){ bLogText=t; bLogTimer=B_LOG_HOLD; } }
 function bForceLog(t,h){ bLogText=t; bLogTimer=(h===undefined?B_LOG_HOLD:h); }
-function bTickLog()   { if (bLogTimer>0) bLogTimer--; document.getElementById('battle-log-bar').textContent=bLogText; }
+function bTickLog()    { if (bLogTimer>0) bLogTimer--; document.getElementById('battle-log-bar').textContent=bLogText; }
 function bAddBubble(side, text, life) {
   life = life === undefined ? 130 : life;
   bBubbles = bBubbles.filter(b => b.side !== side);
@@ -1425,7 +1620,6 @@ function bGameLoop(bgCtx, ctx) {
       const pWin = bGenerals.p.hp > 0;
       bAddBubble(pWin?'p':'e', '勝ったぞ！', 400);
       bEndBattle(pWin);
-      // [バグ4修正] bEndBattle内でループを停止するので return
       return;
     }
   }
@@ -1438,6 +1632,7 @@ function bGameLoop(bgCtx, ctx) {
     ...['p','e'].filter(sd => !bGenerals[sd].dead).map(sd => ({
       type:'general', side:sd, x:bGenerals[sd].x, y:bGenerals[sd].y,
       state:bGenerals[sd].state, wf:animFrame,
+      isMutant: bGenerals[sd].isMutant || false,
     })),
   ];
   allUnits.sort((a,b) => a.y - b.y);
@@ -1445,7 +1640,7 @@ function bGameLoop(bgCtx, ctx) {
     const pal = u.side==='p' ? PAL_P : PAL_E;
     const dir = u.side==='p' ? 1 : -1;
     if (u.type==='soldier') bDrawSoldier(ctx, u.x|0, u.y|0, pal, dir, u.wf, u.state);
-    else                    bDrawGeneral(ctx, u.x|0, u.y|0, pal, dir, u.wf, u.state);
+    else                    bDrawGeneral(ctx, u.x|0, u.y|0, pal, dir, u.wf, u.state, u.isMutant);
   });
   bParticles.forEach(p => {
     ctx.globalAlpha = p.life/p.maxLife;
@@ -1467,10 +1662,8 @@ function bGameLoop(bgCtx, ctx) {
   bLoopId = requestAnimationFrame(() => bGameLoop(bgCtx, ctx));
 }
 
-// [バグ4修正] bEndBattle でアニメーションループを明示的に停止
 function bEndBattle(isWin) {
   if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
-
   const titleEl  = document.getElementById('bres-title-text');
   const detailEl = document.getElementById('bres-detail-text');
   if (isWin) {
@@ -1478,10 +1671,12 @@ function bEndBattle(isWin) {
     const uniGain = 4 + Math.random() * 3;
     state.koku += reward;
     state.unification = Math.min(100, state.unification + uniGain);
-    // 成熟武将のみ戦闘ボーナス
+    // 血統スキル：猛将・狂戦士は追加ボーナス
     gWarriors.forEach(w => {
       if (w.isMature()) {
-        w.stats.power = clamp(w.stats.power + rnd(3,7), 1, 99);
+        let powBonus = rnd(3,7);
+        if (w._skillId === 'brave' || w._skillId === 'berserk') powBonus += 3;
+        w.stats.power = clamp(w.stats.power + powBonus, 1, 99);
         w.stats.hp    = Math.min(w.stats.maxHp, w.stats.hp + rnd(8,15));
       }
     });
@@ -1503,7 +1698,6 @@ function bEndBattle(isWin) {
 
 function openBattle() {
   if (gWarriors.length === 0) { showToast('武将がいません'); return; }
-  // [バグ4修正] 既存のループを確実にキャンセル
   if (bLoopId) { cancelAnimationFrame(bLoopId); bLoopId = null; }
 
   document.getElementById('battle-screen').classList.add('show');
@@ -1532,17 +1726,22 @@ function openBattle() {
   bLogText='両軍、突撃開始！'; bLogTimer=B_LOG_HOLD*2;
   bParticles=[]; bDamageNums=[]; bBubbles=[];
 
-  // 成熟武将のみを合戦力に反映
   const matureWarriors = gWarriors.filter(w => w.isMature());
   const activeWarriors = matureWarriors.length > 0 ? matureWarriors : gWarriors;
   const leader = activeWarriors[0];
   document.getElementById('bunit-pname').textContent = leader ? leader.name.slice(-3) : '我が軍';
 
-  const playerPower = clamp(
-    activeWarriors.reduce((s,w) => s + w.stats.power + w.stats.wisdom, 0) / activeWarriors.length,
-    60, 150
-  )|0;
-  const enemyPower = clamp(120 + Math.floor(state.unification * 0.4), 60, 180)|0;
+  // 血統スキル込みの戦力計算
+  let totalPower = activeWarriors.reduce((s, w) => {
+    let p = w.stats.power + w.stats.wisdom;
+    if (w._skillId === 'brave' || w._skillId === 'swift') p *= 1.15;
+    if (w._skillId === 'berserk') p *= 1.3;
+    if (w._skillId === 'sage')    p *= 1.1;
+    return s + p;
+  }, 0);
+
+  const playerPower = clamp(Math.floor(totalPower / activeWarriors.length), 60, 180);
+  const enemyPower  = clamp(120 + Math.floor(state.unification * 0.4), 60, 200)|0;
 
   bGenMaxHp = { p: playerPower, e: enemyPower };
 
@@ -1558,9 +1757,10 @@ function openBattle() {
     bSoldiers.push({ side:'e', x:BW-22-col*26, y:B_FIELD_Y_MIN+14+row*42, state:'walk', stateTimer:0, hp:20, maxHp:20, target:null, dead:false, walkOffset:(i*11)%12 });
   }
 
+  const leaderMutant = leader && leader._isMutant;
   bGenerals = {
-    p: { x:30,      y:BH/2-15, hp:playerPower, maxHp:playerPower, state:'charge', stateTimer:0, dead:false },
-    e: { x:BW-54,   y:BH/2-15, hp:enemyPower,  maxHp:enemyPower,  state:'charge', stateTimer:0, dead:false },
+    p: { x:30,    y:BH/2-15, hp:playerPower, maxHp:playerPower, state:'charge', stateTimer:0, dead:false, isMutant: leaderMutant },
+    e: { x:BW-54, y:BH/2-15, hp:enemyPower,  maxHp:enemyPower,  state:'charge', stateTimer:0, dead:false, isMutant: false },
   };
 
   document.getElementById('bhp-player').textContent = playerPower;
@@ -1582,23 +1782,31 @@ function closeBattle() {
 }
 
 // ============================================================
-//  アイドルティック（年齢成長・自然回復）
+//  アイドルティック
 // ============================================================
 function performIdleTick() {
   state.turn++;
   ageTickCounter++;
 
   gWarriors.forEach(w => {
-    if (Math.random() < 0.4)  w.stats.power  = clamp(w.stats.power  + 1, 1, 99);
-    if (Math.random() < 0.25) w.stats.wisdom = clamp(w.stats.wisdom + 1, 1, 99);
+    let powGain = Math.random() < 0.4 ? 1 : 0;
+    let wisGain = Math.random() < 0.25 ? 1 : 0;
+    // 血統スキルボーナス
+    if (w._skillId === 'brave' && Math.random() < 0.2)  powGain++;
+    if (w._skillId === 'wise'  && Math.random() < 0.2)  wisGain++;
+    if (w._skillId === 'sage'  && Math.random() < 0.15) { powGain++; wisGain++; }
+    w.stats.power  = clamp(w.stats.power  + powGain, 1, 99);
+    w.stats.wisdom = clamp(w.stats.wisdom + wisGain, 1, 99);
     const hpPct = w.stats.hp / w.stats.maxHp;
     if (hpPct < 0.9) {
-      const rec = Math.floor((1 - hpPct) * 4 + 1);
+      // 鉄壁の血は回復速度+
+      let rec = Math.floor((1 - hpPct) * 4 + 1);
+      if (w._skillId === 'iron') rec = Math.floor(rec * 1.5);
       w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + rec);
     }
   });
 
-  // 約15秒ごとに1歳（ティック間隔3秒 × 5回）
+  // 約15秒ごとに1歳
   if (ageTickCounter % 5 === 0) {
     gWarriors.forEach(w => {
       if (w.age < 60) {
@@ -1629,7 +1837,6 @@ function initIsoCanvas() {
 
   function resize() {
     canvas.width  = field.clientWidth  || window.innerWidth;
-    // [バグ6修正] フィールド高さを正確に取得し、最小値を保証
     canvas.height = Math.max(field.clientHeight || 200, 200);
   }
   resize();
@@ -1639,7 +1846,6 @@ function initIsoCanvas() {
 
   function isoToScreen(ix, iy) {
     const cx    = canvas.width / 2;
-    // [バグ6修正] cy をキャンバス中央寄りに調整して施設が切れにくくする
     const cy    = canvas.height * 0.45;
     const tileW = Math.min(canvas.width * 0.22, canvas.height * 0.28);
     const tileH = tileW * 0.5;
@@ -1681,7 +1887,6 @@ function initIsoCanvas() {
     const fm = FACILITY_MAP[fp.key];
     if (!fm) return;
     const { x, y } = isoToScreen(fp.tx, fp.ty);
-    // [バグ6修正] 画面外の施設は描画しない
     if (x < -20 || x > canvas.width + 20 || y < -20 || y > canvas.height + 20) return;
     const tileW = Math.min(canvas.width * 0.22, canvas.height * 0.28);
     const iconSz = Math.max(14, Math.round(tileW * 0.55));
@@ -1701,34 +1906,47 @@ function initIsoCanvas() {
     const r  = Math.max(7, Math.round(canvas.width * 0.028));
     const bw = r * 2.6;
     ctx.save();
+    // 突然変異：紫オーラ
+    if (w._isMutant) {
+      ctx.shadowColor = '#ff44ff';
+      ctx.shadowBlur  = 8;
+    }
     // 影
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath();
     ctx.ellipse(x, y + r*0.3, r*1.1, r*0.4, 0, 0, Math.PI*2);
     ctx.fill();
     // 本体
+    ctx.shadowBlur = w._isMutant ? 8 : 0;
     ctx.fillStyle = w._color;
     ctx.beginPath();
     ctx.arc(x, y - r*0.7, r, 0, Math.PI*2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.4)';
-    ctx.lineWidth = 1; ctx.stroke();
-    // HPバー背景
+    ctx.strokeStyle = w._isMutant ? '#ff88ff' : 'rgba(255,255,255,.4)';
+    ctx.lineWidth = w._isMutant ? 2 : 1; ctx.stroke();
+    ctx.shadowBlur = 0;
+    // HPバー
     ctx.fillStyle = 'rgba(0,0,0,.5)';
     ctx.fillRect(x - bw/2, y + r*0.5, bw, 3);
-    // HPバー
     ctx.fillStyle = hpPct > 0.6 ? '#44ff88' : hpPct > 0.3 ? '#ffaa44' : '#ff4444';
     ctx.fillRect(x - bw/2, y + r*0.5, bw * hpPct, 3);
-    // 名前（末尾1文字）
+    // 名前
     ctx.fillStyle = 'rgba(245,232,200,.9)';
     ctx.font = Math.max(7, r-1) + 'px Noto Serif JP';
     ctx.textAlign = 'center';
     ctx.fillText(w.name.slice(-1), x, y - r*0.35);
-    // 未成年ラベル
     if (!w.isMature()) {
       ctx.fillStyle = '#ffdd88';
       ctx.font = '6px sans-serif';
       ctx.fillText(w.age + '歳', x, y + r * 1.0);
+    }
+    // スキルバッジ（成人のみ）
+    if (w._skillId && w.isMature()) {
+      const sk = getSkillById(w._skillId);
+      if (sk) {
+        ctx.font = Math.max(7, r) + 'px serif';
+        ctx.fillText(sk.icon, x + r*1.1, y - r*1.2);
+      }
     }
     ctx.restore();
   }
@@ -1768,20 +1986,23 @@ function devRestoreHp()      { gWarriors.forEach(w => { w.stats.hp = w.stats.max
 function devSetUnification() { state.unification = Math.min(99.9, state.unification+30); updateStatusUI(); showToast('統一度 +30%'); closeModal('dev-modal'); }
 function devAgeUp() {
   gWarriors.forEach(w => { w.age = Math.min(60, w.age + 10); });
-  updatePartyRow();
-  showToast('全武将 年齢+10');
-  closeModal('dev-modal');
+  updatePartyRow(); showToast('全武将 年齢+10'); closeModal('dev-modal');
 }
 function devAddWarrior() {
   const gender = Math.random() < 0.5 ? 'male' : 'female';
   const name   = randName(gender);
   const jobId  = Math.floor(Math.random() * Object.keys(ROLES).length);
-  const age    = rnd(20, 35); // 最初から成人として招募
-  // [バグ5補足] offsetX は内部で保持されるが使われないため 0 を明示
+  const age    = rnd(20, 35);
   const w = new IsoWarrior(name, jobId, rnd(35,65), 0, 2+Math.random()*3, gender, age);
+  // ランダムでスキル付与
+  if (Math.random() < 0.4) {
+    const sk = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)];
+    w._skillId = sk.id;
+    w.applyBloodSkill();
+  }
   gWarriors.push(w);
   updatePartyRow();
-  showToast(name + ' が加入！（' + age + '歳）');
+  showToast(name + ' が加入！（' + age + '歳）' + (w._skillId ? '　' + w.skillName() : ''));
   closeModal('dev-modal');
 }
 
@@ -1793,15 +2014,19 @@ function initGame() {
   spawnPetals();
 
   const initialWarriors = [
-    { name:'織田信長', jobId:0, power:72, gender:'male',   age:28 },
-    { name:'豊臣秀吉', jobId:1, power:58, gender:'male',   age:32 },
-    { name:'徳川家康', jobId:2, power:65, gender:'male',   age:35 },
-    { name:'帰蝶',     jobId:7, power:45, gender:'female', age:26 },
+    { name:'織田信長', jobId:0, power:72, gender:'male',   age:28, skillId:'brave'  },
+    { name:'豊臣秀吉', jobId:1, power:58, gender:'male',   age:32, skillId:'wise'   },
+    { name:'徳川家康', jobId:2, power:65, gender:'male',   age:35, skillId:'iron'   },
+    { name:'帰蝶',     jobId:7, power:45, gender:'female', age:26, skillId:'loyal'  },
   ];
 
   initialWarriors.forEach((cfg, i) => {
     const w = new IsoWarrior(cfg.name, cfg.jobId, cfg.power, (i-1.5)*0.8, 2.5+Math.random()*2, cfg.gender, cfg.age);
     if (cfg.gender === 'female') w.stats.wisdom = rnd(50, 70);
+    if (cfg.skillId) {
+      w._skillId = cfg.skillId;
+      w.applyBloodSkill();
+    }
     gWarriors.push(w);
   });
 
