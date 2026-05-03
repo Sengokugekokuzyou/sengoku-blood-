@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>戦国血脈 〜覇道の系譜〜</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Shippori+Mincho:wght@400;700;800&display=swap');
 :root{
   --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
   --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.85);
+  --crimson:#8b0000;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
@@ -53,12 +54,13 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 .np{font-size:11px;color:var(--gold-l);font-weight:700;min-width:32px;text-align:right;}
 #party-row{display:flex;gap:7px;padding:6px 0 5px;overflow-x:auto;scrollbar-width:none;}
 #party-row::-webkit-scrollbar{display:none;}
-.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:56px;cursor:pointer;transition:border-color .2s,background .2s;}
+.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:5px 10px;min-width:60px;cursor:pointer;transition:border-color .2s,background .2s;}
 .party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08);}
 .party-card:active{background:rgba(200,150,12,.15);}
 .pc-role{font-size:8px;color:var(--gold-d);letter-spacing:.1em;}
 .pc-name{font-size:10px;color:var(--parchment);font-weight:700;}
 .pc-pow{font-size:9px;color:#ffaa44;}
+.pc-hp{font-size:8px;color:#88dd88;}
 .pc-loc{font-size:8px;color:#aaddff;margin-top:1px;}
 .pc-rel{font-size:8px;color:#88ffaa;}
 #action-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:5px 0 3px;}
@@ -93,21 +95,21 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 .modal-content{position:relative;background:var(--panel);width:92%;max-width:420px;border:3px solid var(--gold);border-radius:16px;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6);}
 
 /* ── 武将詳細モーダル ── */
-#warrior-modal .modal-content{
-  background:#111;border:3px solid #ffcc00;border-radius:15px;
-  box-shadow:0 0 15px rgba(255,204,0,.5);max-width:360px;max-height:90vh;overflow-y:auto;
-}
+#warrior-modal .modal-content{background:#111;border:3px solid #ffcc00;border-radius:15px;box-shadow:0 0 15px rgba(255,204,0,.5);max-width:380px;max-height:92vh;overflow-y:auto;}
 .wm-name{font-size:22px;font-weight:bold;color:#ffcc00;text-align:center;margin-bottom:4px;}
 .wm-meta{font-size:13px;text-align:center;color:#d1b891;margin-bottom:14px;}
-.wm-status{background:#222;border-radius:10px;padding:10px;margin-bottom:14px;display:flex;justify-content:space-around;text-align:center;}
+.wm-status{background:#222;border-radius:10px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:6px;}
 .wm-stat-item{font-size:14px;font-weight:700;}
 .wm-stat-item.pow{color:#ffcc66;}
 .wm-stat-item.wis{color:#aaddff;}
-.wm-stat-item.loy{color:#88ff88;}
+.wm-hp-wrap{background:#1a1a1a;border-radius:8px;padding:8px 12px;margin-bottom:10px;}
+.wm-hp-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,232,200,.5);margin-bottom:4px;}
+.wm-hp-track{height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.wm-hp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#dd2222,#ffaa44,#44dd44);transition:width .4s;}
 .wm-section-title{font-size:11px;color:#aaa;text-align:center;margin-bottom:5px;letter-spacing:.1em;}
 .wm-skill-block,.wm-bloodline-block,.wm-relation-block{border:1px solid #444;border-radius:8px;padding:10px;margin-bottom:12px;}
 .wm-skill-list{font-size:13px;text-align:center;color:#d1b891;}
-.wm-bloodline-pair{font-size:16px;text-align:center;color:#ffcc00;margin-bottom:10px;font-weight:700;}
+.wm-bloodline-pair{font-size:14px;text-align:center;color:#ffcc00;margin-bottom:10px;font-weight:700;line-height:1.6;}
 .wm-pedigree-btn{background:#ffcc00;color:#000;border:none;border-radius:5px;width:100%;padding:8px;font-weight:bold;font-size:13px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .1s;}
 .wm-pedigree-btn:active{filter:brightness(.85);transform:scale(.97);}
 .wm-rel-item{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;color:#eee;padding:2px 0;border-bottom:1px solid rgba(255,204,0,.07);}
@@ -125,193 +127,181 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 .bt-bonus-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .bt-bonus{padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;}
 
-/* ════════════════════════════════
-   家系図モーダル（新UI）
-════════════════════════════════ */
-#pedigree-modal{
-  position:fixed;inset:0;z-index:800;
-  background:rgba(0,0,0,.92);
-  display:none;flex-direction:column;align-items:center;justify-content:flex-start;
-  overflow-y:auto;
-}
+/* ── 家系図モーダル ── */
+#pedigree-modal{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;}
 #pedigree-modal.show{display:flex;}
-
-.pg-wrap{
-  width:100%;max-width:480px;
-  padding:max(env(safe-area-inset-top,0px),20px) 16px max(env(safe-area-inset-bottom,0px),20px);
-  min-height:100%;
-  display:flex;flex-direction:column;gap:0;
-  animation:pgSlideIn .35s cubic-bezier(.22,.68,0,1.2) both;
-}
-@keyframes pgSlideIn{
-  from{opacity:0;transform:translateY(30px) scale(.96)}
-  to{opacity:1;transform:none}
-}
-
-/* ヘッダー */
-.pg-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding-bottom:14px;
-  border-bottom:1px solid rgba(200,150,12,.25);
-  margin-bottom:18px;
-}
-.pg-title{
-  font-size:18px;font-weight:900;letter-spacing:.25em;
-  color:var(--gold-l);
-  text-shadow:0 0 20px rgba(200,150,12,.5);
-}
+.pg-wrap{width:100%;max-width:480px;padding:max(env(safe-area-inset-top,0px),20px) 16px max(env(safe-area-inset-bottom,0px),20px);min-height:100%;display:flex;flex-direction:column;gap:0;animation:pgSlideIn .35s cubic-bezier(.22,.68,0,1.2) both;}
+@keyframes pgSlideIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
+.pg-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(200,150,12,.25);margin-bottom:18px;}
+.pg-title{font-size:18px;font-weight:900;letter-spacing:.25em;color:var(--gold-l);text-shadow:0 0 20px rgba(200,150,12,.5);}
 .pg-subtitle{font-size:10px;color:var(--gold-d);letter-spacing:.2em;margin-top:2px;}
-.pg-close{
-  width:36px;height:36px;border-radius:50%;
-  border:1px solid rgba(200,150,12,.35);
-  background:rgba(0,0,0,.5);
-  color:var(--gold-l);font-size:18px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;
-  transition:background .15s;
-}
+.pg-close{width:36px;height:36px;border-radius:50%;border:1px solid rgba(200,150,12,.35);background:rgba(0,0,0,.5);color:var(--gold-l);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s;}
 .pg-close:active{background:rgba(200,150,12,.2);}
-
-/* ボーナスカード */
-.pg-bonus-card{
-  background:linear-gradient(135deg,rgba(20,12,4,.95),rgba(10,6,2,.95));
-  border:1px solid rgba(200,150,12,.4);
-  border-radius:14px;
-  padding:14px 16px;
-  margin-bottom:22px;
-  position:relative;
-  overflow:hidden;
-}
-.pg-bonus-card::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at top left,rgba(200,150,12,.08),transparent 60%);
-  pointer-events:none;
-}
-.pg-bonus-warrior{
-  font-size:20px;font-weight:900;color:#fff;
-  letter-spacing:.1em;margin-bottom:2px;
-}
-.pg-bonus-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;
-  border:1px solid;margin-bottom:10px;
-}
-.pg-bonus-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
-}
-.pg-bonus-item{
-  background:rgba(255,255,255,.05);border-radius:8px;
-  padding:7px 4px;text-align:center;
-}
+.pg-bonus-card{background:linear-gradient(135deg,rgba(20,12,4,.95),rgba(10,6,2,.95));border:1px solid rgba(200,150,12,.4);border-radius:14px;padding:14px 16px;margin-bottom:22px;position:relative;overflow:hidden;}
+.pg-bonus-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(200,150,12,.08),transparent 60%);pointer-events:none;}
+.pg-bonus-warrior{font-size:20px;font-weight:900;color:#fff;letter-spacing:.1em;margin-bottom:2px;}
+.pg-bonus-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid;margin-bottom:10px;}
+.pg-bonus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.pg-bonus-item{background:rgba(255,255,255,.05);border-radius:8px;padding:7px 4px;text-align:center;}
 .pg-bonus-item .pbi-val{font-size:16px;font-weight:900;}
 .pg-bonus-item .pbi-lbl{font-size:9px;color:rgba(245,232,200,.55);margin-top:1px;letter-spacing:.05em;}
-.pg-bonus-battle{
-  margin-top:8px;
-  background:rgba(139,0,0,.25);border:1px solid rgba(200,50,50,.3);
-  border-radius:8px;padding:6px 10px;
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;
-}
+.pg-bonus-battle{margin-top:8px;background:rgba(139,0,0,.25);border:1px solid rgba(200,50,50,.3);border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;font-size:11px;}
 .pg-bonus-battle .pbb-val{font-size:15px;font-weight:900;color:#ffaaaa;}
-
-/* 家系ツリー本体 */
-.pg-tree-section{
-  display:flex;flex-direction:column;align-items:center;
-  gap:0;
-}
-.pg-tree-label{
-  font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.6);
-  text-align:center;margin-bottom:10px;
-}
-
-/* ノード */
-.pgn{
-  display:flex;flex-direction:column;align-items:center;
-}
-.pgn-box{
-  border-radius:12px;padding:10px 14px;
-  text-align:center;cursor:default;
-  position:relative;
-  transition:transform .15s;
-}
-.pgn-box.self{
-  background:linear-gradient(135deg,rgba(139,0,0,.5),rgba(80,0,0,.5));
-  border:2px solid var(--gold);
-  box-shadow:0 0 18px rgba(200,150,12,.3);
-  min-width:130px;
-}
-.pgn-box.parent{
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(200,150,12,.35);
-  min-width:110px;
-}
-.pgn-box.grand{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(200,150,12,.18);
-  min-width:88px;
-}
-.pgn-box.unknown{
-  background:rgba(255,255,255,.03);
-  border:1px dashed rgba(200,150,12,.2);
-  min-width:80px;opacity:.5;
-}
+.pg-tree-section{display:flex;flex-direction:column;align-items:center;gap:0;}
+.pg-tree-label{font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.6);text-align:center;margin-bottom:10px;}
+.pgn{display:flex;flex-direction:column;align-items:center;}
+.pgn-box{border-radius:12px;padding:10px 14px;text-align:center;cursor:default;position:relative;transition:transform .15s;}
+.pgn-box.self{background:linear-gradient(135deg,rgba(139,0,0,.5),rgba(80,0,0,.5));border:2px solid var(--gold);box-shadow:0 0 18px rgba(200,150,12,.3);min-width:130px;}
+.pgn-box.parent{background:rgba(255,255,255,.07);border:1px solid rgba(200,150,12,.35);min-width:110px;}
+.pgn-box.grand{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);min-width:88px;}
+.pgn-box.unknown{background:rgba(255,255,255,.03);border:1px dashed rgba(200,150,12,.2);min-width:80px;opacity:.5;}
 .pgn-name{font-weight:700;color:var(--parchment);font-size:13px;letter-spacing:.05em;}
 .pgn-box.grand .pgn-name{font-size:11px;}
 .pgn-box.unknown .pgn-name{font-size:11px;color:rgba(245,232,200,.4);}
 .pgn-clan{font-size:9px;margin-top:1px;font-weight:400;}
 .pgn-role{font-size:8px;color:rgba(245,232,200,.4);margin-top:1px;letter-spacing:.1em;}
-
-/* コネクタ線 */
 .pg-vline{width:1px;background:linear-gradient(rgba(200,150,12,.5),rgba(200,150,12,.2));flex-shrink:0;}
 .pg-hline{height:1px;background:rgba(200,150,12,.3);flex-shrink:0;}
-
-/* 親行レイアウト */
-.pg-parent-row{
-  display:flex;align-items:flex-start;gap:0;width:100%;
-}
-.pg-parent-col{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-}
+.pg-parent-row{display:flex;align-items:flex-start;gap:0;width:100%;}
+.pg-parent-col{flex:1;display:flex;flex-direction:column;align-items:center;}
 .pg-parent-divider{width:16px;flex-shrink:0;}
-
-/* 祖父母行 */
-.pg-grand-row{
-  display:flex;align-items:flex-start;gap:6px;width:100%;
-}
-.pg-grand-col{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-}
-
-/* メモ・血統バー */
-.pg-meter-wrap{
-  margin-top:22px;
-  background:rgba(20,12,4,.9);
-  border:1px solid rgba(200,150,12,.25);
-  border-radius:12px;padding:14px 16px;
-  width:100%;
-}
+.pg-grand-row{display:flex;align-items:flex-start;gap:6px;width:100%;}
+.pg-grand-col{flex:1;display:flex;flex-direction:column;align-items:center;}
+.pg-meter-wrap{margin-top:22px;background:rgba(20,12,4,.9);border:1px solid rgba(200,150,12,.25);border-radius:12px;padding:14px 16px;width:100%;}
 .pg-meter-title{font-size:10px;letter-spacing:.2em;color:var(--gold-d);margin-bottom:10px;}
 .pg-meter-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
 .pg-meter-lbl{font-size:10px;color:rgba(245,232,200,.6);width:36px;flex-shrink:0;}
 .pg-meter-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden;}
 .pg-meter-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,.68,0,1.2);}
 .pg-meter-val{font-size:11px;font-weight:700;min-width:34px;text-align:right;}
-
-/* 閉じるボタン（下） */
 .pg-footer{margin-top:20px;width:100%;}
-.pg-footer-btn{
-  width:100%;padding:14px;border-radius:12px;
-  background:rgba(200,150,12,.15);
-  border:1px solid rgba(200,150,12,.4);
-  color:var(--gold-l);font-size:14px;font-weight:700;
-  letter-spacing:.15em;cursor:pointer;font-family:inherit;
-  transition:background .15s;
-}
+.pg-footer-btn{width:100%;padding:14px;border-radius:12px;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold-l);font-size:14px;font-weight:700;letter-spacing:.15em;cursor:pointer;font-family:inherit;transition:background .15s;}
 .pg-footer-btn:active{background:rgba(200,150,12,.28);}
 
-/* 血統ツリーモーダル */
-#bloodline-modal .modal-content{max-width:460px;}
-#bloodline-modal .modal-content{max-height:88vh;overflow:hidden;display:flex;flex-direction:column;}
+/* ── 縁組モーダル ── */
+#engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;padding:8px;background:rgba(8,4,0,.94);}
+.modal-shell{position:relative;width:100%;max-width:430px;height:92%;max-height:660px;background:linear-gradient(160deg,rgba(14,8,2,.98) 0%,rgba(10,5,1,.99) 100%);border:1px solid rgba(200,150,12,.35);border-radius:18px;box-shadow:0 0 0 1px rgba(200,150,12,.12),0 0 60px rgba(139,0,0,.25),0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,150,12,.15);overflow:hidden;display:flex;flex-direction:column;animation:shellIn .5s cubic-bezier(.22,.68,0,1.15) both;}
+@keyframes shellIn{from{opacity:0;transform:translateY(28px) scale(.96);}to{opacity:1;transform:none;}}
+.modal-shell::before,.modal-shell::after{content:'';position:absolute;width:40px;height:40px;border:2px solid rgba(200,150,12,.3);pointer-events:none;z-index:5;}
+.modal-shell::before{top:8px;left:8px;border-right:none;border-bottom:none;border-radius:6px 0 0 0;}
+.modal-shell::after{bottom:8px;right:8px;border-left:none;border-top:none;border-radius:0 0 6px 0;}
+.eng-header{flex-shrink:0;padding:14px 18px 10px;border-bottom:1px solid rgba(200,150,12,.18);background:linear-gradient(180deg,rgba(139,0,0,.12) 0%,transparent 100%);}
+.eng-header-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.eng-title{font-size:20px;font-weight:800;letter-spacing:.35em;color:var(--gold-l);text-shadow:0 0 30px rgba(200,150,12,.6);}
+.eng-subtitle{font-size:9px;letter-spacing:.4em;color:rgba(200,150,12,.5);margin-top:1px;font-weight:300;}
+.eng-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(200,150,12,.3);background:rgba(0,0,0,.4);color:var(--gold-l);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.eng-close:active{background:rgba(200,150,12,.2);}
+.step-tabs{flex-shrink:0;display:flex;border-bottom:1px solid rgba(200,150,12,.12);background:rgba(0,0,0,.3);}
+.step-tab{flex:1;padding:9px 4px;text-align:center;font-size:10px;letter-spacing:.2em;color:rgba(200,150,12,.4);border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;}
+.step-tab.active{color:var(--gold-l);border-bottom-color:var(--gold);background:rgba(200,150,12,.05);}
+.step-tab .tab-num{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.3);font-size:9px;font-weight:700;margin-right:4px;color:rgba(200,150,12,.6);}
+.step-tab.active .tab-num{background:rgba(200,150,12,.3);color:var(--gold-l);}
+.step-tab.done .tab-num{background:var(--gold);color:#0a0500;}
+.eng-body{flex:1;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:rgba(200,150,12,.25) transparent;}
+.eng-body::-webkit-scrollbar{width:3px;}
+.eng-body::-webkit-scrollbar-thumb{background:rgba(200,150,12,.25);border-radius:2px;}
+.dual-select{padding:10px 12px 14px;}
+.role-toggle{display:flex;gap:0;margin-bottom:12px;background:rgba(0,0,0,.35);border:1px solid rgba(200,150,12,.18);border-radius:12px;overflow:hidden;}
+.role-btn{flex:1;padding:10px 6px 8px;text-align:center;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:.2em;background:transparent;border:none;color:rgba(200,150,12,.4);transition:all .18s;position:relative;line-height:1.3;}
+.role-btn.active{background:linear-gradient(160deg,rgba(139,0,0,.35),rgba(80,0,0,.2));color:var(--gold-l);}
+.role-btn.active::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--gold);border-radius:1px;}
+.rbtn-main{font-size:12px;font-weight:700;}
+.rbtn-sel{display:block;font-size:9px;margin-top:2px;color:rgba(200,150,12,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;margin:2px auto 0;}
+.role-btn.active .rbtn-sel{color:rgba(245,232,200,.6);}
+.role-btn.has-sel .rbtn-sel{color:var(--gold-l)!important;font-weight:700;}
+.rbtn-tick{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--gold);color:#0a0500;font-size:8px;font-weight:900;margin-right:3px;vertical-align:middle;opacity:0;transition:opacity .2s;}
+.role-btn.has-sel .rbtn-tick{opacity:1;}
+.selected-mini{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(139,0,0,.15),rgba(100,50,0,.08));border:1px solid rgba(200,150,12,.28);border-radius:11px;padding:10px 12px;margin-bottom:10px;position:relative;overflow:hidden;}
+.sm-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#6a1010,#3a0808);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px rgba(200,150,12,.3);}
+.sm-info{flex:1;min-width:0;}
+.sm-role{font-size:8px;letter-spacing:.18em;color:rgba(200,150,12,.5);margin-bottom:1px;}
+.sm-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;}
+.sm-stats{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.sm-stat{background:rgba(255,255,255,.05);border-radius:5px;padding:2px 7px;text-align:center;}
+.sm-stat-val{font-size:12px;font-weight:700;}
+.sm-stat-lbl{font-size:7px;color:rgba(245,232,200,.38);}
+.parent-placeholder{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border:1px dashed rgba(200,150,12,.18);border-radius:11px;color:rgba(200,150,12,.3);font-size:10px;letter-spacing:.18em;margin-bottom:10px;}
+.parent-label{font-size:9px;letter-spacing:.22em;color:rgba(200,150,12,.38);margin-bottom:5px;padding-left:2px;}
+.filter-row{display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-btn{flex-shrink:0;padding:4px 11px;border-radius:14px;font-size:9px;letter-spacing:.1em;border:1px solid rgba(200,150,12,.2);background:transparent;color:rgba(245,232,200,.4);cursor:pointer;font-family:inherit;transition:all .16s;}
+.filter-btn.active{background:rgba(200,150,12,.15);border-color:var(--gold);color:var(--gold-l);}
+.candidates-wrap{display:flex;flex-direction:column;gap:6px;}
+.candidate-card{border-radius:12px;padding:10px 12px;border:1px solid rgba(200,150,12,.14);background:rgba(255,255,255,.024);cursor:pointer;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;transition:border-color .16s,background .16s,transform .1s;}
+.candidate-card:active{transform:scale(.98);}
+.candidate-card.selected{border-color:var(--gold);background:rgba(200,150,12,.08);}
+.c-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(200,150,12,.2);}
+.c-info{flex:1;min-width:0;}
+.c-name{font-size:14px;font-weight:700;color:var(--parchment);margin-bottom:1px;letter-spacing:.04em;}
+.c-clan{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.1em;margin-bottom:4px;}
+.c-mini-stats{display:flex;gap:6px;flex-wrap:wrap;}
+.c-mstat{font-size:9px;color:rgba(245,232,200,.38);}
+.c-mstat span{color:rgba(245,232,200,.7);font-weight:700;}
+.compat-mini{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.compat-track{width:28px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.compat-fill{height:100%;border-radius:2px;}
+.compat-lbl{font-size:8px;font-weight:700;}
+.selected-tick{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:9px;color:#0d0600;font-weight:900;}
+.candidate-card.selected .selected-tick{display:flex;}
+.preview-wrap{padding:10px 12px 4px;}
+.parents-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.pr-card{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:10px;padding:8px 10px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
+.pr-card:active{border-color:rgba(200,150,12,.5);background:rgba(200,150,12,.05);}
+.pr-role{font-size:8px;letter-spacing:.2em;color:rgba(200,150,12,.45);margin-bottom:3px;}
+.pr-name{font-size:12px;font-weight:700;color:var(--parchment);}
+.pr-clan{font-size:8px;color:rgba(200,150,12,.45);margin-top:1px;}
+.pr-change{font-size:8px;color:rgba(200,150,12,.35);margin-top:3px;letter-spacing:.05em;}
+.pr-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:28px;}
+.pr-line{width:1px;height:14px;background:rgba(200,150,12,.25);}
+.pr-heart{font-size:14px;}
+.blood-preview{background:linear-gradient(135deg,rgba(20,10,2,.9),rgba(12,6,1,.95));border:1px solid rgba(200,150,12,.22);border-radius:14px;overflow:hidden;margin-bottom:10px;}
+.bp-header{padding:10px 14px 8px;border-bottom:1px solid rgba(200,150,12,.1);display:flex;align-items:center;justify-content:space-between;}
+.bp-title{font-size:9px;letter-spacing:.25em;color:rgba(200,150,12,.5);}
+.bp-badge{padding:2px 10px;border-radius:8px;font-size:9px;font-weight:700;letter-spacing:.04em;border:1px solid;}
+.child-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;}
+.cs-block{background:rgba(255,255,255,.04);border-radius:8px;padding:8px;}
+.cs-label{font-size:8px;letter-spacing:.15em;color:rgba(245,232,200,.35);margin-bottom:4px;}
+.cs-val{font-size:20px;font-weight:900;}
+.cs-bar{height:3px;border-radius:2px;margin-top:4px;}
+.child-skills{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:5px;}
+.skill-tag{padding:3px 10px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.04em;}
+.battle-row{margin:0 14px 8px;background:rgba(139,0,0,.18);border:1px solid rgba(200,50,50,.2);border-radius:8px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;}
+.br-val{font-size:14px;font-weight:900;color:#ffaaaa;}
+.facility-row{margin:0 14px 14px;background:rgba(26,74,46,.15);border:1px solid rgba(60,138,94,.18);border-radius:8px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:rgba(245,232,200,.55);}
+.fac-val{font-size:13px;font-weight:900;color:#88ffaa;}
+.cost-note{text-align:center;font-size:9px;color:rgba(200,150,12,.45);letter-spacing:.1em;padding:0 12px 8px;}
+.cost-note span{color:var(--gold-l);font-weight:700;}
+.eng-footer{flex-shrink:0;padding:10px 12px max(env(safe-area-inset-bottom,0px),12px);border-top:1px solid rgba(200,150,12,.12);background:rgba(6,3,0,.96);display:flex;gap:7px;}
+.execute-btn{flex:1;padding:14px 8px;background:linear-gradient(160deg,rgba(139,0,0,.8) 0%,rgba(80,0,0,.9) 100%);border:1px solid var(--gold);border-radius:11px;color:var(--parchment);font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.14em;cursor:pointer;box-shadow:0 0 20px rgba(139,0,0,.25),inset 0 1px 0 rgba(200,150,12,.2);position:relative;overflow:hidden;transition:filter .15s,transform .1s;}
+.execute-btn:active{filter:brightness(1.25);transform:scale(.98);}
+.execute-btn:disabled{opacity:.34;cursor:not-allowed;box-shadow:none;border-color:rgba(200,150,12,.18);}
+.sub-btn{padding:14px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.16);border-radius:11px;color:rgba(245,232,200,.5);font-family:inherit;font-size:11px;letter-spacing:.1em;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.sub-btn:active{background:rgba(200,150,12,.1);}
+
+/* ── 成功オーバーレイ ── */
+#success-overlay{position:fixed;inset:0;z-index:900;background:rgba(8,4,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;}
+#success-overlay.show{display:flex;}
+.so-kanji{font-size:68px;font-weight:900;color:var(--gold-l);text-shadow:0 0 40px rgba(200,150,12,.8);animation:kanjiPulse 1.5s ease-in-out infinite;}
+@keyframes kanjiPulse{0%,100%{text-shadow:0 0 40px rgba(200,150,12,.8);}50%{text-shadow:0 0 80px rgba(200,150,12,1),0 0 120px rgba(255,200,50,.4);}}
+.so-text{font-size:14px;letter-spacing:.4em;color:var(--gold-l);}
+.so-child{background:rgba(255,255,255,.05);border:1px solid rgba(200,150,12,.4);border-radius:16px;padding:16px 24px;text-align:center;width:100%;max-width:320px;}
+.so-child-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:.1em;margin-bottom:4px;}
+.so-child-blood{font-size:11px;color:rgba(200,150,12,.6);margin-bottom:12px;letter-spacing:.15em;}
+.so-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.so-stat{background:rgba(255,255,255,.06);border-radius:8px;padding:6px 2px;text-align:center;}
+.so-stat-val{font-size:18px;font-weight:900;}
+.so-stat-lbl{font-size:7px;color:rgba(245,232,200,.4);margin-top:2px;}
+.so-skills{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+.so-skill-tag{padding:3px 10px;border-radius:8px;font-size:9px;font-weight:700;}
+.so-dismiss{margin-top:6px;padding:12px 36px;background:var(--gold);color:#0a0500;font-family:inherit;font-size:14px;font-weight:700;border:none;border-radius:22px;cursor:pointer;letter-spacing:.15em;}
+
+/* ── 内政・歴史モーダル ── */
+#dev-modal .modal-content{max-height:80vh;overflow-y:auto;}
+#history-modal .modal-content{max-height:80vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(14,8,2,.97);border:1px solid var(--gold);border-radius:20px;padding:9px 20px;color:var(--gold-l);font-size:12px;letter-spacing:.1em;z-index:999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -333,7 +323,7 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 <div class="petal" style="left:89%;width:6px;height:6px;animation-duration:9.6s;animation-delay:-2.4s;"></div>
 <div id="time-display">第1年 1月 1日</div>
 
-<!-- ══ 合戦画面 ══ -->
+<!-- 合戦画面 -->
 <div id="battle-screen">
   <div class="bh">
     <div class="bt" id="battle-family">織田軍 出陣</div>
@@ -351,7 +341,7 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
   </div>
 </div>
 
-<!-- ══ 家系図モーダル（新UI） ══ -->
+<!-- 家系図モーダル -->
 <div id="pedigree-modal">
   <div class="pg-wrap">
     <div class="pg-header">
@@ -361,56 +351,17 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
       </div>
       <div class="pg-close" onclick="closePedigreeModal()">✕</div>
     </div>
-
-    <!-- ボーナスカード -->
     <div class="pg-bonus-card" id="pg-bonus-card"></div>
-
-    <!-- ツリー本体 -->
     <div class="pg-tree-label">── 血の系譜 ──</div>
     <div class="pg-tree-section" id="pg-tree-body"></div>
-
-    <!-- 血統メーター -->
     <div class="pg-meter-wrap" id="pg-meter-wrap"></div>
-
     <div class="pg-footer">
       <button class="pg-footer-btn" onclick="closePedigreeModal()">城に戻る</button>
     </div>
   </div>
 </div>
 
-<!-- ══ 血統モーダル ══ -->
-<div id="bloodline-modal" class="modal">
-  <div class="modal-content" style="max-height:88vh;overflow:hidden;display:flex;flex-direction:column;max-width:460px;">
-    <div onclick="closeBloodlineModal()" style="position:absolute;top:14px;right:20px;font-size:28px;cursor:pointer;color:var(--gold);z-index:1;">✕</div>
-    <h2 style="text-align:center;color:var(--gold-l);margin-bottom:4px;font-size:19px;letter-spacing:.15em;">血脈 ─ 縁組</h2>
-    <div id="bl-tabs" style="display:flex;gap:6px;margin-bottom:12px;">
-      <button id="bl-tab-tree"  onclick="blTab('tree')"  style="flex:1;padding:7px;border:1px solid var(--gold);background:rgba(200,150,12,.2);color:var(--gold-l);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">🌳 血統ツリー</button>
-      <button id="bl-tab-marry" onclick="blTab('marry')" style="flex:1;padding:7px;border:1px solid rgba(200,150,12,.3);background:transparent;color:var(--parchment);border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;">🌸 縁組を結ぶ</button>
-    </div>
-    <div id="bl-panel-tree" style="flex:1;overflow-y:auto;">
-      <div id="bl-warrior-select" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
-      <div id="bl-tree-view"></div>
-    </div>
-    <div id="bl-panel-marry" style="flex:1;overflow-y:auto;display:none;">
-      <div style="font-size:12px;color:rgba(245,232,200,.6);margin-bottom:10px;text-align:center;">父方・母方を選んで次世代を誕生させます</div>
-      <div style="display:flex;gap:10px;margin-bottom:12px;">
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">父（武官）</div>
-          <div id="father-select"></div>
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:11px;color:var(--gold-d);margin-bottom:4px;letter-spacing:.1em;">母（姫）</div>
-          <div id="mother-select"></div>
-        </div>
-      </div>
-      <div id="bl-preview" style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:12px;margin-bottom:12px;min-height:60px;"></div>
-      <button onclick="doMarriage()" style="width:100%;padding:13px;background:linear-gradient(#8b0000,#5a0000);color:var(--parchment);border:1px solid var(--gold);border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">縁を結ぶ 〜 誕生</button>
-    </div>
-    <button onclick="closeBloodlineModal()" style="margin-top:10px;padding:10px;background:rgba(100,60,0,.4);color:var(--parchment);border:1px solid var(--gold-d);border-radius:10px;font-size:13px;cursor:pointer;">閉じる</button>
-  </div>
-</div>
-
-<!-- ══ 武将モーダル ══ -->
+<!-- 武将モーダル -->
 <div id="warrior-modal" class="modal">
   <div class="modal-content">
     <div class="wm-close-btn" onclick="closeWarriorModal()">×</div>
@@ -419,7 +370,10 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
     <div class="wm-status">
       <div class="wm-stat-item pow" id="wm-pow">武力 ─</div>
       <div class="wm-stat-item wis" id="wm-wis">知力 ─</div>
-      <div class="wm-stat-item loy" id="wm-loy">忠誠 ─</div>
+    </div>
+    <div class="wm-hp-wrap">
+      <div class="wm-hp-label"><span>体力</span><span id="wm-hp-text">─</span></div>
+      <div class="wm-hp-track"><div class="wm-hp-fill" id="wm-hp-fill" style="width:100%"></div></div>
     </div>
     <div class="wm-section-title">所持スキル</div>
     <div class="wm-skill-block">
@@ -436,7 +390,101 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
   </div>
 </div>
 
-<!-- ══ 内政モーダル ══ -->
+<!-- 縁組モーダル -->
+<div id="engumi-modal">
+  <div class="modal-shell">
+    <div class="eng-header">
+      <div class="eng-header-top">
+        <div>
+          <div class="eng-title">縁組</div>
+          <div class="eng-subtitle">── 血脈の系譜 ──</div>
+        </div>
+        <div class="eng-close" onclick="closeEngumiModal()">✕</div>
+      </div>
+    </div>
+    <div class="step-tabs">
+      <div class="step-tab active" id="tab-1" onclick="goEngumiStep(1)"><span class="tab-num">1</span>父母を選ぶ</div>
+      <div class="step-tab" id="tab-2" onclick="goEngumiStep(2)"><span class="tab-num">2</span>縁結び確認</div>
+    </div>
+    <div class="eng-body" id="eng-body">
+      <div id="step-1">
+        <div class="dual-select">
+          <div class="role-toggle">
+            <button class="role-btn active" id="rbtn-father" onclick="switchEngumiRole('father')">
+              <span class="rbtn-tick">✓</span><span class="rbtn-main">⚔ 父</span>
+              <span class="rbtn-sel" id="rbtn-father-sel">未選択</span>
+            </button>
+            <button class="role-btn" id="rbtn-mother" onclick="switchEngumiRole('mother')">
+              <span class="rbtn-tick">✓</span><span class="rbtn-main">🌸 母</span>
+              <span class="rbtn-sel" id="rbtn-mother-sel">未選択</span>
+            </button>
+          </div>
+          <div id="engumi-selected-summary"></div>
+          <div class="parent-label" id="engumi-list-label">── 父となる武将を選択</div>
+          <div class="filter-row" id="engumi-filter-row"></div>
+          <div class="candidates-wrap" id="engumi-candidates-wrap"></div>
+        </div>
+      </div>
+      <div id="step-2" style="display:none;">
+        <div class="preview-wrap">
+          <div class="parents-row">
+            <div class="pr-card" onclick="goEngumiStep(1);switchEngumiRole('father')">
+              <div class="pr-role">⚔ 父</div>
+              <div class="pr-name" id="prev-father-name">─</div>
+              <div class="pr-clan" id="prev-father-clan">─</div>
+              <div class="pr-change">▸ 変更</div>
+            </div>
+            <div class="pr-arrow"><div class="pr-line"></div><div class="pr-heart">💕</div><div class="pr-line"></div></div>
+            <div class="pr-card" onclick="goEngumiStep(1);switchEngumiRole('mother')">
+              <div class="pr-role">🌸 母</div>
+              <div class="pr-name" id="prev-mother-name">─</div>
+              <div class="pr-clan" id="prev-mother-clan">─</div>
+              <div class="pr-change">▸ 変更</div>
+            </div>
+          </div>
+          <div class="blood-preview">
+            <div class="bp-header">
+              <div class="bp-title">生まれる子の予測</div>
+              <div class="bp-badge" id="bp-badge">─</div>
+            </div>
+            <div class="child-stats-grid" id="child-stats-grid"></div>
+            <div class="child-skills" id="child-skills-wrap"></div>
+            <div class="battle-row">
+              <span style="color:rgba(245,232,200,.55);">⚔ 合戦ボーナス</span>
+              <span class="br-val" id="br-val">─</span>
+            </div>
+            <div class="facility-row">
+              <span>🏯 施設効率</span>
+              <span class="fac-val" id="fac-val">─</span>
+            </div>
+          </div>
+        </div>
+        <div class="cost-note">縁組には <span>800石</span> 必要です</div>
+      </div>
+    </div>
+    <div class="eng-footer">
+      <button class="execute-btn" id="execute-btn" disabled onclick="handleEngumiFooterBtn()">
+        <span id="execute-label">縁結び確認へ</span>
+      </button>
+      <button class="sub-btn" onclick="closeEngumiModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 成功オーバーレイ -->
+<div id="success-overlay">
+  <div class="so-kanji">縁</div>
+  <div class="so-text">縁組が成立した</div>
+  <div class="so-child">
+    <div class="so-child-name" id="so-child-name">─</div>
+    <div class="so-child-blood" id="so-child-blood">─</div>
+    <div class="so-stats-grid" id="so-stats-grid"></div>
+    <div class="so-skills" id="so-skills"></div>
+  </div>
+  <button class="so-dismiss" onclick="dismissSuccess()">城へ戻る</button>
+</div>
+
+<!-- 内政モーダル -->
 <div id="dev-modal" class="modal">
   <div class="modal-content">
     <div onclick="closeDevModal()" style="position:absolute;top:14px;right:20px;font-size:32px;line-height:1;cursor:pointer;color:var(--gold);">✕</div>
@@ -446,7 +494,7 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
   </div>
 </div>
 
-<!-- ══ 歴史モーダル ══ -->
+<!-- 歴史モーダル -->
 <div id="history-modal" class="modal">
   <div class="modal-content" style="max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">
     <div onclick="closeHistory()" style="position:absolute;top:14px;right:20px;font-size:32px;cursor:pointer;color:var(--gold);">✕</div>
@@ -456,7 +504,10 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
   </div>
 </div>
 
-<!-- ══ メインレイアウト ══ -->
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- メインUI -->
 <div id="main">
   <div id="header">
     <div id="game-title">戦国血脈<span class="sub">〜 覇道の系譜 〜</span></div>
@@ -478,7 +529,7 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
     <div id="party-row"></div>
     <div id="action-row">
       <button class="act-btn primary" onclick="openBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
-      <button class="act-btn" onclick="openBloodline()"><span class="ico">🌸</span><span class="lbl">配合</span></button>
+      <button class="act-btn" onclick="openEngumiModal()"><span class="ico">🌸</span><span class="lbl">縁組</span></button>
       <button class="act-btn" onclick="showHistory()"><span class="ico">📜</span><span class="lbl">歴史</span></button>
       <button class="act-btn" onclick="showDev()"><span class="ico">🏯</span><span class="lbl">内政</span></button>
     </div>
@@ -489,7 +540,7 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 'use strict';
 
 /* ═══════════════════════════════════════════
-   Canvasエンジン
+   Canvas エンジン
 ═══════════════════════════════════════════ */
 const canvas = document.getElementById('iso-canvas');
 const ctx    = canvas.getContext('2d');
@@ -514,9 +565,7 @@ function resizeCanvas() {
   CY = canvas.height * 0.72;
 }
 
-/* ═══════════════════════════════════════════
-   Canvas 吹き出し
-═══════════════════════════════════════════ */
+/* ── Canvas吹き出し ── */
 let canvasBubbles = [];
 
 function addCanvasBubble(warrior, text, duration = 150) {
@@ -581,9 +630,7 @@ function drawCanvasBubbles() {
   }
 }
 
-/* ═══════════════════════════════════════════
-   施設アクティビティ（HTML overlay）
-═══════════════════════════════════════════ */
+/* ── 施設アクティビティ ── */
 const bubbleLayer = document.getElementById('bubble-layer');
 
 function showFacilityActivity(facKey, text, color) {
@@ -627,9 +674,9 @@ const FACILITY_EFFECT = {
   training: { stat:'power',   label:'武力', color:'#ffcc44', range:[4,9]  },
   forge:    { stat:'power',   label:'武力', color:'#ffaa44', range:[3,7]  },
   academy:  { stat:'wisdom',  label:'知力', color:'#aaddff', range:[4,8]  },
-  tea:      { stat:'loyalty', label:'忠誠', color:'#88ffaa', range:[5,10] },
-  garden:   { stat:'loyalty', label:'回復', color:'#ff88cc', range:[3,6]  },
-  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[6,12] },
+  tea:      { stat:'hp',      label:'体力', color:'#88ffcc', range:[3,8]  },
+  garden:   { stat:'hp',      label:'体力', color:'#ff88cc', range:[5,12] },
+  loyalty:  { stat:'loyalty', label:'忠誠', color:'#ffdd88', range:[6,12] }, // 忠誠は隠し
 };
 const FACILITY_SPEECH = {
   training: ['うりゃーっ！','もっと強く！','千本素振り！','気合だ！'],
@@ -653,7 +700,7 @@ function getSkills(jobId, power, wisdom) {
   const result = [];
   const primary   = table[0];
   const secondary = table[1] || [];
-  result.push(primary[Math.floor((power  / 30)) % primary.length] || primary[0]);
+  result.push(primary[Math.floor((power / 30)) % primary.length] || primary[0]);
   if (wisdom > 60) result.push(secondary[0] || '─');
   if (wisdom > 80) result.push(secondary[1] || '─');
   return result.length ? result : ['─'];
@@ -723,9 +770,7 @@ function getSpeech(w, sit) {
   return a[Math.floor(Math.random() * a.length)];
 }
 
-/* ═══════════════════════════════════════════
-   浮遊テキスト（canvas）
-═══════════════════════════════════════════ */
+/* ── 浮遊テキスト ── */
 let floatingTexts = [];
 
 function createFloatText(warrior, text, color) {
@@ -961,10 +1006,8 @@ class Busho {
     const pure = this.pureScore();
     const mix  = this.mixScore();
     return {
-      pure,
-      mix,
+      pure, mix,
       power:    Math.floor(pure * 18),
-      loyalty:  Math.floor(pure * 12),
       wisdom:   Math.floor(mix  * 16),
       facility: Math.floor(mix  * 0.3 * 100) / 100,
       battle:   Math.floor((pure * 0.6 + mix * 0.4) * 20),
@@ -973,7 +1016,6 @@ class Busho {
   }
 }
 
-/* 家名定義 */
 const CLANS = {
   oda:      new Clan('織田家'),
   saito:    new Clan('齋藤家'),
@@ -1002,10 +1044,9 @@ function applyBloodlineBonus(warrior) {
   if (!warrior._bloodlineApplied) {
     warrior._bloodlineApplied = true;
     warrior.stats.power   += bonus.power;
-    warrior.stats.loyalty  = Math.min(100, warrior.stats.loyalty + bonus.loyalty);
     warrior.stats.wisdom   = Math.min(99,  warrior.stats.wisdom  + bonus.wisdom);
-    if (bonus.power > 0 || bonus.wisdom > 0 || bonus.loyalty > 0) {
-      createFloatText(warrior, `血統 +${bonus.power + bonus.wisdom + bonus.loyalty}`, '#ffcc88');
+    if (bonus.power > 0 || bonus.wisdom > 0) {
+      createFloatText(warrior, `血統 +${bonus.power + bonus.wisdom}`, '#ffcc88');
       addLog(`${warrior.name}の血統ボーナス発動！（${bonus.type}）`, 'success');
     }
   }
@@ -1020,7 +1061,7 @@ function bloodlineBattleBonus() {
 }
 
 /* ═══════════════════════════════════════════
-   家系図モーダル（新UI）
+   家系図モーダル
 ═══════════════════════════════════════════ */
 window.openPedigreeModal = function(warrior) {
   const busho  = getBusho(warrior);
@@ -1028,11 +1069,9 @@ window.openPedigreeModal = function(warrior) {
   const bonus  = busho ? busho.calcBonus() : null;
   const ROLES  = { bukan:'武官', hime:'姫', bunkan:'文官' };
 
-  // サブタイトル
   document.getElementById('pg-warrior-sub').textContent =
     `${ROLES[warrior.jobId] || '武将'} ／ ${warrior.name}の家系`;
 
-  // ── ボーナスカード ──
   const badgeColors = {
     '純血': { fg:'#ffaaaa', bg:'rgba(255,80,80,.15)', border:'rgba(255,100,100,.4)' },
     '混血': { fg:'#aaddff', bg:'rgba(80,160,255,.15)', border:'rgba(100,160,255,.4)' },
@@ -1046,18 +1085,9 @@ window.openPedigreeModal = function(warrior) {
       ${bonus.type === '純血' ? '🔴' : bonus.type === '混血' ? '🔵' : '⭐'} ${bonus.type}の血脈
     </div>
     <div class="pg-bonus-grid">
-      <div class="pg-bonus-item">
-        <div class="pbi-val" style="color:#ffcc66;">+${bonus.power}</div>
-        <div class="pbi-lbl">⚔ 武力</div>
-      </div>
-      <div class="pg-bonus-item">
-        <div class="pbi-val" style="color:#88ff88;">+${bonus.loyalty}</div>
-        <div class="pbi-lbl">💚 忠誠</div>
-      </div>
-      <div class="pg-bonus-item">
-        <div class="pbi-val" style="color:#aaddff;">+${bonus.wisdom}</div>
-        <div class="pbi-lbl">📖 知力</div>
-      </div>
+      <div class="pg-bonus-item"><div class="pbi-val" style="color:#ffcc66;">+${bonus.power}</div><div class="pbi-lbl">⚔ 武力</div></div>
+      <div class="pg-bonus-item"><div class="pbi-val" style="color:#aaddff;">+${bonus.wisdom}</div><div class="pbi-lbl">📖 知力</div></div>
+      <div class="pg-bonus-item"><div class="pbi-val" style="color:#ffaaaa;">+${bonus.battle}%</div><div class="pbi-lbl">⚔ 合戦</div></div>
     </div>
     <div class="pg-bonus-battle">
       <span style="color:rgba(245,232,200,.6);">⚔ 合戦ボーナス</span>
@@ -1065,15 +1095,9 @@ window.openPedigreeModal = function(warrior) {
     </div>
   ` : `<div style="color:rgba(245,232,200,.4);text-align:center;padding:10px;">血統情報なし</div>`;
 
-  // ── 家系図ツリー ──
   const treeEl = document.getElementById('pg-tree-body');
-  if (!bl) {
-    treeEl.innerHTML = '<div style="color:rgba(245,232,200,.35);text-align:center;padding:20px 0;">血統記録なし</div>';
-  } else {
-    treeEl.innerHTML = buildPgTree(bl, warrior, bonus);
-  }
+  treeEl.innerHTML = bl ? buildPgTree(bl, warrior, bonus) : '<div style="color:rgba(245,232,200,.35);text-align:center;padding:20px 0;">血統記録なし</div>';
 
-  // ── 血統メーター ──
   const meterEl = document.getElementById('pg-meter-wrap');
   if (bonus) {
     const pureW  = Math.round(bonus.pure * 100);
@@ -1081,31 +1105,10 @@ window.openPedigreeModal = function(warrior) {
     const battleW = Math.min(100, bonus.battle * 5);
     meterEl.innerHTML = `
       <div class="pg-meter-title">── 血統分析 ──</div>
-      <div class="pg-meter-row">
-        <div class="pg-meter-lbl">純血度</div>
-        <div class="pg-meter-bar">
-          <div class="pg-meter-fill" style="width:${pureW}%;background:linear-gradient(90deg,#8b0000,#ffaaaa);"></div>
-        </div>
-        <div class="pg-meter-val" style="color:#ffaaaa;">${pureW}%</div>
-      </div>
-      <div class="pg-meter-row">
-        <div class="pg-meter-lbl">混血度</div>
-        <div class="pg-meter-bar">
-          <div class="pg-meter-fill" style="width:${mixW}%;background:linear-gradient(90deg,#1a3a8b,#aaddff);"></div>
-        </div>
-        <div class="pg-meter-val" style="color:#aaddff;">${mixW}%</div>
-      </div>
-      <div class="pg-meter-row">
-        <div class="pg-meter-lbl">合戦力</div>
-        <div class="pg-meter-bar">
-          <div class="pg-meter-fill" style="width:${battleW}%;background:linear-gradient(90deg,#5a1a00,#ffcc44);"></div>
-        </div>
-        <div class="pg-meter-val" style="color:#ffcc44;">+${bonus.battle}%</div>
-      </div>
-    `;
-  } else {
-    meterEl.innerHTML = '';
-  }
+      <div class="pg-meter-row"><div class="pg-meter-lbl">純血度</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${pureW}%;background:linear-gradient(90deg,#8b0000,#ffaaaa);"></div></div><div class="pg-meter-val" style="color:#ffaaaa;">${pureW}%</div></div>
+      <div class="pg-meter-row"><div class="pg-meter-lbl">混血度</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${mixW}%;background:linear-gradient(90deg,#1a3a8b,#aaddff);"></div></div><div class="pg-meter-val" style="color:#aaddff;">${mixW}%</div></div>
+      <div class="pg-meter-row"><div class="pg-meter-lbl">合戦力</div><div class="pg-meter-bar"><div class="pg-meter-fill" style="width:${battleW}%;background:linear-gradient(90deg,#5a1a00,#ffcc44);"></div></div><div class="pg-meter-val" style="color:#ffcc44;">+${bonus.battle}%</div></div>`;
+  } else { meterEl.innerHTML = ''; }
 
   const modal = document.getElementById('pedigree-modal');
   modal.classList.add('show');
@@ -1117,7 +1120,6 @@ function buildPgTree(bl, warrior, bonus) {
   const selfColor = clanColor(selfClan);
   const ROLES = { bukan:'武官', hime:'姫', bunkan:'文官' };
 
-  // 本人ノード
   const selfNode = `
     <div class="pgn">
       <div class="pgn-box self" style="border-color:${selfColor};box-shadow:0 0 18px ${selfColor}40;">
@@ -1128,55 +1130,29 @@ function buildPgTree(bl, warrior, bonus) {
     </div>`;
 
   if (!bl.father && !bl.mother) {
-    return selfNode + `
-      <div style="margin-top:16px;color:rgba(245,232,200,.3);font-size:12px;text-align:center;">
-        ─ 祖先の記録なし ─
-      </div>`;
+    return selfNode + `<div style="margin-top:16px;color:rgba(245,232,200,.3);font-size:12px;text-align:center;">─ 祖先の記録なし ─</div>`;
   }
 
-  // 縦線
   const vlineDown = (h=20) => `<div class="pg-vline" style="height:${h}px;margin:0 auto;"></div>`;
 
-  // 親ノード生成
   function parentNode(node, side) {
-    if (!node) return `
-      <div class="pgn-box unknown" style="margin:0 auto;">
-        <div class="pgn-name">不明</div>
-        <div class="pgn-clan" style="color:rgba(200,150,12,.3);">─</div>
-      </div>`;
+    if (!node) return `<div class="pgn-box unknown" style="margin:0 auto;"><div class="pgn-name">不明</div><div class="pgn-clan" style="color:rgba(200,150,12,.3);">─</div></div>`;
     const cc = clanColor(node.clan);
-    return `
-      <div class="pgn-box parent" style="border-color:${cc}60;margin:0 auto;">
-        <div class="pgn-name">${node.name}</div>
-        <div class="pgn-clan" style="color:${cc};">${node.clan}</div>
-        <div class="pgn-role">${side === 'father' ? '父' : '母'}</div>
-      </div>`;
+    return `<div class="pgn-box parent" style="border-color:${cc}60;margin:0 auto;"><div class="pgn-name">${node.name}</div><div class="pgn-clan" style="color:${cc};">${node.clan}</div><div class="pgn-role">${side === 'father' ? '父' : '母'}</div></div>`;
   }
 
-  // 祖父母ノード生成
   function grandNode(node, label) {
-    if (!node) return `
-      <div class="pgn-box grand unknown" style="margin:0 auto;opacity:.35;">
-        <div class="pgn-name" style="font-size:10px;">不明</div>
-      </div>`;
+    if (!node) return `<div class="pgn-box grand unknown" style="margin:0 auto;opacity:.35;"><div class="pgn-name" style="font-size:10px;">不明</div></div>`;
     const cc = clanColor(node.clan);
-    return `
-      <div class="pgn-box grand" style="border-color:${cc}50;margin:0 auto;">
-        <div class="pgn-name">${node.name}</div>
-        <div class="pgn-clan" style="color:${cc};font-size:8px;">${node.clan}</div>
-        <div class="pgn-role">${label}</div>
-      </div>`;
+    return `<div class="pgn-box grand" style="border-color:${cc}50;margin:0 auto;"><div class="pgn-name">${node.name}</div><div class="pgn-clan" style="color:${cc};font-size:8px;">${node.clan}</div><div class="pgn-role">${label}</div></div>`;
   }
 
   const fNode = bl.father;
   const mNode = bl.mother;
-
-  // 祖父母行（父方）
   const ffGrand = fNode?.father ? grandNode(fNode.father, '父方祖父') : grandNode(null,'');
   const fmGrand = fNode?.mother ? grandNode(fNode.mother, '父方祖母') : grandNode(null,'');
   const mfGrand = mNode?.father ? grandNode(mNode.father, '母方祖父') : grandNode(null,'');
   const mmGrand = mNode?.mother ? grandNode(mNode.mother, '母方祖母') : grandNode(null,'');
-
   const showGrandFather = fNode && (fNode.father || fNode.mother);
   const showGrandMother = mNode && (mNode.father || mNode.mother);
 
@@ -1185,36 +1161,15 @@ function buildPgTree(bl, warrior, bonus) {
     grandRowHtml = `
       <div class="pg-grand-row" style="width:100%;margin-bottom:4px;">
         <div class="pg-grand-col">
-          ${showGrandFather ? `
-            <div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;letter-spacing:.1em;">父方の家</div>
-            <div style="display:flex;gap:6px;width:100%;">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                ${ffGrand}
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                ${fmGrand}
-              </div>
-            </div>
-          ` : '<div style="flex:1;"></div>'}
+          ${showGrandFather ? `<div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;">父方の家</div><div style="display:flex;gap:6px;width:100%;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${ffGrand}</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${fmGrand}</div></div>` : '<div style="flex:1;"></div>'}
         </div>
         <div style="width:12px;flex-shrink:0;"></div>
         <div class="pg-grand-col">
-          ${showGrandMother ? `
-            <div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;letter-spacing:.1em;">母方の家</div>
-            <div style="display:flex;gap:6px;width:100%;">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                ${mfGrand}
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                ${mmGrand}
-              </div>
-            </div>
-          ` : '<div style="flex:1;"></div>'}
+          ${showGrandMother ? `<div style="font-size:8px;color:rgba(200,150,12,.5);text-align:center;margin-bottom:4px;">母方の家</div><div style="display:flex;gap:6px;width:100%;"><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${mfGrand}</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;">${mmGrand}</div></div>` : '<div style="flex:1;"></div>'}
         </div>
       </div>
       <div class="pg-hline" style="width:80%;margin:0 auto 0;"></div>
-      ${vlineDown(10)}
-    `;
+      ${vlineDown(10)}`;
   }
 
   return `
@@ -1222,239 +1177,15 @@ function buildPgTree(bl, warrior, bonus) {
     ${vlineDown(16)}
     <div class="pg-hline" style="width:70%;margin:0 auto;"></div>
     <div class="pg-parent-row" style="margin-top:0;width:100%;">
-      <div class="pg-parent-col">
-        ${vlineDown(10)}
-        ${parentNode(fNode,'father')}
-      </div>
+      <div class="pg-parent-col">${vlineDown(10)}${parentNode(fNode,'father')}</div>
       <div class="pg-parent-divider"></div>
-      <div class="pg-parent-col">
-        ${vlineDown(10)}
-        ${parentNode(mNode,'mother')}
-      </div>
+      <div class="pg-parent-col">${vlineDown(10)}${parentNode(mNode,'mother')}</div>
     </div>
-    ${grandRowHtml ? vlineDown(14) + grandRowHtml : ''}
-  `;
+    ${grandRowHtml ? vlineDown(14) + grandRowHtml : ''}`;
 }
 
 window.closePedigreeModal = function() {
   document.getElementById('pedigree-modal').classList.remove('show');
-};
-
-/* ═══════════════════════════════════════════
-   血統モーダル UI
-═══════════════════════════════════════════ */
-let blSelectedWarrior = null;
-let blFatherIdx = 0;
-let blMotherIdx = 0;
-
-window.openBloodline = function () {
-  document.getElementById('bloodline-modal').style.display = 'flex';
-  blTab('tree');
-};
-window.closeBloodlineModal = function () {
-  document.getElementById('bloodline-modal').style.display = 'none';
-};
-
-window.blTab = function (tab) {
-  document.getElementById('bl-panel-tree').style.display  = tab === 'tree'  ? '' : 'none';
-  document.getElementById('bl-panel-marry').style.display = tab === 'marry' ? '' : 'none';
-  document.getElementById('bl-tab-tree').style.background  = tab === 'tree'  ? 'rgba(200,150,12,.2)' : 'transparent';
-  document.getElementById('bl-tab-marry').style.background = tab === 'marry' ? 'rgba(200,150,12,.2)' : 'transparent';
-  document.getElementById('bl-tab-tree').style.color  = tab === 'tree'  ? 'var(--gold-l)' : 'var(--parchment)';
-  document.getElementById('bl-tab-marry').style.color = tab === 'marry' ? 'var(--gold-l)' : 'var(--parchment)';
-  if (tab === 'tree')  renderBloodlineTree();
-  if (tab === 'marry') renderMarriagePanel();
-};
-
-function renderBloodlineTree() {
-  const sel = document.getElementById('bl-warrior-select');
-  if (!blSelectedWarrior && gWarriors.length) blSelectedWarrior = gWarriors[0];
-  sel.innerHTML = gWarriors.map((w, i) => `
-    <button onclick="blSelectWarrior(${i})"
-      style="padding:5px 10px;border-radius:6px;
-             border:1px solid ${blSelectedWarrior === w ? 'var(--gold)' : 'rgba(200,150,12,.3)'};
-             background:${blSelectedWarrior === w ? 'rgba(200,150,12,.2)' : 'transparent'};
-             color:var(--parchment);cursor:pointer;font-family:inherit;font-size:11px;">
-      ${w.name}
-    </button>`).join('');
-  renderTreeView(blSelectedWarrior);
-}
-
-window.blSelectWarrior = function (i) {
-  blSelectedWarrior = gWarriors[i];
-  renderBloodlineTree();
-};
-
-function renderTreeView(warrior) {
-  const view = document.getElementById('bl-tree-view');
-  if (!warrior) return;
-  const busho = getBusho(warrior);
-  if (!busho) { view.innerHTML = '<div style="color:rgba(245,232,200,.4);text-align:center;padding:20px;">血統情報なし</div>'; return; }
-  const bl    = busho.getBloodline();
-  const bonus = busho.calcBonus();
-  const badgeColor = bonus.type === '純血' ? '#ffaaaa' : bonus.type === '混血' ? '#aaddff' : '#ffdd88';
-  const badgeBg    = bonus.type === '純血' ? 'rgba(255,80,80,.2)' : bonus.type === '混血' ? 'rgba(80,160,255,.2)' : 'rgba(200,150,12,.2)';
-  view.innerHTML = `
-    <div style="background:rgba(255,255,255,.06);border:1px solid var(--gold-d);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span style="font-size:14px;font-weight:700;">${warrior.name}</span>
-        <span style="background:${badgeBg};color:${badgeColor};border:1px solid ${badgeColor};border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;">${bonus.type}</span>
-        <span style="font-size:10px;color:var(--gold-d);">純血${Math.round(bonus.pure*100)}% / 混血${Math.round(bonus.mix*100)}%</span>
-      </div>
-      <div class="bt-bonus-row">
-        <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">⚔ 武力+${bonus.power}</span>
-        <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">🌸 忠誠+${bonus.loyalty}</span>
-        <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">📖 知力+${bonus.wisdom}</span>
-        <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">🏯 施設×${(1 + bonus.facility).toFixed(2)}</span>
-        <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">⚔合戦+${bonus.battle}%</span>
-      </div>
-    </div>
-    ${renderTreeNode(bl, 1)}`;
-}
-
-function renderTreeNode(node, gen) {
-  if (!node) return `<div class="bt-node gen${Math.min(gen,3)}" style="opacity:.35;"><span class="bn">不明</span></div>`;
-  const cc = clanColor(node.clan);
-  return `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-      <div class="bt-node gen${Math.min(gen,3)}" style="border-color:${cc}40;">
-        <div class="bn">${node.name}</div>
-        <div class="bc-name" style="color:${cc};">${node.clan}</div>
-      </div>
-      ${(node.father || node.mother) && gen < 3 ? `
-        <div style="width:1px;height:10px;background:rgba(200,150,12,.3);"></div>
-        <div style="display:flex;gap:16px;align-items:flex-start;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div style="font-size:9px;color:var(--gold-d);">父</div>${renderTreeNode(node.father, gen+1)}
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-            <div style="font-size:9px;color:var(--gold-d);">母</div>${renderTreeNode(node.mother, gen+1)}
-          </div>
-        </div>` : ''}
-    </div>`;
-}
-
-function renderMarriagePanel() {
-  const fathers = gWarriors.filter(w => w.jobId !== 'hime');
-  const mothers = gWarriors.filter(w => w.jobId === 'hime');
-  const extFathers = [
-    { name:'武田 信玄', clan: CLANS.takeda, jobId:'bukan' },
-    { name:'上杉 謙信', clan: CLANS.uesugi, jobId:'bukan' },
-    { name:'毛利 元就', clan: CLANS.mouri,  jobId:'bukan' },
-  ];
-  const extMothers = [
-    { name:'濃姫',    clan: CLANS.saito,    jobId:'hime' },
-    { name:'お江',   clan: CLANS.azai,     jobId:'hime' },
-    { name:'築山殿', clan: CLANS.tokugawa, jobId:'hime' },
-  ];
-  const allFathers = [...fathers.map(w => ({ w, ext:false })), ...extFathers.map(w => ({ w, ext:true }))];
-  const allMothers = [...mothers.map(w => ({ w, ext:false })), ...extMothers.map(w => ({ w, ext:true }))];
-
-  if (blFatherIdx >= allFathers.length) blFatherIdx = 0;
-  if (blMotherIdx >= allMothers.length) blMotherIdx = 0;
-
-  document.getElementById('father-select').innerHTML = allFathers.map((item, i) => {
-    const clanName = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name || '織田家');
-    return `<div onclick="blPickFather(${i})"
-      style="padding:7px 10px;border-radius:7px;cursor:pointer;margin-bottom:5px;font-size:12px;
-             border:1px solid ${blFatherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
-             background:${blFatherIdx===i?'rgba(200,150,12,.12)':'transparent'};">
-      <span style="font-weight:700;">${item.w.name}</span>
-      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${clanName}</span>
-      ${item.ext ? '<span style="font-size:9px;color:#ffaa44;margin-left:4px;">外</span>' : ''}
-    </div>`;
-  }).join('');
-
-  document.getElementById('mother-select').innerHTML = allMothers.map((item, i) => {
-    const clanName = item.ext ? item.w.clan.name : (getBusho(item.w)?.clan.name || '齋藤家');
-    return `<div onclick="blPickMother(${i})"
-      style="padding:7px 10px;border-radius:7px;cursor:pointer;margin-bottom:5px;font-size:12px;
-             border:1px solid ${blMotherIdx===i?'var(--gold)':'rgba(200,150,12,.2)'};
-             background:${blMotherIdx===i?'rgba(200,150,12,.12)':'transparent'};">
-      <span style="font-weight:700;">${item.w.name}</span>
-      <span style="font-size:10px;color:var(--gold-d);margin-left:4px;">${clanName}</span>
-      ${item.ext ? '<span style="font-size:9px;color:#ffaa44;margin-left:4px;">外</span>' : ''}
-    </div>`;
-  }).join('');
-
-  window._allFathers = allFathers;
-  window._allMothers = allMothers;
-  updateMarriagePreview();
-}
-
-window.blPickFather = function (i) { blFatherIdx = i; renderMarriagePanel(); };
-window.blPickMother = function (i) { blMotherIdx = i; renderMarriagePanel(); };
-
-function updateMarriagePreview() {
-  const prev = document.getElementById('bl-preview');
-  const fa   = window._allFathers?.[blFatherIdx];
-  const mo   = window._allMothers?.[blMotherIdx];
-  if (!fa || !mo) {
-    prev.innerHTML = '<div style="color:rgba(245,232,200,.4);text-align:center;">父と母を選んでください</div>';
-    return;
-  }
-  const fClan  = fa.ext ? fa.w.clan : (getBusho(fa.w)?.clan || CLANS.oda);
-  const mClan  = mo.ext ? mo.w.clan : (getBusho(mo.w)?.clan || CLANS.saito);
-  const fBusho = fa.ext ? new Busho(fa.w.name, fClan) : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
-  const mBusho = mo.ext ? new Busho(mo.w.name, mClan) : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
-  const childBusho = new Busho('（生まれる子）', fClan, fBusho, mBusho);
-  const bonus      = childBusho.calcBonus();
-  const badgeColor = bonus.type === '純血' ? '#ffaaaa' : bonus.type === '混血' ? '#aaddff' : '#ffdd88';
-  prev.innerHTML = `
-    <div style="font-size:12px;margin-bottom:6px;color:var(--gold-l);">
-      ${fa.w.name} × ${mo.w.name} の子
-      <span style="color:${badgeColor};margin-left:6px;font-size:10px;">${bonus.type}の血脈</span>
-    </div>
-    <div style="font-size:10px;color:rgba(245,232,200,.55);margin-bottom:6px;">
-      純血度 ${Math.round(bonus.pure*100)}% ／ 混血度 ${Math.round(bonus.mix*100)}%
-    </div>
-    <div class="bt-bonus-row">
-      <span class="bt-bonus" style="background:rgba(255,150,50,.15);color:#ffcc66;">⚔ 武力+${bonus.power}</span>
-      <span class="bt-bonus" style="background:rgba(100,200,100,.12);color:#88ffaa;">🌸 忠誠+${bonus.loyalty}</span>
-      <span class="bt-bonus" style="background:rgba(100,160,255,.12);color:#aaddff;">📖 知力+${bonus.wisdom}</span>
-      <span class="bt-bonus" style="background:rgba(255,200,50,.1);color:#ffdd88;">🏯 施設×${(1+bonus.facility).toFixed(2)}</span>
-      <span class="bt-bonus" style="background:rgba(255,80,80,.12);color:#ffaaaa;">⚔合戦+${bonus.battle}%</span>
-    </div>`;
-}
-
-window.doMarriage = function () {
-  const fa = window._allFathers?.[blFatherIdx];
-  const mo = window._allMothers?.[blMotherIdx];
-  if (!fa || !mo) { alert('父と母を選んでください'); return; }
-  if (state.genNum >= 5) { alert('すでに最終世代です！'); return; }
-  if (state.koku < 800) { alert('縁組には 800石 必要です！'); return; }
-
-  const fClan  = fa.ext ? fa.w.clan : (getBusho(fa.w)?.clan || CLANS.oda);
-  const mClan  = mo.ext ? mo.w.clan : (getBusho(mo.w)?.clan || CLANS.saito);
-  const fBusho = fa.ext ? new Busho(fa.w.name, fClan) : (getBusho(fa.w) || new Busho(fa.w.name, fClan));
-  const mBusho = mo.ext ? new Busho(mo.w.name, mClan) : (getBusho(mo.w) || new Busho(mo.w.name, mClan));
-
-  const childClan  = fClan;
-  const childName  = fClan.name.replace('家','') + ' ' + ['太郎','次郎','三郎','四郎','五郎'][Math.floor(Math.random()*5)];
-  const childJob   = Math.random() < 0.15 ? 'bunkan' : 'bukan';
-  const childBusho = new Busho(childName, childClan, fBusho, mBusho);
-  const bonus      = childBusho.calcBonus();
-  const basePow    = 60 + Math.floor(Math.random() * 30);
-
-  state.koku  -= 800;
-  state.genNum = Math.min(5, state.genNum + 1);
-
-  const nw = new IsoWarrior(childName, childJob, basePow, Math.random() * 4 - 2, 3.5);
-  setBusho(nw, childBusho);
-  applyBloodlineBonus(nw);
-
-  const ni = gWarriors.length - 1;
-  for (let j = 0; j < ni; j++) {
-    const k = relKey(ni, j);
-    if (relations[k] === undefined)
-      relations[k] = Math.floor(10 + Math.random() * 40);
-  }
-
-  addLog(`${fa.w.name}×${mo.w.name}の縁組！${childName}が誕生（${bonus.type}の血脈）`, 'success');
-  addCanvasBubble(nw, '参上！', 160);
-  updatePartyRow();
-  updateStatusUI();
-  closeBloodlineModal();
 };
 
 /* ═══════════════════════════════════════════
@@ -1475,13 +1206,18 @@ class IsoWarrior {
     this.tileX  = tx;
     this.tileY  = ty;
     this.color  = jobId === 'hime' ? 'c_pink' : jobId === 'bunkan' ? 'c_blue' : 'c_red';
+    // 体力を stats に追加
+    const baseHp = 80 + Math.floor(Math.random() * 20);
     this.stats  = {
       power,
-      loyalty: jobId === 'hime' ? 92 : jobId === 'bunkan' ? 72 : 65,
       wisdom:  jobId === 'bunkan' ? 84 : jobId === 'hime' ? 58 : 52,
+      hp:      baseHp,   // 現在体力
+      maxHp:   baseHp,   // 最大体力
       level: 1,
       exp:   0,
     };
+    // 忠誠度は隠しパラメータ (_loyalty)
+    this._loyalty = jobId === 'hime' ? 92 : jobId === 'bunkan' ? 72 : 65;
     this.destX  = tx;
     this.destY  = ty;
     this.moveSpeed    = 0.013 + Math.random() * 0.005;
@@ -1604,12 +1340,15 @@ class IsoWarrior {
     const gain = Math.floor(base * mul);
     if (eff.stat === 'power')   this.stats.power   += gain;
     if (eff.stat === 'wisdom')  this.stats.wisdom   = Math.min(99,  this.stats.wisdom  + gain);
-    if (eff.stat === 'loyalty') this.stats.loyalty  = Math.min(100, this.stats.loyalty + gain);
+    if (eff.stat === 'hp')      this.stats.hp       = Math.min(this.stats.maxHp, this.stats.hp + gain);
+    if (eff.stat === 'loyalty') this._loyalty       = Math.min(100, this._loyalty + gain); // 隠し
     if (gain > 0) {
-      createFloatText(this, `+${gain}${eff.label}`, eff.color);
+      if (eff.stat !== 'loyalty') { // 忠誠は表示しない
+        createFloatText(this, `+${gain}${eff.label}`, eff.color);
+      }
       if (isEntry) {
         showFacilityActivity(key, `${this.name}が${FACILITY_MAP[key].name}で鍛練！`, eff.color);
-        addLog(`${this.name}が${FACILITY_MAP[key].name}で${eff.label}+${gain}`);
+        if (eff.stat !== 'loyalty') addLog(`${this.name}が${FACILITY_MAP[key].name}で${eff.label}+${gain}`);
       }
     }
     updatePartyRow();
@@ -1620,8 +1359,8 @@ class IsoWarrior {
     this.speechTimer = Math.max(0, this.speechTimer - 1);
     if (this.speechTimer === 0 && Math.random() < 0.005) {
       let sit = 'idle';
-      if (this.stats.loyalty > 80 && Math.random() < .3) sit = 'highLoyalty';
-      else if (this.stats.loyalty < 35 && Math.random() < .4) sit = 'lowLoyalty';
+      if (this._loyalty > 80 && Math.random() < .3) sit = 'highLoyalty';
+      else if (this._loyalty < 35 && Math.random() < .4) sit = 'lowLoyalty';
       addCanvasBubble(this, getSpeech(this, sit));
       this.speechTimer = 200 + Math.floor(Math.random() * 280);
     }
@@ -1861,6 +1600,7 @@ function updatePartyRow() {
   const row = document.getElementById('party-row');
   row.innerHTML = '';
   gWarriors.forEach((w, i) => {
+    const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
     const card = document.createElement('div');
     card.className = 'party-card' + (i === 0 ? ' head' : '');
     let relText = '';
@@ -1877,7 +1617,8 @@ function updatePartyRow() {
     card.innerHTML =
       `<span class="pc-role">${ROLES[w.jobId] || '武将'}</span>` +
       `<span class="pc-name">${w.name}</span>` +
-      `<span class="pc-pow">武力 ${w.stats.power} Lv${w.stats.level}</span>` +
+      `<span class="pc-pow">武${w.stats.power} Lv${w.stats.level}</span>` +
+      `<span class="pc-hp">体${hpPct}%</span>` +
       `<span class="pc-loc">${locationLabel(w)}</span>` +
       (relText ? `<span class="pc-rel">${relText}</span>` : '');
     card.onclick = () => showWarriorModal(i);
@@ -1893,6 +1634,7 @@ function showWarriorModal(i) {
   const w     = gWarriors[i];
   const busho = getBusho(w);
   const bl    = busho ? busho.getBloodline() : null;
+  const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
 
   document.getElementById('wm-name').textContent = w.name;
   document.getElementById('wm-meta').textContent =
@@ -1900,7 +1642,13 @@ function showWarriorModal(i) {
 
   document.getElementById('wm-pow').textContent = `武力 ${w.stats.power}`;
   document.getElementById('wm-wis').textContent = `知力 ${w.stats.wisdom}`;
-  document.getElementById('wm-loy').textContent = `忠誠 ${w.stats.loyalty}`;
+  // 忠誠度は表示しない
+
+  document.getElementById('wm-hp-text').textContent = `${w.stats.hp} / ${w.stats.maxHp}`;
+  const hpFill = document.getElementById('wm-hp-fill');
+  hpFill.style.width = hpPct + '%';
+  const hpColor = hpPct > 60 ? '#44dd44' : hpPct > 30 ? '#ffaa44' : '#dd4444';
+  hpFill.style.background = hpColor;
 
   const skills = getSkills(w.jobId, w.stats.power, w.stats.wisdom);
   document.getElementById('wm-skills').innerHTML =
@@ -1937,16 +1685,300 @@ function closeWarriorModal() {
   currentModalIndex = -1;
 }
 
-/* 武将モーダル → 家系図モーダルへ */
 window.openPedigreeFromModal = function () {
   const i = currentModalIndex;
   if (i < 0 || i >= gWarriors.length) return;
   const warrior = gWarriors[i];
   closeWarriorModal();
-  // 少し遅らせてアニメを綺麗に
   setTimeout(() => openPedigreeModal(warrior), 80);
 };
 
+/* ═══════════════════════════════════════════
+   縁組モーダル (新規・完全動作版)
+═══════════════════════════════════════════ */
+const ENGUMI_FATHERS = [
+  { id:'f1', name:'武田 信玄', clan:'武田家', emoji:'🐴', stats:{power:94,wisdom:82,maxHp:90}, bonus:{power:8,wisdom:5,hp:10}, skills:['騎馬隊','智謀'] },
+  { id:'f2', name:'上杉 謙信', clan:'上杉家', emoji:'🦅', stats:{power:98,wisdom:75,maxHp:95}, bonus:{power:12,wisdom:3,hp:12}, skills:['騎馬隊','弓隊'] },
+  { id:'f3', name:'毛利 元就', clan:'毛利家', emoji:'🌸', stats:{power:70,wisdom:97,maxHp:75}, bonus:{power:3,wisdom:10,hp:8},  skills:['智謀','火計'] },
+  { id:'f4', name:'北条 氏康', clan:'北条家', emoji:'🗡️', stats:{power:78,wisdom:85,maxHp:85}, bonus:{power:6,wisdom:7,hp:9},  skills:['築城','槍隊'] },
+  { id:'f5', name:'今川 義元', clan:'今川家', emoji:'🌊', stats:{power:65,wisdom:80,maxHp:70}, bonus:{power:4,wisdom:8,hp:7},  skills:['商才','仁政'] },
+  { id:'f6', name:'島津 義久', clan:'島津家', emoji:'⚡', stats:{power:88,wisdom:72,maxHp:92}, bonus:{power:10,wisdom:4,hp:11}, skills:['騎馬隊','火計'] },
+];
+const ENGUMI_MOTHERS = [
+  { id:'m1', name:'帰蝶',         clan:'齋藤家', emoji:'🌸', stats:{power:30,wisdom:88,maxHp:65}, bonus:{wisdom:12,hp:8,  battle:15}, skills:['智謀','仁政'] },
+  { id:'m2', name:'お市',         clan:'織田家', emoji:'🌺', stats:{power:25,wisdom:82,maxHp:60}, bonus:{wisdom:10,hp:7,  battle:12}, skills:['仁政','商才'] },
+  { id:'m3', name:'三条の方',     clan:'三条家', emoji:'🍂', stats:{power:20,wisdom:90,maxHp:68}, bonus:{wisdom:14,hp:9,  battle:10}, skills:['智謀','築城'] },
+  { id:'m4', name:'築山殿',       clan:'今川家', emoji:'🌙', stats:{power:22,wisdom:85,maxHp:62}, bonus:{wisdom:11,hp:8,  battle:13}, skills:['商才','弓隊'] },
+  { id:'m5', name:'松姫',         clan:'武田家', emoji:'🦋', stats:{power:18,wisdom:92,maxHp:70}, bonus:{wisdom:15,hp:10, battle:8},  skills:['智謀','仁政'] },
+  { id:'m6', name:'細川 ガラシャ', clan:'明智家', emoji:'✨', stats:{power:28,wisdom:95,maxHp:72}, bonus:{wisdom:16,hp:11, battle:14}, skills:['智謀','商才'] },
+];
+
+let eng = {
+  selectedFather: null,
+  selectedMother: null,
+  step: 1,
+  role: 'father',
+  fatherFilter: 'all',
+  motherFilter: 'all',
+};
+
+window.openEngumiModal = function() {
+  eng = { selectedFather:null, selectedMother:null, step:1, role:'father', fatherFilter:'all', motherFilter:'all' };
+  document.getElementById('rbtn-father').classList.add('active');
+  document.getElementById('rbtn-mother').classList.remove('active');
+  document.getElementById('rbtn-father').classList.remove('has-sel');
+  document.getElementById('rbtn-mother').classList.remove('has-sel');
+  document.getElementById('rbtn-father-sel').textContent = '未選択';
+  document.getElementById('rbtn-mother-sel').textContent = '未選択';
+  document.getElementById('engumi-modal').style.display = 'flex';
+  renderEngumiStep1();
+  updateEngumiFooter();
+};
+
+window.closeEngumiModal = function() {
+  document.getElementById('engumi-modal').style.display = 'none';
+};
+
+window.switchEngumiRole = function(role) {
+  eng.role = role;
+  document.getElementById('rbtn-father').classList.toggle('active', role === 'father');
+  document.getElementById('rbtn-mother').classList.toggle('active', role === 'mother');
+  document.getElementById('engumi-list-label').textContent = role === 'father' ? '── 父となる武将を選択' : '── 母となる姫を選択';
+  renderEngumiStep1();
+};
+
+window.goEngumiStep = function(n) {
+  if (n === 2 && (!eng.selectedFather || !eng.selectedMother)) { showToast('父と母を両方選んでください'); return; }
+  eng.step = n;
+  document.getElementById('step-1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('step-2').style.display = n === 2 ? 'block' : 'none';
+  const t1 = document.getElementById('tab-1');
+  const t2 = document.getElementById('tab-2');
+  t1.classList.toggle('active', n === 1);
+  t2.classList.toggle('active', n === 2);
+  if (eng.selectedFather && eng.selectedMother) t1.classList.add('done');
+  if (n === 2) renderEngumiPreview();
+  updateEngumiFooter();
+};
+
+function updateEngumiFooter() {
+  const btn = document.getElementById('execute-btn');
+  const lbl = document.getElementById('execute-label');
+  if (eng.step === 1) {
+    btn.disabled = !(eng.selectedFather && eng.selectedMother);
+    lbl.textContent = '縁結び確認へ →';
+  } else {
+    btn.disabled = state.koku < 800;
+    lbl.textContent = btn.disabled ? '石高不足' : '⚔ 縁組を結ぶ';
+  }
+}
+
+window.handleEngumiFooterBtn = function() {
+  if (eng.step === 1) goEngumiStep(2);
+  else doEngumi();
+};
+
+function renderEngumiStep1() {
+  const isFather = eng.role === 'father';
+  const list = isFather ? ENGUMI_FATHERS : ENGUMI_MOTHERS;
+  const filter = isFather ? eng.fatherFilter : eng.motherFilter;
+  const selected = isFather ? eng.selectedFather : eng.selectedMother;
+  const filtered = filter === 'all' ? list : list.filter(p => p.clan === filter);
+
+  // フィルタ
+  const clans = ['all', ...new Set(list.map(p => p.clan))];
+  document.getElementById('engumi-filter-row').innerHTML = clans.map(c =>
+    `<button class="filter-btn ${filter === c ? 'active' : ''}" onclick="setEngumiFilter('${c}')">${c === 'all' ? '全て' : c}</button>`
+  ).join('');
+
+  // 相手サマリー
+  const other = isFather ? eng.selectedMother : eng.selectedFather;
+  const summary = document.getElementById('engumi-selected-summary');
+  if (other) {
+    summary.innerHTML = `
+      <div class="selected-mini">
+        <div class="sm-avatar">${other.emoji}</div>
+        <div class="sm-info">
+          <div class="sm-role">${isFather ? '母（選択済）' : '父（選択済）'}</div>
+          <div class="sm-name">${other.name}</div>
+          <div class="sm-stats">
+            <div class="sm-stat"><div class="sm-stat-val" style="color:#ffaa44;">${other.stats.power}</div><div class="sm-stat-lbl">武力</div></div>
+            <div class="sm-stat"><div class="sm-stat-val" style="color:#88aaff;">${other.stats.wisdom}</div><div class="sm-stat-lbl">智謀</div></div>
+            <div class="sm-stat"><div class="sm-stat-val" style="color:#88dd88;">${other.stats.maxHp}</div><div class="sm-stat-lbl">体力</div></div>
+          </div>
+        </div>
+      </div>`;
+  } else { summary.innerHTML = ''; }
+
+  // 候補リスト
+  document.getElementById('engumi-candidates-wrap').innerHTML = filtered.map(p => {
+    const isSelected = selected && selected.id === p.id;
+    const compat = engumiCompat(isFather ? p : eng.selectedFather, isFather ? eng.selectedMother : p);
+    const compatColor = compat >= 80 ? '#88ffaa' : compat >= 50 ? '#ffdd44' : '#ff8888';
+    return `
+      <div class="candidate-card ${isSelected ? 'selected' : ''}" onclick="selectEngumiPerson('${p.id}')">
+        <div class="c-avatar">${p.emoji}</div>
+        <div class="c-info">
+          <div class="c-name">${p.name}</div>
+          <div class="c-clan">${p.clan}</div>
+          <div class="c-mini-stats">
+            <div class="c-mstat">武<span>${p.stats.power}</span></div>
+            <div class="c-mstat">智<span>${p.stats.wisdom}</span></div>
+            <div class="c-mstat">体<span>${p.stats.maxHp}</span></div>
+          </div>
+        </div>
+        <div class="compat-mini">
+          <div class="compat-track"><div class="compat-fill" style="width:${compat}%;background:${compatColor};"></div></div>
+          <div class="compat-lbl" style="color:${compatColor};">${compat}%</div>
+        </div>
+        <div class="selected-tick">✓</div>
+      </div>`;
+  }).join('');
+}
+
+function engumiCompat(f, m) {
+  if (!f || !m) return 50;
+  return Math.max(20, Math.min(99, 80 - Math.floor(Math.abs(f.stats.power - m.stats.wisdom) / 4)));
+}
+
+window.selectEngumiPerson = function(id) {
+  const isFather = eng.role === 'father';
+  const list = isFather ? ENGUMI_FATHERS : ENGUMI_MOTHERS;
+  const p = list.find(x => x.id === id);
+  if (!p) return;
+  if (isFather) {
+    eng.selectedFather = p;
+    document.getElementById('rbtn-father-sel').textContent = p.name;
+    document.getElementById('rbtn-father').classList.add('has-sel');
+  } else {
+    eng.selectedMother = p;
+    document.getElementById('rbtn-mother-sel').textContent = p.name;
+    document.getElementById('rbtn-mother').classList.add('has-sel');
+  }
+  renderEngumiStep1();
+  updateEngumiFooter();
+};
+
+window.setEngumiFilter = function(filter) {
+  if (eng.role === 'father') eng.fatherFilter = filter;
+  else eng.motherFilter = filter;
+  renderEngumiStep1();
+};
+
+function renderEngumiPreview() {
+  const f = eng.selectedFather, m = eng.selectedMother;
+  if (!f || !m) return;
+
+  document.getElementById('prev-father-name').textContent = f.name;
+  document.getElementById('prev-father-clan').textContent = f.clan;
+  document.getElementById('prev-mother-name').textContent = m.name;
+  document.getElementById('prev-mother-clan').textContent = m.clan;
+
+  const childPow = Math.min(99, Math.round(f.stats.power * 0.6 + m.stats.power * 0.4 + (f.bonus?.power || 0)));
+  const childWis = Math.min(99, Math.round(f.stats.wisdom * 0.4 + m.stats.wisdom * 0.6 + (f.bonus?.wisdom || 0) + (m.bonus?.wisdom || 0)));
+  const childHp  = Math.min(150, Math.round((f.stats.maxHp + m.stats.maxHp) / 2 + (f.bonus?.hp || 0) + (m.bonus?.hp || 0)));
+
+  const compat = engumiCompat(f, m);
+  const badge = compat >= 80 ? '大吉' : compat >= 60 ? '吉' : compat >= 40 ? '中吉' : '小吉';
+  const badgeColor = compat >= 80 ? '#88ffaa' : compat >= 60 ? '#ffdd44' : '#ffaa44';
+  document.getElementById('bp-badge').textContent = badge;
+  document.getElementById('bp-badge').style.cssText = `color:${badgeColor};border-color:${badgeColor};`;
+
+  document.getElementById('child-stats-grid').innerHTML = [
+    { lbl:'武力', val:childPow, color:'#ffaa44', bar:'#c8640c' },
+    { lbl:'智謀', val:childWis, color:'#88aaff', bar:'#3344cc' },
+    { lbl:'体力', val:childHp,  color:'#88dd88', bar:'#226622' },
+  ].map(s => `
+    <div class="cs-block">
+      <div class="cs-label">${s.lbl}</div>
+      <div class="cs-val" style="color:${s.color};">${s.val}</div>
+      <div class="cs-bar" style="background:rgba(255,255,255,.05);">
+        <div style="width:${Math.min(s.val,100)}%;height:100%;border-radius:2px;background:${s.bar};"></div>
+      </div>
+    </div>`).join('');
+
+  const battleBonus = m.bonus?.battle || 12;
+  const facBonus = Math.round((f.stats.wisdom + m.stats.wisdom) / 20);
+  document.getElementById('br-val').textContent = `+${battleBonus}`;
+  document.getElementById('fac-val').textContent = `×${(1 + facBonus * 0.1).toFixed(1)}`;
+
+  // スキルプレビュー
+  const allSkills = [...new Set([...f.skills, ...m.skills])];
+  const SKILL_STYLES = { '騎馬隊':'#ff8844','弓隊':'#44bbff','槍隊':'#ffdd44','火計':'#ff4444','智謀':'#aa88ff','仁政':'#88ffaa','築城':'#ffaa44','商才':'#44ffee' };
+  document.getElementById('child-skills-wrap').innerHTML = allSkills.filter(() => Math.random() < 0.6).map(sk =>
+    `<div class="skill-tag" style="background:rgba(200,150,12,.12);border:1px solid rgba(200,150,12,.3);color:${SKILL_STYLES[sk]||'#ffcc88'};">${sk}</div>`
+  ).join('');
+}
+
+function doEngumi() {
+  const f = eng.selectedFather, m = eng.selectedMother;
+  if (!f || !m) return;
+  if (state.koku < 800) { showToast('石高が不足しています！'); return; }
+  state.koku -= 800;
+  state.genNum = Math.min(10, state.genNum + 1);
+
+  const childPow = Math.min(99, Math.round(f.stats.power * 0.6 + m.stats.power * 0.4 + (f.bonus?.power || 0) + (Math.random()*6-3)));
+  const childWis = Math.min(99, Math.round(f.stats.wisdom * 0.4 + m.stats.wisdom * 0.6 + (f.bonus?.wisdom || 0) + (m.bonus?.wisdom || 0) + (Math.random()*6-3)));
+  const childHp  = Math.min(150, Math.round((f.stats.maxHp + m.stats.maxHp) / 2 + (f.bonus?.hp || 0) + (m.bonus?.hp || 0) + (Math.random()*10-5)));
+
+  const givenNames = ['太郎','次郎','三郎','四郎','五郎','六郎','七郎','八郎'];
+  const surname = f.name.split(' ')[0];
+  const childName = surname + ' ' + givenNames[Math.floor(Math.random() * givenNames.length)];
+  const jobId = Math.random() < 0.15 ? 'bunkan' : 'bukan';
+
+  // ゲームに武将追加
+  const fClan = CLANS[Object.keys(CLANS).find(k => CLANS[k].name === f.clan)] || CLANS.oda;
+  const mClan = CLANS[Object.keys(CLANS).find(k => CLANS[k].name === m.clan)] || CLANS.saito;
+  const fBusho = new Busho(f.name, fClan);
+  const mBusho = new Busho(m.name, mClan);
+  const childBusho = new Busho(childName, fClan, fBusho, mBusho);
+
+  const nw = new IsoWarrior(childName, jobId, childPow, Math.random()*4-2, 3.5);
+  nw.stats.wisdom = childWis;
+  nw.stats.hp = childHp;
+  nw.stats.maxHp = childHp;
+  nw._loyalty = 85 + Math.floor(Math.random() * 15);
+  setBusho(nw, childBusho);
+  applyBloodlineBonus(nw);
+
+  // 関係初期化
+  const ni = gWarriors.indexOf(nw);
+  gWarriors.forEach((_, j) => {
+    if (j !== ni) {
+      const k = relKey(ni, j);
+      if (relations[k] === undefined) relations[k] = Math.floor(10 + Math.random() * 40);
+    }
+  });
+
+  addLog(`${f.name} × ${m.name} の縁組成立！${childName}が誕生`, 'success');
+  addCanvasBubble(nw, '参上！', 200);
+  closeEngumiModal();
+  updatePartyRow();
+  updateStatusUI();
+
+  // 成功オーバーレイ
+  document.getElementById('so-child-name').textContent = childName;
+  document.getElementById('so-child-blood').textContent = `${f.clan} × ${m.clan} の血脈`;
+  document.getElementById('so-stats-grid').innerHTML = [
+    { lbl:'武力', val:childPow, color:'#ffaa44' },
+    { lbl:'智謀', val:childWis, color:'#88aaff' },
+    { lbl:'体力', val:childHp,  color:'#88dd88' },
+  ].map(s => `<div class="so-stat"><div class="so-stat-val" style="color:${s.color};">${s.val}</div><div class="so-stat-lbl">${s.lbl}</div></div>`).join('');
+  const SKILL_STYLES2 = { '騎馬隊':'#ff8844','弓隊':'#44bbff','槍隊':'#ffdd44','火計':'#ff4444','智謀':'#aa88ff','仁政':'#88ffaa','築城':'#ffaa44','商才':'#44ffee' };
+  const inheritedSkills = [...new Set([...f.skills, ...m.skills])].filter(() => Math.random() < 0.6);
+  document.getElementById('so-skills').innerHTML = inheritedSkills.map(sk =>
+    `<div class="so-skill-tag" style="background:rgba(200,150,12,.12);border:1px solid rgba(200,150,12,.3);color:${SKILL_STYLES2[sk]||'#ffcc88'};">${sk}</div>`
+  ).join('');
+  document.getElementById('success-overlay').classList.add('show');
+}
+
+window.dismissSuccess = function() {
+  document.getElementById('success-overlay').classList.remove('show');
+};
+
+/* ═══════════════════════════════════════════
+   内政
+═══════════════════════════════════════════ */
 function showDev() { document.getElementById('dev-modal').style.display = 'flex'; renderFacilities(); }
 function closeDevModal() { document.getElementById('dev-modal').style.display = 'none'; }
 
@@ -1983,6 +2015,9 @@ window.upgradeFacility = function (key, cost) {
   renderFacilities();
 };
 
+/* ═══════════════════════════════════════════
+   歴史
+═══════════════════════════════════════════ */
 window.showHistory = function () {
   document.getElementById('history-list').innerHTML = gameLog.length
     ? gameLog.slice().reverse().map(l => {
@@ -2022,21 +2057,26 @@ window.startBattleSimulation = function () {
   const isWin       = Math.random() < winChance;
   setTimeout(() => {
     if (isWin) {
-      log.innerHTML += `<div class="ll ally" style="color:#ffdd88">大勝利！天下に名を轟かせた！${battleBonus > 0 ? `（血統ボーナス+${battleBonus}%）` : ''}</div>`;
+      log.innerHTML += `<div class="ll ally" style="color:#ffdd88">大勝利！${battleBonus > 0 ? `（血統ボーナス+${battleBonus}%）` : ''}</div>`;
       state.koku         += 1680;
       state.unification   = Math.min(100, state.unification + 4.5);
       gWarriors.forEach((w, i) => {
         w.stats.power   += 5;
-        w.stats.loyalty  = Math.min(100, w.stats.loyalty + 8);
+        w._loyalty       = Math.min(100, w._loyalty + 8);
         createFloatText(w, '+5武力', '#ffdd88');
         addCanvasBubble(w, getSpeech(w, 'highLoyalty'), 140);
         gWarriors.forEach((_, j) => { if (i !== j) changeRel(i, j, Math.floor(3 + Math.random()*5)); });
       });
       addLog('合戦大勝利！', 'success');
     } else {
-      log.innerHTML += '<div class="ll ally" style="color:#ff8888">惜しくも敗戦…次こそ雪辱を！</div>';
+      log.innerHTML += '<div class="ll ally" style="color:#ff8888">惜しくも敗戦…</div>';
       state.koku = Math.max(0, state.koku - 500);
-      gWarriors.forEach(w => { w.stats.loyalty = Math.max(0, w.stats.loyalty - 5); });
+      gWarriors.forEach(w => {
+        w._loyalty = Math.max(0, w._loyalty - 5);
+        // 体力にもダメージ
+        const dmg = Math.floor(5 + Math.random() * 15);
+        w.stats.hp = Math.max(1, w.stats.hp - dmg);
+      });
       addLog('合戦敗北…', 'betrayal');
     }
     log.scrollTop = log.scrollHeight;
@@ -2046,6 +2086,18 @@ window.startBattleSimulation = function () {
 };
 
 window.endBattle = function () { document.getElementById('battle-screen').classList.remove('show'); };
+
+/* ═══════════════════════════════════════════
+   Toast
+═══════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
 
 /* ═══════════════════════════════════════════
    アイドルティック・イベント
@@ -2060,6 +2112,10 @@ function performIdleTick() {
       leveledUp = true;
       const pu = Math.floor(2 + Math.random() * 3);
       w.stats.power += pu;
+      // レベルアップで体力も少し増加
+      const hpUp = Math.floor(3 + Math.random() * 5);
+      w.stats.maxHp += hpUp;
+      w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + hpUp);
       createFloatText(w, `+${pu}武力`, '#ffcc66');
     }
     if (leveledUp) {
@@ -2068,8 +2124,9 @@ function performIdleTick() {
       addLog(`${w.name}がLv${w.stats.level}に！`);
     }
     if (Math.random() < .6)  w.stats.power++;
-    if (Math.random() < .35) w.stats.wisdom   = Math.min(99,  w.stats.wisdom  + 1);
-    if (Math.random() < .3)  w.stats.loyalty  = Math.min(100, w.stats.loyalty + Math.floor(1 + Math.random()*3));
+    if (Math.random() < .35) w.stats.wisdom = Math.min(99, w.stats.wisdom + 1);
+    // 体力は自然回復
+    if (Math.random() < .4)  w.stats.hp = Math.min(w.stats.maxHp, w.stats.hp + Math.floor(1 + Math.random()*3));
   });
   state.koku          += Math.floor(62 + Math.random() * 98);
   state.unification    = Math.min(99.9, state.unification + .12);
@@ -2089,10 +2146,10 @@ function triggerEvent() {
     addCanvasBubble(w, '目覚めた…！', 140);
     addLog(`${w.name}が覚醒した！`, 'awakening');
   } else if (roll < .25) {
-    w.stats.loyalty = Math.max(0, w.stats.loyalty - 30);
-    createFloatText(w, '裏切り兆候', '#ff0000');
+    w._loyalty = Math.max(0, w._loyalty - 30);
+    createFloatText(w, '不満の兆候', '#ff6666');
     addCanvasBubble(w, getSpeech(w, 'lowLoyalty'), 140);
-    addLog(`${w.name}に裏切りの兆し…`, 'betrayal');
+    addLog(`${w.name}に不満の兆し…`, 'betrayal');
   } else if (roll < .5) {
     const g = 500 + Math.floor(Math.random() * 500);
     state.koku += g;
@@ -2176,3 +2233,4 @@ window.onload    = initGame;
 window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
+</html>
