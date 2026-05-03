@@ -1055,10 +1055,6 @@
     let engumiSelectedMother = null;
     let lastBornChild = null;
 
-    let lastFrame = 0;
-    let stepAccumulator = 0;
-    let worldStepCount = 0;
-
     function rnd(lo, hi){ return Math.floor(lo + Math.random() * (hi - lo + 1)); }
     function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
     function getSkillById(id){ return BLOOD_SKILLS.find(s => s.id === id) || null; }
@@ -1250,26 +1246,10 @@
       }
 
       get loyalty(){ return this._loyalty; }
-
-      get ageYears(){
-        return Math.floor(this._ageMonths / 12);
-      }
-
-      get ageMonthRemainder(){
-        return this._ageMonths % 12;
-      }
-
-      ageLabel(){
-        return `${this.ageYears}歳`;
-      }
-
-      isReady(){
-        return this._trainingMonths <= 0;
-      }
-
-      canParent(){
-        return this.isReady();
-      }
+      get ageYears(){ return Math.floor(this._ageMonths / 12); }
+      ageLabel(){ return `${this.ageYears}歳`; }
+      isReady(){ return this._trainingMonths <= 0; }
+      canParent(){ return this.isReady(); }
 
       statusLabel(){
         return this.isReady() ? '実戦可' : `育成中 あと${this._trainingMonths}月`;
@@ -1345,7 +1325,7 @@
 
         const base = isEntry ? rnd(eff.range[0], eff.range[1]) : rnd(1, 2);
         const trainingPenalty = this.isReady() ? 1 : 0.75;
-        const gain = Math.floor(base * bloodlineFacilityMul(this) * trainingPenalty);
+        const gain = Math.max(1, Math.floor(base * bloodlineFacilityMul(this) * trainingPenalty));
 
         let hpChange = 0;
         if (isEntry) {
@@ -1461,3 +1441,52 @@
       $('wm-hp').textContent = `${warrior.stats.hp} / ${warrior.stats.maxHp}`;
       $('wm-hp-fill').style.width = `${Math.round(warrior.stats.hp / warrior.stats.maxHp * 100)}%`;
       $('wm-hp-fill').style.background = warrior.stats.hp / warrior.stats.maxHp > 0.6 ? '#88dd88' : warrior.stats.hp / warrior.stats.maxHp > 0.3 ? '#ffaa44' : '#ff6666';
+      $('wm-loyalty').textContent = warrior.loyalty;
+      $('wm-status').textContent = warrior.statusLabel();
+      $('wm-location').textContent = warrior.locationLabel();
+      $('wm-age').textContent = warrior.ageLabel();
+      $('wm-lineage').textContent = warrior._parents ? `${warrior._parents.father} × ${warrior._parents.mother}` : '初代';
+      $('wm-skill').textContent = warrior.skillName();
+      $('wm-generation').textContent = `第${warrior._generation}世代`;
+      openModal('warrior-modal');
+    }
+
+    function openHistory(){
+      const box = $('hist-list');
+      box.innerHTML = '';
+      if (state.log.length === 0) {
+        box.innerHTML = `<div class="hist-empty">記録なし</div>`;
+      } else {
+        state.log.forEach(item => {
+          const div = document.createElement('div');
+          div.className = `hist-item${item.mutant ? ' hi-mutant' : ''}`;
+          div.innerHTML = `<div class="hi-time">${item.time}</div><div class="hi-text">${item.text}</div>`;
+          box.appendChild(div);
+        });
+      }
+      openModal('history-modal');
+    }
+
+    function openPedigree(){
+      const content = $('pedigree-content');
+
+      const skillHtml = BLOOD_SKILLS.map(sk => `
+        <div class="bsk-row">
+          <div class="bsk-icon">${sk.icon}</div>
+          <div>
+            <div class="bsk-name">${sk.name}</div>
+            <div class="bsk-desc">${sk.desc}</div>
+          </div>
+        </div>
+      `).join('');
+
+      const gens = [...new Set(gWarriors.map(w => w._generation))].sort((a,b)=>a-b);
+      let genHtml = '';
+      gens.forEach(gen => {
+        const list = gWarriors.filter(w => w._generation === gen);
+        genHtml += `
+          <div class="gen-block">
+            <div class="gen-label">第 ${gen} 世 代</div>
+            <div class="gen-list">
+              ${list.map(w => `
+                <div class="gen-card ${w._is
