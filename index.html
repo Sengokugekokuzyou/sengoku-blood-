@@ -257,6 +257,21 @@ button{font:inherit;}
 }
 #toast.show{opacity:1;}
 #toast.mutant-toast{border-color:#ff44ff;background:rgba(60,0,60,.97);color:#ff88ff;}
+
+/* ── 天下図モーダル ── */
+#map-modal .modal-shell{max-width:520px;height:92vh;}
+#strategic-map{
+  width:100%;height:100%;
+  background:radial-gradient(ellipse at 40% 30%, #0d1a08 0%, #0a1204 50%, #060c02 100%);
+  border-radius:10px;
+  display:block;
+}
+.map-province-info{
+  padding:10px;text-align:center;font-size:12px;color:var(--gold-l);
+  background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);
+  border-radius:8px;margin-bottom:8px;min-height:42px;
+  display:flex;align-items:center;justify-content:center;
+}
 </style>
 </head>
 <body>
@@ -406,6 +421,26 @@ button{font:inherit;}
   </div>
 </div>
 
+<!-- ── 天下図モーダル ── -->
+<div id="map-modal" class="modal">
+  <div class="modal-shell modal-tall">
+    <div class="modal-deco-top"></div>
+    <div class="modal-head">
+      <div class="modal-title">🗺️ 天下図　全国制覇</div>
+      <button class="close-btn" onclick="closeModal('map-modal')">閉じる</button>
+    </div>
+    <div class="modal-body" style="padding:8px 10px;display:flex;flex-direction:column;gap:8px;">
+      <div class="map-province-info" id="selected-province-info">国をタップして侵攻先を選択</div>
+      <canvas id="strategic-map" height="460"></canvas>
+    </div>
+    <div class="modal-footer" style="flex-direction:column;gap:8px;">
+      <button id="invade-btn" class="modal-btn modal-btn-exec" onclick="startInvasion()" style="display:none;">
+        ⚔️ この国に侵攻する
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ── トースト ── -->
 <div id="toast"></div>
 
@@ -457,14 +492,14 @@ button{font:inherit;}
       <button class="act-btn" onclick="openEngumi()">
         <div class="ico">⚜️</div><div class="lbl">縁組</div>
       </button>
+      <button class="act-btn" onclick="openMap()">
+        <div class="ico">🗺️</div><div class="lbl">天下図</div>
+      </button>
       <button class="act-btn" onclick="openPedigree()">
         <div class="ico">🌳</div><div class="lbl">系譜</div>
       </button>
       <button class="act-btn" onclick="openHistory()">
         <div class="ico">📜</div><div class="lbl">戦記</div>
-      </button>
-      <button class="act-btn" onclick="openModal('dev-modal')">
-        <div class="ico">⚙️</div><div class="lbl">設定</div>
       </button>
     </div>
   </div>
@@ -479,7 +514,7 @@ const ENGUMI_COST = 600;
 const MATURE_AGE  = 20;
 const MONTH_ADVANCE_EVERY = 2;
 
-// ── グレード変換（Doc2より） ──
+// ── グレード変換 ──
 function getGrade(val){
   if(val>=95) return {grade:'S',color:'#ffdd44'};
   if(val>=85) return {grade:'A',color:'#88ff88'};
@@ -495,12 +530,11 @@ function gradeSpan(val){
 }
 function hpGradeSpan(hp,maxHp){
   const pct=Math.round(hp/maxHp*100);
-  // HP%を0-99にマップしてグレード算出（少し緩め）
   const g=getGrade(Math.floor(pct*0.6+40));
   return `<span class="sg-${g.grade}">${g.grade}</span>(${pct}%)`;
 }
 
-// ── 性別定数（Doc2より） ──
+// ── 性別定数 ──
 const GENDER_ICON  = {male:'♂', female:'♀'};
 const GENDER_LABEL = {male:'男', female:'女'};
 
@@ -559,6 +593,37 @@ const state = {
 let gWarriors = [];
 let idleTimer = null, ageTickCounter = 0, isoAnimFrame = null;
 let engumiStep = 0, engumiSelectedFather = null, engumiSelectedMother = null;
+
+// ============================================================
+//  天下図データ
+// ============================================================
+const PROVINCES = [
+  {id:1,  name:'尾張', x:240, y:240, clan:'player',      strength:65, adj:[2,3,4]},
+  {id:2,  name:'美濃', x:210, y:255, clan:'saito',       strength:72, adj:[1,5,12]},
+  {id:3,  name:'三河', x:268, y:228, clan:'matsudaira',  strength:58, adj:[1,11,8]},
+  {id:4,  name:'甲斐', x:182, y:195, clan:'takeda',      strength:85, adj:[1,5,6]},
+  {id:5,  name:'信濃', x:198, y:218, clan:'takeda',      strength:78, adj:[2,4,6,7]},
+  {id:6,  name:'上野', x:158, y:160, clan:'hojo',        strength:70, adj:[4,5,7]},
+  {id:7,  name:'武蔵', x:138, y:142, clan:'hojo',        strength:82, adj:[5,6,8]},
+  {id:8,  name:'相模', x:128, y:118, clan:'hojo',        strength:75, adj:[3,7]},
+  {id:9,  name:'近江', x:225, y:272, clan:'azai',        strength:62, adj:[2,10,12]},
+  {id:10, name:'山城', x:215, y:290, clan:'ashikaga',    strength:55, adj:[9,11,12]},
+  {id:11, name:'摂津', x:235, y:295, clan:'miyoshi',     strength:68, adj:[3,10,13]},
+  {id:12, name:'越前', x:198, y:275, clan:'asakura',     strength:60, adj:[2,5,9]},
+  {id:13, name:'播磨', x:215, y:318, clan:'bessho',      strength:52, adj:[11,14]},
+  {id:14, name:'備前', x:215, y:348, clan:'ukita',       strength:65, adj:[13,15]},
+  {id:15, name:'安芸', x:195, y:378, clan:'mouri',       strength:80, adj:[14,16]},
+  {id:16, name:'周防', x:180, y:405, clan:'mouri',       strength:72, adj:[15,17]},
+  {id:17, name:'長門', x:160, y:420, clan:'mouri',       strength:68, adj:[16,18]},
+  {id:18, name:'豊前', x:175, y:445, clan:'otomo',       strength:58, adj:[17,19]},
+  {id:19, name:'筑前', x:155, y:462, clan:'otomo',       strength:62, adj:[18,20]},
+  {id:20, name:'薩摩', x:148, y:495, clan:'shimazu',     strength:90, adj:[19]},
+  {id:21, name:'阿波', x:268, y:380, clan:'chousokabe',  strength:55, adj:[22]},
+  {id:22, name:'土佐', x:255, y:410, clan:'chousokabe',  strength:68, adj:[21]},
+];
+
+let selectedProvince = null;
+let currentEnemy = null;
 
 // ============================================================
 //  ユーティリティ
@@ -806,7 +871,6 @@ function updateStatusUI(){
   }
 }
 
-// ── パーティ列表示（Doc2の性別・グレード表示を統合） ──
 function updatePartyRow(){
   const row=document.getElementById('party-row');
   if(!row) return;
@@ -832,7 +896,7 @@ function updatePartyRow(){
 }
 
 // ============================================================
-//  武将モーダル（Doc2の性別・グレード統合）
+//  武将モーダル
 // ============================================================
 function openWarriorModal(w){
   const hpPct=(w.stats.hp/w.stats.maxHp)*100;
@@ -1090,7 +1154,172 @@ function doEngumi(){
 function closeSuccessOverlay(){ closeModal('success-overlay'); }
 
 // ============================================================
-//  合戦システム（ピクセルアート戦闘）
+//  天下図
+// ============================================================
+const CLAN_COLORS = {
+  player:      '#c8960c',
+  saito:       '#4a6a3a',
+  matsudaira:  '#3a5a7a',
+  takeda:      '#7a1a1a',
+  hojo:        '#1a2a6a',
+  azai:        '#4a2a6a',
+  ashikaga:    '#6a4a1a',
+  miyoshi:     '#2a6a4a',
+  asakura:     '#5a4a2a',
+  bessho:      '#3a4a2a',
+  ukita:       '#6a3a2a',
+  mouri:       '#2a4a6a',
+  otomo:       '#5a2a4a',
+  shimazu:     '#1a4a3a',
+  chousokabe:  '#4a3a1a',
+};
+
+function playerProvinceCount(){
+  return PROVINCES.filter(p=>p.clan==='player').length;
+}
+function drawStrategicMap(){
+  const canvas=document.getElementById('strategic-map');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // 背景
+  ctx.fillStyle='#08100a';
+  ctx.fillRect(0,0,W,H);
+
+  // グリッドライン（薄く）
+  ctx.strokeStyle='rgba(200,150,12,.05)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // 隣接線
+  PROVINCES.forEach(p=>{
+    p.adj.forEach(adjId=>{
+      if(adjId<=p.id) return;
+      const q=PROVINCES.find(x=>x.id===adjId);
+      if(!q) return;
+      ctx.strokeStyle='rgba(200,150,12,.18)';
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();
+    });
+  });
+
+  // 国を描画
+  PROVINCES.forEach(p=>{
+    const isPlayer=(p.clan==='player');
+    const isSelected=(selectedProvince&&selectedProvince.id===p.id);
+    const color=CLAN_COLORS[p.clan]||'#444';
+    const r=18;
+
+    // 影
+    ctx.fillStyle='rgba(0,0,0,.4)';
+    ctx.beginPath();ctx.ellipse(p.x+2,p.y+2,r+2,r*0.6+2,0,0,Math.PI*2);ctx.fill();
+
+    // 本体
+    ctx.fillStyle=color;
+    ctx.strokeStyle=isSelected?'#ffee44':isPlayer?'#ffcc00':'rgba(255,255,255,.2)';
+    ctx.lineWidth=isSelected?3:isPlayer?2:1;
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+
+    // 選択グロー
+    if(isSelected){
+      ctx.shadowColor='#ffee44';ctx.shadowBlur=16;
+      ctx.strokeStyle='#ffee44';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(p.x,p.y,r+4,0,Math.PI*2);ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+    if(isPlayer){
+      ctx.shadowColor='#ffcc00';ctx.shadowBlur=10;
+      ctx.strokeStyle='#ffcc00';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(p.x,p.y,r+3,0,Math.PI*2);ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+
+    // 国名
+    ctx.fillStyle=isPlayer?'#ffee88':'#f0e8c8';
+    ctx.font='bold 9px DotGothic16,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.name,p.x,p.y);
+
+    // 勢力値（下部）
+    ctx.fillStyle='rgba(245,228,180,.6)';
+    ctx.font='7px sans-serif';
+    ctx.fillText(p.strength,p.x,p.y+r+9);
+  });
+
+  // 凡例
+  ctx.fillStyle='rgba(200,150,12,.8)';
+  ctx.font='9px DotGothic16,monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('🟡 自領地  ● 敵国',6,H-16);
+  ctx.fillStyle='rgba(245,228,180,.5)';
+  ctx.fillText('支配: '+playerProvinceCount()+'/'+PROVINCES.length+'国',6,H-6);
+}
+
+function openMap(){
+  selectedProvince=null;
+  document.getElementById('selected-province-info').textContent='国をタップして侵攻先を選択';
+  document.getElementById('invade-btn').style.display='none';
+  openModal('map-modal');
+
+  // canvasサイズをモーダル幅に合わせる
+  setTimeout(()=>{
+    const canvas=document.getElementById('strategic-map');
+    const body=canvas.parentElement;
+    if(body){
+      canvas.width=body.clientWidth-20;
+      canvas.height=Math.max(400, body.clientHeight-60);
+    }
+    drawStrategicMap();
+
+    canvas.onclick=function(e){
+      const rect=canvas.getBoundingClientRect();
+      const scaleX=canvas.width/rect.width;
+      const scaleY=canvas.height/rect.height;
+      const mx=(e.clientX-rect.left)*scaleX;
+      const my=(e.clientY-rect.top)*scaleY;
+
+      const hit=PROVINCES.find(p=>Math.hypot(p.x-mx,p.y-my)<22);
+      if(!hit) return;
+
+      if(hit.clan==='player'){
+        // 自領地をタップ
+        selectedProvince=null;
+        document.getElementById('selected-province-info').innerHTML=
+          `<span style="color:var(--gold)">【自領地】${hit.name}　勢力: ${hit.strength}</span>`;
+        document.getElementById('invade-btn').style.display='none';
+      } else {
+        // 隣接チェック（プレイヤー領地と隣接しているか）
+        const playerIds=PROVINCES.filter(p=>p.clan==='player').map(p=>p.id);
+        const isAdjacent=hit.adj.some(id=>playerIds.includes(id));
+        selectedProvince=hit;
+
+        if(isAdjacent){
+          document.getElementById('selected-province-info').innerHTML=
+            `<span style="color:#ffdd44">侵攻先: ${hit.name}　${hit.clan}氏　勢力 ${hit.strength}</span>`;
+          document.getElementById('invade-btn').style.display='block';
+        } else {
+          document.getElementById('selected-province-info').innerHTML=
+            `<span style="color:#ff8888">${hit.name}（隣接していないため侵攻不可）</span>`;
+          document.getElementById('invade-btn').style.display='none';
+        }
+      }
+      drawStrategicMap();
+    };
+  },120);
+}
+
+function startInvasion(){
+  if(!selectedProvince) return;
+  currentEnemy={name:selectedProvince.name+'勢',strength:selectedProvince.strength,province:selectedProvince};
+  closeModal('map-modal');
+  openBattle(true);
+}
+
+// ============================================================
+//  合戦システム
 // ============================================================
 const BW=480,BH=300;
 const B_FIELD_Y_MIN=68,B_FIELD_Y_MAX=BH-18;
@@ -1345,7 +1574,21 @@ function bEndBattle(isWin){
   const titleEl=document.getElementById('bres-title-text');
   const detailEl=document.getElementById('bres-detail-text');
   if(isWin){
-    const reward=rnd(1800,2400),uniGain=4+Math.random()*3;
+    let reward=rnd(1800,2400);
+    let uniGain=4+Math.random()*3;
+    let extraMsg='';
+
+    // 天下図侵攻からの勝利
+    if(currentEnemy&&currentEnemy.province){
+      const p=currentEnemy.province;
+      p.clan='player';
+      uniGain=8+Math.random()*4;
+      reward+=rnd(800,1400);
+      extraMsg='\n【'+p.name+'】を平定！';
+      addLog('【天下図】'+p.name+'を制圧（'+currentEnemy.clan+'氏を降伏させた）');
+      showToast('🎉 '+p.name+' を平定！',4000);
+    }
+
     state.koku+=reward;state.unification=Math.min(100,state.unification+uniGain);
     gWarriors.forEach(w=>{
       if(w.isMature()){
@@ -1356,7 +1599,7 @@ function bEndBattle(isWin){
       }
     });
     titleEl.textContent='勝利！';
-    detailEl.textContent='石高 +'+reward.toLocaleString()+'\n統一度 +'+uniGain.toFixed(1)+'%';
+    detailEl.textContent='石高 +'+reward.toLocaleString()+'\n統一度 +'+uniGain.toFixed(1)+'%'+extraMsg;
     addLog('合戦勝利（報酬'+reward+'石）');
   } else {
     const loss=rnd(400,700);state.koku=Math.max(0,state.koku-loss);
@@ -1365,15 +1608,18 @@ function bEndBattle(isWin){
     detailEl.textContent='石高 -'+loss.toLocaleString()+'\n武将が負傷した';
     addLog('合戦敗北（損失'+loss+'石）');
   }
+  currentEnemy=null;
   document.getElementById('battle-result-panel').classList.add('show');
   updateStatusUI();updatePartyRow();
 }
-function openBattle(){
+
+function openBattle(fromMap){
   if(gWarriors.length===0){showToast('武将がいません');return;}
   if(bLoopId){cancelAnimationFrame(bLoopId);bLoopId=null;}
   document.getElementById('battle-screen').classList.add('show');
   document.getElementById('battle-result-panel').classList.remove('show');
   document.getElementById('battle-log-bar').textContent='両軍、突撃開始！';
+
   const bgCv=document.getElementById('bg-canvas');
   const mainCv=document.getElementById('battle-main-canvas');
   const frame=document.getElementById('bscr-frame');
@@ -1392,6 +1638,14 @@ function openBattle(){
   const active=matures.length>0?matures:gWarriors;
   const leader=active[0];
   document.getElementById('bunit-pname').textContent=leader?leader.name.slice(-3):'我が軍';
+
+  // 天下図からの侵攻なら敵名を反映
+  if(fromMap&&currentEnemy){
+    document.getElementById('bunit-ename').textContent=currentEnemy.name;
+  } else {
+    document.getElementById('bunit-ename').textContent='敵　軍';
+  }
+
   let totalPower=active.reduce((s,w)=>{
     let p=w.stats.power+w.stats.wisdom;
     if(w._skillId==='brave'||w._skillId==='swift') p*=1.15;
@@ -1400,7 +1654,12 @@ function openBattle(){
     return s+p;
   },0);
   const playerPower=clamp(Math.floor(totalPower/active.length),60,180);
-  const enemyPower=clamp(120+Math.floor(state.unification*0.4),60,200)|0;
+
+  // 天下図侵攻ならその国の勢力を使用
+  let enemyBase=120+Math.floor(state.unification*0.4);
+  if(fromMap&&currentEnemy) enemyBase=clamp(currentEnemy.strength*1.5,60,220);
+  const enemyPower=clamp(enemyBase,60,220)|0;
+
   bGenMaxHp={p:playerPower,e:enemyPower};
   bSoldiers=[];
   const soldierCount=Math.min(8,4+gWarriors.length);
@@ -1432,7 +1691,7 @@ function closeBattle(){
 }
 
 // ============================================================
-//  アイドルティック（ゲーム進行）
+//  アイドルティック
 // ============================================================
 function performIdleTick(){
   state.turn++;
@@ -1475,7 +1734,7 @@ function performIdleTick(){
 }
 
 // ============================================================
-//  ISOキャンバス描画
+//  ISOキャンバス
 // ============================================================
 function initIsoCanvas(){
   const canvas=document.getElementById('iso-canvas');
@@ -1547,7 +1806,6 @@ function initIsoCanvas(){
     ctx.fillStyle='rgba(245,232,200,.9)';
     ctx.font=Math.max(7,r-1)+'px Noto Serif JP';
     ctx.textAlign='center';ctx.fillText(w.name.slice(-1),x,y-r*0.35);
-    // 性別アイコンを小さく右上に表示
     ctx.font=Math.max(6,r-3)+'px sans-serif';
     ctx.fillStyle=w.gender==='female'?'#ffaacc':'#aaccff';
     ctx.fillText(gIcon,x+r*0.85,y-r*1.05);
@@ -1608,7 +1866,7 @@ function devAddWarrior(){
 }
 
 // ============================================================
-//  星・花びら生成
+//  星・花びら
 // ============================================================
 function spawnStars(){
   const sky=document.getElementById('sky');
