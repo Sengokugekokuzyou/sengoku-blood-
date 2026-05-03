@@ -248,7 +248,7 @@
       flex-direction:column;
       align-items:center;
       gap:1px;
-      min-width:78px;
+      min-width:84px;
       padding:5px 8px;
       border-radius:8px;
       border:1px solid rgba(200,150,12,.2);
@@ -398,7 +398,7 @@
       font-size:9px;
       color:var(--parchment);
       line-height:1.6;
-      min-width:135px;
+      min-width:140px;
     }
     .gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l);}
     .gen-card .gp{color:#ffaa44;}
@@ -482,7 +482,7 @@
     }
 
     .warrior-sel-card{
-      min-height:72px;
+      min-height:78px;
       padding:10px;
       border-radius:10px;
       border:1px solid rgba(200,150,12,.15);
@@ -1027,13 +1027,13 @@
       5:'忍頭', 6:'軍師', 7:'外交官', 8:'鉄砲頭', 9:'武者'
     };
 
-    const SURNAMES = ['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
-    const GIVEN_NAMES_M = ['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
-    const GIVEN_NAMES_F = ['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督'];
-
     const ROLE_ICONS = {
       0:'👑',1:'🪭',2:'⚔️',3:'🛡️',4:'🍚',5:'🥷',6:'📜',7:'🤝',8:'🔫',9:'🏹'
     };
+
+    const SURNAMES = ['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
+    const GIVEN_NAMES_M = ['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
+    const GIVEN_NAMES_F = ['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督'];
 
     const state = {
       koku: 1200,
@@ -1193,4 +1193,271 @@
         if (Math.random() < inheritRate) {
           skillId = pool[Math.floor(Math.random() * pool.length)];
         }
-      } else if (Math.random
+      } else if (Math.random() < 0.08) {
+        skillId = BLOOD_SKILLS[Math.floor(Math.random() * BLOOD_SKILLS.length)].id;
+      }
+
+      return { skillId, isMutant };
+    }
+
+    function bloodlineFacilityMul(w){
+      let mul = 1.0;
+      if (w._parents) mul += ((w._generation || 1) - 1) * 0.06;
+      if (w._skillId === 'wise' || w._skillId === 'loyal') mul *= 1.18;
+      return mul;
+    }
+
+    class IsoWarrior{
+      constructor(name, jobId, power, wisdom, gender='male', trainingMonths=0, ageMonths=null){
+        this.name = name;
+        this.jobId = jobId;
+        this.gender = gender;
+
+        this.stats = {
+          power: clamp(power, 1, 99),
+          wisdom: clamp(wisdom, 1, 99),
+          maxHp: rnd(90, 130),
+          hp: 0
+        };
+        this.stats.hp = this.stats.maxHp;
+
+        this.speed = 0.016 + Math.random() * 0.01;
+        this.isoX = (Math.random() - .5) * 3.8;
+        this.isoY = 1.0 + Math.random() * 2.5;
+        this.dirX = Math.random() > .5 ? 1 : -1;
+        this.dirY = Math.random() > .5 ? 1 : -1;
+
+        this._loyalty = rnd(55, 88);
+        this._currentFacility = null;
+        this._facilityTimer = 0;
+        this._facilityStayMax = 0;
+        this._moveTimer = rnd(60, 180);
+
+        this._parents = null;
+        this._generation = 1;
+        this._skillId = null;
+        this._isMutant = false;
+        this._compatibility = 0;
+        this._trainingMonths = trainingMonths;
+        this._ageMonths = ageMonths ?? rnd(192, 360); // 16〜30歳
+        this._color = this.pickColor();
+      }
+
+      pickColor(){
+        if (this._isMutant) return '#ff44ff';
+        const cols = ['#c8960c','#cc4444','#4488cc','#44cc88','#cc88cc','#ccaa44','#44aacc','#cc6644'];
+        return cols[Math.floor(Math.random() * cols.length)];
+      }
+
+      get loyalty(){ return this._loyalty; }
+
+      get ageYears(){
+        return Math.floor(this._ageMonths / 12);
+      }
+
+      get ageMonthRemainder(){
+        return this._ageMonths % 12;
+      }
+
+      ageLabel(){
+        return `${this.ageYears}歳`;
+      }
+
+      isReady(){
+        return this._trainingMonths <= 0;
+      }
+
+      canParent(){
+        return this.isReady();
+      }
+
+      statusLabel(){
+        return this.isReady() ? '実戦可' : `育成中 あと${this._trainingMonths}月`;
+      }
+
+      skillName(){
+        const sk = this._skillId ? getSkillById(this._skillId) : null;
+        return sk ? `${sk.icon} ${sk.name}` : '—';
+      }
+
+      locationLabel(){
+        if (!this._currentFacility) return '巡回中';
+        return FACILITY_MAP[this._currentFacility]?.name || '巡回中';
+      }
+
+      applyBloodSkill(){
+        if (!this._skillId) return;
+        const sk = getSkillById(this._skillId);
+        if (sk) sk.effect(this);
+        this._color = this.pickColor();
+      }
+
+      tick(){
+        if (this._currentFacility) {
+          this._facilityTimer++;
+          if (this._facilityTimer >= this._facilityStayMax) {
+            this.leaveFacility();
+          } else if (this._facilityTimer % 90 === 45) {
+            this.applyFacilityEffect(this._currentFacility, false);
+          }
+        } else {
+          this._moveTimer--;
+          if (this._moveTimer <= 0) {
+            if (Math.random() < (this.isReady() ? 0.72 : 0.35)) {
+              const f = FACILITY_POSITIONS[Math.floor(Math.random() * FACILITY_POSITIONS.length)].key;
+              this.enterFacility(f);
+            }
+            this._moveTimer = rnd(70, 180);
+          }
+
+          this.isoX += this.dirX * this.speed;
+          this.isoY += this.dirY * this.speed * .8;
+
+          const bx = 3.2, byMin = -0.2, byMax = 3.9;
+          if (this.isoX < -bx){ this.isoX = -bx; this.dirX = 1; }
+          if (this.isoX >  bx){ this.isoX =  bx; this.dirX = -1; }
+          if (this.isoY < byMin){ this.isoY = byMin; this.dirY = 1; }
+          if (this.isoY > byMax){ this.isoY = byMax; this.dirY = -1; }
+        }
+      }
+
+      enterFacility(key){
+        const fp = FACILITY_POSITIONS.find(v => v.key === key);
+        if (!fp) return;
+        this._currentFacility = key;
+        this.isoX = fp.tx + (Math.random() - .5) * 0.35;
+        this.isoY = fp.ty + (Math.random() - .5) * 0.35;
+        this._facilityTimer = 0;
+        this._facilityStayMax = rnd(120, 300);
+        this.applyFacilityEffect(key, true);
+      }
+
+      leaveFacility(){
+        this._currentFacility = null;
+        this._facilityTimer = 0;
+        this.dirX = Math.random() > .5 ? 1 : -1;
+        this.dirY = Math.random() > .5 ? 1 : -1;
+      }
+
+      applyFacilityEffect(key, isEntry){
+        const eff = FACILITY_EFFECT[key];
+        if (!eff) return;
+
+        const base = isEntry ? rnd(eff.range[0], eff.range[1]) : rnd(1, 2);
+        const trainingPenalty = this.isReady() ? 1 : 0.75;
+        const gain = Math.floor(base * bloodlineFacilityMul(this) * trainingPenalty);
+
+        let hpChange = 0;
+        if (isEntry) {
+          hpChange = eff.costHp > 0
+            ? Math.floor(eff.costHp * (0.8 + Math.random() * 0.4))
+            : Math.floor(eff.costHp * (0.7 + Math.random() * 0.6));
+        }
+
+        if (eff.stat === 'power') this.stats.power = clamp(this.stats.power + gain, 1, 99);
+        if (eff.stat === 'wisdom') this.stats.wisdom = clamp(this.stats.wisdom + gain, 1, 99);
+        if (eff.stat === 'hp') this.stats.hp = clamp(this.stats.hp + gain, 1, this.stats.maxHp);
+        if (eff.stat === 'loyalty') this._loyalty = clamp(this._loyalty + gain, 0, 100);
+
+        this.stats.hp = clamp(this.stats.hp + hpChange, 1, this.stats.maxHp);
+
+        if (isEntry) {
+          let text = eff.stat === 'hp' ? `体力 +${gain}` : `${eff.label} +${gain}`;
+          if (hpChange !== 0) text += `（体力 ${hpChange > 0 ? '+' : ''}${hpChange}）`;
+          showFacilityActivity(this, text, eff.color);
+          updatePartyRow();
+          updateStatusUI();
+        }
+      }
+    }
+
+    function getWarriorScreenPos(w){
+      const canvas = $('iso-canvas');
+      const rect = canvas.getBoundingClientRect();
+      const tileW = Math.min(canvas.width * 0.18, canvas.height * 0.22);
+      const tileH = tileW * 0.5;
+      const cx = canvas.width / 2;
+      const cy = canvas.height * 0.28;
+      const x = cx + (w.isoX - w.isoY) * tileW * 0.5;
+      const y = cy + (w.isoX + w.isoY) * tileH * 0.5;
+      return {
+        x: rect.left + (x / canvas.width) * rect.width,
+        y: rect.top + (y / canvas.height) * rect.height
+      };
+    }
+
+    function showFacilityActivity(warrior, text, color){
+      const layer = $('bubble-layer');
+      const pos = getWarriorScreenPos(warrior);
+      const lr = layer.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className = 'facility-activity';
+      el.textContent = text;
+      el.style.color = color || '#ffdd88';
+      el.style.left = (pos.x - lr.left) + 'px';
+      el.style.top = (pos.y - lr.top - 40) + 'px';
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 2400);
+    }
+
+    function showFloatText(warrior, text, color){
+      const layer = $('bubble-layer');
+      const pos = getWarriorScreenPos(warrior);
+      const lr = layer.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className = 'float-text';
+      el.textContent = text;
+      el.style.color = color || '#fff';
+      el.style.left = (pos.x - lr.left) + 'px';
+      el.style.top = (pos.y - lr.top - 30) + 'px';
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 1800);
+    }
+
+    function updateStatusUI(){
+      $('koku-val').textContent = Math.floor(state.koku).toLocaleString();
+      $('uni-val').textContent = state.unification.toFixed(1);
+      $('uni-bar').style.width = `${Math.min(100, state.unification)}%`;
+      $('uni-pct').textContent = `${state.unification.toFixed(1)}%`;
+      $('date-val').textContent = `${state.year}年${state.month}月`;
+      $('season-val').textContent = seasonLabel(state.season);
+      $('season-chip').className = `stat-chip season-chip ${state.season}`;
+
+      if (state.unification >= 100 && !state.gameCleared) {
+        state.gameCleared = true;
+        showToast('🎉 天下統一を達成せり！', 5000);
+        addLog('天下統一を達成した');
+      }
+    }
+
+    function updatePartyRow(){
+      const row = $('party-row');
+      row.innerHTML = '';
+
+      gWarriors.forEach((w, i) => {
+        const hpPct = Math.round((w.stats.hp / w.stats.maxHp) * 100);
+        const hpColor = hpPct > 60 ? '#88dd88' : hpPct > 30 ? '#ffaa44' : '#ff6666';
+
+        const card = document.createElement('div');
+        card.className = `party-card${i === 0 ? ' head' : ''}${!w.isReady() ? ' training' : ''}${w._isMutant ? ' mutant' : ''}`;
+        card.innerHTML = `
+          <div class="pc-role">${i === 0 ? '当主' : (ROLES[w.jobId] || '武者')}</div>
+          <div class="pc-name">${w.name}</div>
+          <div class="pc-pow">武 ${w.stats.power} / 知 ${w.stats.wisdom}</div>
+          <div class="pc-hp" style="color:${hpColor}">体力 ${w.stats.hp}/${w.stats.maxHp}</div>
+          <div class="pc-loc">${w.locationLabel()} ・ ${w.ageLabel()}</div>
+          <div class="pc-skill">${w.skillName()}</div>
+        `;
+        card.addEventListener('click', () => openWarrior(w));
+        row.appendChild(card);
+      });
+    }
+
+    function openWarrior(warrior){
+      $('wm-name-text').textContent = warrior.name;
+      $('wm-role-text').textContent = ROLES[warrior.jobId] || '武者';
+      $('wm-power').textContent = warrior.stats.power;
+      $('wm-wisdom').textContent = warrior.stats.wisdom;
+      $('wm-hp').textContent = `${warrior.stats.hp} / ${warrior.stats.maxHp}`;
+      $('wm-hp-fill').style.width = `${Math.round(warrior.stats.hp / warrior.stats.maxHp * 100)}%`;
+      $('wm-hp-fill').style.background = warrior.stats.hp / warrior.stats.maxHp > 0.6 ? '#88dd88' : warrior.stats.hp / warrior.stats.maxHp > 0.3 ? '#ffaa44' : '#ff6666';
