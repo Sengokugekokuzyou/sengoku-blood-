@@ -3,64 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>戦国血脈 〜覇道の系譜〜 v4.1 Final</title>
+<title>戦国血脈 〜覇道の系譜〜 v4.2 Optimized</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');
+
 :root{
   --gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);
   --parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);
   --crimson:#8b0000;
   --h-header:52px;--h-nation:28px;--h-party:74px;--h-action:58px;
 }
+
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;color:var(--parchment);overflow:hidden;position:fixed;touch-action:none;user-select:none}
+
 #sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%);transition:background 3s}
 #sky.spring{background:linear-gradient(175deg,#150a10 0%,#251520 35%,#301828 65%,#201015 100%)}
 #sky.summer{background:linear-gradient(175deg,#050a18 0%,#0a1525 35%,#0d1c30 65%,#081018 100%)}
 #sky.autumn{background:linear-gradient(175deg,#150800 0%,#251200 35%,#30180a 65%,#1a0d05 100%)}
 #sky.winter{background:linear-gradient(175deg,#080d15 0%,#10151f 35%,#121820 65%,#0a1018 100%)}
-.star,.mist,.petal,.snowflake,.firefly{position:fixed;pointer-events:none}
-.party-card,.staff-card{cursor:pointer;transition:.2s}
-.party-card:hover,.staff-card:hover{transform:scale(1.08);border-color:var(--gold)}
+
+#main{position:fixed;inset:0;display:flex;flex-direction:column;z-index:10}
+header{height:var(--h-header);background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--gold-d)}
+#iso-field{flex:1;position:relative;background:#0a0603;overflow:hidden}
+#iso-canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30}
+
+#bottom-ui{background:rgba(0,0,0,.9);padding:6px 8px;border-top:1px solid var(--gold-d)}
+#nation-bar{height:28px;display:flex;align-items:center;gap:12px;font-size:13px}
+#party-row{display:flex;gap:6px;overflow-x:auto;padding:6px 0;height:var(--h-party);scrollbar-width:none}
+.party-card{flex-shrink:0;min-width:66px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.06);border:2px solid var(--gold-d);text-align:center;transition:.15s}
+.party-card:hover{transform:scale(1.08);border-color:var(--gold)}
+.act-btn{background:var(--panel);border:2px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer;transition:.2s}
+.act-btn:active{transform:scale(0.95)}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-content{background:var(--panel);border:2px solid var(--gold);border-radius:12px;max-width:92%;max-height:92%;overflow:auto}
+.modal-content{background:var(--panel);border:3px solid var(--gold);border-radius:14px;max-width:94%;max-height:92vh;overflow:auto;padding:20px;color:var(--parchment);box-shadow:0 0 30px rgba(200,150,12,.6)}
 </style>
 </head>
 <body>
 
 <div id="sky"></div>
 
-<!-- パーティクルレイヤー -->
-<div id="particles"></div>
-
-<div id="main" style="position:fixed;inset:0;display:flex;flex-direction:column;z-index:10">
+<div id="main">
   <!-- ヘッダー -->
-  <header style="height:var(--h-header);background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--gold-d)">
-    <div style="color:var(--gold);font-size:18px;font-weight:900;letter-spacing:2px">戦国血脈</div>
-    <div style="display:flex;gap:12px;font-size:13px">
-      <div>石高 <span id="koku" style="color:var(--gold-l)">1480</span>石</div>
-      <div>統一 <span id="uni" style="color:var(--gold-l)">12.4</span>%</div>
+  <header>
+    <div style="color:var(--gold);font-size:19px;font-weight:900;letter-spacing:2px">戦国血脈</div>
+    <div id="status-bar" style="display:flex;gap:16px;font-size:13px;font-weight:700">
+      <div>石高 <span id="koku-val" style="color:var(--gold-l)">1480</span>石</div>
+      <div>統一 <span id="uni-val" style="color:var(--gold-l)">12.4</span>%</div>
+      <div>季節 <span id="season-val" style="color:#ffcc88">春</span></div>
     </div>
   </header>
 
   <!-- ISOフィールド -->
-  <div id="iso-field" style="flex:1;position:relative;background:#0a0603">
-    <canvas id="iso-canvas" width="800" height="500" style="width:100%;height:100%;image-rendering:pixelated"></canvas>
-    <div id="bubble-layer" style="position:absolute;inset:0;pointer-events:none"></div>
+  <div id="iso-field">
+    <canvas id="iso-canvas"></canvas>
+    <div id="bubble-layer"></div>
   </div>
 
   <!-- ボトムUI -->
-  <div style="background:rgba(0,0,0,.9);padding:6px 8px;border-top:1px solid var(--gold-d)">
-    <div id="nation-bar" style="height:28px;display:flex;align-items:center;gap:8px;font-size:13px"></div>
-    
-    <!-- パーティ -->
-    <div id="party-row" style="display:flex;gap:6px;overflow-x:auto;padding:6px 0;height:var(--h-party)"></div>
+  <div id="bottom-ui">
+    <div id="nation-bar"></div>
+    <div id="party-row"></div>
     
     <!-- アクションボタン -->
-    <div style="display:flex;gap:8px;justify-content:center;padding:4px 0">
-      <button onclick="openEngumiModal()" class="act-btn" style="background:var(--panel);border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:8px">縁組</button>
-      <button onclick="openBattleModal()" class="act-btn" style="background:var(--panel);border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:8px">出陣</button>
-      <button onclick="openCastleModal()" class="act-btn" style="background:var(--panel);border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:8px">城強化</button>
+    <div style="display:flex;gap:10px;justify-content:center;padding:8px 0">
+      <button onclick="Game.openEngumi()" class="act-btn">縁組</button>
+      <button onclick="Game.openBattle()" class="act-btn">出陣</button>
+      <button onclick="Game.openCastle()" class="act-btn">城強化</button>
+      <button onclick="Game.openPedigree()" class="act-btn">系譜</button>
     </div>
   </div>
 </div>
@@ -71,148 +83,296 @@ html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif J
 </div>
 
 <script>
-// ======================== 戦国血脈 v4.1 Final ========================
+// ======================== 戦国血脈 v4.2 OPTIMIZED ========================
+// 完全最適化版：Gameオブジェクト一元管理 + requestAnimationFrame + Canvasパーティクル + DOMキャッシュ
+
 'use strict';
 
-const BLOODLINES = [
-  {id:0, name:"織田", color:"#ff4444", skill:"天下布武"},
-  {id:1, name:"徳川", color:"#4488ff", skill:"神君"},
-  {id:2, name:"武田", color:"#ff8800", skill:"風林火山"},
-  {id:3, name:"上杉", color:"#66cc88", skill:"毘沙門天"},
-];
+const Game = {
+  // 状態一元管理
+  state: {
+    koku: 1480,
+    unification: 12.4,
+    season: 0, // 0:春 1:夏 2:秋 3:冬
+    turn: 0,
+    generation: 1
+  },
+  
+  // ゲームオブジェクト
+  warriors: [],
+  parents: [],
+  staff: [],
+  
+  // DOMキャッシュ
+  dom: {},
+  
+  // Canvas関連
+  canvas: null,
+  ctx: null,
+  particles: [],
+  
+  // アニメーション
+  frame: 0,
+  lastTime: 0,
+  animationFrameId: null,
+  
+  // 定数
+  BLOODLINES: [
+    {id:0, name:"織田", color:"#ff4444", skill:"天下布武"},
+    {id:1, name:"徳川", color:"#4488ff", skill:"神君"},
+    {id:2, name:"武田", color:"#ff8800", skill:"風林火山"},
+    {id:3, name:"上杉", color:"#66cc88", skill:"毘沙門天"}
+  ],
+  
+  // ユーティリティ
+  rnd: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+  
+  // パーティクルクラス
+  Particle: class {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * Game.canvas.width;
+      this.y = Math.random() * Game.canvas.height * 0.6;
+      this.size = Math.random() * 3.5 + 1;
+      this.speed = Math.random() * 2 + 1.2;
+      this.type = Math.random() > 0.5 ? 'petal' : 'star';
+      this.vx = (Math.random() - 0.5) * 0.6;
+    }
+  },
+  
+  // 初期化
+  init() {
+    // DOMキャッシュ
+    this.dom.kokuVal = document.getElementById('koku-val');
+    this.dom.uniVal = document.getElementById('uni-val');
+    this.dom.seasonVal = document.getElementById('season-val');
+    this.dom.partyRow = document.getElementById('party-row');
+    this.dom.modal = document.getElementById('modal');
+    this.dom.modalContent = document.getElementById('modal-content');
+    this.canvas = document.getElementById('iso-canvas');
+    this.ctx = this.canvas.getContext('2d', {alpha: true});
+    
+    // キャンバスサイズ調整
+    const resize = () => {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight - 52 - 140; // header + bottom
+    };
+    window.addEventListener('resize', resize);
+    resize();
+    
+    // 初期武将
+    const initData = [
+      {name:'織田信長', gender:'male', power:82, blId:0},
+      {name:'徳川家康', gender:'male', power:68, blId:1},
+      {name:'武田信玄', gender:'male', power:78, blId:2},
+      {name:'帰蝶', gender:'female', power:55, blId:0}
+    ];
+    initData.forEach(d => {
+      const w = new IsoWarrior(d.name, d.gender, d.power, d.blId);
+      this.warriors.push(w);
+      this.parents.push(w);
+    });
+    
+    // パーティクル初期化
+    for (let i = 0; i < 85; i++) {
+      this.particles.push(new this.Particle());
+    }
+    
+    // 季節背景設定
+    document.getElementById('sky').className = 'spring';
+    
+    // UI更新
+    this.updateUI();
+    
+    // メインループ開始
+    this.lastTime = performance.now();
+    this.animationFrameId = requestAnimationFrame(t => this.gameLoop(t));
+    
+    console.log('%c✅ 戦国血脈 v4.2 OPTIMIZED 完全起動', 'color:#ffdd44;font-weight:900;font-size:15px');
+  },
+  
+  // メインゲームループ（60fps最適化）
+  gameLoop(timestamp) {
+    const delta = timestamp - this.lastTime;
+    
+    if (delta >= 16) { // 約60fps制御
+      this.frame++;
+      this.lastTime = timestamp;
+      
+      // 定期処理
+      if (this.frame % 48 === 0) this.idleTick(); // 約3秒に1回
+      
+      // 描画
+      this.renderCanvas();
+    }
+    
+    this.animationFrameId = requestAnimationFrame(t => this.gameLoop(t));
+  },
+  
+  // アイドル処理（成長・季節進行）
+  idleTick() {
+    this.warriors.forEach(w => w.tick());
+    
+    // 石高・統一度成長
+    this.state.koku += this.rnd(35, 95);
+    if (Math.random() < 0.12) this.state.unification = Math.min(99.9, this.state.unification + this.rnd(0.2, 0.8));
+    
+    // 季節進行
+    if (Math.random() < 0.07) {
+      this.state.season = (this.state.season + 1) % 4;
+      const sky = document.getElementById('sky');
+      const seasonsClass = ['spring','summer','autumn','winter'];
+      sky.className = seasonsClass[this.state.season];
+      this.dom.seasonVal.textContent = ['春','夏','秋','冬'][this.state.season];
+    }
+    
+    this.updateUI();
+  },
+  
+  // Canvas描画（ISO + パーティクル）
+  renderCanvas() {
+    const c = this.ctx;
+    c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // 簡易ISO地面
+    c.fillStyle = '#1a1208';
+    c.fillRect(0, this.canvas.height * 0.55, this.canvas.width, this.canvas.height * 0.45);
+    
+    // 武将描画（簡易）
+    this.warriors.forEach((w, i) => {
+      const x = this.canvas.width * 0.2 + (i % 4) * (this.canvas.width * 0.18) + w.isoX * 18;
+      const y = this.canvas.height * 0.6 + w.isoY * 12;
+      
+      // 影
+      c.fillStyle = 'rgba(0,0,0,.4)';
+      c.fillRect(x + 4, y + 18, 28, 8);
+      
+      // 本体
+      c.fillStyle = Game.BLOODLINES[w.bloodlineId].color;
+      c.fillRect(x + 8, y + 4, 22, 22);
+      
+      // 頭
+      c.fillStyle = '#f5d8b8';
+      c.fillRect(x + 12, y, 14, 14);
+    });
+    
+    // パーティクル描画（最適化）
+    c.shadowBlur = 2;
+    this.particles.forEach(p => {
+      p.y += p.speed;
+      p.x += p.vx;
+      if (p.y > this.canvas.height) p.reset();
+      
+      c.globalAlpha = 0.75;
+      c.fillStyle = p.type === 'petal' ? '#ffcc88' : '#ffeecc';
+      if (p.type === 'petal') {
+        c.fillRect(p.x, p.y, p.size, p.size * 0.7);
+      } else {
+        c.fillRect(p.x, p.y, p.size, p.size);
+      }
+    });
+    c.shadowBlur = 0;
+    c.globalAlpha = 1;
+  },
+  
+  // UI更新
+  updateUI() {
+    this.dom.kokuVal.textContent = Math.floor(this.state.koku);
+    this.dom.uniVal.textContent = this.state.unification.toFixed(1);
+    
+    // パーティ行更新
+    this.dom.partyRow.innerHTML = '';
+    this.warriors.slice(0, 6).forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'party-card';
+      div.style.borderColor = this.BLOODLINES[w.bloodlineId].color;
+      div.innerHTML = `
+        <div style="font-size:10px;color:#ddd">${w.age}歳</div>
+        <div style="font-weight:700;color:var(--gold-l);font-size:13px">${w.name}</div>
+        <div style="font-size:11px">${this.BLOODLINES[w.bloodlineId].name}</div>
+      `;
+      div.onclick = () => this.showWarriorDetail(w);
+      this.dom.partyRow.appendChild(div);
+    });
+  },
+  
+  // 武将詳細モーダル
+  showWarriorDetail(w) {
+    const html = `
+      <h2 style="text-align:center;color:var(--gold);margin-bottom:16px">${w.name}</h2>
+      <div style="display:flex;gap:20px;justify-content:center">
+        <div style="text-align:center">
+          <div style="font-size:48px;margin-bottom:8px">🗡️</div>
+          <div style="font-size:15px">力 ${w.stats.power}</div>
+        </div>
+        <div>
+          <p>血統：${this.BLOODLINES[w.bloodlineId].name}</p>
+          <p>年齢：${w.age}歳</p>
+          <p>知力：${w.stats.wisdom}</p>
+          <p>スキル：${this.BLOODLINES[w.bloodlineId].skill}</p>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:24px">
+        <button onclick="Game.closeModal()" style="background:var(--gold);color:#111;padding:12px 32px;border-radius:8px;font-weight:700">閉じる</button>
+      </div>
+    `;
+    this.dom.modalContent.innerHTML = html;
+    this.dom.modal.style.display = 'flex';
+  },
+  
+  closeModal() {
+    this.dom.modal.style.display = 'none';
+  },
+  
+  // 機能モーダル（簡易版・拡張容易）
+  openEngumi() {
+    const html = `<h2 style="color:var(--gold)">縁組の儀</h2><p>親武将を選択して新しい血脈を紡ぎましょう（次回フル実装可能）</p><button onclick="Game.closeModal()" style="margin-top:20px">閉じる</button>`;
+    this.dom.modalContent.innerHTML = html;
+    this.dom.modal.style.display = 'flex';
+  },
+  
+  openBattle() {
+    alert('⚔️ 出陣！\n\n（合戦システムは次回さらに強化できます）');
+    this.state.koku += 420;
+    this.state.unification = Math.min(99.9, this.state.unification + 2.8);
+    this.updateUI();
+  },
+  
+  openCastle() {
+    this.state.koku += this.rnd(280, 520);
+    this.updateUI();
+    alert('🏯 城を強化！ 石高大幅増加');
+  },
+  
+  openPedigree() {
+    const html = `<h2>系譜</h2><p>現在の世代：${this.state.generation}代</p><p>親武将数：${this.parents.length}名</p><button onclick="Game.closeModal()">閉じる</button>`;
+    this.dom.modalContent.innerHTML = html;
+    this.dom.modal.style.display = 'flex';
+  }
+};
 
-let gWarriors = [], gParents = [], gStaff = [];
-let koku = 1480, unification = 12.4, season = 0;
-let isoCanvas, isoCtx;
-let animationFrame;
-
-const seasons = ["春","夏","秋","冬"];
-
+// IsoWarriorクラス（最適化版）
 class IsoWarrior {
   constructor(name, gender, power, blId) {
     this.name = name;
     this.gender = gender;
-    this.stats = {power: power, wisdom: 45, hp: 100, maxHp: 100};
+    this.stats = {power: power, wisdom: Game.rnd(35, 65), hp: 100, maxHp: 100};
     this.bloodlineId = blId;
-    this.age = 24 + Math.floor(Math.random()*8);
-    this.isoX = (Math.random()-0.5)*8;
-    this.isoY = (Math.random()-0.5)*5;
-    this._facilityTimer = 0;
+    this.age = Game.rnd(18, 32);
+    this.isoX = (Math.random() - 0.5) * 12;
+    this.isoY = (Math.random() - 0.5) * 8;
   }
-  
   tick() {
-    this.isoX += (Math.random()-0.5)*0.12;
-    this.isoY += (Math.random()-0.5)*0.08;
-    this._facilityTimer++;
+    this.isoX += (Math.random() - 0.5) * 0.4;
+    this.isoY += (Math.random() - 0.5) * 0.3;
+    if (Math.random() < 0.02) this.age++;
   }
 }
 
-function rnd(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function spawnParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 60; i++) {
-    const p = document.createElement('div');
-    p.className = Math.random() > 0.6 ? 'petal' : 'star';
-    p.style.left = Math.random() * 100 + 'vw';
-    p.style.top = Math.random() * 50 + 'vh';
-    p.style.animation = 'petalFall ' + (8 + Math.random()*12) + 's linear infinite';
-    p.style.opacity = Math.random() * 0.7 + 0.3;
-    container.appendChild(p);
-  }
-}
-
-function updateUI() {
-  document.getElementById('koku').textContent = koku;
-  document.getElementById('uni').textContent = unification.toFixed(1);
-  renderPartyRow();
-}
-
-function renderPartyRow() {
-  const row = document.getElementById('party-row');
-  row.innerHTML = '';
-  gWarriors.slice(0, 6).forEach(w => {
-    const div = document.createElement('div');
-    div.className = 'party-card';
-    div.style.borderColor = BLOODLINES[w.bloodlineId].color;
-    div.innerHTML = `
-      <div style="font-size:11px;color:#aaa">${w.age}歳</div>
-      <div style="font-weight:700;color:var(--gold-l)">${w.name}</div>
-      <div style="font-size:13px">${BLOODLINES[w.bloodlineId].name}</div>
-    `;
-    div.onclick = () => showWarriorDetail(w);
-    row.appendChild(div);
-  });
-}
-
-function showWarriorDetail(w) {
-  const html = `
-    <h2>${w.name} (${BLOODLINES[w.bloodlineId].name})</h2>
-    <p>年齢: ${w.age}歳　力: ${w.stats.power}　知: ${w.stats.wisdom}</p>
-    <button onclick="closeModal()">閉じる</button>
-  `;
-  document.getElementById('modal-content').innerHTML = html;
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-
-function performIdleTick() {
-  gWarriors.forEach(w => w.tick());
-  if (Math.random() < 0.15) koku += rnd(30, 80);
-  if (Math.random() < 0.08) unification = Math.min(100, unification + 0.3);
-  updateUI();
-}
-
-function openEngumiModal() {
-  const html = `<h2>縁組の儀</h2><p>現在準備中…（フル実装希望なら教えてください）</p><button onclick="closeModal()">閉じる</button>`;
-  document.getElementById('modal-content').innerHTML = html;
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function openBattleModal() {
-  alert("⚔️ 出陣！\n\n合戦システムは現在簡易版です。\n完全版希望なら「合戦を強化して」と教えてください。");
-}
-
-function openCastleModal() {
-  koku += 300;
-  unification += 1.2;
-  updateUI();
-  alert("🏯 城を強化しました！\n石高 +300、石高増加！");
-}
-
-// 初期化
-function initGame() {
-  isoCanvas = document.getElementById('iso-canvas');
-  isoCtx = isoCanvas.getContext('2d');
-  
-  // 初期武将
-  const initData = [
-    {name:'織田信長', gender:'male', power:82, bl:0},
-    {name:'徳川家康', gender:'male', power:68, bl:1},
-    {name:'武田信玄', gender:'male', power:78, bl:2},
-  ];
-  
-  initData.forEach(d => {
-    const w = new IsoWarrior(d.name, d.gender, d.power, d.bl);
-    gWarriors.push(w);
-    gParents.push(w);
-  });
-
-  spawnParticles();
-  updateUI();
-  
-  setInterval(performIdleTick, 2400);
-  
-  console.log('%c✅ 戦国血脈 v4.1 Final 正常起動', 'color:#ffdd44;font-size:14px;font-weight:bold');
-  alert('🎉 戦国血脈 v4.1 Final が起動しました！\n\n不具合があれば具体的に教えてください。');
-}
-
-window.onload = initGame;
+// 起動
+window.onload = () => Game.init();
 </script>
 </body>
 </html>
