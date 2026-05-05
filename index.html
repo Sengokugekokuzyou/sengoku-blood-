@@ -4,618 +4,93 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>戦国血脈 〜覇道の系譜〜 v7</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');
-:root{--gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);--parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);--crimson:#8b0000;--h-header:52px;--h-nationbar:28px;--h-partyrow:74px;--h-actionrow:62px;--h-bottom-pad:max(env(safe-area-inset-bottom,0),8px)}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;position:fixed;touch-action:none}
-#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%)}
-.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}
-.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none}
-.mist:nth-child(1){height:40px;top:30%;animation-duration:32s}
-.mist:nth-child(2){height:50px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65}
-.mist:nth-child(3){height:35px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45}
-@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}
-.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9),rgba(255,130,130,.25));animation:petalFall linear infinite;pointer-events:none}
-@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}
-#main{position:fixed;inset:0;z-index:10;display:grid;grid-template-rows:var(--h-header) 1fr auto;width:100%;height:100%}
-#header{height:var(--h-header);padding:max(env(safe-area-inset-top,0),8px) 12px 4px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0}
-#game-title{color:var(--gold);font-size:clamp(13px,4.2vw,17px);font-weight:900;letter-spacing:.25em;text-shadow:0 0 16px rgba(200,150,12,.7);line-height:1.3;white-space:nowrap}
-#game-title .sub{display:block;font-size:clamp(7px,1.8vw,9px);letter-spacing:.4em;color:var(--gold-d);font-weight:400;margin-top:1px}
-#status-panel{display:flex;flex-direction:row;align-items:center;gap:5px}
-.stat-chip{display:flex;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:16px;padding:3px 8px}
-.sl{font-size:8px;color:rgba(245,232,200,.5);letter-spacing:.1em}
-.sv{font-size:13px;font-weight:700;color:var(--gold-l)}
-.su{font-size:8px;color:var(--gold-d)}
-#iso-field{position:relative;overflow:hidden;min-height:0}
-#iso-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden}
-.facility-activity{position:absolute;font-size:9px;color:#fd8;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop .3s ease-out}
-@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
-.float-text{position:absolute;font-size:10px;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:floatUp 1.8s ease-out forwards}
-@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}
-#bottom-ui{flex-shrink:0;padding:0 10px var(--h-bottom-pad);background:linear-gradient(0deg,rgba(6,3,0,.98),rgba(6,3,0,.82) 80%,transparent)}
-#nation-bar{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:5px 2px 4px;border-bottom:1px solid rgba(200,150,12,.12);height:var(--h-nationbar)}
-.nl{font-size:8px;color:var(--gold-d);letter-spacing:.18em;white-space:nowrap}
-.nt{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden}
-.nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s}
-.np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:30px;text-align:right}
-#party-row{flex-shrink:0;display:flex;gap:5px;padding:4px 0 3px;overflow-x:auto;scrollbar-width:none;height:var(--h-partyrow);align-items:center;-webkit-overflow-scrolling:touch;touch-action:pan-x}
-#party-row::-webkit-scrollbar{display:none}
-.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:4px 8px;min-width:66px;cursor:pointer;transition:border-color .2s,background .2s;touch-action:manipulation}
-.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08)}
-.party-card.growing{opacity:.72;border-color:rgba(100,200,100,.25)}
-.party-card.parent-card{border-color:rgba(200,150,12,.45);background:rgba(200,150,12,.05)}
-.party-card:active{background:rgba(200,150,12,.18)}
-.pc-role{font-size:7px;color:rgba(200,150,12,.6)}
-.pc-name{font-size:9px;color:var(--parchment);font-weight:700}
-.pc-pow{font-size:8px;color:#fa4}
-.pc-hp{font-size:7px}
-.pc-bl{font-size:7px;font-weight:700}
-#staff-row{display:none;flex-shrink:0;gap:5px;padding:3px 0;overflow-x:auto;scrollbar-width:none;height:50px;align-items:center;-webkit-overflow-scrolling:touch;touch-action:pan-x;border-top:1px solid rgba(200,150,12,.1)}
-#staff-row::-webkit-scrollbar{display:none}
-.staff-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(0,180,80,.07);border:1px solid rgba(0,200,80,.28);border-radius:8px;padding:3px 9px;min-width:70px;cursor:pointer;touch-action:manipulation}
-.staff-card:active{background:rgba(0,200,80,.16)}
-.sc-label{font-size:7px;color:rgba(0,220,100,.65);letter-spacing:.1em}
-.sc-name{font-size:9px;color:var(--parchment);font-weight:700}
-.sc-job{font-size:8px;color:#8fc}
-.sc-lv{font-size:7px;color:rgba(0,220,100,.55)}
-#action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:3px 0 2px;height:var(--h-actionrow)}
-.act-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;touch-action:manipulation;min-height:52px}
-.act-btn:active{transform:scale(.91);background:rgba(200,150,12,.16);border-color:var(--gold)}
-.act-btn .ico{font-size:18px;line-height:1}
-.act-btn .lbl{font-size:8px;letter-spacing:.1em;color:rgba(245,232,200,.72)}
-.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45)}
-.act-btn.primary .lbl{color:var(--gold-l)}
-/* ── BATTLE ── */
-#battle-screen{position:fixed;inset:0;z-index:500;background:#0a0600;display:none;flex-direction:column;font-family:'DotGothic16',monospace}
-#battle-screen.show{display:flex}
-#bscr-inner{display:flex;flex-direction:column;width:100%;height:100%}
-#bscr-frame{position:relative;flex:1;min-height:0;overflow:hidden;border-bottom:3px solid #8b6914;box-shadow:0 4px 20px #c8960033}
-#battle-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0d0800 0%,#1a1000 15%,#221400 30%,#243010 50%,#1c2a10 70%,#162210 100%)}
-#battle-moon{position:absolute;top:8%;right:12%;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fffbe0,#f0d878 50%,#c8a820);box-shadow:0 0 20px 6px rgba(248,230,120,.35),0 0 60px 20px rgba(200,150,12,.12);animation:moonPulse 4s ease-in-out infinite alternate}
-@keyframes moonPulse{from{box-shadow:0 0 20px 6px rgba(248,230,120,.35),0 0 60px 20px rgba(200,150,12,.12)}to{box-shadow:0 0 28px 10px rgba(248,230,120,.5),0 0 80px 30px rgba(200,150,12,.2)}}
-#battle-mountains{position:absolute;bottom:36%;left:0;right:0;height:40%;overflow:hidden;pointer-events:none}
-.bmtn{position:absolute;bottom:0}
-.bmtn-far{background:linear-gradient(180deg,#1a1a2a,#12121e);clip-path:polygon(0% 100%,8% 40%,18% 55%,28% 20%,40% 50%,52% 15%,65% 45%,75% 25%,88% 48%,100% 30%,100% 100%)}
-.bmtn-mid{background:linear-gradient(180deg,#161820,#0e1018);clip-path:polygon(0% 100%,5% 60%,15% 35%,25% 55%,38% 25%,50% 50%,62% 20%,75% 45%,85% 30%,100% 50%,100% 100%)}
-#battle-ground{position:absolute;bottom:0;left:0;right:0;height:38%;overflow:hidden}
-#battle-ground::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,#182810 0,#223818 22px,#1c3012 22px,#1c3012 44px);border-top:2px solid #384828}
-#battle-ground::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,transparent 50%)}
-.btorch{position:absolute;bottom:38%;width:6px;height:22px;background:linear-gradient(180deg,#9a7010,#5a4008);pointer-events:none}
-.btorch::after{content:'🔥';position:absolute;bottom:100%;left:-8px;font-size:14px;animation:torchF .22s infinite alternate;filter:drop-shadow(0 0 6px #f80)}
-@keyframes torchF{from{transform:scale(1);opacity:1}to{transform:scale(1.18) translateY(-2px);opacity:.8}}
-.btorch-l{left:15%}.btorch-r{right:15%}
-.bflag{position:absolute;bottom:38%;width:3px;height:32px;pointer-events:none}
-.bflag::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#9a7010,#5a4008)}
-.bflag::after{content:'';position:absolute;top:0;left:3px;width:16px;height:11px;animation:flagW .55s ease-in-out infinite alternate;transform-origin:left top}
-.bflag-p{left:26%}.bflag-p::after{background:#1840b8;clip-path:polygon(0 0,100% 20%,100% 80%,0 100%)}
-.bflag-e{right:26%}.bflag-e::after{background:#b81830;clip-path:polygon(0 20%,100% 0,100% 100%,0 80%)}
-@keyframes flagW{from{transform:skewY(-5deg)}to{transform:skewY(5deg)}}
-.dot-unit{position:absolute;width:1px;height:1px;image-rendering:pixelated}
-.du-walk{animation:duWalk .28s steps(1) infinite}
-.du-hit{animation:duHit .15s steps(1) 3}
-.du-die{animation:duDie .7s ease-out forwards}
-.du-awaken{animation:duAwaken .5s ease-in-out infinite alternate}
-@keyframes duWalk{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}
-@keyframes duHit{0%,100%{filter:brightness(1)}50%{filter:brightness(4) saturate(0)}}
-@keyframes duDie{0%{opacity:1;transform:rotate(0) scale(1)}70%{opacity:.4;transform:rotate(50deg) scale(.7)}100%{opacity:0;transform:rotate(90deg) scale(.2)}}
-@keyframes duAwaken{from{filter:drop-shadow(0 0 4px gold) brightness(1.3)}to{filter:drop-shadow(0 0 12px orange) brightness(1.8)}}
-.skill-flash{position:absolute;border-radius:50%;pointer-events:none;animation:skillFlash .6s ease-out forwards}
-@keyframes skillFlash{0%{opacity:.9;transform:translate(-50%,-50%) scale(.3)}60%{opacity:.7;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}}
-.skill-text{position:absolute;font-family:'DotGothic16',monospace;font-size:11px;font-weight:bold;pointer-events:none;transform:translateX(-50%);text-shadow:1px 1px 0 #000,2px 2px 0 #0008;animation:skillText 1.4s ease-out forwards;white-space:nowrap}
-@keyframes skillText{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.4)}50%{opacity:1;transform:translateX(-50%) translateY(-22px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-42px) scale(.8)}}
-.gen-label{position:absolute;font-family:'DotGothic16',monospace;font-size:8px;color:#f8e8a0;text-shadow:1px 1px 0 #000,0 0 6px #c8a000;white-space:nowrap;pointer-events:none;transform:translateX(-50%)}
-.dot-bubble{position:absolute;background:#f0ebff;border:1.5px solid #3828a0;border-radius:4px;padding:2px 6px;font-size:9px;color:#1a0800;white-space:nowrap;pointer-events:none;transform:translateX(-50%);animation:bbPop .2s ease-out both;font-family:'DotGothic16',monospace}
-.dot-bubble.ene{background:#fff0f2;border-color:#901830}
-.dot-bubble::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:#3828a0}
-.dot-bubble.ene::after{border-top-color:#901830}
-@keyframes bbPop{from{opacity:0;transform:translateX(-50%) scale(.5)}to{opacity:1;transform:translateX(-50%) scale(1)}}
-.unit-hpbar{position:absolute;height:3px;background:#111;border:1px solid #333;pointer-events:none;transform:translateX(-50%)}
-.unit-hpfill{height:100%;transition:width .12s}
-.dmg-num{position:absolute;font-family:'DotGothic16',monospace;font-size:12px;font-weight:bold;pointer-events:none;transform:translateX(-50%);animation:dmgUp 1s ease-out forwards;text-shadow:1px 1px 0 #000,2px 2px 0 #0008}
-@keyframes dmgUp{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.2)}60%{opacity:1;transform:translateX(-50%) translateY(-26px)}100%{opacity:0;transform:translateX(-50%) translateY(-44px) scale(.8)}}
-#battle-log-bar{flex-shrink:0;height:22px;background:#0a0600;border-bottom:1px solid #4a3000;color:#e8c060;font-size:clamp(9px,2.6vw,12px);display:flex;align-items:center;padding:0 10px;letter-spacing:.06em;overflow:hidden;white-space:nowrap;font-family:'DotGothic16',monospace}
-#battle-ui-panel{flex-shrink:0;display:flex;flex-direction:column;gap:2px;padding:3px 4px;background:#1a0800}
-.bgen-row{display:flex;gap:3px;align-items:stretch}
-.bunit-panel{flex:1;background:linear-gradient(180deg,#e8dcc0,#d4c090 40%,#c0a860);border:2px solid #7a5800;border-radius:4px;padding:3px 7px;display:flex;flex-direction:column;gap:1px;box-shadow:inset 0 1px 0 #fff8,inset 0 -1px 0 #0004;min-width:0}
-.bunit-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px}
-.bunit-name{font-size:clamp(9px,3vw,13px);color:#1a0800;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-.bhp-group{display:flex;align-items:baseline;gap:2px;flex-shrink:0}
-.bhp-label{font-size:8px;color:#6a4000}
-.bhp-value{font-size:clamp(13px,3.8vw,18px);color:#1a0800;min-width:28px;text-align:right;font-family:'DotGothic16',monospace}
-.bpower-wrap{width:100%;height:7px;background:#2a1800;border:1px solid #5a3000;border-radius:2px;overflow:hidden;position:relative}
-.bpower-bar{height:100%;background:linear-gradient(90deg,#2060c0,#40a0ff);transition:width .35s}
-.bpower-bar-e{background:linear-gradient(90deg,#c01010,#ff4040)}
-.bskill-wrap{display:flex;gap:3px;align-items:center}
-.bskill-label{font-size:7px;color:#5a3800;flex-shrink:0}
-.bskill-bar-bg{flex:1;height:3px;background:#2a1800;border-radius:2px;overflow:hidden;min-width:0}
-.bskill-bar{height:100%;background:linear-gradient(90deg,#c80,#fc0);transition:width .3s;border-radius:2px}
-.bskill-btn{font-size:8px;padding:1px 5px;background:rgba(200,150,12,.3);border:1px solid var(--gold-d);border-radius:3px;color:var(--gold-l);font-family:'DotGothic16',monospace;cursor:pointer;white-space:nowrap;touch-action:manipulation;line-height:1.4;flex-shrink:0}
-.bskill-btn:disabled{opacity:.35;cursor:not-allowed}
-.bskill-btn:active:not(:disabled){background:rgba(200,150,12,.6)}
-.bsub-row{display:flex;gap:3px}
-.bsub-panel{flex:1;background:linear-gradient(180deg,#d0c8a8,#b8a870);border:1px solid #7a5800;border-radius:3px;padding:2px 6px;display:flex;align-items:center;gap:4px;min-width:0;opacity:.92}
-.bsub-panel.enemy{background:linear-gradient(180deg,#c8a8a8,#a87070);border-color:#7a3000}
-.bsub-panel.empty{background:rgba(26,8,0,.4);border:1px dashed #4a3000;opacity:.5}
-.bsub-label{font-size:7px;color:#5a3800;flex-shrink:0}
-.bsub-label.enemy{color:#6a2800}
-.bsub-name{font-size:10px;color:#1a0800;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
-.bsub-hp-wrap{flex:1;height:5px;background:#2a1800;border-radius:2px;overflow:hidden;min-width:30px;max-width:80px}
-.bsub-hp-fill{height:100%;border-radius:2px;transition:width .2s}
-.bsub-hp-val{font-size:9px;color:#1a0800;min-width:22px;text-align:right;font-family:'DotGothic16',monospace;flex-shrink:0}
-#battle-result-panel{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;background:#000b;z-index:10}
-#battle-result-panel.show{display:flex}
-#result-box{background:linear-gradient(180deg,#f4e080,#c89020);border:3px solid #7a5000;border-radius:10px;padding:18px 32px;text-align:center;box-shadow:0 8px 40px #00000099}
-.bres-title{font-family:'DotGothic16',monospace;font-size:clamp(14px,5vw,20px);color:#1a0800;letter-spacing:.2em;margin-bottom:12px;display:block}
-.bres-detail{font-family:'DotGothic16',monospace;font-size:clamp(10px,3vw,13px);color:#3a1400;text-align:center;line-height:1.9;white-space:pre-line;margin-bottom:14px}
-.bres-btn{font-family:'DotGothic16',monospace;font-size:clamp(11px,3.2vw,14px);background:linear-gradient(180deg,#e05010,#a02808);color:#fff8e0;border:2px solid #601000;border-radius:6px;padding:8px 24px;cursor:pointer;touch-action:manipulation}
-/* ── MODALS共通 ── */
-@keyframes slideUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-.close-btn{background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-size:13px;padding:5px 14px;border-radius:20px;cursor:pointer;font-family:inherit;touch-action:manipulation}
-.modal-btn{flex:1;padding:13px;border-radius:10px;font-family:inherit;font-size:12px;letter-spacing:.25em;cursor:pointer;transition:all .2s;touch-action:manipulation}
-.modal-btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:rgba(200,150,12,.6)}
-.modal-btn-exec{background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-weight:700}
-.modal-btn-exec:active{transform:scale(.96)}
-.modal-btn-exec:disabled{opacity:.38;cursor:not-allowed}
-/* ── FORMATION ── */
-#formation-modal{position:fixed;inset:0;z-index:540;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.95)}
-#formation-modal.show{display:flex}
-.formation-shell{width:100%;max-width:480px;height:88%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.formation-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.formation-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}
-.formation-body{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch}
-.formation-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.formation-card{background:rgba(255,255,255,.04);border:2px solid rgba(200,150,12,.2);border-radius:10px;padding:9px 10px;cursor:pointer;transition:all .2s;touch-action:manipulation}
-.formation-card.selected{background:rgba(200,150,12,.14);border-color:var(--gold)}
-.formation-card:active{transform:scale(.95)}
-.fc-name{font-size:12px;font-weight:700;color:var(--parchment)}
-.fc-stats{font-size:10px;color:rgba(200,150,12,.8);margin-top:3px}
-.fc-bl{font-size:9px;font-weight:700;margin-top:2px}
-.fc-hp{font-size:9px;margin-top:2px}
-.formation-footer{padding:10px 14px max(env(safe-area-inset-bottom,0),12px);border-top:1px solid rgba(200,150,12,.1);display:flex;gap:8px;flex-shrink:0}
-.formation-count{font-size:10px;color:var(--gold-d);text-align:center;padding:4px 0 6px;letter-spacing:.2em}
-/* ── CASTLE BAR ── */
-#castle-bar{display:flex;align-items:center;gap:6px;padding:3px 2px;height:24px;border-bottom:1px solid rgba(200,150,12,.08);font-size:9px;color:var(--gold-d);flex-shrink:0}
-.castle-lv{font-size:11px;font-weight:700;color:var(--gold-l)}
-.castle-exp-bg{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
-.castle-exp-fill{height:100%;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .5s;border-radius:2px}
-.castle-upgrade-btn{font-size:8px;padding:2px 8px;background:rgba(139,0,0,.45);border:1px solid var(--gold-d);border-radius:12px;color:var(--gold-l);cursor:pointer;font-family:inherit;touch-action:manipulation;white-space:nowrap}
-.castle-upgrade-btn:disabled{opacity:.35;cursor:not-allowed}
-/* ── PEDIGREE ── */
-#pedigree-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}
-#pedigree-modal.show{display:flex}
-.ped-shell{width:100%;max-width:480px;height:88%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.ped-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.ped-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}
-#pedigree-content{overflow-y:auto;padding:12px 14px;flex:1;-webkit-overflow-scrolling:touch}
-.gen-block{margin-bottom:14px}
-.gen-label-h{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-bottom:5px}
-.gen-list{display:flex;flex-wrap:wrap;gap:5px}
-.gen-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:8px;padding:7px 10px;font-size:9px;color:var(--parchment);line-height:1.6}
-.gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l)}
-.gen-card .gp{color:#fa4}
-/* ── WARRIOR MODAL ── */
-#warrior-modal{position:fixed;inset:0;z-index:700;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}
-#warrior-modal.show{display:flex}
-.wm-shell{width:100%;max-width:480px;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.wm-head{padding:16px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15)}
-.wm-name{font-size:18px;font-weight:900;color:var(--gold-l);letter-spacing:.2em}
-.wm-role{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-top:2px}
-.wm-body{padding:10px 16px max(env(safe-area-inset-bottom,0),16px)}
-.wm-stat{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
-.wm-stat .wsk{color:rgba(245,228,180,.6)}
-.wm-stat .wsv{color:var(--parchment);font-weight:700}
-.wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px}
-.wm-hp-fill{height:100%;border-radius:3px;transition:width .4s}
-.wm-close{display:block;width:100%;background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-family:inherit;font-size:12px;padding:11px;border-radius:8px;cursor:pointer;margin-top:10px;letter-spacing:.3em;touch-action:manipulation}
-/* ── ENGUMI ── */
-#engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}
-#engumi-modal.show{display:flex}
-.modal-shell{width:100%;max-width:480px;height:92%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .4s cubic-bezier(.22,.68,0,1.1) both}
-.modal-deco-top{height:3px;background:linear-gradient(90deg,transparent,var(--gold),rgba(200,150,12,.4),var(--gold),transparent)}
-.modal-header{padding:14px 18px 10px;border-bottom:1px solid rgba(200,150,12,.1);flex-shrink:0}
-.modal-kamon{font-size:28px;text-align:center;margin-bottom:4px}
-.modal-title{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:.5em;text-align:center}
-.modal-subtitle{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.35em;text-align:center;margin-top:3px}
-.modal-body{flex:1;overflow-y:auto;padding:14px 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-.modal-body::-webkit-scrollbar{display:none}
-.modal-section{margin-bottom:14px}
-.modal-section-title{font-size:9px;color:rgba(200,150,12,.6);letter-spacing:.3em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(200,150,12,.12)}
-.engumi-cost{text-align:center;padding:8px;background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);border-radius:8px;margin-bottom:12px}
-.engumi-cost .ec-label{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.3em}
-.engumi-cost .ec-val{font-size:20px;font-weight:900;color:var(--gold-l);display:block;margin-top:2px}
-.engumi-cost .ec-unit{font-size:9px;color:rgba(200,150,12,.6)}
-.warrior-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.warrior-sel-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,150,12,.15);border-radius:10px;padding:10px;cursor:pointer;transition:all .2s;touch-action:manipulation;min-height:70px}
-.warrior-sel-card:active,.warrior-sel-card.selected{background:rgba(200,150,12,.12);border-color:var(--gold)}
-.wsc-name{font-size:12px;font-weight:700;color:var(--parchment)}
-.wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px}
-.wsc-bl{font-size:9px;font-weight:700;margin-top:2px}
-.wsc-lv{font-size:9px;color:#adf;margin-top:2px}
-.confirm-panel{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px}
-.confirm-pair{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
-.confirm-w{text-align:center}
-.confirm-w .cw-name{font-size:13px;font-weight:700;color:var(--parchment)}
-.confirm-w .cw-role{font-size:9px;color:var(--gold-d)}
-.confirm-heart{font-size:22px;color:var(--crimson)}
-.child-preview{background:rgba(255,255,255,.03);border-radius:8px;padding:9px;margin-top:7px}
-.cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px}
-.cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0}
-.cp-stat .cpv{color:var(--gold-l);font-weight:700}
-.modal-footer{padding:10px 16px max(env(safe-area-inset-bottom,0),12px);border-top:1px solid rgba(200,150,12,.1);display:flex;gap:8px;flex-shrink:0}
-.modal-step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:12px}
-.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(200,150,12,.22);transition:all .3s}
-.step-dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,150,12,.5)}
-/* ── SUCCESS OVERLAY ── */
-#success-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96);flex-direction:column;gap:12px;padding:20px}
-#success-overlay.show{display:flex;animation:fadeIn .4s ease}
-.suc-kamon{font-size:52px;animation:pulse 2s ease infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center}
-.suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.3em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center}
-.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2}
-.suc-btn{background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold-l);font-family:inherit;font-size:13px;letter-spacing:.35em;padding:13px 28px;border-radius:10px;cursor:pointer;margin-top:6px;touch-action:manipulation}
-/* ── CASTLE/DEV/HISTORY ── */
-#dev-modal,#history-modal,#castle-modal{position:fixed;inset:0;z-index:800;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}
-#dev-modal.show,#history-modal.show,#castle-modal.show{display:flex}
-.dev-shell{width:100%;max-width:480px;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.dev-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center}
-.dev-title{font-size:13px;color:var(--gold);letter-spacing:.3em}
-.dev-body{padding:12px 16px max(env(safe-area-inset-bottom,0),16px);display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.dev-btn{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:var(--parchment);font-family:inherit;font-size:11px;padding:12px 6px;border-radius:8px;cursor:pointer;letter-spacing:.15em;touch-action:manipulation}
-.dev-btn:active{background:rgba(200,150,12,.14)}
-.hist-shell{width:100%;max-width:480px;height:78%;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.hist-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.hist-title{font-size:13px;color:var(--gold);letter-spacing:.3em}
-#hist-list{overflow-y:auto;padding:10px 14px max(env(safe-area-inset-bottom,0),12px);flex:1;scrollbar-width:none}
-#hist-list::-webkit-scrollbar{display:none}
-.hist-item{font-size:11px;color:rgba(245,228,180,.8);padding:7px 0;border-bottom:1px solid rgba(200,150,12,.1);line-height:1.5;display:flex;gap:8px;align-items:baseline}
-.hist-item .hi-time{color:rgba(200,150,12,.55);font-size:9px;white-space:nowrap;flex-shrink:0}
-.hist-item .hi-text{flex:1}
-.hist-empty{text-align:center;padding:32px 16px;color:rgba(200,150,12,.35);font-size:11px;letter-spacing:.3em}
-.castle-shell{width:100%;max-width:480px;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.castle-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center}
-.castle-body{padding:14px 16px max(env(safe-area-inset-bottom,0),20px)}
-.castle-upgrade-row{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px;margin-bottom:10px}
-.cur-name{font-size:14px;font-weight:700;color:var(--gold-l);letter-spacing:.2em;margin-bottom:4px}
-.cur-desc{font-size:10px;color:rgba(245,228,180,.65);line-height:1.7;margin-bottom:10px}
-.cur-cost{font-size:11px;color:var(--gold-d);margin-bottom:8px}
-.cur-btn{width:100%;padding:12px;background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-family:inherit;font-size:12px;border-radius:8px;cursor:pointer;letter-spacing:.25em;touch-action:manipulation}
-.cur-btn:disabled{opacity:.38;cursor:not-allowed}
-/* ── EVENTS ── */
-#event-popup{position:fixed;left:50%;transform:translateX(-50%);z-index:980;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0;transition:opacity .35s;top:18%}
-#event-popup.show{opacity:1}
-.ev-badge{font-size:9px;letter-spacing:.25em;padding:2px 10px;border-radius:10px;font-weight:700;white-space:nowrap}
-.ev-badge.daily{background:rgba(60,45,10,.9);color:#fd8;border:1px solid rgba(200,150,12,.3)}
-.ev-badge.rare{background:rgba(10,30,80,.95);color:#8cf;border:1px solid rgba(80,160,255,.55)}
-.ev-badge.divine{background:rgba(70,0,0,.96);color:#f84;border:1px solid rgba(255,120,40,.7);box-shadow:0 0 18px rgba(255,60,0,.6)}
-.ev-warrior{font-size:11px;font-weight:900;color:var(--parchment);letter-spacing:.15em;text-shadow:0 1px 4px #000;white-space:nowrap}
-.ev-desc{font-size:10px;color:rgba(245,232,200,.85);text-shadow:0 1px 4px #000;white-space:nowrap}
-.ev-effect{font-size:14px;font-weight:900;text-shadow:0 0 14px currentColor;white-space:nowrap}
-#divine-flash{position:fixed;inset:0;z-index:975;pointer-events:none;background:radial-gradient(ellipse at center,rgba(255,80,0,.32),transparent 72%);opacity:0;transition:opacity .15s}
-#divine-flash.show{opacity:1}
-#toast{position:fixed;bottom:calc(var(--h-actionrow) + var(--h-partyrow) + var(--h-nationbar) + var(--h-bottom-pad) + 10px);left:50%;transform:translateX(-50%);background:rgba(14,8,2,.97);border:1px solid var(--gold-d);color:var(--parchment);font-size:11px;padding:8px 18px;border-radius:18px;white-space:nowrap;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:.15em;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
-#toast.show{opacity:1}
-/* ── RETIRE ── */
-#retire-modal{position:fixed;inset:0;z-index:960;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96)}
-#retire-modal.show{display:flex;animation:fadeIn .3s ease}
-.retire-box{background:linear-gradient(160deg,#1a0f02,#2a1a08);border:2px solid var(--gold);border-radius:16px;padding:22px 20px;max-width:340px;width:92%;text-align:center;color:var(--parchment)}
-.retire-name{font-size:17px;font-weight:900;color:var(--gold-l);margin-bottom:6px;letter-spacing:.2em}
-.retire-sub{font-size:12px;color:rgba(245,232,200,.7);margin-bottom:18px}
-.retire-btn{display:block;width:100%;margin-bottom:10px;padding:14px;border:none;border-radius:10px;font-family:inherit;font-size:14px;cursor:pointer;letter-spacing:.1em;touch-action:manipulation;transition:transform .1s}
-.retire-btn:active{transform:scale(.96)}
-.retire-btn-parent{background:linear-gradient(135deg,#8b0000,#c01010);color:#fff8e0}
-.retire-btn-staff{background:linear-gradient(135deg,#052,#083);color:#e0ffee}
-.retire-btn-staff:disabled{opacity:.4;cursor:not-allowed}
-.retire-note{font-size:10px;color:rgba(200,150,12,.55);margin-top:4px;letter-spacing:.15em}
-/* ── MAP MODAL ── */
-#map-modal{position:fixed;inset:0;z-index:620;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.95)}
-#map-modal.show{display:flex}
-.map-shell{width:100%;max-width:520px;height:92%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}
-.map-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.map-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}
-.map-body{flex:1;overflow:hidden;padding:8px 10px;display:flex;flex-direction:column;gap:6px;min-height:0}
-#strategic-map{flex:1;width:100%;border-radius:8px;background:#060e04;display:block;min-height:0}
-.map-province-info{flex-shrink:0;min-height:36px;padding:5px 10px;background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);border-radius:8px;font-size:12px;color:var(--gold-l);text-align:center;display:flex;align-items:center;justify-content:center}
-.map-footer{flex-shrink:0;display:flex;gap:8px;padding:8px 16px max(env(safe-area-inset-bottom,0),10px);border-top:1px solid rgba(200,150,12,.1)}
-/* ── 遺伝システム CSS ── */
-/* ── 遺伝システム追加CSS ── */
-.trait-badge{display:inline-block;font-size:7px;padding:1px 5px;border-radius:8px;font-weight:700;margin:1px;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.3);color:var(--gold-l);}
-.nick-badge{display:inline-block;font-size:7px;font-weight:900;border-radius:8px;padding:1px 5px;font-family:'DotGothic16',monospace;}
-.nick-SS{background:rgba(255,200,0,.2);border:1px solid #ffd700;color:#ffd700;animation:nkSS 1.5s ease infinite;}
-.nick-S{background:rgba(240,192,64,.15);border:1px solid #f0c040;color:#f0c040;}
-.nick-A{background:rgba(180,60,255,.12);border:1px solid rgba(180,60,255,.5);color:#cc88ff;}
-.nick-B{background:rgba(0,180,100,.1);border:1px solid rgba(0,180,100,.4);color:#66ddaa;}
-.nick-C{background:rgba(120,120,120,.1);border:1px solid rgba(120,120,120,.3);color:#aaa;}
-@keyframes nkSS{0%,100%{box-shadow:0 0 4px rgba(255,200,0,.3)}50%{box-shadow:0 0 14px rgba(255,200,0,.8)}}
-.nick-confirm{background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:8px 12px;margin:8px 0;text-align:center;}
-.nc-rank{font-size:18px;font-weight:900;font-family:'DotGothic16',monospace;letter-spacing:.2em;}
-.nc-desc{font-size:9px;color:rgba(245,228,180,.6);margin-top:4px;line-height:1.6;}
-.nc-sp{font-size:9px;color:#ffcc88;margin-top:3px;}
-
-</style>
+<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=DotGothic16&display=swap');:root{--gold:#c8960c;--gold-l:#f0c040;--gold-d:rgba(200,150,12,.4);--parchment:#f5e8c8;--ink:#0e0800;--panel:rgba(8,4,0,.88);--crimson:#8b0000;--h-header:52px;--h-nationbar:28px;--h-partyrow:74px;--h-actionrow:62px;--h-bottom-pad:max(env(safe-area-inset-bottom,0),8px)}*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{width:100%;height:100%;background:var(--ink);font-family:'Noto Serif JP',serif;overflow:hidden;user-select:none;-webkit-user-select:none;position:fixed;touch-action:none}#sky{position:fixed;inset:0;z-index:0;background:linear-gradient(175deg,#0a0500 0%,#18100a 35%,#251808 65%,#1a1005 100%)}.star{position:fixed;border-radius:50%;background:#fff;opacity:0;animation:twinkle ease-in-out infinite}@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.7}}.mist{position:fixed;left:-20%;width:140%;background:linear-gradient(90deg,transparent,rgba(245,228,180,.06),rgba(245,228,180,.1),rgba(245,228,180,.06),transparent);border-radius:50%;animation:drift linear infinite;pointer-events:none}.mist:nth-child(1){height:40px;top:30%;animation-duration:32s}.mist:nth-child(2){height:50px;top:48%;animation-duration:26s;animation-delay:-11s;opacity:.65}.mist:nth-child(3){height:35px;top:40%;animation-duration:42s;animation-delay:-20s;opacity:.45}@keyframes drift{0%{transform:translateX(-8%) scaleY(1)}50%{transform:translateX(7%) scaleY(1.4)}100%{transform:translateX(-8%) scaleY(1)}}.petal{position:fixed;border-radius:50% 0 50% 0;background:radial-gradient(ellipse,rgba(255,200,200,.9),rgba(255,130,130,.25));animation:petalFall linear infinite;pointer-events:none}@keyframes petalFall{0%{transform:translateY(-10px) rotate(0deg);opacity:0}7%{opacity:.9}93%{opacity:.5}100%{transform:translateY(102vh) rotate(760deg) translateX(45px);opacity:0}}#main{position:fixed;inset:0;z-index:10;display:grid;grid-template-rows:var(--h-header) 1fr auto;width:100%;height:100%}#header{height:var(--h-header);padding:max(env(safe-area-inset-top,0),8px) 12px 4px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0}#game-title{color:var(--gold);font-size:clamp(13px,4.2vw,17px);font-weight:900;letter-spacing:.25em;text-shadow:0 0 16px rgba(200,150,12,.7);line-height:1.3;white-space:nowrap}#game-title .sub{display:block;font-size:clamp(7px,1.8vw,9px);letter-spacing:.4em;color:var(--gold-d);font-weight:400;margin-top:1px}#status-panel{display:flex;flex-direction:row;align-items:center;gap:5px}.stat-chip{display:flex;align-items:center;gap:3px;background:var(--panel);border:1px solid var(--gold-d);border-radius:16px;padding:3px 8px}.sl{font-size:8px;color:rgba(245,232,200,.5);letter-spacing:.1em}.sv{font-size:13px;font-weight:700;color:var(--gold-l)}.su{font-size:8px;color:var(--gold-d)}#iso-field{position:relative;overflow:hidden;min-height:0}#iso-canvas{position:absolute;top:0;left:0;width:100%;height:100%}#bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden}.facility-activity{position:absolute;font-size:9px;color:#fd8;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:actPop .3s ease-out}@keyframes actPop{0%{opacity:0;transform:translateX(-50%) scale(.5)}100%{opacity:1;transform:translateX(-50%) scale(1)}}.float-text{position:absolute;font-size:10px;pointer-events:none;text-shadow:0 1px 3px #000;white-space:nowrap;transform:translateX(-50%);animation:floatUp 1.8s ease-out forwards}@keyframes floatUp{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-36px)}}#bottom-ui{flex-shrink:0;padding:0 10px var(--h-bottom-pad);background:linear-gradient(0deg,rgba(6,3,0,.98),rgba(6,3,0,.82) 80%,transparent)}#nation-bar{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:5px 2px 4px;border-bottom:1px solid rgba(200,150,12,.12);height:var(--h-nationbar)}.nl{font-size:8px;color:var(--gold-d);letter-spacing:.18em;white-space:nowrap}.nt{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden}.nf{height:100%;border-radius:2px;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .6s}.np{font-size:10px;color:var(--gold-l);font-weight:700;min-width:30px;text-align:right}#party-row{flex-shrink:0;display:flex;gap:5px;padding:4px 0 3px;overflow-x:auto;scrollbar-width:none;height:var(--h-partyrow);align-items:center;-webkit-overflow-scrolling:touch;touch-action:pan-x}#party-row::-webkit-scrollbar{display:none}.party-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:4px 8px;min-width:66px;cursor:pointer;transition:border-color .2s,background .2s;touch-action:manipulation}.party-card.head{border-color:var(--gold);background:rgba(200,150,12,.08)}.party-card.growing{opacity:.72;border-color:rgba(100,200,100,.25)}.party-card.parent-card{border-color:rgba(200,150,12,.45);background:rgba(200,150,12,.05)}.party-card:active{background:rgba(200,150,12,.18)}.pc-role{font-size:7px;color:rgba(200,150,12,.6)}.pc-name{font-size:9px;color:var(--parchment);font-weight:700}.pc-pow{font-size:8px;color:#fa4}.pc-hp{font-size:7px}.pc-bl{font-size:7px;font-weight:700}#staff-row{display:none;flex-shrink:0;gap:5px;padding:3px 0;overflow-x:auto;scrollbar-width:none;height:50px;align-items:center;-webkit-overflow-scrolling:touch;touch-action:pan-x;border-top:1px solid rgba(200,150,12,.1)}#staff-row::-webkit-scrollbar{display:none}.staff-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(0,180,80,.07);border:1px solid rgba(0,200,80,.28);border-radius:8px;padding:3px 9px;min-width:70px;cursor:pointer;touch-action:manipulation}.staff-card:active{background:rgba(0,200,80,.16)}.sc-label{font-size:7px;color:rgba(0,220,100,.65);letter-spacing:.1em}.sc-name{font-size:9px;color:var(--parchment);font-weight:700}.sc-job{font-size:8px;color:#8fc}.sc-lv{font-size:7px;color:rgba(0,220,100,.55)}#action-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:3px 0 2px;height:var(--h-actionrow)}.act-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--panel);border:1px solid var(--gold-d);border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;color:var(--parchment);font-family:inherit;touch-action:manipulation;min-height:52px}.act-btn:active{transform:scale(.91);background:rgba(200,150,12,.16);border-color:var(--gold)}.act-btn .ico{font-size:18px;line-height:1}.act-btn .lbl{font-size:8px;letter-spacing:.1em;color:rgba(245,232,200,.72)}.act-btn.primary{border-color:var(--gold);background:rgba(139,0,0,.45)}.act-btn.primary .lbl{color:var(--gold-l)}#battle-screen{position:fixed;inset:0;z-index:500;background:#0a0600;display:none;flex-direction:column;font-family:'DotGothic16',monospace}#battle-screen.show{display:flex}#bscr-inner{display:flex;flex-direction:column;width:100%;height:100%}#bscr-frame{position:relative;flex:1;min-height:0;overflow:hidden;border-bottom:3px solid #8b6914;box-shadow:0 4px 20px #c8960033}#battle-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0d0800 0%,#1a1000 15%,#221400 30%,#243010 50%,#1c2a10 70%,#162210 100%)}#battle-moon{position:absolute;top:8%;right:12%;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fffbe0,#f0d878 50%,#c8a820);box-shadow:0 0 20px 6px rgba(248,230,120,.35),0 0 60px 20px rgba(200,150,12,.12);animation:moonPulse 4s ease-in-out infinite alternate}@keyframes moonPulse{from{box-shadow:0 0 20px 6px rgba(248,230,120,.35),0 0 60px 20px rgba(200,150,12,.12)}to{box-shadow:0 0 28px 10px rgba(248,230,120,.5),0 0 80px 30px rgba(200,150,12,.2)}}#battle-mountains{position:absolute;bottom:36%;left:0;right:0;height:40%;overflow:hidden;pointer-events:none}.bmtn{position:absolute;bottom:0}.bmtn-far{background:linear-gradient(180deg,#1a1a2a,#12121e);clip-path:polygon(0% 100%,8% 40%,18% 55%,28% 20%,40% 50%,52% 15%,65% 45%,75% 25%,88% 48%,100% 30%,100% 100%)}.bmtn-mid{background:linear-gradient(180deg,#161820,#0e1018);clip-path:polygon(0% 100%,5% 60%,15% 35%,25% 55%,38% 25%,50% 50%,62% 20%,75% 45%,85% 30%,100% 50%,100% 100%)}#battle-ground{position:absolute;bottom:0;left:0;right:0;height:38%;overflow:hidden}#battle-ground::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,#182810 0,#223818 22px,#1c3012 22px,#1c3012 44px);border-top:2px solid #384828}#battle-ground::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,transparent 50%)}.btorch{position:absolute;bottom:38%;width:6px;height:22px;background:linear-gradient(180deg,#9a7010,#5a4008);pointer-events:none}.btorch::after{content:'🔥';position:absolute;bottom:100%;left:-8px;font-size:14px;animation:torchF .22s infinite alternate;filter:drop-shadow(0 0 6px #f80)}@keyframes torchF{from{transform:scale(1);opacity:1}to{transform:scale(1.18) translateY(-2px);opacity:.8}}.btorch-l{left:15%}.btorch-r{right:15%}.bflag{position:absolute;bottom:38%;width:3px;height:32px;pointer-events:none}.bflag::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#9a7010,#5a4008)}.bflag::after{content:'';position:absolute;top:0;left:3px;width:16px;height:11px;animation:flagW .55s ease-in-out infinite alternate;transform-origin:left top}.bflag-p{left:26%}.bflag-p::after{background:#1840b8;clip-path:polygon(0 0,100% 20%,100% 80%,0 100%)}.bflag-e{right:26%}.bflag-e::after{background:#b81830;clip-path:polygon(0 20%,100% 0,100% 100%,0 80%)}@keyframes flagW{from{transform:skewY(-5deg)}to{transform:skewY(5deg)}}.dot-unit{position:absolute;width:1px;height:1px;image-rendering:pixelated}.du-walk{animation:duWalk .28s steps(1) infinite}.du-hit{animation:duHit .15s steps(1) 3}.du-die{animation:duDie .7s ease-out forwards}.du-awaken{animation:duAwaken .5s ease-in-out infinite alternate}@keyframes duWalk{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}@keyframes duHit{0%,100%{filter:brightness(1)}50%{filter:brightness(4) saturate(0)}}@keyframes duDie{0%{opacity:1;transform:rotate(0) scale(1)}70%{opacity:.4;transform:rotate(50deg) scale(.7)}100%{opacity:0;transform:rotate(90deg) scale(.2)}}@keyframes duAwaken{from{filter:drop-shadow(0 0 4px gold) brightness(1.3)}to{filter:drop-shadow(0 0 12px orange) brightness(1.8)}}.skill-flash{position:absolute;border-radius:50%;pointer-events:none;animation:skillFlash .6s ease-out forwards}@keyframes skillFlash{0%{opacity:.9;transform:translate(-50%,-50%) scale(.3)}60%{opacity:.7;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}}.skill-text{position:absolute;font-family:'DotGothic16',monospace;font-size:11px;font-weight:bold;pointer-events:none;transform:translateX(-50%);text-shadow:1px 1px 0 #000,2px 2px 0 #0008;animation:skillText 1.4s ease-out forwards;white-space:nowrap}@keyframes skillText{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.4)}50%{opacity:1;transform:translateX(-50%) translateY(-22px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-42px) scale(.8)}}.gen-label{position:absolute;font-family:'DotGothic16',monospace;font-size:8px;color:#f8e8a0;text-shadow:1px 1px 0 #000,0 0 6px #c8a000;white-space:nowrap;pointer-events:none;transform:translateX(-50%)}.dot-bubble{position:absolute;background:#f0ebff;border:1.5px solid #3828a0;border-radius:4px;padding:2px 6px;font-size:9px;color:#1a0800;white-space:nowrap;pointer-events:none;transform:translateX(-50%);animation:bbPop .2s ease-out both;font-family:'DotGothic16',monospace}.dot-bubble.ene{background:#fff0f2;border-color:#901830}.dot-bubble::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:#3828a0}.dot-bubble.ene::after{border-top-color:#901830}@keyframes bbPop{from{opacity:0;transform:translateX(-50%) scale(.5)}to{opacity:1;transform:translateX(-50%) scale(1)}}.unit-hpbar{position:absolute;height:3px;background:#111;border:1px solid #333;pointer-events:none;transform:translateX(-50%)}.unit-hpfill{height:100%;transition:width .12s}.dmg-num{position:absolute;font-family:'DotGothic16',monospace;font-size:12px;font-weight:bold;pointer-events:none;transform:translateX(-50%);animation:dmgUp 1s ease-out forwards;text-shadow:1px 1px 0 #000,2px 2px 0 #0008}@keyframes dmgUp{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.2)}60%{opacity:1;transform:translateX(-50%) translateY(-26px)}100%{opacity:0;transform:translateX(-50%) translateY(-44px) scale(.8)}}#battle-log-bar{flex-shrink:0;height:22px;background:#0a0600;border-bottom:1px solid #4a3000;color:#e8c060;font-size:clamp(9px,2.6vw,12px);display:flex;align-items:center;padding:0 10px;letter-spacing:.06em;overflow:hidden;white-space:nowrap;font-family:'DotGothic16',monospace}#battle-ui-panel{flex-shrink:0;display:flex;flex-direction:column;gap:2px;padding:3px 4px;background:#1a0800}.bgen-row{display:flex;gap:3px;align-items:stretch}.bunit-panel{flex:1;background:linear-gradient(180deg,#e8dcc0,#d4c090 40%,#c0a860);border:2px solid #7a5800;border-radius:4px;padding:3px 7px;display:flex;flex-direction:column;gap:1px;box-shadow:inset 0 1px 0 #fff8,inset 0 -1px 0 #0004;min-width:0}.bunit-top{display:flex;align-items:baseline;justify-content:space-between;gap:4px}.bunit-name{font-size:clamp(9px,3vw,13px);color:#1a0800;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}.bhp-group{display:flex;align-items:baseline;gap:2px;flex-shrink:0}.bhp-label{font-size:8px;color:#6a4000}.bhp-value{font-size:clamp(13px,3.8vw,18px);color:#1a0800;min-width:28px;text-align:right;font-family:'DotGothic16',monospace}.bpower-wrap{width:100%;height:7px;background:#2a1800;border:1px solid #5a3000;border-radius:2px;overflow:hidden;position:relative}.bpower-bar{height:100%;background:linear-gradient(90deg,#2060c0,#40a0ff);transition:width .35s}.bpower-bar-e{background:linear-gradient(90deg,#c01010,#ff4040)}.bskill-wrap{display:flex;gap:3px;align-items:center}.bskill-label{font-size:7px;color:#5a3800;flex-shrink:0}.bskill-bar-bg{flex:1;height:3px;background:#2a1800;border-radius:2px;overflow:hidden;min-width:0}.bskill-bar{height:100%;background:linear-gradient(90deg,#c80,#fc0);transition:width .3s;border-radius:2px}.bskill-btn{font-size:8px;padding:1px 5px;background:rgba(200,150,12,.3);border:1px solid var(--gold-d);border-radius:3px;color:var(--gold-l);font-family:'DotGothic16',monospace;cursor:pointer;white-space:nowrap;touch-action:manipulation;line-height:1.4;flex-shrink:0}.bskill-btn:disabled{opacity:.35;cursor:not-allowed}.bskill-btn:active:not(:disabled){background:rgba(200,150,12,.6)}.bsub-row{display:flex;gap:3px}.bsub-panel{flex:1;background:linear-gradient(180deg,#d0c8a8,#b8a870);border:1px solid #7a5800;border-radius:3px;padding:2px 6px;display:flex;align-items:center;gap:4px;min-width:0;opacity:.92}.bsub-panel.enemy{background:linear-gradient(180deg,#c8a8a8,#a87070);border-color:#7a3000}.bsub-panel.empty{background:rgba(26,8,0,.4);border:1px dashed #4a3000;opacity:.5}.bsub-label{font-size:7px;color:#5a3800;flex-shrink:0}.bsub-label.enemy{color:#6a2800}.bsub-name{font-size:10px;color:#1a0800;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.bsub-hp-wrap{flex:1;height:5px;background:#2a1800;border-radius:2px;overflow:hidden;min-width:30px;max-width:80px}.bsub-hp-fill{height:100%;border-radius:2px;transition:width .2s}.bsub-hp-val{font-size:9px;color:#1a0800;min-width:22px;text-align:right;font-family:'DotGothic16',monospace;flex-shrink:0}#battle-result-panel{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;background:#000b;z-index:10}#battle-result-panel.show{display:flex}#result-box{background:linear-gradient(180deg,#f4e080,#c89020);border:3px solid #7a5000;border-radius:10px;padding:18px 32px;text-align:center;box-shadow:0 8px 40px #00000099}.bres-title{font-family:'DotGothic16',monospace;font-size:clamp(14px,5vw,20px);color:#1a0800;letter-spacing:.2em;margin-bottom:12px;display:block}.bres-detail{font-family:'DotGothic16',monospace;font-size:clamp(10px,3vw,13px);color:#3a1400;text-align:center;line-height:1.9;white-space:pre-line;margin-bottom:14px}.bres-btn{font-family:'DotGothic16',monospace;font-size:clamp(11px,3.2vw,14px);background:linear-gradient(180deg,#e05010,#a02808);color:#fff8e0;border:2px solid #601000;border-radius:6px;padding:8px 24px;cursor:pointer;touch-action:manipulation}@keyframes slideUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}.close-btn{background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-size:13px;padding:5px 14px;border-radius:20px;cursor:pointer;font-family:inherit;touch-action:manipulation}.modal-btn{flex:1;padding:13px;border-radius:10px;font-family:inherit;font-size:12px;letter-spacing:.25em;cursor:pointer;transition:all .2s;touch-action:manipulation}.modal-btn-cancel{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:rgba(200,150,12,.6)}.modal-btn-exec{background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-weight:700}.modal-btn-exec:active{transform:scale(.96)}.modal-btn-exec:disabled{opacity:.38;cursor:not-allowed}#formation-modal{position:fixed;inset:0;z-index:540;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.95)}#formation-modal.show{display:flex}.formation-shell{width:100%;max-width:480px;height:88%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.formation-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.formation-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}.formation-body{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch}.formation-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}.formation-card{background:rgba(255,255,255,.04);border:2px solid rgba(200,150,12,.2);border-radius:10px;padding:9px 10px;cursor:pointer;transition:all .2s;touch-action:manipulation}.formation-card.selected{background:rgba(200,150,12,.14);border-color:var(--gold)}.formation-card:active{transform:scale(.95)}.fc-name{font-size:12px;font-weight:700;color:var(--parchment)}.fc-stats{font-size:10px;color:rgba(200,150,12,.8);margin-top:3px}.fc-bl{font-size:9px;font-weight:700;margin-top:2px}.fc-hp{font-size:9px;margin-top:2px}.formation-footer{padding:10px 14px max(env(safe-area-inset-bottom,0),12px);border-top:1px solid rgba(200,150,12,.1);display:flex;gap:8px;flex-shrink:0}.formation-count{font-size:10px;color:var(--gold-d);text-align:center;padding:4px 0 6px;letter-spacing:.2em}#castle-bar{display:flex;align-items:center;gap:6px;padding:3px 2px;height:24px;border-bottom:1px solid rgba(200,150,12,.08);font-size:9px;color:var(--gold-d);flex-shrink:0}.castle-lv{font-size:11px;font-weight:700;color:var(--gold-l)}.castle-exp-bg{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}.castle-exp-fill{height:100%;background:linear-gradient(90deg,#8b0000,var(--gold));transition:width .5s;border-radius:2px}.castle-upgrade-btn{font-size:8px;padding:2px 8px;background:rgba(139,0,0,.45);border:1px solid var(--gold-d);border-radius:12px;color:var(--gold-l);cursor:pointer;font-family:inherit;touch-action:manipulation;white-space:nowrap}.castle-upgrade-btn:disabled{opacity:.35;cursor:not-allowed}#pedigree-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}#pedigree-modal.show{display:flex}.ped-shell{width:100%;max-width:480px;height:88%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.ped-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.ped-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}#pedigree-content{overflow-y:auto;padding:12px 14px;flex:1;-webkit-overflow-scrolling:touch}.gen-block{margin-bottom:14px}.gen-label-h{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-bottom:5px}.gen-list{display:flex;flex-wrap:wrap;gap:5px}.gen-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:8px;padding:7px 10px;font-size:9px;color:var(--parchment);line-height:1.6}.gen-card .gn{font-size:11px;font-weight:700;color:var(--gold-l)}.gen-card .gp{color:#fa4}#warrior-modal{position:fixed;inset:0;z-index:700;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}#warrior-modal.show{display:flex}.wm-shell{width:100%;max-width:480px;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.wm-head{padding:16px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15)}.wm-name{font-size:18px;font-weight:900;color:var(--gold-l);letter-spacing:.2em}.wm-role{font-size:9px;color:var(--gold-d);letter-spacing:.3em;margin-top:2px}.wm-body{padding:10px 16px max(env(safe-area-inset-bottom,0),16px)}.wm-stat{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}.wm-stat .wsk{color:rgba(245,228,180,.6)}.wm-stat .wsv{color:var(--parchment);font-weight:700}.wm-hp-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin:2px 0 6px}.wm-hp-fill{height:100%;border-radius:3px;transition:width .4s}.wm-close{display:block;width:100%;background:none;border:1px solid rgba(200,150,12,.3);color:var(--gold);font-family:inherit;font-size:12px;padding:11px;border-radius:8px;cursor:pointer;margin-top:10px;letter-spacing:.3em;touch-action:manipulation}#engumi-modal{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}#engumi-modal.show{display:flex}.modal-shell{width:100%;max-width:480px;height:92%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .4s cubic-bezier(.22,.68,0,1.1) both}.modal-deco-top{height:3px;background:linear-gradient(90deg,transparent,var(--gold),rgba(200,150,12,.4),var(--gold),transparent)}.modal-header{padding:14px 18px 10px;border-bottom:1px solid rgba(200,150,12,.1);flex-shrink:0}.modal-kamon{font-size:28px;text-align:center;margin-bottom:4px}.modal-title{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:.5em;text-align:center}.modal-subtitle{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.35em;text-align:center;margin-top:3px}.modal-body{flex:1;overflow-y:auto;padding:14px 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-y}.modal-body::-webkit-scrollbar{display:none}.modal-section{margin-bottom:14px}.modal-section-title{font-size:9px;color:rgba(200,150,12,.6);letter-spacing:.3em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid rgba(200,150,12,.12)}.engumi-cost{text-align:center;padding:8px;background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);border-radius:8px;margin-bottom:12px}.engumi-cost .ec-label{font-size:9px;color:rgba(200,150,12,.5);letter-spacing:.3em}.engumi-cost .ec-val{font-size:20px;font-weight:900;color:var(--gold-l);display:block;margin-top:2px}.engumi-cost .ec-unit{font-size:9px;color:rgba(200,150,12,.6)}.warrior-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.warrior-sel-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,150,12,.15);border-radius:10px;padding:10px;cursor:pointer;transition:all .2s;touch-action:manipulation;min-height:70px}.warrior-sel-card:active,.warrior-sel-card.selected{background:rgba(200,150,12,.12);border-color:var(--gold)}.wsc-name{font-size:12px;font-weight:700;color:var(--parchment)}.wsc-stats{font-size:10px;color:rgba(200,150,12,.7);margin-top:3px}.wsc-bl{font-size:9px;font-weight:700;margin-top:2px}.wsc-lv{font-size:9px;color:#adf;margin-top:2px}.confirm-panel{background:rgba(200,150,12,.05);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px}.confirm-pair{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}.confirm-w{text-align:center}.confirm-w .cw-name{font-size:13px;font-weight:700;color:var(--parchment)}.confirm-w .cw-role{font-size:9px;color:var(--gold-d)}.confirm-heart{font-size:22px;color:var(--crimson)}.child-preview{background:rgba(255,255,255,.03);border-radius:8px;padding:9px;margin-top:7px}.cp-title{font-size:8px;color:rgba(200,150,12,.5);letter-spacing:.3em;margin-bottom:5px}.cp-stat{display:flex;justify-content:space-between;font-size:10px;color:rgba(245,228,180,.7);padding:2px 0}.cp-stat .cpv{color:var(--gold-l);font-weight:700}.modal-footer{padding:10px 16px max(env(safe-area-inset-bottom,0),12px);border-top:1px solid rgba(200,150,12,.1);display:flex;gap:8px;flex-shrink:0}.modal-step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:12px}.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(200,150,12,.22);transition:all .3s}.step-dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,150,12,.5)}#success-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96);flex-direction:column;gap:12px;padding:20px}#success-overlay.show{display:flex;animation:fadeIn .4s ease}.suc-kamon{font-size:52px;animation:pulse 2s ease infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}.suc-title{font-size:12px;color:var(--gold-d);letter-spacing:.5em;text-align:center}.suc-name{font-size:24px;font-weight:900;color:var(--gold-l);letter-spacing:.3em;text-shadow:0 0 28px rgba(200,150,12,.6);text-align:center}.suc-stats{font-size:11px;color:rgba(245,228,180,.7);text-align:center;line-height:2}.suc-btn{background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold-l);font-family:inherit;font-size:13px;letter-spacing:.35em;padding:13px 28px;border-radius:10px;cursor:pointer;margin-top:6px;touch-action:manipulation}#dev-modal,#history-modal,#castle-modal{position:fixed;inset:0;z-index:800;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.92)}#dev-modal.show,#history-modal.show,#castle-modal.show{display:flex}.dev-shell{width:100%;max-width:480px;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.dev-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center}.dev-title{font-size:13px;color:var(--gold);letter-spacing:.3em}.dev-body{padding:12px 16px max(env(safe-area-inset-bottom,0),16px);display:grid;grid-template-columns:1fr 1fr;gap:7px}.dev-btn{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.2);color:var(--parchment);font-family:inherit;font-size:11px;padding:12px 6px;border-radius:8px;cursor:pointer;letter-spacing:.15em;touch-action:manipulation}.dev-btn:active{background:rgba(200,150,12,.14)}.hist-shell{width:100%;max-width:480px;height:78%;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.hist-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.hist-title{font-size:13px;color:var(--gold);letter-spacing:.3em}#hist-list{overflow-y:auto;padding:10px 14px max(env(safe-area-inset-bottom,0),12px);flex:1;scrollbar-width:none}#hist-list::-webkit-scrollbar{display:none}.hist-item{font-size:11px;color:rgba(245,228,180,.8);padding:7px 0;border-bottom:1px solid rgba(200,150,12,.1);line-height:1.5;display:flex;gap:8px;align-items:baseline}.hist-item .hi-time{color:rgba(200,150,12,.55);font-size:9px;white-space:nowrap;flex-shrink:0}.hist-item .hi-text{flex:1}.hist-empty{text-align:center;padding:32px 16px;color:rgba(200,150,12,.35);font-size:11px;letter-spacing:.3em}.castle-shell{width:100%;max-width:480px;background:rgba(10,5,1,.99);border:1px solid rgba(200,150,12,.3);border-radius:18px 18px 0 0;overflow:hidden;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.castle-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.12);display:flex;justify-content:space-between;align-items:center}.castle-body{padding:14px 16px max(env(safe-area-inset-bottom,0),20px)}.castle-upgrade-row{background:rgba(255,255,255,.04);border:1px solid rgba(200,150,12,.18);border-radius:10px;padding:12px;margin-bottom:10px}.cur-name{font-size:14px;font-weight:700;color:var(--gold-l);letter-spacing:.2em;margin-bottom:4px}.cur-desc{font-size:10px;color:rgba(245,228,180,.65);line-height:1.7;margin-bottom:10px}.cur-cost{font-size:11px;color:var(--gold-d);margin-bottom:8px}.cur-btn{width:100%;padding:12px;background:linear-gradient(135deg,rgba(139,0,0,.65),rgba(180,30,0,.55));border:1px solid rgba(200,150,12,.5);color:var(--gold-l);font-family:inherit;font-size:12px;border-radius:8px;cursor:pointer;letter-spacing:.25em;touch-action:manipulation}.cur-btn:disabled{opacity:.38;cursor:not-allowed}#event-popup{position:fixed;left:50%;transform:translateX(-50%);z-index:980;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0;transition:opacity .35s;top:18%}#event-popup.show{opacity:1}.ev-badge{font-size:9px;letter-spacing:.25em;padding:2px 10px;border-radius:10px;font-weight:700;white-space:nowrap}.ev-badge.daily{background:rgba(60,45,10,.9);color:#fd8;border:1px solid rgba(200,150,12,.3)}.ev-badge.rare{background:rgba(10,30,80,.95);color:#8cf;border:1px solid rgba(80,160,255,.55)}.ev-badge.divine{background:rgba(70,0,0,.96);color:#f84;border:1px solid rgba(255,120,40,.7);box-shadow:0 0 18px rgba(255,60,0,.6)}.ev-warrior{font-size:11px;font-weight:900;color:var(--parchment);letter-spacing:.15em;text-shadow:0 1px 4px #000;white-space:nowrap}.ev-desc{font-size:10px;color:rgba(245,232,200,.85);text-shadow:0 1px 4px #000;white-space:nowrap}.ev-effect{font-size:14px;font-weight:900;text-shadow:0 0 14px currentColor;white-space:nowrap}#divine-flash{position:fixed;inset:0;z-index:975;pointer-events:none;background:radial-gradient(ellipse at center,rgba(255,80,0,.32),transparent 72%);opacity:0;transition:opacity .15s}#divine-flash.show{opacity:1}#toast{position:fixed;bottom:calc(var(--h-actionrow)+var(--h-partyrow)+var(--h-nationbar)+var(--h-bottom-pad)+10px);left:50%;transform:translateX(-50%);background:rgba(14,8,2,.97);border:1px solid var(--gold-d);color:var(--parchment);font-size:11px;padding:8px 18px;border-radius:18px;white-space:nowrap;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:.15em;max-width:90vw;overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1}#retire-modal{position:fixed;inset:0;z-index:960;display:none;align-items:center;justify-content:center;background:rgba(8,4,0,.96)}#retire-modal.show{display:flex;animation:fadeIn .3s ease}.retire-box{background:linear-gradient(160deg,#1a0f02,#2a1a08);border:2px solid var(--gold);border-radius:16px;padding:22px 20px;max-width:340px;width:92%;text-align:center;color:var(--parchment)}.retire-name{font-size:17px;font-weight:900;color:var(--gold-l);margin-bottom:6px;letter-spacing:.2em}.retire-sub{font-size:12px;color:rgba(245,232,200,.7);margin-bottom:18px}.retire-btn{display:block;width:100%;margin-bottom:10px;padding:14px;border:none;border-radius:10px;font-family:inherit;font-size:14px;cursor:pointer;letter-spacing:.1em;touch-action:manipulation;transition:transform .1s}.retire-btn:active{transform:scale(.96)}.retire-btn-parent{background:linear-gradient(135deg,#8b0000,#c01010);color:#fff8e0}.retire-btn-staff{background:linear-gradient(135deg,#052,#083);color:#e0ffee}.retire-btn-staff:disabled{opacity:.4;cursor:not-allowed}.retire-note{font-size:10px;color:rgba(200,150,12,.55);margin-top:4px;letter-spacing:.15em}#map-modal{position:fixed;inset:0;z-index:620;display:none;align-items:flex-end;justify-content:center;background:rgba(8,4,0,.95)}#map-modal.show{display:flex}.map-shell{width:100%;max-width:520px;height:92%;background:linear-gradient(160deg,rgba(14,8,2,.99),rgba(10,5,1,1));border:1px solid rgba(200,150,12,.35);border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .35s cubic-bezier(.22,.68,0,1.1) both}.map-head{padding:14px 16px 10px;border-bottom:1px solid rgba(200,150,12,.15);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.map-title{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.3em}.map-body{flex:1;overflow:hidden;padding:8px 10px;display:flex;flex-direction:column;gap:6px;min-height:0}#strategic-map{flex:1;width:100%;border-radius:8px;background:#060e04;display:block;min-height:0}.map-province-info{flex-shrink:0;min-height:36px;padding:5px 10px;background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.15);border-radius:8px;font-size:12px;color:var(--gold-l);text-align:center;display:flex;align-items:center;justify-content:center}.map-footer{flex-shrink:0;display:flex;gap:8px;padding:8px 16px max(env(safe-area-inset-bottom,0),10px);border-top:1px solid rgba(200,150,12,.1)}.trait-badge{display:inline-block;font-size:7px;padding:1px 5px;border-radius:8px;font-weight:700;margin:1px;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.3);color:var(--gold-l)}.nick-badge{display:inline-block;font-size:7px;font-weight:900;border-radius:8px;padding:1px 5px;font-family:'DotGothic16',monospace}.nick-SS{background:rgba(255,200,0,.2);border:1px solid #ffd700;color:#ffd700;animation:nkSS 1.5s ease infinite}.nick-S{background:rgba(240,192,64,.15);border:1px solid #f0c040;color:#f0c040}.nick-A{background:rgba(180,60,255,.12);border:1px solid rgba(180,60,255,.5);color:#cc88ff}.nick-B{background:rgba(0,180,100,.1);border:1px solid rgba(0,180,100,.4);color:#66ddaa}.nick-C{background:rgba(120,120,120,.1);border:1px solid rgba(120,120,120,.3);color:#aaa}@keyframes nkSS{0%,100%{box-shadow:0 0 4px rgba(255,200,0,.3)}50%{box-shadow:0 0 14px rgba(255,200,0,.8)}}.nick-confirm{background:rgba(200,150,12,.06);border:1px solid rgba(200,150,12,.2);border-radius:8px;padding:8px 12px;margin:8px 0;text-align:center}.nc-rank{font-size:18px;font-weight:900;font-family:'DotGothic16',monospace;letter-spacing:.2em}.nc-desc{font-size:9px;color:rgba(245,228,180,.6);margin-top:4px;line-height:1.6}.nc-sp{font-size:9px;color:#ffcc88;margin-top:3px}</style>
 </head>
 <body>
 <div id="sky"></div>
 <div class="mist"></div><div class="mist"></div><div class="mist"></div>
-<div id="event-popup">
-  <div class="ev-badge daily" id="ev-badge">日常</div>
-  <div class="ev-warrior" id="ev-warrior"></div>
-  <div class="ev-desc" id="ev-desc"></div>
-  <div class="ev-effect" id="ev-effect"></div>
+<div id="event-popup"> <div class="ev-badge daily" id="ev-badge">日常</div> <div class="ev-warrior" id="ev-warrior"></div> <div class="ev-desc" id="ev-desc"></div> <div class="ev-effect" id="ev-effect"></div>
 </div>
-<div id="divine-flash"></div>
-
-<!-- 編成モーダル -->
-<div id="formation-modal"><div class="formation-shell">
-  <div class="formation-head"><div class="formation-title">⚔ 出陣編成（最大3名）</div><button class="close-btn" onclick="closeModal('formation-modal')">取消</button></div>
-  <div class="formation-body"><div class="formation-count" id="formation-count">0 / 3 名選択中</div><div class="formation-grid" id="formation-grid"></div></div>
-  <div class="formation-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('formation-modal')">取消</button><button class="modal-btn modal-btn-exec" id="formation-start-btn" onclick="startBattleWithFormation()">この編成で出陣</button></div>
-</div></div>
-
-<!-- バトル画面 -->
-<div id="battle-screen"><div id="bscr-inner">
-  <div id="bscr-frame">
-    <div id="battle-bg"></div>
-    <div id="battle-moon"></div>
-    <div id="battle-mountains"><div class="bmtn bmtn-far" style="width:100%;height:80%;"></div><div class="bmtn bmtn-mid" style="width:100%;height:65%;"></div></div>
-    <div id="battle-ground"></div>
-    <div class="btorch btorch-l"></div><div class="btorch btorch-r"></div>
-    <div class="bflag bflag-p"></div><div class="bflag bflag-e"></div>
-    <div id="dot-field" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
-    <div id="battle-result-panel"><div id="result-box">
-      <span class="bres-title" id="bres-title-text"></span>
-      <div class="bres-detail" id="bres-detail-text"></div>
-      <button class="bres-btn" onclick="closeBattle()">帰城する</button>
-    </div></div>
-  </div>
-  <div id="battle-log-bar">戦闘開始！</div>
-  <div id="battle-ui-panel">
-    <div class="bgen-row">
-      <div class="bunit-panel">
-        <div class="bunit-top"><span class="bunit-name" id="bunit-pname">我が軍</span><div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-player">120</span></div></div>
-        <div class="bpower-wrap"><div class="bpower-bar" id="bbar-player" style="width:100%"></div></div>
-        <div class="bskill-wrap"><span class="bskill-label">必殺</span><div class="bskill-bar-bg"><div class="bskill-bar" id="bskill-bar-p" style="width:0%"></div></div><button class="bskill-btn" id="bskill-btn-p" onclick="fireSkill('p')" disabled>発動!</button></div>
-      </div>
-      <div class="bunit-panel">
-        <div class="bunit-top"><span class="bunit-name" id="bunit-ename">敵　軍</span><div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-enemy">120</span></div></div>
-        <div class="bpower-wrap"><div class="bpower-bar bpower-bar-e" id="bbar-enemy" style="width:100%"></div></div>
-        <div class="bskill-wrap"><span class="bskill-label">必殺</span><div class="bskill-bar-bg"><div class="bskill-bar" id="bskill-bar-e" style="width:0%;background:linear-gradient(90deg,#901830,#ff3050)"></div></div><span class="bskill-label" style="color:#ff5060;">敵</span></div>
-      </div>
-    </div>
-    <div class="bsub-row" id="bsub-row1">
-      <div class="bsub-panel" id="bsub-p1"><span class="bsub-label">副将</span><span class="bsub-name" id="bsub-p1-name">―</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-p1-bar" style="width:100%;background:#44cc88"></div></div><span class="bsub-hp-val" id="bsub-p1-hp">―</span></div>
-      <div class="bsub-panel enemy" id="bsub-e1"><span class="bsub-label enemy">副将</span><span class="bsub-name" id="bsub-e1-name">副将甲</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-e1-bar" style="width:100%;background:#ff6666"></div></div><span class="bsub-hp-val" id="bsub-e1-hp">―</span></div>
-    </div>
-    <div class="bsub-row" id="bsub-row2">
-      <div class="bsub-panel" id="bsub-p2"><span class="bsub-label">副将</span><span class="bsub-name" id="bsub-p2-name">―</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-p2-bar" style="width:100%;background:#44cc88"></div></div><span class="bsub-hp-val" id="bsub-p2-hp">―</span></div>
-      <div class="bsub-panel enemy" id="bsub-e2"><span class="bsub-label enemy">副将</span><span class="bsub-name" id="bsub-e2-name">副将乙</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-e2-bar" style="width:100%;background:#ff6666"></div></div><span class="bsub-hp-val" id="bsub-e2-hp">―</span></div>
-    </div>
-  </div>
-</div></div>
-
-<!-- 系譜モーダル -->
-<div id="pedigree-modal"><div class="ped-shell">
-  <div class="ped-head"><div class="ped-title">⚔ 武将系譜</div><button class="close-btn" onclick="closeModal('pedigree-modal')">閉じる</button></div>
-  <div id="pedigree-content"></div>
-</div></div>
-
-<!-- 武将詳細モーダル -->
-<div id="warrior-modal"><div class="wm-shell">
-  <div class="wm-head"><div class="wm-name" id="wm-name-text"></div><div class="wm-role" id="wm-role-text"></div></div>
-  <div class="wm-body">
-    <div class="wm-stat"><span class="wsk">武力</span><span class="wsv" id="wm-power"></span></div>
-    <div class="wm-stat"><span class="wsk">知力</span><span class="wsv" id="wm-wisdom"></span></div>
-    <div class="wm-stat"><span class="wsk">体力</span><span class="wsv" id="wm-hp"></span></div>
-    <div class="wm-hp-bar"><div class="wm-hp-fill" id="wm-hp-fill"></div></div>
-    <div class="wm-stat"><span class="wsk">忠誠</span><span class="wsv" id="wm-loyalty"></span></div>
-    <div class="wm-stat"><span class="wsk">年齢</span><span class="wsv" id="wm-age"></span></div>
-    <div class="wm-stat"><span class="wsk">血統</span><span class="wsv" id="wm-bloodline" style="font-weight:900;"></span></div>
-    <div class="wm-stat"><span class="wsk">職業</span><span class="wsv" id="wm-job"></span></div>
-    <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location"></span></div>
-    <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage"></span></div>
-    <div class="wm-stat"><span class="wsk">特性</span><span class="wsv" id="wm-traits" style="font-size:10px;"></span></div>
-    <div class="wm-stat" id="wm-nick-row" style="display:none;"><span class="wsk">血統ニックス</span><span class="wsv" id="wm-nick"></span></div>
-    <div class="wm-stat" id="wm-level-row" style="display:none;"><span class="wsk">親LV</span><span class="wsv" id="wm-level"></span></div>
-    <button class="wm-close" onclick="closeWarriorModal()">閉じる</button>
-  </div>
-</div></div>
-
-<!-- 縁組モーダル -->
-<div id="engumi-modal"><div class="modal-shell">
-  <div class="modal-deco-top"></div>
-  <div class="modal-header"><div class="modal-kamon">⚜️</div><div class="modal-title">縁　組</div><div class="modal-subtitle">血脈を紡ぎ、新たな将を育む</div></div>
-  <div class="modal-body" id="engumi-body">
-    <div class="modal-step-indicator"><div class="step-dot active" id="sdot0"></div><div class="step-dot" id="sdot1"></div><div class="step-dot" id="sdot2"></div></div>
-    <div id="engumi-step-content"></div>
-  </div>
-  <div class="modal-footer"><button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn">取消</button><button class="modal-btn modal-btn-exec" id="engumi-next-btn" onclick="engumiNext()">次へ →</button></div>
-</div></div>
-
-<!-- 縁組成功オーバーレイ -->
-<div id="success-overlay">
-  <div class="suc-kamon">👶</div>
-  <div class="suc-title">縁組成立</div>
-  <div class="suc-name" id="suc-name"></div>
-  <div class="suc-stats" id="suc-stats"></div>
-  <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
-</div>
-
-<!-- 城モーダル -->
-<div id="castle-modal"><div class="castle-shell">
-  <div class="castle-head"><div class="dev-title">🏯 城を強化する</div><button class="close-btn" onclick="closeModal('castle-modal')">閉じる</button></div>
-  <div class="castle-body" id="castle-modal-body"></div>
-</div></div>
-
-<!-- 開発者モーダル -->
-<div id="dev-modal"><div class="dev-shell">
-  <div class="dev-head"><div class="dev-title">⚙ 開発者メニュー</div><button class="close-btn" onclick="closeModal('dev-modal')">閉じる</button></div>
-  <div class="dev-body">
-    <button class="dev-btn" onclick="devAddKoku()">石高 +5000</button>
-    <button class="dev-btn" onclick="devAddPower()">全武将 武力+20</button>
-    <button class="dev-btn" onclick="devAgeUp()">全武将 年齢+5</button>
-    <button class="dev-btn" onclick="devRestoreHp()">全武将 体力全回復</button>
-    <button class="dev-btn" onclick="devSetUnification()">統一度 +30%</button>
-    <button class="dev-btn" onclick="devAddWarrior()">新武将招募</button>
-  </div>
-</div></div>
-
-<!-- 戦記モーダル -->
-<div id="history-modal"><div class="hist-shell">
-  <div class="hist-head"><div class="hist-title">📜 戦記履歴</div><button class="close-btn" onclick="closeModal('history-modal')">閉じる</button></div>
-  <div id="hist-list"></div>
-</div></div>
-
-<!-- 引退モーダル -->
-<div id="retire-modal"><div class="retire-box">
-  <div class="retire-name" id="retire-warrior-name"></div>
-  <div class="retire-sub">が20歳になりました。<br>これからどうしますか？</div>
-  <button class="retire-btn retire-btn-parent" onclick="chooseRetire(1)">⚜️ 親として残す<br><span style="font-size:11px;opacity:.8;">血脈を継ぎ縁組専念</span></button>
-  <button class="retire-btn retire-btn-staff" id="retire-btn-staff" onclick="chooseRetire(2)">🏮 家臣団に迎える<br><span style="font-size:11px;opacity:.8;">教育係として子の成長を支援</span></button>
-  <div class="retire-note" id="retire-staff-note">家臣団 0 / 4 名</div>
-</div></div>
-
-<!-- 天下図モーダル -->
-<div id="map-modal"><div class="map-shell">
-  <div class="map-head"><div class="map-title">🗺️ 天下図　全国制覇</div><button class="close-btn" onclick="closeModal('map-modal')">閉じる</button></div>
-  <div class="map-body">
-    <div class="map-province-info" id="map-province-info">国をタップして侵攻先を選択</div>
-    <canvas id="strategic-map"></canvas>
-  </div>
-  <div class="map-footer">
-    <button class="modal-btn modal-btn-cancel" onclick="closeModal('map-modal')">戻る</button>
-    <button class="modal-btn modal-btn-exec" id="invade-btn" onclick="startInvasion()" style="display:none;">⚔️ この国に侵攻する</button>
-  </div>
-</div></div>
-
-<div id="toast"></div>
-<div id="modal-bg" style="display:none;position:fixed;inset:0;z-index:530;" onclick="closeAllModals()"></div>
-
-<!-- メインUI -->
-<div id="main">
-  <div id="header">
-    <div id="game-title">戦国血脈<span class="sub">〜覇道の系譜〜</span></div>
-    <div id="status-panel">
-      <div class="stat-chip"><span class="sl">石高</span><span class="sv" id="koku-val">0</span><span class="su">石</span></div>
-      <div class="stat-chip"><span class="sl">統一</span><span class="sv" id="uni-val">0.0</span><span class="su">%</span></div>
-    </div>
-  </div>
-  <div id="iso-field"><canvas id="iso-canvas"></canvas><div id="bubble-layer"></div></div>
-  <div id="bottom-ui">
-    <div id="castle-bar">
-      <span>🏯 城</span><span class="castle-lv" id="castle-lv-text">Lv.1</span>
-      <div class="castle-exp-bg"><div class="castle-exp-fill" id="castle-exp-fill" style="width:0%"></div></div>
-      <button class="castle-upgrade-btn" id="castle-upgrade-btn" onclick="openCastleModal()">強化</button>
-    </div>
-    <div id="nation-bar"><span class="nl">天下統一</span><div class="nt"><div class="nf" id="uni-bar" style="width:0%"></div></div><span class="np" id="uni-pct">0%</span></div>
-    <div id="party-row"></div>
-    <div id="staff-row"></div>
-    <div id="action-row">
-      <button class="act-btn primary" onclick="openBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button>
-      <button class="act-btn" onclick="openEngumi()"><span class="ico">⚜️</span><span class="lbl">縁組</span></button>
-      <button class="act-btn" onclick="openMap()"><span class="ico">🗺️</span><span class="lbl">天下図</span></button>
-      <button class="act-btn" onclick="openPedigree()"><span class="ico">🌳</span><span class="lbl">系譜</span></button>
-      <button class="act-btn" onclick="openHistory()"><span class="ico">📜</span><span class="lbl">戦記</span></button>
-    </div>
-  </div>
-</div>
-
-<script>
-'use strict';
-const $=id=>document.getElementById(id);
-const ENGUMI_COST=600,MATURE_AGE=20,RETIRE_AGE=20,MAX_STAFF=4,MAX_FORMATION=3;
-const HPX=2;
-const CASTLE_LEVELS=[
-  {lv:1,name:'小屋',kokuBonus:1.0,powerBonus:1.0,maxExp:200,upgCost:800,upgDesc:'鍛錬場・学問所を拡張'},
-  {lv:2,name:'陣屋',kokuBonus:1.2,powerBonus:1.05,maxExp:600,upgCost:2000,upgDesc:'城壁を整備し防衛力強化'},
-  {lv:3,name:'館',kokuBonus:1.5,powerBonus:1.12,maxExp:1500,upgCost:5000,upgDesc:'天守閣の基礎を建造'},
-  {lv:4,name:'城',kokuBonus:2.0,powerBonus:1.20,maxExp:4000,upgCost:12000,upgDesc:'五重天守を完成させる'},
-  {lv:5,name:'天下城',kokuBonus:3.0,powerBonus:1.35,maxExp:99999,upgCost:99999,upgDesc:'天下統一の象徴'},
-];
-const FACILITY_EFFECT={training:{stat:'power',label:'武力',color:'#ffcc44',range:[5,11],costHp:-6},forge:{stat:'power',label:'武力',color:'#ffaa44',range:[4,9],costHp:-5},academy:{stat:'wisdom',label:'知力',color:'#aaddff',range:[5,10],costHp:-4},tea:{stat:'hp',label:'体力',color:'#88ffcc',range:[12,18],costHp:8},garden:{stat:'hp',label:'体力',color:'#ff88cc',range:[18,25],costHp:15},loyalty:{stat:'loyalty',label:'忠誠',color:'#ffdd88',range:[7,14],costHp:-3}};
-const FACILITY_MAP={training:{name:'鍛錬場',color:'#cc8800',icon:'🏋️'},forge:{name:'鍛冶場',color:'#aa6600',icon:'⚒️'},academy:{name:'学問所',color:'#4488cc',icon:'📚'},tea:{name:'茶室',color:'#88cc88',icon:'🍵'},garden:{name:'庭園',color:'#cc88aa',icon:'🌸'},loyalty:{name:'忠義堂',color:'#ccaa44',icon:'🏮'}};
-const FACILITY_POSITIONS=[{key:'training',tx:0,ty:1},{key:'forge',tx:1,ty:2},{key:'academy',tx:-1,ty:2},{key:'tea',tx:2,ty:0},{key:'garden',tx:-2,ty:0},{key:'loyalty',tx:0,ty:3}];
-const JOB_DEFS=[{id:0,name:'武官',icon:'⚔️',gender:'male'},{id:1,name:'文官',icon:'📜',gender:'male'},{id:2,name:'姫',icon:'🌸',gender:'female'},{id:3,name:'姫武将',icon:'🌸',gender:'female'},{id:4,name:'軍師',icon:'🪭',gender:'any'},{id:5,name:'忍者',icon:'🌑',gender:'any'}];
-const BLOODLINES=[
-  {id:0,name:'織田流',color:'#c83030',bonus:'power'},{id:1,name:'徳川流',color:'#4488cc',bonus:'wisdom'},
-  {id:2,name:'武田流',color:'#ffaa00',bonus:'power'},{id:3,name:'上杉流',color:'#44cc88',bonus:'wisdom'},
-  {id:4,name:'毛利流',color:'#cc7733',bonus:'power'},{id:5,name:'島津流',color:'#cc3333',bonus:'power'},
-  {id:6,name:'伊達流',color:'#dd4444',bonus:'power'},{id:7,name:'豊臣流',color:'#ddcc00',bonus:'wisdom'},
-  {id:8,name:'北条流',color:'#888888',bonus:'wisdom'},{id:9,name:'今川流',color:'#aa88cc',bonus:'power'},
-  {id:10,name:'浅井流',color:'#88aacc',bonus:'wisdom'},{id:11,name:'朝倉流',color:'#cc8844',bonus:'power'},
-  {id:12,name:'三好流',color:'#aa66aa',bonus:'wisdom'},{id:13,name:'宇喜多流',color:'#ccaa88',bonus:'power'},
-  {id:14,name:'立花流',color:'#44bb66',bonus:'power'},{id:15,name:'黒田流',color:'#aaaa44',bonus:'wisdom'},
-  {id:16,name:'細川流',color:'#aa99cc',bonus:'wisdom'},{id:17,name:'長曾我部流',color:'#33aa55',bonus:'power'},
-  {id:18,name:'龍造寺流',color:'#cc2222',bonus:'power'},{id:19,name:'大友流',color:'#aa8800',bonus:'wisdom'},
-];
-const SURNAMES=['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];
-const GIVEN_NAMES_M=['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];
-const GIVEN_NAMES_F=['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督','お梶','阿茶','寧々','旭姫','亀姫','振姫','珠姫','天姫','千代','鶴姫'];
-const GROWTH_EVENTS=[
-  {tier:'daily',id:'train_ok',label:'訓練成功',icon:'⚔️',desc:'地道な鍛錬が実を結んだ',apply(w){const g=rnd(2,5);w.stats.power=clamp(w.stats.power+g,1,99);return{text:'+武力'+g,color:'#ffcc44'};}},
-  {tier:'daily',id:'study_ok',label:'学問励行',icon:'📚',desc:'書物から多くを学んだ',apply(w){const g=rnd(2,5);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+知力'+g,color:'#aaddff'};}},
-  {tier:'daily',id:'meal',label:'食事',icon:'🍚',desc:'滋養たっぷりの食事で回復',apply(w){const g=rnd(10,20);w.stats.hp=clamp(w.stats.hp+g,1,w.stats.maxHp);return{text:'+体力'+g,color:'#88ffcc'};}},
-  {tier:'daily',id:'slack',label:'サボり',icon:'😴',desc:'今日は気が乗らなかった…',apply(w){const g=rnd(1,3);w.stats.power=clamp(w.stats.power-g,1,99);w.stats.wisdom=clamp(w.stats.wisdom-g,1,99);return{text:'-武力/知力'+g,color:'#ff8888'};}},
-  {tier:'daily',id:'argue',label:'口論',icon:'💢',desc:'仲間と言い合いになった',apply(w){const g=rnd(2,6);w._loyalty=clamp(w._loyalty-g,0,100);return{text:'-忠誠'+g,color:'#ff6666'};}},
-  {tier:'daily',id:'patrol',label:'見回り',icon:'🏯',desc:'城内を見回り経験を積んだ',apply(w){w.stats.power=clamp(w.stats.power+1,1,99);w.stats.wisdom=clamp(w.stats.wisdom+1,1,99);return{text:'+武力/知力 1',color:'#ffdd88'};}},
-  {tier:'daily',id:'rest',label:'休養',icon:'🌙',desc:'ゆっくり休んで体力回復',apply(w){const g=rnd(15,25);w.stats.hp=clamp(w.stats.hp+g,1,w.stats.maxHp);return{text:'+体力'+g,color:'#88ffcc'};}},
-  {tier:'daily',id:'encourage',label:'激励',icon:'🔥',desc:'仲間に励まされ士気が上がった',apply(w){const g=rnd(3,7);w._loyalty=clamp(w._loyalty+g,0,100);return{text:'+忠誠'+g,color:'#ffdd88'};}},
-  {tier:'rare',id:'master',label:'師匠に出会う',icon:'🧙',desc:'名高い師に弟子入りした！',apply(w){const gp=rnd(5,10),gw=rnd(5,10);w.stats.power=clamp(w.stats.power+gp,1,99);w.stats.wisdom=clamp(w.stats.wisdom+gw,1,99);return{text:'+武力'+gp+' 知力'+gw,color:'#88ccff'};}},
-  {tier:'rare',id:'secret',label:'秘伝習得',icon:'📜',desc:'古の秘技を習得した！',apply(w){const g=rnd(8,14);w.stats.power=clamp(w.stats.power+g,1,99);return{text:'+武力'+g+'（秘伝）',color:'#aaddff'};}},
-  {tier:'rare',id:'hard_train',label:'特訓成功',icon:'💪',desc:'血のにじむ特訓が大きな成果！',apply(w){const gp=rnd(7,13);w.stats.power=clamp(w.stats.power+gp,1,99);w.stats.hp=clamp(w.stats.hp-8,1,w.stats.maxHp);return{text:'+武力'+gp+' HP-8',color:'#ffaa44'};}},
-  {tier:'rare',id:'insight',label:'悟り',icon:'✨',desc:'深夜の修行で悟りを開いた！',apply(w){const g=rnd(7,13);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+知力'+g+'（悟り）',color:'#88ccff'};}},
-  {tier:'rare',id:'rival',label:'ライバル出現',icon:'⚡',desc:'好敵手の登場で互いを高め合う！',apply(w){const g=rnd(4,8);w.stats.power=clamp(w.stats.power+g,1,99);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+武力/知力'+g,color:'#ffcc88'};}},
-  {tier:'rare',id:'gift',label:'才能開花',icon:'🌸',desc:'眠れる才能が開花し始めた！',apply(w){const g=rnd(6,12);const stat=Math.random()<.5?'power':'wisdom';w.stats[stat]=clamp(w.stats[stat]+g,1,99);return{text:'+'+(stat==='power'?'武力':'知力')+g,color:'#ffaaff'};}},
-  {tier:'divine',id:'awakening',label:'【覚　醒】',icon:'🌟',desc:'天賦の才が一気に目覚めた！！',apply(w){const op=w.stats.power,ow=w.stats.wisdom;w.stats.power=clamp(Math.floor(w.stats.power*1.8+rnd(10,20)),1,99);w.stats.wisdom=clamp(Math.floor(w.stats.wisdom*1.8+rnd(10,20)),1,99);return{text:'覚醒！武力'+op+'→'+w.stats.power+' 知力'+ow+'→'+w.stats.wisdom,color:'#ffdd00'};}},
-  {tier:'divine',id:'betrayal',label:'【裏　切】',icon:'🗡️',desc:'突然の裏切り…忠誠が崩壊した！！',apply(w){const old=w._loyalty;w._loyalty=Math.max(0,Math.floor(w._loyalty*.1));w.stats.hp=clamp(w.stats.hp-rnd(30,50),1,w.stats.maxHp);return{text:'忠誠崩壊 '+old+'→'+w._loyalty,color:'#ff4444'};}},
-  {tier:'divine',id:'rampage',label:'【暴　走】',icon:'💀',desc:'制御不能の暴走状態に！！',apply(w){w.stats.hp=clamp(w.stats.hp-rnd(40,60),1,w.stats.maxHp);w.stats.power=clamp(w.stats.power+rnd(15,25),1,99);w._loyalty=clamp(w._loyalty-rnd(20,35),0,100);return{text:'暴走！武力大幅UP・HP大損失',color:'#ff6600'};}},
-  {tier:'divine',id:'genius',label:'【天才誕生】',icon:'👑',desc:'歴史に残る天才が覚醒した！！！',apply(w){w.stats.power=clamp(w.stats.power+rnd(25,35),1,99);w.stats.wisdom=clamp(w.stats.wisdom+rnd(25,35),1,99);w.stats.maxHp=clamp(w.stats.maxHp+rnd(30,50),100,200);w.stats.hp=w.stats.maxHp;return{text:'天才覚醒！全能力+大幅UP',color:'#ffe040'};}},
-];
-const EVENT_TIER_WEIGHTS={daily:.80,rare:.17,divine:.03};
-const SKILLS={
-  p:[{name:'千本槍',color:'#ffcc44',dmg:0.8,aoe:true},{name:'鬼神斬',color:'#ff6622',dmg:1.8,aoe:false},{name:'士気高揚',color:'#44ffaa',dmg:0,aoe:false}],
-  e:[{name:'鉄砲斉射',color:'#ff4444',dmg:0.9,aoe:true},{name:'獅子奮迅',color:'#ff2222',dmg:2.0,aoe:false},{name:'包囲陣',color:'#ff8800',dmg:0.6,aoe:true}],
-};
-const PROVINCES=[
-  {id:1,name:'尾張',x:240,y:238,clan:'player',strength:65,adj:[2,3,4]},
-  {id:2,name:'美濃',x:210,y:255,clan:'saito',strength:72,adj:[1,5,12]},
-  {id:3,name:'三河',x:268,y:226,clan:'tokugawa',strength:58,adj:[1,11,8]},
-  {id:4,name:'甲斐',x:182,y:193,clan:'takeda',strength:85,adj:[1,5,6]},
-  {id:5,name:'信濃',x:198,y:217,clan:'takeda',strength:78,adj:[2,4,6,7]},
-  {id:6,name:'上野',x:158,y:160,clan:'hojo',strength:70,adj:[4,5,7]},
-  {id:7,name:'武蔵',x:138,y:141,clan:'hojo',strength:82,adj:[5,6,8]},
-  {id:8,name:'相模',x:128,y:116,clan:'hojo',strength:75,adj:[3,7]},
-  {id:9,name:'近江',x:226,y:272,clan:'azai',strength:62,adj:[2,10,12]},
-  {id:10,name:'山城',x:215,y:291,clan:'ashikaga',strength:55,adj:[9,11,12]},
-  {id:11,name:'摂津',x:235,y:295,clan:'miyoshi',strength:68,adj:[3,10,13]},
-  {id:12,name:'越前',x:199,y:274,clan:'asakura',strength:60,adj:[2,5,9]},
-  {id:13,name:'播磨',x:215,y:318,clan:'bessho',strength:52,adj:[11,14]},
-  {id:14,name:'備前',x:215,y:348,clan:'ukita',strength:65,adj:[13,15]},
-  {id:15,name:'安芸',x:195,y:378,clan:'mouri',strength:80,adj:[14,16]},
-  {id:16,name:'周防',x:178,y:405,clan:'mouri',strength:72,adj:[15,17]},
-  {id:17,name:'長門',x:160,y:420,clan:'mouri',strength:68,adj:[16,18]},
-  {id:18,name:'豊前',x:175,y:445,clan:'otomo',strength:58,adj:[17,19]},
-  {id:19,name:'筑前',x:155,y:462,clan:'otomo',strength:62,adj:[18,20]},
-  {id:20,name:'薩摩',x:148,y:495,clan:'shimazu',strength:90,adj:[19]},
-  {id:21,name:'阿波',x:268,y:380,clan:'choso',strength:55,adj:[22]},
-  {id:22,name:'土佐',x:255,y:410,clan:'choso',strength:68,adj:[21]},
-];
-const CLAN_COLORS={player:'#c8960c',saito:'#4a6a3a',tokugawa:'#3a5a7a',takeda:'#7a1a1a',hojo:'#1a2a6a',azai:'#4a2a6a',ashikaga:'#6a4a1a',miyoshi:'#2a6a4a',asakura:'#5a4a2a',bessho:'#3a4a2a',ukita:'#6a3a2a',mouri:'#2a4a6a',otomo:'#5a2a4a',shimazu:'#1a4a3a',choso:'#4a3a1a'};
-let selectedProvince=null,currentEnemy=null;
-const state={koku:1200,unification:0,turn:0,generation:1,log:[],pedigree:[],castle:{lv:1,exp:0}};
-let gWarriors=[],gParents=[],gStaff=[];
-let retireTarget=null,retireQueue=[];
-let idleTimer=null,ageTickCounter=0;
-let engumiStep=0,engumiSelectedFather=null,engumiSelectedMother=null;
-let selectedForBattle=[];
-function rnd(lo,hi){return Math.floor(lo+Math.random()*(hi-lo+1));}
+<div id="divine-flash"></div> <div id="formation-modal"><div class="formation-shell"> <div class="formation-head"><div class="formation-title">⚔ 出陣編成（最大3名）</div><button class="close-btn" onclick="closeModal('formation-modal')">取消</button></div> <div class="formation-body"><div class="formation-count" id="formation-count">0 / 3 名選択中</div><div class="formation-grid" id="formation-grid"></div></div> <div class="formation-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('formation-modal')">取消</button><button class="modal-btn modal-btn-exec" id="formation-start-btn" onclick="startBattleWithFormation()">この編成で出陣</button></div>
+</div></div> <div id="battle-screen"><div id="bscr-inner"> <div id="bscr-frame"> <div id="battle-bg"></div> <div id="battle-moon"></div> <div id="battle-mountains"><div class="bmtn bmtn-far" style="width:100%;height:80%;"></div><div class="bmtn bmtn-mid" style="width:100%;height:65%;"></div></div> <div id="battle-ground"></div> <div class="btorch btorch-l"></div><div class="btorch btorch-r"></div> <div class="bflag bflag-p"></div><div class="bflag bflag-e"></div> <div id="dot-field" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div> <div id="battle-result-panel"><div id="result-box"> <span class="bres-title" id="bres-title-text"></span> <div class="bres-detail" id="bres-detail-text"></div> <button class="bres-btn" onclick="closeBattle()">帰城する</button> </div></div> </div> <div id="battle-log-bar">戦闘開始！</div> <div id="battle-ui-panel"> <div class="bgen-row"> <div class="bunit-panel"> <div class="bunit-top"><span class="bunit-name" id="bunit-pname">我が軍</span><div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-player">120</span></div></div> <div class="bpower-wrap"><div class="bpower-bar" id="bbar-player" style="width:100%"></div></div> <div class="bskill-wrap"><span class="bskill-label">必殺</span><div class="bskill-bar-bg"><div class="bskill-bar" id="bskill-bar-p" style="width:0%"></div></div><button class="bskill-btn" id="bskill-btn-p" onclick="fireSkill('p')" disabled>発動!</button></div> </div> <div class="bunit-panel"> <div class="bunit-top"><span class="bunit-name" id="bunit-ename">敵　軍</span><div class="bhp-group"><span class="bhp-label">HP</span><span class="bhp-value" id="bhp-enemy">120</span></div></div> <div class="bpower-wrap"><div class="bpower-bar bpower-bar-e" id="bbar-enemy" style="width:100%"></div></div> <div class="bskill-wrap"><span class="bskill-label">必殺</span><div class="bskill-bar-bg"><div class="bskill-bar" id="bskill-bar-e" style="width:0%;background:linear-gradient(90deg,#901830,#ff3050)"></div></div><span class="bskill-label" style="color:#ff5060;">敵</span></div> </div> </div> <div class="bsub-row" id="bsub-row1"> <div class="bsub-panel" id="bsub-p1"><span class="bsub-label">副将</span><span class="bsub-name" id="bsub-p1-name">―</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-p1-bar" style="width:100%;background:#44cc88"></div></div><span class="bsub-hp-val" id="bsub-p1-hp">―</span></div> <div class="bsub-panel enemy" id="bsub-e1"><span class="bsub-label enemy">副将</span><span class="bsub-name" id="bsub-e1-name">副将甲</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-e1-bar" style="width:100%;background:#ff6666"></div></div><span class="bsub-hp-val" id="bsub-e1-hp">―</span></div> </div> <div class="bsub-row" id="bsub-row2"> <div class="bsub-panel" id="bsub-p2"><span class="bsub-label">副将</span><span class="bsub-name" id="bsub-p2-name">―</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-p2-bar" style="width:100%;background:#44cc88"></div></div><span class="bsub-hp-val" id="bsub-p2-hp">―</span></div> <div class="bsub-panel enemy" id="bsub-e2"><span class="bsub-label enemy">副将</span><span class="bsub-name" id="bsub-e2-name">副将乙</span><div class="bsub-hp-wrap"><div class="bsub-hp-fill" id="bsub-e2-bar" style="width:100%;background:#ff6666"></div></div><span class="bsub-hp-val" id="bsub-e2-hp">―</span></div> </div> </div>
+</div></div> <div id="pedigree-modal"><div class="ped-shell"> <div class="ped-head"><div class="ped-title">⚔ 武将系譜</div><button class="close-btn" onclick="closeModal('pedigree-modal')">閉じる</button></div> <div id="pedigree-content"></div>
+</div></div> <div id="warrior-modal"><div class="wm-shell"> <div class="wm-head"><div class="wm-name" id="wm-name-text"></div><div class="wm-role" id="wm-role-text"></div></div> <div class="wm-body"> <div class="wm-stat"><span class="wsk">武力</span><span class="wsv" id="wm-power"></span></div> <div class="wm-stat"><span class="wsk">知力</span><span class="wsv" id="wm-wisdom"></span></div> <div class="wm-stat"><span class="wsk">体力</span><span class="wsv" id="wm-hp"></span></div> <div class="wm-hp-bar"><div class="wm-hp-fill" id="wm-hp-fill"></div></div> <div class="wm-stat"><span class="wsk">忠誠</span><span class="wsv" id="wm-loyalty"></span></div> <div class="wm-stat"><span class="wsk">年齢</span><span class="wsv" id="wm-age"></span></div> <div class="wm-stat"><span class="wsk">血統</span><span class="wsv" id="wm-bloodline" style="font-weight:900;"></span></div> <div class="wm-stat"><span class="wsk">職業</span><span class="wsv" id="wm-job"></span></div> <div class="wm-stat"><span class="wsk">場所</span><span class="wsv" id="wm-location"></span></div> <div class="wm-stat"><span class="wsk">家系</span><span class="wsv" id="wm-lineage"></span></div> <div class="wm-stat"><span class="wsk">特性</span><span class="wsv" id="wm-traits" style="font-size:10px;"></span></div> <div class="wm-stat" id="wm-nick-row" style="display:none;"><span class="wsk">血統ニックス</span><span class="wsv" id="wm-nick"></span></div> <div class="wm-stat" id="wm-level-row" style="display:none;"><span class="wsk">親LV</span><span class="wsv" id="wm-level"></span></div> <button class="wm-close" onclick="closeWarriorModal()">閉じる</button> </div>
+</div></div> <div id="engumi-modal"><div class="modal-shell"> <div class="modal-deco-top"></div> <div class="modal-header"><div class="modal-kamon">⚜️</div><div class="modal-title">縁　組</div><div class="modal-subtitle">血脈を紡ぎ、新たな将を育む</div></div> <div class="modal-body" id="engumi-body"> <div class="modal-step-indicator"><div class="step-dot active" id="sdot0"></div><div class="step-dot" id="sdot1"></div><div class="step-dot" id="sdot2"></div></div> <div id="engumi-step-content"></div> </div> <div class="modal-footer"><button class="modal-btn modal-btn-cancel" id="engumi-cancel-btn">取消</button><button class="modal-btn modal-btn-exec" id="engumi-next-btn" onclick="engumiNext()">次へ →</button></div>
+</div></div> <div id="success-overlay"> <div class="suc-kamon">👶</div> <div class="suc-title">縁組成立</div> <div class="suc-name" id="suc-name"></div> <div class="suc-stats" id="suc-stats"></div> <button class="suc-btn" onclick="closeSuccessOverlay()">家臣として迎える</button>
+</div> <div id="castle-modal"><div class="castle-shell"> <div class="castle-head"><div class="dev-title">🏯 城を強化する</div><button class="close-btn" onclick="closeModal('castle-modal')">閉じる</button></div> <div class="castle-body" id="castle-modal-body"></div>
+</div></div> <div id="dev-modal"><div class="dev-shell"> <div class="dev-head"><div class="dev-title">⚙ 開発者メニュー</div><button class="close-btn" onclick="closeModal('dev-modal')">閉じる</button></div> <div class="dev-body"> <button class="dev-btn" onclick="devAddKoku()">石高 +5000</button> <button class="dev-btn" onclick="devAddPower()">全武将 武力+20</button> <button class="dev-btn" onclick="devAgeUp()">全武将 年齢+5</button> <button class="dev-btn" onclick="devRestoreHp()">全武将 体力全回復</button> <button class="dev-btn" onclick="devSetUnification()">統一度 +30%</button> <button class="dev-btn" onclick="devAddWarrior()">新武将招募</button> </div>
+</div></div> <div id="history-modal"><div class="hist-shell"> <div class="hist-head"><div class="hist-title">📜 戦記履歴</div><button class="close-btn" onclick="closeModal('history-modal')">閉じる</button></div> <div id="hist-list"></div>
+</div></div> <div id="retire-modal"><div class="retire-box"> <div class="retire-name" id="retire-warrior-name"></div> <div class="retire-sub">が20歳になりました。<br>これからどうしますか？</div> <button class="retire-btn retire-btn-parent" onclick="chooseRetire(1)">⚜️ 親として残す<br><span style="font-size:11px;opacity:.8;">血脈を継ぎ縁組専念</span></button> <button class="retire-btn retire-btn-staff" id="retire-btn-staff" onclick="chooseRetire(2)">🏮 家臣団に迎える<br><span style="font-size:11px;opacity:.8;">教育係として子の成長を支援</span></button> <div class="retire-note" id="retire-staff-note">家臣団 0 / 4 名</div>
+</div></div> <div id="map-modal"><div class="map-shell"> <div class="map-head"><div class="map-title">🗺️ 天下図　全国制覇</div><button class="close-btn" onclick="closeModal('map-modal')">閉じる</button></div> <div class="map-body"> <div class="map-province-info" id="map-province-info">国をタップして侵攻先を選択</div> <canvas id="strategic-map"></canvas> </div> <div class="map-footer"> <button class="modal-btn modal-btn-cancel" onclick="closeModal('map-modal')">戻る</button> <button class="modal-btn modal-btn-exec" id="invade-btn" onclick="startInvasion()" style="display:none;">⚔️ この国に侵攻する</button> </div>
+</div></div> <div id="toast"></div>
+<div id="modal-bg" style="display:none;position:fixed;inset:0;z-index:530;" onclick="closeAllModals()"></div> <div id="main"> <div id="header"> <div id="game-title">戦国血脈<span class="sub">〜覇道の系譜〜</span></div> <div id="status-panel"> <div class="stat-chip"><span class="sl">石高</span><span class="sv" id="koku-val">0</span><span class="su">石</span></div> <div class="stat-chip"><span class="sl">統一</span><span class="sv" id="uni-val">0.0</span><span class="su">%</span></div> </div> </div> <div id="iso-field"><canvas id="iso-canvas"></canvas><div id="bubble-layer"></div></div> <div id="bottom-ui"> <div id="castle-bar"> <span>🏯 城</span><span class="castle-lv" id="castle-lv-text">Lv.1</span> <div class="castle-exp-bg"><div class="castle-exp-fill" id="castle-exp-fill" style="width:0%"></div></div> <button class="castle-upgrade-btn" id="castle-upgrade-btn" onclick="openCastleModal()">強化</button> </div> <div id="nation-bar"><span class="nl">天下統一</span><div class="nt"><div class="nf" id="uni-bar" style="width:0%"></div></div><span class="np" id="uni-pct">0%</span></div> <div id="party-row"></div> <div id="staff-row"></div> <div id="action-row"> <button class="act-btn primary" onclick="openBattle()"><span class="ico">⚔️</span><span class="lbl">合戦</span></button> <button class="act-btn" onclick="openEngumi()"><span class="ico">⚜️</span><span class="lbl">縁組</span></button> <button class="act-btn" onclick="openMap()"><span class="ico">🗺️</span><span class="lbl">天下図</span></button> <button class="act-btn" onclick="openPedigree()"><span class="ico">🌳</span><span class="lbl">系譜</span></button> <button class="act-btn" onclick="openHistory()"><span class="ico">📜</span><span class="lbl">戦記</span></button> </div> </div>
+</div> <script>
+'use strict';const $=id=>document.getElementById(id);const ENGUMI_COST=600,MATURE_AGE=20,RETIRE_AGE=20,MAX_STAFF=4,MAX_FORMATION=3;const HPX=2;const CASTLE_LEVELS=[
+{lv:1,name:'小屋',kokuBonus:1.0,powerBonus:1.0,maxExp:200,upgCost:800,upgDesc:'鍛錬場・学問所を拡張'},
+{lv:2,name:'陣屋',kokuBonus:1.2,powerBonus:1.05,maxExp:600,upgCost:2000,upgDesc:'城壁を整備し防衛力強化'},
+{lv:3,name:'館',kokuBonus:1.5,powerBonus:1.12,maxExp:1500,upgCost:5000,upgDesc:'天守閣の基礎を建造'},
+{lv:4,name:'城',kokuBonus:2.0,powerBonus:1.20,maxExp:4000,upgCost:12000,upgDesc:'五重天守を完成させる'},
+{lv:5,name:'天下城',kokuBonus:3.0,powerBonus:1.35,maxExp:99999,upgCost:99999,upgDesc:'天下統一の象徴'},
+];const FACILITY_EFFECT={training:{stat:'power',label:'武力',color:'#ffcc44',range:[5,11],costHp:-6},forge:{stat:'power',label:'武力',color:'#ffaa44',range:[4,9],costHp:-5},academy:{stat:'wisdom',label:'知力',color:'#aaddff',range:[5,10],costHp:-4},tea:{stat:'hp',label:'体力',color:'#88ffcc',range:[12,18],costHp:8},garden:{stat:'hp',label:'体力',color:'#ff88cc',range:[18,25],costHp:15},loyalty:{stat:'loyalty',label:'忠誠',color:'#ffdd88',range:[7,14],costHp:-3}};const FACILITY_MAP={training:{name:'鍛錬場',color:'#cc8800',icon:'🏋️'},forge:{name:'鍛冶場',color:'#aa6600',icon:'⚒️'},academy:{name:'学問所',color:'#4488cc',icon:'📚'},tea:{name:'茶室',color:'#88cc88',icon:'🍵'},garden:{name:'庭園',color:'#cc88aa',icon:'🌸'},loyalty:{name:'忠義堂',color:'#ccaa44',icon:'🏮'}};const FACILITY_POSITIONS=[{key:'training',tx:0,ty:1},{key:'forge',tx:1,ty:2},{key:'academy',tx:-1,ty:2},{key:'tea',tx:2,ty:0},{key:'garden',tx:-2,ty:0},{key:'loyalty',tx:0,ty:3}];const JOB_DEFS=[{id:0,name:'武官',icon:'⚔️',gender:'male'},{id:1,name:'文官',icon:'📜',gender:'male'},{id:2,name:'姫',icon:'🌸',gender:'female'},{id:3,name:'姫武将',icon:'🌸',gender:'female'},{id:4,name:'軍師',icon:'🪭',gender:'any'},{id:5,name:'忍者',icon:'🌑',gender:'any'}];const BLOODLINES=[
+{id:0,name:'織田流',color:'#c83030',bonus:'power'},{id:1,name:'徳川流',color:'#4488cc',bonus:'wisdom'},
+{id:2,name:'武田流',color:'#ffaa00',bonus:'power'},{id:3,name:'上杉流',color:'#44cc88',bonus:'wisdom'},
+{id:4,name:'毛利流',color:'#cc7733',bonus:'power'},{id:5,name:'島津流',color:'#cc3333',bonus:'power'},
+{id:6,name:'伊達流',color:'#dd4444',bonus:'power'},{id:7,name:'豊臣流',color:'#ddcc00',bonus:'wisdom'},
+{id:8,name:'北条流',color:'#888888',bonus:'wisdom'},{id:9,name:'今川流',color:'#aa88cc',bonus:'power'},
+{id:10,name:'浅井流',color:'#88aacc',bonus:'wisdom'},{id:11,name:'朝倉流',color:'#cc8844',bonus:'power'},
+{id:12,name:'三好流',color:'#aa66aa',bonus:'wisdom'},{id:13,name:'宇喜多流',color:'#ccaa88',bonus:'power'},
+{id:14,name:'立花流',color:'#44bb66',bonus:'power'},{id:15,name:'黒田流',color:'#aaaa44',bonus:'wisdom'},
+{id:16,name:'細川流',color:'#aa99cc',bonus:'wisdom'},{id:17,name:'長曾我部流',color:'#33aa55',bonus:'power'},
+{id:18,name:'龍造寺流',color:'#cc2222',bonus:'power'},{id:19,name:'大友流',color:'#aa8800',bonus:'wisdom'},
+];const SURNAMES=['織田','豊臣','徳川','武田','上杉','毛利','伊達','島津','長曾我部','北条','今川','斎藤','浅井','朝倉','松永','三好','宇喜多','立花','黒田','細川'];const GIVEN_NAMES_M=['信長','秀吉','家康','信玄','謙信','元就','政宗','義久','元親','氏康','義元','道三','長政','義景','久秀','長慶','直家','道雪','如水','幽斎','勝家','利家','光秀','秀長','半兵衛','官兵衛','兼続','慶次','幸村','昌幸'];const GIVEN_NAMES_F=['茶々','ねね','帰蝶','お市','松','江','千姫','春日局','淀殿','小督','お梶','阿茶','寧々','旭姫','亀姫','振姫','珠姫','天姫','千代','鶴姫'];const GROWTH_EVENTS=[
+{tier:'daily',id:'train_ok',label:'訓練成功',icon:'⚔️',desc:'地道な鍛錬が実を結んだ',apply(w){const g=rnd(2,5);w.stats.power=clamp(w.stats.power+g,1,99);return{text:'+武力'+g,color:'#ffcc44'};}},
+{tier:'daily',id:'study_ok',label:'学問励行',icon:'📚',desc:'書物から多くを学んだ',apply(w){const g=rnd(2,5);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+知力'+g,color:'#aaddff'};}},
+{tier:'daily',id:'meal',label:'食事',icon:'🍚',desc:'滋養たっぷりの食事で回復',apply(w){const g=rnd(10,20);w.stats.hp=clamp(w.stats.hp+g,1,w.stats.maxHp);return{text:'+体力'+g,color:'#88ffcc'};}},
+{tier:'daily',id:'slack',label:'サボり',icon:'😴',desc:'今日は気が乗らなかった…',apply(w){const g=rnd(1,3);w.stats.power=clamp(w.stats.power-g,1,99);w.stats.wisdom=clamp(w.stats.wisdom-g,1,99);return{text:'-武力/知力'+g,color:'#ff8888'};}},
+{tier:'daily',id:'argue',label:'口論',icon:'💢',desc:'仲間と言い合いになった',apply(w){const g=rnd(2,6);w._loyalty=clamp(w._loyalty-g,0,100);return{text:'-忠誠'+g,color:'#ff6666'};}},
+{tier:'daily',id:'patrol',label:'見回り',icon:'🏯',desc:'城内を見回り経験を積んだ',apply(w){w.stats.power=clamp(w.stats.power+1,1,99);w.stats.wisdom=clamp(w.stats.wisdom+1,1,99);return{text:'+武力/知力 1',color:'#ffdd88'};}},
+{tier:'daily',id:'rest',label:'休養',icon:'🌙',desc:'ゆっくり休んで体力回復',apply(w){const g=rnd(15,25);w.stats.hp=clamp(w.stats.hp+g,1,w.stats.maxHp);return{text:'+体力'+g,color:'#88ffcc'};}},
+{tier:'daily',id:'encourage',label:'激励',icon:'🔥',desc:'仲間に励まされ士気が上がった',apply(w){const g=rnd(3,7);w._loyalty=clamp(w._loyalty+g,0,100);return{text:'+忠誠'+g,color:'#ffdd88'};}},
+{tier:'rare',id:'master',label:'師匠に出会う',icon:'🧙',desc:'名高い師に弟子入りした！',apply(w){const gp=rnd(5,10),gw=rnd(5,10);w.stats.power=clamp(w.stats.power+gp,1,99);w.stats.wisdom=clamp(w.stats.wisdom+gw,1,99);return{text:'+武力'+gp+' 知力'+gw,color:'#88ccff'};}},
+{tier:'rare',id:'secret',label:'秘伝習得',icon:'📜',desc:'古の秘技を習得した！',apply(w){const g=rnd(8,14);w.stats.power=clamp(w.stats.power+g,1,99);return{text:'+武力'+g+'（秘伝）',color:'#aaddff'};}},
+{tier:'rare',id:'hard_train',label:'特訓成功',icon:'💪',desc:'血のにじむ特訓が大きな成果！',apply(w){const gp=rnd(7,13);w.stats.power=clamp(w.stats.power+gp,1,99);w.stats.hp=clamp(w.stats.hp-8,1,w.stats.maxHp);return{text:'+武力'+gp+' HP-8',color:'#ffaa44'};}},
+{tier:'rare',id:'insight',label:'悟り',icon:'✨',desc:'深夜の修行で悟りを開いた！',apply(w){const g=rnd(7,13);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+知力'+g+'（悟り）',color:'#88ccff'};}},
+{tier:'rare',id:'rival',label:'ライバル出現',icon:'⚡',desc:'好敵手の登場で互いを高め合う！',apply(w){const g=rnd(4,8);w.stats.power=clamp(w.stats.power+g,1,99);w.stats.wisdom=clamp(w.stats.wisdom+g,1,99);return{text:'+武力/知力'+g,color:'#ffcc88'};}},
+{tier:'rare',id:'gift',label:'才能開花',icon:'🌸',desc:'眠れる才能が開花し始めた！',apply(w){const g=rnd(6,12);const stat=Math.random()<.5?'power':'wisdom';w.stats[stat]=clamp(w.stats[stat]+g,1,99);return{text:'+'+(stat==='power'?'武力':'知力')+g,color:'#ffaaff'};}},
+{tier:'divine',id:'awakening',label:'【覚　醒】',icon:'🌟',desc:'天賦の才が一気に目覚めた！！',apply(w){const op=w.stats.power,ow=w.stats.wisdom;w.stats.power=clamp(Math.floor(w.stats.power*1.8+rnd(10,20)),1,99);w.stats.wisdom=clamp(Math.floor(w.stats.wisdom*1.8+rnd(10,20)),1,99);return{text:'覚醒！武力'+op+'→'+w.stats.power+' 知力'+ow+'→'+w.stats.wisdom,color:'#ffdd00'};}},
+{tier:'divine',id:'betrayal',label:'【裏　切】',icon:'🗡️',desc:'突然の裏切り…忠誠が崩壊した！！',apply(w){const old=w._loyalty;w._loyalty=Math.max(0,Math.floor(w._loyalty*.1));w.stats.hp=clamp(w.stats.hp-rnd(30,50),1,w.stats.maxHp);return{text:'忠誠崩壊 '+old+'→'+w._loyalty,color:'#ff4444'};}},
+{tier:'divine',id:'rampage',label:'【暴　走】',icon:'💀',desc:'制御不能の暴走状態に！！',apply(w){w.stats.hp=clamp(w.stats.hp-rnd(40,60),1,w.stats.maxHp);w.stats.power=clamp(w.stats.power+rnd(15,25),1,99);w._loyalty=clamp(w._loyalty-rnd(20,35),0,100);return{text:'暴走！武力大幅UP・HP大損失',color:'#ff6600'};}},
+{tier:'divine',id:'genius',label:'【天才誕生】',icon:'👑',desc:'歴史に残る天才が覚醒した！！！',apply(w){w.stats.power=clamp(w.stats.power+rnd(25,35),1,99);w.stats.wisdom=clamp(w.stats.wisdom+rnd(25,35),1,99);w.stats.maxHp=clamp(w.stats.maxHp+rnd(30,50),100,200);w.stats.hp=w.stats.maxHp;return{text:'天才覚醒！全能力+大幅UP',color:'#ffe040'};}},
+];const EVENT_TIER_WEIGHTS={daily:.80,rare:.17,divine:.03};const SKILLS={
+p:[{name:'千本槍',color:'#ffcc44',dmg:0.8,aoe:true},{name:'鬼神斬',color:'#ff6622',dmg:1.8,aoe:false},{name:'士気高揚',color:'#44ffaa',dmg:0,aoe:false}],
+e:[{name:'鉄砲斉射',color:'#ff4444',dmg:0.9,aoe:true},{name:'獅子奮迅',color:'#ff2222',dmg:2.0,aoe:false},{name:'包囲陣',color:'#ff8800',dmg:0.6,aoe:true}],
+};const PROVINCES=[
+{id:1,name:'尾張',x:240,y:238,clan:'player',strength:65,adj:[2,3,4]},
+{id:2,name:'美濃',x:210,y:255,clan:'saito',strength:72,adj:[1,5,12]},
+{id:3,name:'三河',x:268,y:226,clan:'tokugawa',strength:58,adj:[1,11,8]},
+{id:4,name:'甲斐',x:182,y:193,clan:'takeda',strength:85,adj:[1,5,6]},
+{id:5,name:'信濃',x:198,y:217,clan:'takeda',strength:78,adj:[2,4,6,7]},
+{id:6,name:'上野',x:158,y:160,clan:'hojo',strength:70,adj:[4,5,7]},
+{id:7,name:'武蔵',x:138,y:141,clan:'hojo',strength:82,adj:[5,6,8]},
+{id:8,name:'相模',x:128,y:116,clan:'hojo',strength:75,adj:[3,7]},
+{id:9,name:'近江',x:226,y:272,clan:'azai',strength:62,adj:[2,10,12]},
+{id:10,name:'山城',x:215,y:291,clan:'ashikaga',strength:55,adj:[9,11,12]},
+{id:11,name:'摂津',x:235,y:295,clan:'miyoshi',strength:68,adj:[3,10,13]},
+{id:12,name:'越前',x:199,y:274,clan:'asakura',strength:60,adj:[2,5,9]},
+{id:13,name:'播磨',x:215,y:318,clan:'bessho',strength:52,adj:[11,14]},
+{id:14,name:'備前',x:215,y:348,clan:'ukita',strength:65,adj:[13,15]},
+{id:15,name:'安芸',x:195,y:378,clan:'mouri',strength:80,adj:[14,16]},
+{id:16,name:'周防',x:178,y:405,clan:'mouri',strength:72,adj:[15,17]},
+{id:17,name:'長門',x:160,y:420,clan:'mouri',strength:68,adj:[16,18]},
+{id:18,name:'豊前',x:175,y:445,clan:'otomo',strength:58,adj:[17,19]},
+{id:19,name:'筑前',x:155,y:462,clan:'otomo',strength:62,adj:[18,20]},
+{id:20,name:'薩摩',x:148,y:495,clan:'shimazu',strength:90,adj:[19]},
+{id:21,name:'阿波',x:268,y:380,clan:'choso',strength:55,adj:[22]},
+{id:22,name:'土佐',x:255,y:410,clan:'choso',strength:68,adj:[21]},
+];const CLAN_COLORS={player:'#c8960c',saito:'#4a6a3a',tokugawa:'#3a5a7a',takeda:'#7a1a1a',hojo:'#1a2a6a',azai:'#4a2a6a',ashikaga:'#6a4a1a',miyoshi:'#2a6a4a',asakura:'#5a4a2a',bessho:'#3a4a2a',ukita:'#6a3a2a',mouri:'#2a4a6a',otomo:'#5a2a4a',shimazu:'#1a4a3a',choso:'#4a3a1a'};let selectedProvince=null,currentEnemy=null;const state={koku:1200,unification:0,turn:0,generation:1,log:[],pedigree:[],castle:{lv:1,exp:0}};let gWarriors=[],gParents=[],gStaff=[];let retireTarget=null,retireQueue=[];let idleTimer=null,ageTickCounter=0;let engumiStep=0,engumiSelectedFather=null,engumiSelectedMother=null;let selectedForBattle=[];function rnd(lo,hi){return Math.floor(lo+Math.random()*(hi-lo+1));}
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 function getAgeModifier(age){if(age>=MATURE_AGE)return 1;if(age<=14)return .6;return .7+(age-15)*.06;}
-let toastTimer=null;
-function showToast(msg,dur){const t=$('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.classList.remove('show');toastTimer=null;},dur||2200);}
+let toastTimer=null;function showToast(msg,dur){const t=$('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.classList.remove('show');toastTimer=null;},dur||2200);}
 function addLog(text){const now=new Date();const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');state.log.unshift({time:ts,text});if(state.log.length>100)state.log.pop();}
 function openModal(id){document.getElementById(id).classList.add('show');const bg=$('modal-bg');if(bg)bg.style.display='block';}
 function closeModal(id){document.getElementById(id).classList.remove('show');refreshModalBg();}
@@ -631,49 +106,25 @@ function updateCastleUI(){const d=castleLvData();$('castle-lv-text').textContent
 function openCastleModal(){const d=castleLvData();const next=CASTLE_LEVELS[state.castle.lv];let html='<div class="castle-upgrade-row"><div class="cur-name">🏯 '+d.name+' Lv.'+state.castle.lv+'</div><div class="cur-desc">石高収入 ×'+d.kokuBonus+'<br>武将強さ ×'+d.powerBonus+'<br>城EXP：'+state.castle.exp+' / '+d.maxExp+'</div>';if(next){html+='<div class="cur-desc">次：<b>'+next.name+' Lv.'+next.lv+'</b><br>'+next.upgDesc+'<br>収入→×'+next.kokuBonus+' / 強さ→×'+next.powerBonus+'</div>';const ok=state.castle.exp>=d.maxExp&&state.koku>=d.upgCost;html+='<div class="cur-cost">費用：'+d.upgCost.toLocaleString()+'石　（現在：'+Math.floor(state.koku).toLocaleString()+'石）</div>';html+='<button class="cur-btn" '+(ok?'':'disabled')+' onclick="doUpgradeCastle()">城を強化する（'+d.upgCost.toLocaleString()+'石）</button>';}else{html+='<div class="cur-desc" style="color:var(--gold);">★ 最高レベルに達しました！</div>';}html+='</div>';$('castle-modal-body').innerHTML=html;openModal('castle-modal');}
 function doUpgradeCastle(){if(state.castle.lv>=CASTLE_LEVELS.length){showToast('すでに最高レベルです');return;}const d=castleLvData();if(state.castle.exp<d.maxExp){showToast('城EXPが不足しています');return;}if(state.koku<d.upgCost){showToast('石高が不足しています');return;}state.koku-=d.upgCost;state.castle.lv++;state.castle.exp=0;const nd=castleLvData();addLog('城が強化！→ '+nd.name+' Lv.'+state.castle.lv);showToast('🏯 城が'+nd.name+'に昇格！',3000);closeModal('castle-modal');updateCastleUI();updateStatusUI();}
 class IsoWarrior{
-  constructor(name,jobDef,power,offsetX,speed,gender,age,bloodlineId){
-    this.name=name;this.gender=gender||(Math.random()<.7?'male':'female');
-    const blId=(bloodlineId!=null&&bloodlineId>=0)?bloodlineId:Math.floor(Math.random()*BLOODLINES.length);
-    this.bloodlineId=blId;this.bloodline=BLOODLINES[blId];
-    const jd=jobDef||generateJob(this.gender);this.jobId=jd.id;this.jobName=jd.name;this.jobIcon=jd.icon;
-    this.offsetX=offsetX||0;this.speed=speed||(2+Math.random()*3);this.age=age??25;
-    this.stats={power:clamp(power||rnd(20,45),1,99),wisdom:rnd(15,45),hp:100,maxHp:100};
-    this._loyalty=rnd(60,95);this._generation=1;this._parents=null;this._birthTurn=state.turn;
-    this._traits=[];this._nickRank=null;this._nickSp=null;this._isBreakthrough=false;
-    this.uid=Math.random().toString(36).slice(2,9);
-    this.isParent=false;this.isStaff=false;this.staffLevel=0;this.staffJob=null;this.useCount=0;this.level=1;
-    this.isoX=(Math.random()-.5)*4;this.isoY=(Math.random()-.5)*4;
-    this.dirX=Math.random()>.5?1:-1;this.dirY=Math.random()>.5?1:-1;
-    this._currentFacility=null;this._facilityTimer=0;this._facilityStayMax=0;this._moveTimer=rnd(60,180);
-  }
-  getEffectivePower(){let mod=getAgeModifier(this.age);if(this.bloodline?.bonus==='power')mod*=1.12;const lvMul=1+(this.level-1)*.08;const castleMul=castleLvData().powerBonus;return Math.floor(this.stats.power*mod*lvMul*castleMul);}
-  getEffectiveWisdom(){let mod=getAgeModifier(this.age);if(this.bloodline?.bonus==='wisdom')mod*=1.12;const lvMul=1+(this.level-1)*.06;return Math.floor(this.stats.wisdom*mod*lvMul);}
-  get loyalty(){return this._loyalty;}
-  isMature(){return this.age>=MATURE_AGE||(this.isParent&&!this.isStaff);}
-  locationLabel(){if(!this._currentFacility)return '巡回中';return FACILITY_MAP[this._currentFacility]?.name||'巡回中';}
-  tick(){if(this._currentFacility){this._facilityTimer++;if(this._facilityTimer>=this._facilityStayMax)this._leaveFacility();else if(this._facilityTimer%90===45)this._applyEffect(this._currentFacility,false);}else{this._moveTimer--;if(this._moveTimer<=0){this._tryEnterFacility();this._moveTimer=rnd(40,120);}this._walk();}}
-  _walk(){const spd=this.speed*.012;this.isoX+=this.dirX*spd;this.isoY+=this.dirY*spd;const b=3.5;if(this.isoX>b){this.isoX=b;this.dirX=-1;}if(this.isoX<-b){this.isoX=-b;this.dirX=1;}if(this.isoY>b){this.isoY=b;this.dirY=-1;}if(this.isoY<-b){this.isoY=-b;this.dirY=1;}if(Math.random()<.005)this.dirX*=-1;if(Math.random()<.005)this.dirY*=-1;}
-  _tryEnterFacility(){const hpPct=this.stats.hp/this.stats.maxHp;const cands=hpPct<.4?['tea','garden','tea']:Object.keys(FACILITY_MAP);const key=cands[Math.floor(Math.random()*cands.length)];const fp=FACILITY_POSITIONS.find(f=>f.key===key);if(!fp)return;this._currentFacility=key;this.isoX=fp.tx+(Math.random()-.5)*.4;this.isoY=fp.ty+(Math.random()-.5)*.4;this._facilityTimer=0;this._facilityStayMax=rnd(120,300);this._applyEffect(key,true);}
-  _leaveFacility(){this._currentFacility=null;this._facilityTimer=0;this.dirX=Math.random()>.5?1:-1;this.dirY=Math.random()>.5?1:-1;}
-  _applyEffect(key,isEntry){
-    const eff=FACILITY_EFFECT[key];if(!eff)return;
-    const[lo,hi]=eff.range;const base=isEntry?Math.floor(lo+Math.random()*(hi-lo)):Math.floor(1+Math.random()*2);
-    const gen=this._generation||1;const mul=this._parents?1+(gen-1)*.08:1;const gain=Math.floor(base*mul);
-    let hpChange=0;if(isEntry)hpChange=eff.costHp>0?Math.floor(eff.costHp*(.8+Math.random()*.4)):Math.floor(eff.costHp*(.7+Math.random()*.6));
-    if(eff.stat==='power')this.stats.power=clamp(this.stats.power+gain,1,99);
-    else if(eff.stat==='wisdom')this.stats.wisdom=clamp(this.stats.wisdom+gain,1,99);
-    else if(eff.stat==='hp')this.stats.hp=clamp(this.stats.hp+gain,1,this.stats.maxHp);
-    else if(eff.stat==='loyalty')this._loyalty=clamp(this._loyalty+gain,0,100);
-    this.stats.hp=clamp(this.stats.hp+hpChange,1,this.stats.maxHp);
-    if(isEntry&&gain>0){const text=eff.stat==='hp'?'体力 +'+gain:eff.label+'+'+gain+(hpChange<0?' 疲労'+hpChange:'');createFloatText(this,text,eff.color);showFacilityActivity(this,this.name+'が'+FACILITY_MAP[key].name+'を使用',eff.color);addLog(this.name+'が'+FACILITY_MAP[key].name+'（'+eff.label+'+'+gain+'）');addCastleExp(2);}
-    updatePartyRow();updateStatusUI();
-  }
+constructor(name,jobDef,power,offsetX,speed,gender,age,bloodlineId){
+this.name=name;this.gender=gender||(Math.random()<.7?'male':'female');const blId=(bloodlineId!=null&&bloodlineId>=0)?bloodlineId:Math.floor(Math.random()*BLOODLINES.length);this.bloodlineId=blId;this.bloodline=BLOODLINES[blId];const jd=jobDef||generateJob(this.gender);this.jobId=jd.id;this.jobName=jd.name;this.jobIcon=jd.icon;this.offsetX=offsetX||0;this.speed=speed||(2+Math.random()*3);this.age=age??25;this.stats={power:clamp(power||rnd(20,45),1,99),wisdom:rnd(15,45),hp:100,maxHp:100};this._loyalty=rnd(60,95);this._generation=1;this._parents=null;this._birthTurn=state.turn;this._traits=[];this._nickRank=null;this._nickSp=null;this._isBreakthrough=false;this.uid=Math.random().toString(36).slice(2,9);this.isParent=false;this.isStaff=false;this.staffLevel=0;this.staffJob=null;this.useCount=0;this.level=1;this.isoX=(Math.random()-.5)*4;this.isoY=(Math.random()-.5)*4;this.dirX=Math.random()>.5?1:-1;this.dirY=Math.random()>.5?1:-1;this._currentFacility=null;this._facilityTimer=0;this._facilityStayMax=0;this._moveTimer=rnd(60,180);}
+getEffectivePower(){let mod=getAgeModifier(this.age);if(this.bloodline?.bonus==='power')mod*=1.12;const lvMul=1+(this.level-1)*.08;const castleMul=castleLvData().powerBonus;return Math.floor(this.stats.power*mod*lvMul*castleMul);}
+getEffectiveWisdom(){let mod=getAgeModifier(this.age);if(this.bloodline?.bonus==='wisdom')mod*=1.12;const lvMul=1+(this.level-1)*.06;return Math.floor(this.stats.wisdom*mod*lvMul);}
+get loyalty(){return this._loyalty;}
+isMature(){return this.age>=MATURE_AGE||(this.isParent&&!this.isStaff);}
+locationLabel(){if(!this._currentFacility)return '巡回中';return FACILITY_MAP[this._currentFacility]?.name||'巡回中';}
+tick(){if(this._currentFacility){this._facilityTimer++;if(this._facilityTimer>=this._facilityStayMax)this._leaveFacility();else if(this._facilityTimer%90===45)this._applyEffect(this._currentFacility,false);}else{this._moveTimer--;if(this._moveTimer<=0){this._tryEnterFacility();this._moveTimer=rnd(40,120);}this._walk();}}
+_walk(){const spd=this.speed*.012;this.isoX+=this.dirX*spd;this.isoY+=this.dirY*spd;const b=3.5;if(this.isoX>b){this.isoX=b;this.dirX=-1;}if(this.isoX<-b){this.isoX=-b;this.dirX=1;}if(this.isoY>b){this.isoY=b;this.dirY=-1;}if(this.isoY<-b){this.isoY=-b;this.dirY=1;}if(Math.random()<.005)this.dirX*=-1;if(Math.random()<.005)this.dirY*=-1;}
+_tryEnterFacility(){const hpPct=this.stats.hp/this.stats.maxHp;const cands=hpPct<.4?['tea','garden','tea']:Object.keys(FACILITY_MAP);const key=cands[Math.floor(Math.random()*cands.length)];const fp=FACILITY_POSITIONS.find(f=>f.key===key);if(!fp)return;this._currentFacility=key;this.isoX=fp.tx+(Math.random()-.5)*.4;this.isoY=fp.ty+(Math.random()-.5)*.4;this._facilityTimer=0;this._facilityStayMax=rnd(120,300);this._applyEffect(key,true);}
+_leaveFacility(){this._currentFacility=null;this._facilityTimer=0;this.dirX=Math.random()>.5?1:-1;this.dirY=Math.random()>.5?1:-1;}
+_applyEffect(key,isEntry){
+const eff=FACILITY_EFFECT[key];if(!eff)return;const[lo,hi]=eff.range;const base=isEntry?Math.floor(lo+Math.random()*(hi-lo)):Math.floor(1+Math.random()*2);const gen=this._generation||1;const mul=this._parents?1+(gen-1)*.08:1;const gain=Math.floor(base*mul);let hpChange=0;if(isEntry)hpChange=eff.costHp>0?Math.floor(eff.costHp*(.8+Math.random()*.4)):Math.floor(eff.costHp*(.7+Math.random()*.6));if(eff.stat==='power')this.stats.power=clamp(this.stats.power+gain,1,99);else if(eff.stat==='wisdom')this.stats.wisdom=clamp(this.stats.wisdom+gain,1,99);else if(eff.stat==='hp')this.stats.hp=clamp(this.stats.hp+gain,1,this.stats.maxHp);else if(eff.stat==='loyalty')this._loyalty=clamp(this._loyalty+gain,0,100);this.stats.hp=clamp(this.stats.hp+hpChange,1,this.stats.maxHp);if(isEntry&&gain>0){const text=eff.stat==='hp'?'体力 +'+gain:eff.label+'+'+gain+(hpChange<0?' 疲労'+hpChange:'');createFloatText(this,text,eff.color);showFacilityActivity(this,this.name+'が'+FACILITY_MAP[key].name+'を使用',eff.color);addLog(this.name+'が'+FACILITY_MAP[key].name+'（'+eff.label+'+'+gain+'）');addCastleExp(2);}
+updatePartyRow();updateStatusUI();}
 }
 function getWarriorScreenPos(w){const canvas=$('iso-canvas');if(!canvas)return{x:0,y:0};const rect=canvas.getBoundingClientRect();const cx=canvas.width/2,cy=canvas.height*.55,tileW=canvas.width*.22,tileH=tileW*.5;return{x:rect.left+cx+(w.isoX-w.isoY)*tileW*.5,y:rect.top+cy+(w.isoX+w.isoY)*tileH*.5};}
 function createFloatText(w,text,color){const layer=$('bubble-layer');if(!layer)return;const pos=getWarriorScreenPos(w);const lr=layer.getBoundingClientRect();const el=document.createElement('div');el.className='float-text';el.textContent=text;el.style.color=color||'#fff';el.style.left=(pos.x-lr.left)+'px';el.style.top=(pos.y-lr.top-20)+'px';layer.appendChild(el);setTimeout(()=>el.remove(),1900);}
 function showFacilityActivity(w,text,color){const layer=$('bubble-layer');if(!layer)return;const pos=getWarriorScreenPos(w);const lr=layer.getBoundingClientRect();const el=document.createElement('div');el.className='facility-activity';el.textContent=text;el.style.color=color||'#ffdd88';el.style.left=(pos.x-lr.left)+'px';el.style.top=(pos.y-lr.top-40)+'px';layer.appendChild(el);setTimeout(()=>el.remove(),2800);}
-let eventPopTimer=null;
-function pickGrowthEvent(){const r=Math.random();const tier=r<EVENT_TIER_WEIGHTS.divine?'divine':r<EVENT_TIER_WEIGHTS.divine+EVENT_TIER_WEIGHTS.rare?'rare':'daily';const pool=GROWTH_EVENTS.filter(e=>e.tier===tier);return pool[Math.floor(Math.random()*pool.length)];}
+let eventPopTimer=null;function pickGrowthEvent(){const r=Math.random();const tier=r<EVENT_TIER_WEIGHTS.divine?'divine':r<EVENT_TIER_WEIGHTS.divine+EVENT_TIER_WEIGHTS.rare?'rare':'daily';const pool=GROWTH_EVENTS.filter(e=>e.tier===tier);return pool[Math.floor(Math.random()*pool.length)];}
 function fireGrowthEvent(warrior){const ev=pickGrowthEvent();const result=ev.apply(warrior);const popup=$('event-popup');$('ev-badge').textContent=ev.icon+' '+ev.label;$('ev-badge').className='ev-badge '+ev.tier;$('ev-warrior').textContent=warrior.name+'（'+warrior.age+'歳）';$('ev-desc').textContent=ev.desc;$('ev-effect').textContent=result.text;$('ev-effect').style.color=result.color;popup.classList.add('show');if(ev.tier==='divine'){const f=$('divine-flash');f.classList.add('show');setTimeout(()=>f.classList.remove('show'),600);addLog('【神イベント】'+warrior.name+'：'+ev.label+' → '+result.text);showToast('⚡ '+ev.label+'　'+warrior.name,4000);}else if(ev.tier==='rare')addLog('【レア】'+warrior.name+'：'+ev.label+' → '+result.text);else addLog(warrior.name+'：'+ev.label);addCastleExp(ev.tier==='divine'?20:ev.tier==='rare'?8:1);if(eventPopTimer)clearTimeout(eventPopTimer);eventPopTimer=setTimeout(()=>{popup.classList.remove('show');eventPopTimer=null;},ev.tier==='divine'?4500:ev.tier==='rare'?3000:1800);}
 function updateStatusUI(){$('koku-val').textContent=Math.floor(state.koku).toLocaleString();const uni=Math.min(state.unification>=100?100:99.9,state.unification);$('uni-val').textContent=uni.toFixed(1);$('uni-bar').style.width=Math.min(uni,100)+'%';$('uni-pct').textContent=uni.toFixed(1)+'%';updateCastleUI();if(state.unification>=100)showToast('🎉 天下統一を達成せり！',5000);}
 function updatePartyRow(){const row=$('party-row');if(!row)return;row.innerHTML='';gWarriors.forEach((w,i)=>{const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const mature=w.isMature();const card=document.createElement('div');card.className='party-card'+(i===0?' head':'')+(!mature?' growing':'');const blE=BM&&BM.get(w.bloodlineId);const nickColor=w._nickRank?NICKS.rankColor[w._nickRank]||'#aaa':'';card.innerHTML='<span class="pc-role">'+(w.jobIcon||'')+(mature?'':' 育成中')+(w._nickRank?'<span style="font-size:6px;color:'+nickColor+'"> '+w._nickRank+'</span>':'')+'</span><span class="pc-name">'+w.name+'</span><span class="pc-pow">武'+w.getEffectivePower()+'　'+w.age+'歳</span><span class="pc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</span><span class="pc-hp" style="color:'+hpc+'">体 '+hpPct+'%</span>';card.onclick=()=>showWarriorModal('child',i);row.appendChild(card);});gParents.forEach((w,i)=>{const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const blE=BM&&BM.get(w.bloodlineId);const card=document.createElement('div');card.className='party-card parent-card';card.innerHTML='<span class="pc-role">親　Lv.'+w.level+'</span><span class="pc-name">'+w.name+'</span><span class="pc-pow">武'+w.getEffectivePower()+'　知'+w.getEffectiveWisdom()+'</span><span class="pc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</span><span class="pc-hp" style="color:'+hpc+'">体 '+hpPct+'%</span>';card.onclick=()=>showWarriorModal('parent',i);row.appendChild(card);});updateStaffUI();}
@@ -699,19 +150,9 @@ function startInvasion(){if(!selectedProvince)return;currentEnemy={name:selected
 function openBattle(){const candidates=[...gWarriors,...gParents];if(!candidates.length){showToast('出陣できる武将がいません');return;}selectedForBattle=candidates.slice(0,MAX_FORMATION);renderFormationModal(candidates);openModal('formation-modal');}
 function renderFormationModal(candidates){const grid=$('formation-grid');const count=$('formation-count');if(!grid)return;count.textContent=selectedForBattle.length+' / '+MAX_FORMATION+' 名選択中';grid.innerHTML='';candidates.forEach(w=>{const sel=selectedForBattle.includes(w);const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const blE=BM&&BM.get(w.bloodlineId);const card=document.createElement('div');card.className='formation-card'+(sel?' selected':'');card.innerHTML='<div class="fc-name">'+(w.jobIcon||'')+' '+w.name+'</div><div class="fc-stats">武'+w.getEffectivePower()+'　知'+w.getEffectiveWisdom()+'　'+(w.isParent?'親':w.age+'歳')+'</div><div class="fc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</div><div class="fc-hp" style="color:'+hpc+'">体 '+hpPct+'%</div>';card.onclick=()=>{if(sel)selectedForBattle=selectedForBattle.filter(x=>x!==w);else if(selectedForBattle.length<MAX_FORMATION)selectedForBattle.push(w);else{showToast('最大'+MAX_FORMATION+'名まで選択できます');return;}renderFormationModal(candidates);};grid.appendChild(card);});$('formation-start-btn').disabled=!selectedForBattle.length;}
 function startBattleWithFormation(){if(!selectedForBattle.length){showToast('武将を選択してください');return;}closeModal('formation-modal');launchBattle(selectedForBattle);}
-const PX=3;
-const PAL_A={helm:'#1838b0',armor:'#1040c8',skin:'#f5c890',eye:'#201440',acc:'#c8a020',shadow:'#0a2060'};
-const PAL_E={helm:'#a01828',armor:'#c01840',skin:'#f5c890',eye:'#400010',acc:'#c8a020',shadow:'#480c18'};
-function makeSoldierShadow(pal,frame,state_){const H=pal.helm,A=pal.armor,S=pal.skin,E=pal.eye,C=pal.acc,D=pal.shadow;const b=frame?1:0;const px=[{x:2,y:b,c:H},{x:3,y:b,c:H},{x:4,y:b,c:H},{x:5,y:b,c:H},{x:1,y:1+b,c:H},{x:2,y:1+b,c:H},{x:3,y:1+b,c:H},{x:4,y:1+b,c:H},{x:5,y:1+b,c:H},{x:6,y:1+b,c:H},{x:3,y:-1+b,c:C},{x:4,y:-1+b,c:C},{x:2,y:2+b,c:S},{x:3,y:2+b,c:S},{x:4,y:2+b,c:S},{x:5,y:2+b,c:S},{x:3,y:3+b,c:E},{x:5,y:3+b,c:E},{x:2,y:4+b,c:S},{x:3,y:4+b,c:S},{x:4,y:4+b,c:S},{x:5,y:4+b,c:S},{x:1,y:5+b,c:A},{x:2,y:5+b,c:A},{x:3,y:5+b,c:C},{x:4,y:5+b,c:A},{x:5,y:5+b,c:C},{x:6,y:5+b,c:A},{x:1,y:6+b,c:A},{x:2,y:6+b,c:A},{x:3,y:6+b,c:A},{x:4,y:6+b,c:A},{x:5,y:6+b,c:A},{x:6,y:6+b,c:A},{x:1,y:7+b,c:D},{x:2,y:7+b,c:D},{x:3,y:7+b,c:D},{x:4,y:7+b,c:D},{x:5,y:7+b,c:D},{x:6,y:7+b,c:D},{x:frame?-1:0,y:5+b,c:A},{x:frame?-1:0,y:6+b,c:A},{x:frame?7:8,y:5+b,c:A},{x:frame?7:8,y:6+b,c:A},{x:2,y:8+b,c:D},{x:3,y:8+b,c:A},{x:4,y:8+b,c:A},{x:5,y:8+b,c:D},{x:2,y:9+b,c:'#333'},{x:3,y:9+b,c:'#333'},{x:4,y:9+b,c:'#333'},{x:5,y:9+b,c:'#333'}];if(state_==='attack')px.push({x:9,y:4+b,c:C},{x:10,y:3+b,c:C},{x:11,y:2+b,c:'#ddd'},{x:12,y:1+b,c:'#bbb'});return px.map(p=>`${p.x*PX}px ${p.y*PX}px 0 ${PX}px ${p.c}`).join(',');}
+const PX=3;const PAL_A={helm:'#1838b0',armor:'#1040c8',skin:'#f5c890',eye:'#201440',acc:'#c8a020',shadow:'#0a2060'};const PAL_E={helm:'#a01828',armor:'#c01840',skin:'#f5c890',eye:'#400010',acc:'#c8a020',shadow:'#480c18'};function makeSoldierShadow(pal,frame,state_){const H=pal.helm,A=pal.armor,S=pal.skin,E=pal.eye,C=pal.acc,D=pal.shadow;const b=frame?1:0;const px=[{x:2,y:b,c:H},{x:3,y:b,c:H},{x:4,y:b,c:H},{x:5,y:b,c:H},{x:1,y:1+b,c:H},{x:2,y:1+b,c:H},{x:3,y:1+b,c:H},{x:4,y:1+b,c:H},{x:5,y:1+b,c:H},{x:6,y:1+b,c:H},{x:3,y:-1+b,c:C},{x:4,y:-1+b,c:C},{x:2,y:2+b,c:S},{x:3,y:2+b,c:S},{x:4,y:2+b,c:S},{x:5,y:2+b,c:S},{x:3,y:3+b,c:E},{x:5,y:3+b,c:E},{x:2,y:4+b,c:S},{x:3,y:4+b,c:S},{x:4,y:4+b,c:S},{x:5,y:4+b,c:S},{x:1,y:5+b,c:A},{x:2,y:5+b,c:A},{x:3,y:5+b,c:C},{x:4,y:5+b,c:A},{x:5,y:5+b,c:C},{x:6,y:5+b,c:A},{x:1,y:6+b,c:A},{x:2,y:6+b,c:A},{x:3,y:6+b,c:A},{x:4,y:6+b,c:A},{x:5,y:6+b,c:A},{x:6,y:6+b,c:A},{x:1,y:7+b,c:D},{x:2,y:7+b,c:D},{x:3,y:7+b,c:D},{x:4,y:7+b,c:D},{x:5,y:7+b,c:D},{x:6,y:7+b,c:D},{x:frame?-1:0,y:5+b,c:A},{x:frame?-1:0,y:6+b,c:A},{x:frame?7:8,y:5+b,c:A},{x:frame?7:8,y:6+b,c:A},{x:2,y:8+b,c:D},{x:3,y:8+b,c:A},{x:4,y:8+b,c:A},{x:5,y:8+b,c:D},{x:2,y:9+b,c:'#333'},{x:3,y:9+b,c:'#333'},{x:4,y:9+b,c:'#333'},{x:5,y:9+b,c:'#333'}];if(state_==='attack')px.push({x:9,y:4+b,c:C},{x:10,y:3+b,c:C},{x:11,y:2+b,c:'#ddd'},{x:12,y:1+b,c:'#bbb'});return px.map(p=>`${p.x*PX}px ${p.y*PX}px 0 ${PX}px ${p.c}`).join(',');}
 function makeGeneralShadow(pal,frame,state_){const H=pal.helm,A=pal.armor,S=pal.skin,E=pal.eye,C=pal.acc,D=pal.shadow;const b=frame?1:0;const px=[{x:1,y:b,c:H},{x:2,y:b,c:H},{x:3,y:b,c:H},{x:4,y:b,c:H},{x:5,y:b,c:H},{x:6,y:b,c:H},{x:7,y:b,c:H},{x:0,y:1+b,c:H},{x:1,y:1+b,c:H},{x:2,y:1+b,c:H},{x:3,y:1+b,c:H},{x:4,y:1+b,c:H},{x:5,y:1+b,c:H},{x:6,y:1+b,c:H},{x:7,y:1+b,c:H},{x:8,y:1+b,c:H},{x:3,y:-1+b,c:C},{x:4,y:-1+b,c:C},{x:5,y:-1+b,c:C},{x:4,y:-2+b,c:'#fff8e0'},{x:3,y:-2+b,c:C},{x:5,y:-2+b,c:C},{x:1,y:2+b,c:S},{x:2,y:2+b,c:S},{x:3,y:2+b,c:S},{x:4,y:2+b,c:S},{x:5,y:2+b,c:S},{x:6,y:2+b,c:S},{x:7,y:2+b,c:S},{x:2,y:3+b,c:S},{x:3,y:3+b,c:E},{x:4,y:3+b,c:S},{x:5,y:3+b,c:S},{x:6,y:3+b,c:E},{x:7,y:3+b,c:S},{x:4,y:4+b,c:'#c08060'},{x:1,y:4+b,c:S},{x:8,y:4+b,c:S},{x:0,y:5+b,c:C},{x:1,y:5+b,c:A},{x:2,y:5+b,c:A},{x:3,y:5+b,c:A},{x:4,y:5+b,c:C},{x:5,y:5+b,c:A},{x:6,y:5+b,c:A},{x:7,y:5+b,c:A},{x:8,y:5+b,c:C},{x:0,y:6+b,c:C},{x:1,y:6+b,c:A},{x:2,y:6+b,c:A},{x:3,y:6+b,c:A},{x:4,y:6+b,c:A},{x:5,y:6+b,c:A},{x:6,y:6+b,c:A},{x:7,y:6+b,c:A},{x:8,y:6+b,c:C},{x:0,y:7+b,c:C},{x:1,y:7+b,c:D},{x:2,y:7+b,c:D},{x:3,y:7+b,c:D},{x:4,y:7+b,c:D},{x:5,y:7+b,c:D},{x:6,y:7+b,c:D},{x:7,y:7+b,c:D},{x:8,y:7+b,c:C},{x:3,y:5+b,c:C},{x:5,y:5+b,c:C},{x:4,y:6+b,c:C},{x:3,y:7+b,c:C},{x:5,y:7+b,c:C},{x:frame?-2:-1,y:5+b,c:A},{x:frame?-2:-1,y:6+b,c:A},{x:frame?9:10,y:5+b,c:A},{x:frame?9:10,y:6+b,c:A},{x:1,y:8+b,c:D},{x:2,y:8+b,c:A},{x:3,y:8+b,c:A},{x:5,y:8+b,c:A},{x:6,y:8+b,c:A},{x:7,y:8+b,c:D},{x:2,y:9+b,c:'#222'},{x:3,y:9+b,c:'#222'},{x:5,y:9+b,c:'#222'},{x:6,y:9+b,c:'#222'}];if(state_==='attack'){for(let i=0;i<6;i++)px.push({x:9+i,y:5-i+b,c:i<2?C:i<4?'#dde':'#bbc'});}return px.map(p=>`${p.x*PX}px ${p.y*PX}px 0 ${PX}px ${p.c}`).join(',');}
-const B_LOG_HOLD=90;
-const B_LINES_P=['かかれーっ！','討ち取れ！','引くな！','前へ！','者ども続け！'];
-const B_LINES_E=['押せ押せ！','蹴散らせ！','逃がすな！','突き崩せ！','進め！'];
-const B_DUEL=['一騎討ち！','尋常に勝負！','受けてみよ！','逃がさぬ！'];
-let bSoldiers,bGenerals,bSubGenerals=[],bGameState,bTickCount,bLoopId,bField;
-let bLogText='',bLogTimer=0,bGenMaxHp={p:120,e:120},bActiveWarriors=[],bSkillGauge={p:0,e:0};
-const B_SKILL_MAX=100;
-function bYMin(){const f=$('bscr-frame');return f?f.clientHeight*.38:110;}
+const B_LOG_HOLD=90;const B_LINES_P=['かかれーっ！','討ち取れ！','引くな！','前へ！','者ども続け！'];const B_LINES_E=['押せ押せ！','蹴散らせ！','逃がすな！','突き崩せ！','進め！'];const B_DUEL=['一騎討ち！','尋常に勝負！','受けてみよ！','逃がさぬ！'];let bSoldiers,bGenerals,bSubGenerals=[],bGameState,bTickCount,bLoopId,bField;let bLogText='',bLogTimer=0,bGenMaxHp={p:120,e:120},bActiveWarriors=[],bSkillGauge={p:0,e:0};const B_SKILL_MAX=100;function bYMin(){const f=$('bscr-frame');return f?f.clientHeight*.38:110;}
 function bYMax(){const f=$('bscr-frame');return f?f.clientHeight*.88:270;}
 function bFW(){const f=$('bscr-frame');return f?f.clientWidth:360;}
 function bFH(){const f=$('bscr-frame');return f?f.clientHeight:300;}
@@ -732,105 +173,75 @@ function bUpdateSubUI(){if(!bSubGenerals)return;const pSubs=bSubGenerals.filter(
 function bUpdateUI(){if(!bGenerals)return;const ph=Math.max(0,bGenerals.p.hp),eh=Math.max(0,bGenerals.e.hp);$('bhp-player').textContent=ph;$('bhp-enemy').textContent=eh;$('bbar-player').style.width=Math.min(100,(ph/bGenMaxHp.p*100)).toFixed(1)+'%';$('bbar-enemy').style.width=Math.min(100,(eh/bGenMaxHp.e*100)).toFixed(1)+'%';$('bskill-bar-p').style.width=(bSkillGauge.p/B_SKILL_MAX*100)+'%';$('bskill-bar-e').style.width=(bSkillGauge.e/B_SKILL_MAX*100)+'%';$('bskill-btn-p').disabled=bSkillGauge.p<B_SKILL_MAX||bGameState==='end';bUpdateSubUI();}
 function fireSkill(side){if(!bGenerals||bSkillGauge[side]<B_SKILL_MAX||bGameState==='end')return;bSkillGauge[side]=0;const sk=SKILLS[side][Math.floor(Math.random()*SKILLS[side].length)];const g=bGenerals['p'];bAddBubble('p','【'+sk.name+'】');bAddSkillFlash(g.x+15,g.y+15,sk.color,90);bAddSkillText(g.x+15,g.y-20,'【'+sk.name+'】',sk.color);bForceLog('必殺技【'+sk.name+'】発動！',B_LOG_HOLD*2);if(sk.name==='士気高揚'){bSoldiers.filter(s=>s.side==='p'&&!s.dead).forEach(s=>{s.hp=Math.min(s.maxHp,s.hp+15);});bGenerals.p.hp=Math.min(bGenMaxHp.p,bGenerals.p.hp+Math.floor(bGenMaxHp.p*.15));bSubGenerals.filter(sg=>sg.side==='p'&&!sg.dead).forEach(sg=>{sg.hp=Math.min(sg.maxHp,sg.hp+Math.floor(sg.maxHp*.15));});bAddDmg(g.x+15,g.y-10,-(Math.floor(bGenMaxHp.p*.15)),'#44ff88');addLog('必殺技【'+sk.name+'】：味方HP回復！');}else if(sk.aoe){const dmg=Math.floor((bGenMaxHp.p*.08+rnd(5,15))*sk.dmg);bSoldiers.filter(s=>s.side==='e'&&!s.dead).forEach(s=>{s.hp-=dmg;s.state='hit';s.stateTimer=14;if(s.hp<=0){s.dead=true;s._deadAt=Date.now();}});bGenerals.e.hp-=Math.floor(dmg*.5);bGenerals.e.state='hit';bGenerals.e.stateTimer=20;bSubGenerals.filter(sg=>sg.side==='e'&&!sg.dead).forEach(sg=>{sg.hp-=Math.floor(dmg*.4);sg.state='hit';sg.stateTimer=16;if(sg.hp<=0){sg.dead=true;sg._deadAt=Date.now();}});bAddSkillFlash(bFW()/2,bFH()/2,sk.color,180);bAddDmg(bFW()/2,bFH()/3,dmg,sk.color);addLog('必殺技【'+sk.name+'】：全敵に'+dmg+'ダメージ！');}else{const dmg=Math.floor((bGenMaxHp.p*.2+rnd(10,25))*sk.dmg);bGenerals.e.hp-=dmg;bGenerals.e.state='hit';bGenerals.e.stateTimer=30;bAddSkillFlash(bGenerals.e.x+18,bGenerals.e.y+15,sk.color,80);bAddDmg(bGenerals.e.x+18,bGenerals.e.y-15,dmg,sk.color);addLog('必殺技【'+sk.name+'】：敵将に'+dmg+'の大ダメージ！');}}
 function bEnemySkillAI(){if(bSkillGauge.e<B_SKILL_MAX)return;bSkillGauge.e=0;const sk=SKILLS.e[Math.floor(Math.random()*SKILLS.e.length)];bAddBubble('e','【'+sk.name+'】');bAddSkillFlash(bGenerals.e.x+18,bGenerals.e.y+15,sk.color,80);bForceLog('敵の必殺技【'+sk.name+'】！',B_LOG_HOLD*2);if(sk.aoe){const dmg=Math.floor((bGenMaxHp.e*.07+rnd(4,12))*sk.dmg);bSoldiers.filter(s=>s.side==='p'&&!s.dead).forEach(s=>{s.hp-=dmg;s.state='hit';s.stateTimer=12;if(s.hp<=0){s.dead=true;s._deadAt=Date.now();}});bGenerals.p.hp-=Math.floor(dmg*.4);bGenerals.p.state='hit';bGenerals.p.stateTimer=16;bSubGenerals.filter(sg=>sg.side==='p'&&!sg.dead).forEach(sg=>{sg.hp-=Math.floor(dmg*.35);sg.state='hit';sg.stateTimer=14;if(sg.hp<=0){sg.dead=true;sg._deadAt=Date.now();}});bAddSkillFlash(bFW()/3,bFH()/2,sk.color,140);}else{const dmg=Math.floor((bGenMaxHp.e*.18+rnd(8,20))*sk.dmg);bGenerals.p.hp-=dmg;bGenerals.p.state='hit';bGenerals.p.stateTimer=28;bAddDmg(bGenerals.p.x+15,bGenerals.p.y-15,dmg,'#ff4444');}}
-
 </script>
 <script>
-// ═══════════════════════════════════════════
-// 遺伝システム v5→v6 統合版
-// ═══════════════════════════════════════════
-
-// 血統グループ定義(5グループ)
 const BL_EXT=[
-  {id:0, n:'織田流',    c:'#e03030',g:'武',i:'🔥',b:'power',  lo:'天下布武を掲げた覇道の血。攻撃本能が際立つ'},
-  {id:1, n:'武田流',    c:'#ffaa00',g:'武',i:'🐯',b:'power',  lo:'風林火山。山岳で鍛えられた剛の武脈'},
-  {id:2, n:'島津流',    c:'#cc2222',g:'武',i:'⚡',b:'power',  lo:'示現流の猛々しさ。鬼島津の血が滾る'},
-  {id:3, n:'伊達流',    c:'#dd5555',g:'武',i:'🐉',b:'power',  lo:'独眼竜の奔放さ。華美と武が混じりあう'},
-  {id:4, n:'徳川流',    c:'#4488cc',g:'智',i:'🌊',b:'wisdom', lo:'忍耐と謀略。泰平の礎を築く深謀の系譜'},
-  {id:5, n:'豊臣流',    c:'#ddcc00',g:'智',i:'🌸',b:'wisdom', lo:'百姓から天下人へ。機転と人心掌握の極み'},
-  {id:6, n:'今川流',    c:'#aa88cc',g:'智',i:'📖',b:'wisdom', lo:'学問と文化の守護者。詩歌に通じた才智の血'},
-  {id:7, n:'三好流',    c:'#bb66bb',g:'智',i:'🎭',b:'wisdom', lo:'室町の実力者。政治的駆け引きに長けた謀臣'},
-  {id:8, n:'大友流',    c:'#cc9900',g:'智',i:'⚓',b:'wisdom', lo:'南蛮交易の要衝。外交と商才が血に宿る'},
-  {id:9, n:'上杉流',    c:'#44cc88',g:'将',i:'🏔️',b:'command',lo:'義の将・謙信の血統。軍律と統制の化身'},
-  {id:10,n:'毛利流',    c:'#cc7733',g:'将',i:'🌿',b:'command',lo:'三本の矢。合議と結束が生む不抜の大組織'},
-  {id:11,n:'北条流',    c:'#888888',g:'将',i:'🏯',b:'command',lo:'関東の雄。内政と守城に極まる鉄壁の系譜'},
-  {id:12,n:'朝倉流',    c:'#cc8844',g:'将',i:'🌄',b:'command',lo:'一乗谷の文化と軍政。組織力を誇る北陸の雄'},
-  {id:13,n:'立花流',    c:'#44bb66',g:'将',i:'⚔️',b:'command',lo:'鬼道雪・誾千代。男女問わぬ鉄の将帥の血'},
-  {id:14,n:'浅井流',    c:'#88aaee',g:'霊',i:'💠',b:'loyalty',lo:'信義と哀愁。儚くも気高き魂の系譜'},
-  {id:15,n:'黒田流',    c:'#aaaa44',g:'霊',i:'🕯️',b:'loyalty',lo:'如水の深謀と信仰。精神の強さが血に宿る'},
-  {id:16,n:'細川流',    c:'#aa99cc',g:'霊',i:'🌙',b:'loyalty',lo:'文武両道の公家武将。精神的高潔さが際立つ'},
-  {id:17,n:'宇喜多流',  c:'#ccaa88',g:'霊',i:'🌟',b:'loyalty',lo:'備前の梟雄。乱世を生き抜く強靭な精神力の血'},
-  {id:18,n:'長曾我部流',c:'#33bb55',g:'忍',i:'🌊',b:'power',  lo:'土佐一条の鯨。海と陸を駆ける自由の戦士'},
-  {id:19,n:'龍造寺流',  c:'#cc2255',g:'忍',i:'🐊',b:'power',  lo:'肥前の熊。豪胆さと野性的な奇襲戦術の血'},
-];
-// BLEXTとBLOODLINES(v6)をマージ(同一id参照を同期)
-(()=>{
-  BL_EXT.forEach(e=>{
-    const ex=BLOODLINES.find(b=>b.id===e.id);
-    if(ex){ex.group=e.g;ex.icon=e.i;ex.statBonus=e.b;ex.lore=e.lo;ex.extColor=e.c;}
-  });
-})();
-const BM=new Map(BL_EXT.map(b=>[b.id,b]));
-
-// ニックス(血統相性)システム
-const NICKS=(()=>{
-  const k=(a,b)=>a<b?`${a}-${b}`:`${b}-${a}`;
-  const m=new Map([
-    [k('武','霊'),{rank:'SS',label:'完全共鳴！！',bonus:12,scMult:.92,sp:{name:'魂砕鬼将',fl:'剛と魂の完全共鳴',sb:{power:5,loyalty:5}}}],
-    [k('智','将'),{rank:'S', label:'理想配合！', bonus:8, scMult:.85,sp:{name:'軍師双璧',fl:'謀と軍が合わさり戦略の極みへ',sb:{wisdom:4,command:4}}}],
-    [k('武','忍'),{rank:'S', label:'理想配合！', bonus:8, scMult:.85,sp:{name:'鬼焔一閃',fl:'剛力と奇襲が爆発',sb:{power:6}}}],
-    [k('武','智'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'知勇兼備',fl:'知恵と武勇を兼備',sb:{power:2,wisdom:2}}}],
-    [k('将','霊'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'義将覚醒',fl:'忠臣を引き寄せる義将',sb:{command:3,loyalty:3}}}],
-    [k('智','忍'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'奇謀縦横',fl:'予測不能な謀略',sb:{wisdom:3}}}],
-    [k('武','将'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
-    [k('智','霊'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
-    [k('将','忍'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
-    [k('霊','忍'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
-  ]);
-  ['武','智','将','霊','忍'].forEach(g=>m.set(k(g,g),{rank:'C',label:'相性薄',bonus:0,scMult:.50,sp:null}));
-  return {
-    get(aId,bId){
-      const ga=BM.get(aId)?.g||'武', gb=BM.get(bId)?.g||'武';
-      return m.get(k(ga,gb))||{rank:'C',label:'相性薄',bonus:0,scMult:.50,sp:null};
-    },
-    rankColor:{SS:'#ffd700',S:'#f0c040',A:'#cc88ff',B:'#66ddaa',C:'#aaa'}
-  };
-})();
-
-// 特性定義
-const TRAITS=[
-  {id:'genius',   n:'天才',   cls:'t-ge',w:5,  special:true, ap(s){s.power=Math.min(99,s.power+10);s.wisdom=Math.min(99,s.wisdom+10);}},
-  {id:'sickly',   n:'病弱',   cls:'t-si',w:8,  ap(s){s._loyalty=Math.max(1,s._loyalty-10);}},
-  {id:'ambitious',n:'野心家', cls:'t-am',w:10, ap(s){s._loyalty=Math.max(1,s._loyalty-15);s.stats.power=Math.min(99,s.stats.power+5);}},
-  {id:'loyal',    n:'忠義者', cls:'t-lo',w:8,  ap(s){s._loyalty=Math.min(99,s._loyalty+15);}},
-  {id:'fierce',   n:'剛勇',   cls:'t-fi',w:10, ap(s){s.stats.power=Math.min(99,s.stats.power+8);}},
-  {id:'wise',     n:'智謀',   cls:'t-wi',w:10, ap(s){s.stats.wisdom=Math.min(99,s.stats.wisdom+8);}},
-  {id:'cursed',   n:'呪縛',   cls:'t-cu',w:3,  ap(s){s.stats.power=Math.max(1,s.stats.power-8);s.stats.wisdom=Math.max(1,s.stats.wisdom-8);}},
-];
-const TRAIT_MAP=new Map(TRAITS.map(t=>[t.id,t]));
-const TRAIT_TOTAL=TRAITS.reduce((s,t)=>s+t.w,0);
-function pickTrait(){let r=Math.random()*TRAIT_TOTAL;for(const t of TRAITS){r-=t.w;if(r<=0)return t;}return TRAITS[0];}
+{id:0, n:'織田流',    c:'#e03030',g:'武',i:'🔥',b:'power',  lo:'天下布武を掲げた覇道の血。攻撃本能が際立つ'},
+{id:1, n:'武田流',    c:'#ffaa00',g:'武',i:'🐯',b:'power',  lo:'風林火山。山岳で鍛えられた剛の武脈'},
+{id:2, n:'島津流',    c:'#cc2222',g:'武',i:'⚡',b:'power',  lo:'示現流の猛々しさ。鬼島津の血が滾る'},
+{id:3, n:'伊達流',    c:'#dd5555',g:'武',i:'🐉',b:'power',  lo:'独眼竜の奔放さ。華美と武が混じりあう'},
+{id:4, n:'徳川流',    c:'#4488cc',g:'智',i:'🌊',b:'wisdom', lo:'忍耐と謀略。泰平の礎を築く深謀の系譜'},
+{id:5, n:'豊臣流',    c:'#ddcc00',g:'智',i:'🌸',b:'wisdom', lo:'百姓から天下人へ。機転と人心掌握の極み'},
+{id:6, n:'今川流',    c:'#aa88cc',g:'智',i:'📖',b:'wisdom', lo:'学問と文化の守護者。詩歌に通じた才智の血'},
+{id:7, n:'三好流',    c:'#bb66bb',g:'智',i:'🎭',b:'wisdom', lo:'室町の実力者。政治的駆け引きに長けた謀臣'},
+{id:8, n:'大友流',    c:'#cc9900',g:'智',i:'⚓',b:'wisdom', lo:'南蛮交易の要衝。外交と商才が血に宿る'},
+{id:9, n:'上杉流',    c:'#44cc88',g:'将',i:'🏔️',b:'command',lo:'義の将・謙信の血統。軍律と統制の化身'},
+{id:10,n:'毛利流',    c:'#cc7733',g:'将',i:'🌿',b:'command',lo:'三本の矢。合議と結束が生む不抜の大組織'},
+{id:11,n:'北条流',    c:'#888888',g:'将',i:'🏯',b:'command',lo:'関東の雄。内政と守城に極まる鉄壁の系譜'},
+{id:12,n:'朝倉流',    c:'#cc8844',g:'将',i:'🌄',b:'command',lo:'一乗谷の文化と軍政。組織力を誇る北陸の雄'},
+{id:13,n:'立花流',    c:'#44bb66',g:'将',i:'⚔️',b:'command',lo:'鬼道雪・誾千代。男女問わぬ鉄の将帥の血'},
+{id:14,n:'浅井流',    c:'#88aaee',g:'霊',i:'💠',b:'loyalty',lo:'信義と哀愁。儚くも気高き魂の系譜'},
+{id:15,n:'黒田流',    c:'#aaaa44',g:'霊',i:'🕯️',b:'loyalty',lo:'如水の深謀と信仰。精神の強さが血に宿る'},
+{id:16,n:'細川流',    c:'#aa99cc',g:'霊',i:'🌙',b:'loyalty',lo:'文武両道の公家武将。精神的高潔さが際立つ'},
+{id:17,n:'宇喜多流',  c:'#ccaa88',g:'霊',i:'🌟',b:'loyalty',lo:'備前の梟雄。乱世を生き抜く強靭な精神力の血'},
+{id:18,n:'長曾我部流',c:'#33bb55',g:'忍',i:'🌊',b:'power',  lo:'土佐一条の鯨。海と陸を駆ける自由の戦士'},
+{id:19,n:'龍造寺流',  c:'#cc2255',g:'忍',i:'🐊',b:'power',  lo:'肥前の熊。豪胆さと野性的な奇襲戦術の血'},
+];(()=>{
+BL_EXT.forEach(e=>{
+const ex=BLOODLINES.find(b=>b.id===e.id);if(ex){ex.group=e.g;ex.icon=e.i;ex.statBonus=e.b;ex.lore=e.lo;ex.extColor=e.c;}
+});})();const BM=new Map(BL_EXT.map(b=>[b.id,b]));const NICKS=(()=>{
+const k=(a,b)=>a<b?`${a}-${b}`:`${b}-${a}`;const m=new Map([
+[k('武','霊'),{rank:'SS',label:'完全共鳴！！',bonus:12,scMult:.92,sp:{name:'魂砕鬼将',fl:'剛と魂の完全共鳴',sb:{power:5,loyalty:5}}}],
+[k('智','将'),{rank:'S', label:'理想配合！', bonus:8, scMult:.85,sp:{name:'軍師双璧',fl:'謀と軍が合わさり戦略の極みへ',sb:{wisdom:4,command:4}}}],
+[k('武','忍'),{rank:'S', label:'理想配合！', bonus:8, scMult:.85,sp:{name:'鬼焔一閃',fl:'剛力と奇襲が爆発',sb:{power:6}}}],
+[k('武','智'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'知勇兼備',fl:'知恵と武勇を兼備',sb:{power:2,wisdom:2}}}],
+[k('将','霊'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'義将覚醒',fl:'忠臣を引き寄せる義将',sb:{command:3,loyalty:3}}}],
+[k('智','忍'),{rank:'A', label:'好配合',     bonus:5, scMult:.70,sp:{name:'奇謀縦横',fl:'予測不能な謀略',sb:{wisdom:3}}}],
+[k('武','将'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
+[k('智','霊'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
+[k('将','忍'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
+[k('霊','忍'),{rank:'B', label:'普通',        bonus:2, scMult:.60,sp:null}],
+]);['武','智','将','霊','忍'].forEach(g=>m.set(k(g,g),{rank:'C',label:'相性薄',bonus:0,scMult:.50,sp:null}));return{
+get(aId,bId){
+const ga=BM.get(aId)?.g||'武', gb=BM.get(bId)?.g||'武';return m.get(k(ga,gb))||{rank:'C',label:'相性薄',bonus:0,scMult:.50,sp:null};},
+rankColor:{SS:'#ffd700',S:'#f0c040',A:'#cc88ff',B:'#66ddaa',C:'#aaa'}
+};})();const TRAITS=[
+{id:'genius',   n:'天才',   cls:'t-ge',w:5,  special:true, ap(s){s.power=Math.min(99,s.power+10);s.wisdom=Math.min(99,s.wisdom+10);}},
+{id:'sickly',   n:'病弱',   cls:'t-si',w:8,  ap(s){s._loyalty=Math.max(1,s._loyalty-10);}},
+{id:'ambitious',n:'野心家', cls:'t-am',w:10, ap(s){s._loyalty=Math.max(1,s._loyalty-15);s.stats.power=Math.min(99,s.stats.power+5);}},
+{id:'loyal',    n:'忠義者', cls:'t-lo',w:8,  ap(s){s._loyalty=Math.min(99,s._loyalty+15);}},
+{id:'fierce',   n:'剛勇',   cls:'t-fi',w:10, ap(s){s.stats.power=Math.min(99,s.stats.power+8);}},
+{id:'wise',     n:'智謀',   cls:'t-wi',w:10, ap(s){s.stats.wisdom=Math.min(99,s.stats.wisdom+8);}},
+{id:'cursed',   n:'呪縛',   cls:'t-cu',w:3,  ap(s){s.stats.power=Math.max(1,s.stats.power-8);s.stats.wisdom=Math.max(1,s.stats.wisdom-8);}},
+];const TRAIT_MAP=new Map(TRAITS.map(t=>[t.id,t]));const TRAIT_TOTAL=TRAITS.reduce((s,t)=>s+t.w,0);function pickTrait(){let r=Math.random()*TRAIT_TOTAL;for(const t of TRAITS){r-=t.w;if(r<=0)return t;}return TRAITS[0];}
 function inheritTraits(fTraits,mTraits){
-  const o=new Set();
-  [...fTraits,...mTraits].forEach(id=>{if(Math.random()<.30)o.add(id);});
-  if(Math.random()<.05)o.add(pickTrait().id);
-  return[...o];
-}
-
-// ソフトキャップテーブル(世代別)
+const o=new Set();[...fTraits,...mTraits].forEach(id=>{if(Math.random()<.30)o.add(id);});if(Math.random()<.05)o.add(pickTrait().id);return[...o];}
 const SCT_GEN=[
-  [60,.50,80,.20,92,.05],[65,.50,82,.22,93,.06],[70,.52,84,.25,94,.07],
-  [74,.54,86,.28,94,.08],[78,.56,88,.30,95,.09],[80,.58,89,.32,95,.10],
-  [82,.60,90,.34,96,.11],[84,.62,91,.36,96,.12],[86,.65,92,.40,97,.15],
-];
-function getGenCaps(gen){const r=SCT_GEN[Math.min(gen,9)-1]||SCT_GEN[8];return[{t:r[0],m:r[1]},{t:r[2],m:r[3]},{t:r[4],m:r[5]}];}
+[60,.50,80,.20,92,.05],[65,.50,82,.22,93,.06],[70,.52,84,.25,94,.07],
+[74,.54,86,.28,94,.08],[78,.56,88,.30,95,.09],[80,.58,89,.32,95,.10],
+[82,.60,90,.34,96,.11],[84,.62,91,.36,96,.12],[86,.65,92,.40,97,.15],
+];function getGenCaps(gen){const r=SCT_GEN[Math.min(gen,9)-1]||SCT_GEN[8];return[{t:r[0],m:r[1]},{t:r[2],m:r[3]},{t:r[4],m:r[5]}];}
 function applyGenCap(raw,gen,scMult,isGenius){
-  const caps=getGenCaps(gen);let v=raw;
-  for(const{t,m} of caps)if(v>t){let e=Math.max(m,scMult);if(isGenius)e=Math.min(1,e+.5*(1-e));v=t+(v-t)*e;}
-  return Math.min(99,Math.floor(v));
-}
-
-// ─── 子供生成(v6統合版)───
-// v6のcreateChildStats()をニックスシステム対応に置き換え
+const caps=getGenCaps(gen);let v=raw;for(const{t,m} of caps)if(v>t){let e=Math.max(m,scMult);if(isGenius)e=Math.min(1,e+.5*(1-e));v=t+(v-t)*e;}
+return Math.min(99,Math.floor(v));}
 function createChildStatsV6(f, m){
-  const nd = NICKS.get(f.bloodlineId, m.bloodlineId);
-  const cg = Math.max(f._generation||1, m._g
+const nd = NICKS.get(f.bloodlineId, m.bloodlineId);const cg = Math.max(f._generation||1, m._generation||1) + 1;const childBlId = Math.random()<.6 ? f.bloodlineId : m.bloodlineId;const childBl = BM.get(childBlId) || BLOODLINES[childBlId];const traits = inheritTraits(f._traits||[], m._traits||[]);const isGenius = traits.includes('genius');const fluct = 8 + Math.min(6,(cg-1)*1.5);const bonus = nd.bonus;const scMult = nd.scMult;const rawP = (f.stats.power*.55 + m.stats.power*.45) + bonus + (Math.random()*2-1)*fluct + (childBl?.b==='power'?3:0);const rawW = (f.stats.wisdom*.45 + m.stats.wisdom*.55) + bonus + (Math.random()*2-1)*fluct + (childBl?.b==='wisdom'?3:0);const rawH = Math.round((f.stats.maxHp + m.stats.maxHp)/1.8) + rnd(10,20);const rawL = Math.round(f._loyalty*.45 + m._loyalty*.55) + rnd(8,14);let p = applyGenCap(rawP, cg, scMult, isGenius);let w = applyGenCap(rawW, cg, scMult, isGenius);let hp = clamp(rawH,100,200);let loyalty = clamp(rawL,30,98);if(nd.sp){
+if(nd.sp.sb.power) p = clamp(p+nd.sp.sb.power,1,99);if(nd.sp.sb.wisdom) w = clamp(w+nd.sp.sb.wisdom,1,99);if(nd.sp.sb.loyalty) loyalty = clamp(loyalty+nd.sp.sb.loyalty,1,99);}
+const bt=(nd.rank==='SS'&&Math.random()<.40)||(nd.rank==='S'&&isGenius&&Math.random()<.25);if(bt){p=clamp(p+rnd(5,12),1,99);w=clamp(w+rnd(5,12),1,99);}
+return {power:p, wisdom:w, hp, maxHp:hp, _loyalty:loyalty, _traits:traits,
+_nickRank:nd.rank, _nickLabel:nd.label, _nickSp:nd.sp, _isBreakthrough:bt,
+_childBlId:childBlId};}
+const _origIsoWarrior = IsoWarrior;function doEngumiV6(){
+if(state.koku<ENGUMI_COST){showToast('石高が足りません(必要：'+ENGUMI_COST+'石)');return;}
+if(engumiSelectedFather===null||engumiSelectedMother===null){showToast('父母を選択してください');return;}
+const f=gParents[engumiSelectedFather], m=gParents[engumiSelectedMother];const nd=NICKS.get(f.bloodlineId, m.bloodlineId);const cs=createChildStatsV6(f, m);state.koku-=ENGUMI_COST;state.generation++;f.useCount++;m.useCount++;if(f.useCount%3===0) f.level=Math.min(9,f.level+1);if(m.useCount%3===0) m.level=Math.min(9,m.level+1);const gender=Math.random()<.5?'male':'female';const jobDef=generateJob(gender);const childName=randName(gender);const child=new IsoWarrior(childName, jobDef, cs.power, 
