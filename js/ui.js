@@ -1,1 +1,56 @@
-あ
+// js/ui.js
+// UI更新・モーダル・トースト・武将カード表示
+
+let toastTimer=null;
+let _uiTimer=null;
+
+
+function showToast(msg,dur){const t=$('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.classList.remove('show');toastTimer=null;},dur||2200);}
+
+function addLog(text){const now=new Date();const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');state.log.unshift({time:ts,text});if(state.log.length>100)state.log.pop();}
+
+function openModal(id){document.getElementById(id).classList.add('show');const bg=$('modal-bg');if(bg)bg.style.display='block';}
+
+function closeModal(id){document.getElementById(id).classList.remove('show');refreshModalBg();}
+
+function refreshModalBg(){const ids=['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal','formation-modal','castle-modal','map-modal'];const any=ids.some(i=>document.getElementById(i).classList.contains('show'));$('modal-bg').style.display=any?'block':'none';}
+
+function closeAllModals(){['pedigree-modal','warrior-modal','engumi-modal','dev-modal','history-modal','formation-modal','castle-modal','map-modal'].forEach(id=>document.getElementById(id).classList.remove('show'));$('modal-bg').style.display='none';}
+
+function updateStatusUI(){$('koku-val').textContent=Math.floor(state.koku).toLocaleString();const uni=Math.min(state.unification>=100?100:99.9,state.unification);$('uni-val').textContent=uni.toFixed(1);$('uni-bar').style.width=Math.min(uni,100)+'%';$('uni-pct').textContent=uni.toFixed(1)+'%';updateCastleUI();if(state.unification>=100)showToast('🎉 天下統一を達成せり！',5000);}
+
+function updateCastleUI(){const d=castleLvData();$('castle-lv-text').textContent='Lv.'+state.castle.lv+' '+d.name;const pct=Math.min(100,(state.castle.exp/d.maxExp)*100);$('castle-exp-fill').style.width=pct+'%';const btn=$('castle-upgrade-btn');const ok=state.castle.lv<CASTLE_LEVELS.length&&state.castle.exp>=d.maxExp&&state.koku>=d.upgCost;btn.textContent=ok?'★強化可!':'強化';btn.style.borderColor=ok?'var(--gold-l)':'var(--gold-d)';btn.style.color=ok?'#fff':'';}
+
+function updatePartyRow(){const row=$('party-row');if(!row)return;row.innerHTML='';gWarriors.forEach((w,i)=>{const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const mature=w.isMature();const card=document.createElement('div');card.className='party-card'+(i===0?' head':'')+(!mature?' growing':'');const blE=BM&&BM.get(w.bloodlineId);const nickColor=w._nickRank?NICKS.rankColor[w._nickRank]||'#aaa':'';card.innerHTML='<span class="pc-role">'+(w.jobIcon||'')+(mature?'':' 育成中')+(w._nickRank?'<span style="font-size:6px;color:'+nickColor+'"> '+w._nickRank+'</span>':'')+'</span><span class="pc-name">'+w.name+'</span><span class="pc-pow">武'+w.getEffectivePower()+'　'+w.age+'歳</span><span class="pc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</span><span class="pc-hp" style="color:'+hpc+'">体 '+hpPct+'%</span>';card.onclick=()=>showWarriorModal('child',i);row.appendChild(card);});gParents.forEach((w,i)=>{const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const blE=BM&&BM.get(w.bloodlineId);const card=document.createElement('div');card.className='party-card parent-card';card.innerHTML='<span class="pc-role">親　Lv.'+w.level+'</span><span class="pc-name">'+w.name+'</span><span class="pc-pow">武'+w.getEffectivePower()+'　知'+w.getEffectiveWisdom()+'</span><span class="pc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</span><span class="pc-hp" style="color:'+hpc+'">体 '+hpPct+'%</span>';card.onclick=()=>showWarriorModal('parent',i);row.appendChild(card);});updateStaffUI();}
+
+function updateStaffUI(){const row=$('staff-row');if(!row)return;row.innerHTML='';if(!gStaff.length){row.style.display='none';return;}row.style.display='flex';gStaff.forEach((s,i)=>{const card=document.createElement('div');card.className='staff-card';card.innerHTML='<span class="sc-label">家臣 '+(i+1)+'/'+MAX_STAFF+'</span><span class="sc-name">'+s.name+'</span><span class="sc-job">'+(s.staffJob||'教育係')+'</span><span class="sc-lv">教育Lv.'+s.staffLevel+'</span>';card.onclick=()=>showWarriorModal('staff',i);row.appendChild(card);});}
+
+function openCastleModal(){const d=castleLvData();const next=CASTLE_LEVELS[state.castle.lv];let html='<div class="castle-upgrade-row"><div class="cur-name">🏯 '+d.name+' Lv.'+state.castle.lv+'</div><div class="cur-desc">石高収入 ×'+d.kokuBonus+'<br>武将強さ ×'+d.powerBonus+'<br>城EXP：'+state.castle.exp+' / '+d.maxExp+'</div>';if(next){html+='<div class="cur-desc">次：<b>'+next.name+' Lv.'+next.lv+'</b><br>'+next.upgDesc+'<br>収入→×'+next.kokuBonus+' / 強さ→×'+next.powerBonus+'</div>';const ok=state.castle.exp>=d.maxExp&&state.koku>=d.upgCost;html+='<div class="cur-cost">費用：'+d.upgCost.toLocaleString()+'石　（現在：'+Math.floor(state.koku).toLocaleString()+'石）</div>';html+='<button class="cur-btn" '+(ok?'':'disabled')+' onclick="doUpgradeCastle()">城を強化する（'+d.upgCost.toLocaleString()+'石）</button>';}else{html+='<div class="cur-desc" style="color:var(--gold);">★ 最高レベルに達しました！</div>';}html+='</div>';$('castle-modal-body').innerHTML=html;openModal('castle-modal');}
+
+function doUpgradeCastle(){if(state.castle.lv>=CASTLE_LEVELS.length){showToast('すでに最高レベルです');return;}const d=castleLvData();if(state.castle.exp<d.maxExp){showToast('城EXPが不足しています');return;}if(state.koku<d.upgCost){showToast('石高が不足しています');return;}state.koku-=d.upgCost;state.castle.lv++;state.castle.exp=0;const nd=castleLvData();addLog('城が強化！→ '+nd.name+' Lv.'+state.castle.lv);showToast('🏯 城が'+nd.name+'に昇格！',3000);closeModal('castle-modal');updateCastleUI();updateStatusUI();}
+
+function enqueueRetire(w){if(!retireQueue.includes(w))retireQueue.push(w);if(!retireTarget)processRetireQueue();}
+
+function processRetireQueue(){if(!retireQueue.length){retireTarget=null;return;}showRetireModal(retireQueue.shift());}
+
+function showRetireModal(w){retireTarget=w;$('retire-warrior-name').textContent=w.name;$('retire-staff-note').textContent='家臣団 '+gStaff.length+' / '+MAX_STAFF+' 名';$('retire-btn-staff').disabled=gStaff.length>=MAX_STAFF;$('retire-modal').classList.add('show');}
+
+function chooseRetire(choice){const w=retireTarget;if(!w)return;$('retire-modal').classList.remove('show');retireTarget=null;gWarriors=gWarriors.filter(x=>x!==w);if(choice===1){w.isParent=true;w.isStaff=false;gParents.push(w);
+if(gParents.length>20){gParents.shift();}
+addLog(w.name+' が親として血脈を紡ぐ');showToast(w.name+' を親リストに迎えました',2500);}else{if(gStaff.length>=MAX_STAFF){w.isParent=true;w.isStaff=false;gParents.push(w);showToast('家臣団が満員のため親リストに移しました',2500);}else{w.isStaff=true;w.isParent=false;w.staffLevel=1;w.staffJob=Math.random()<.5?'武芸師範':'学問師範';gStaff.push(w);addLog(w.name+' が家臣団（'+w.staffJob+'）に就いた');showToast(w.name+' を家臣団に迎えました！',2500);}}updatePartyRow();setTimeout(processRetireQueue,400);}
+
+function applyStaffEducation(){if(!gStaff.length)return;gWarriors.forEach(w=>{if(w.age>=RETIRE_AGE)return;const nearby=gStaff.filter(s=>Math.hypot(s.isoX-w.isoX,s.isoY-w.isoY)<2.8);if(!nearby.length)return;const bonus=1+nearby.reduce((s,st)=>s+st.staffLevel*.05,0);if(Math.random()<.15){w.stats.power=clamp(w.stats.power+Math.floor(1*bonus),1,99);w.stats.wisdom=clamp(w.stats.wisdom+Math.floor(1*bonus),1,99);}});if(state.turn%100===0)gStaff.forEach(s=>{s.staffLevel=Math.min(20,s.staffLevel+1);});}
+
+function showWarriorModal(type,idx){const w=type==='parent'?gParents[idx]:type==='staff'?gStaff[idx]:gWarriors[idx];if(!w)return;const hpPct=w.stats.hp/w.stats.maxHp*100;const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const blE=BM&&BM.get(w.bloodlineId);$('wm-name-text').textContent=w.name;$('wm-role-text').textContent=(w.jobIcon||'')+' '+(w.jobName||'武将');$('wm-power').textContent=w.stats.power+'（実効:'+w.getEffectivePower()+'）';$('wm-wisdom').textContent=w.stats.wisdom+'（実効:'+w.getEffectiveWisdom()+'）';$('wm-hp').textContent=w.stats.hp+' / '+w.stats.maxHp;$('wm-loyalty').textContent=w._loyalty;$('wm-age').textContent=w.isStaff?'家臣団（'+(w.staffJob||'教育係')+'）':w.isParent?'引退（縁組専念）':w.age+'歳　'+(w.isMature()?'成人':'育成中');$('wm-bloodline').textContent=(blE?.i||'')+w.bloodline.name+(blE?' 【'+blE.g+'系】':'');$('wm-bloodline').style.color=blE?.c||w.bloodline.color;$('wm-job').textContent=w.isStaff?(w.staffJob||'教育係')+'　教育Lv.'+w.staffLevel:w.jobName;$('wm-location').textContent=w.locationLabel();$('wm-lineage').textContent=w._parents?w._parents.father+' × '+w._parents.mother+'の子':'初代';$('wm-traits').textContent=w._traits&&w._traits.length?w._traits.map(id=>TRAIT_MAP&&TRAIT_MAP.get(id)?.n||id).join('・'):'なし';const nickRow=$('wm-nick-row');if(w._nickRank){nickRow.style.display='flex';$('wm-nick').textContent=w._nickRank+' '+(w._nickSp?w._nickSp.name:'')+(w._isBreakthrough?' 🌟限界突破！':'');}else nickRow.style.display='none';const lvRow=$('wm-level-row');if(w.isParent&&!w.isStaff){lvRow.style.display='flex';$('wm-level').textContent='Lv.'+w.level+'（縁組'+w.useCount+'回）';}else lvRow.style.display='none';const fill=$('wm-hp-fill');fill.style.width=hpPct+'%';fill.style.background=hpc;openModal('warrior-modal');}
+
+function closeWarriorModal(){closeModal('warrior-modal');}
+
+function openHistory(){const list=$('hist-list');if(!list)return;list.innerHTML=state.log.length?state.log.map(e=>'<div class="hist-item"><span class="hi-time">'+e.time+'</span><span class="hi-text">'+e.text+'</span></div>').join(''):'<div class="hist-empty">まだ記録がありません</div>';openModal('history-modal');}
+
+function openBattle(){const candidates=[...gWarriors,...gParents];if(!candidates.length){showToast('出陣できる武将がいません');return;}selectedForBattle=candidates.slice(0,MAX_FORMATION);renderFormationModal(candidates);openModal('formation-modal');}
+
+function renderFormationModal(candidates){const grid=$('formation-grid');const count=$('formation-count');if(!grid)return;count.textContent=selectedForBattle.length+' / '+MAX_FORMATION+' 名選択中';grid.innerHTML='';candidates.forEach(w=>{const sel=selectedForBattle.includes(w);const hpPct=Math.round(w.stats.hp/w.stats.maxHp*100);const hpc=hpPct>60?'#88dd88':hpPct>30?'#ffaa44':'#ff6666';const blE=BM&&BM.get(w.bloodlineId);const card=document.createElement('div');card.className='formation-card'+(sel?' selected':'');card.innerHTML='<div class="fc-name">'+(w.jobIcon||'')+' '+w.name+'</div><div class="fc-stats">武'+w.getEffectivePower()+'　知'+w.getEffectiveWisdom()+'　'+(w.isParent?'親':w.age+'歳')+'</div><div class="fc-bl" style="color:'+(blE?.c||w.bloodline.color)+'">'+(blE?.i||'')+w.bloodline.name+'</div><div class="fc-hp" style="color:'+hpc+'">体 '+hpPct+'%</div>';card.onclick=()=>{if(sel)selectedForBattle=selectedForBattle.filter(x=>x!==w);else if(selectedForBattle.length<MAX_FORMATION)selectedForBattle.push(w);else{showToast('最大'+MAX_FORMATION+'名まで選択できます');return;}renderFormationModal(candidates);};grid.appendChild(card);});$('formation-start-btn').disabled=!selectedForBattle.length;}
+
+function startBattleWithFormation(){if(!selectedForBattle.length){showToast('武将を選択してください');return;}closeModal('formation-modal');launchBattle(selectedForBattle);}
+
+function _scheduleUIUpdate(){if(_uiTimer)return;_uiTimer=setTimeout(()=>{updatePartyRow();updateStatusUI();_uiTimer=null;},80);}
