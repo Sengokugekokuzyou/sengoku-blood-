@@ -94,12 +94,22 @@ sg.state='attack';sg.stateTimer=24;const dmg=rnd(6,12);tgt.hp-=dmg;tgt.state='hi
 sg.state='walk';const spd=1.4;sg.x+=dx/dist*spd+sx*.5;sg.y+=dy/dist*spd+sy2*.5;sg.y=Math.max(yMin,Math.min(yMax,sg.y));}
 sg.x=Math.max(8,Math.min(fw-8,sg.x));});}
 
+let bAdPushed=false;
+
+function pushBattleResultAd(){
+if(bAdPushed)return;
+if(window.matchMedia&&window.matchMedia('(max-height: 620px)').matches)return;
+const ad=document.querySelector('#battle-result-panel .adsbygoogle');
+if(!ad||!window.adsbygoogle)return;
+try{(window.adsbygoogle=window.adsbygoogle||[]).push({});bAdPushed=true;}catch(e){console.warn('AdSense push skipped',e);}
+}
+
 function bEndBattle(isWin){
 const cb=castleLvData().kokuBonus;let extraMsg='';if(isWin){
 let reward=Math.floor(rnd(1800,2400)*cb),uniGain=4+Math.random()*3;if(currentEnemy?.province){const p=currentEnemy.province;p.clan='player';uniGain=8+Math.random()*4;reward+=rnd(800,1400);extraMsg='\n【'+p.name+'】を平定！';addLog('【天下図】'+p.name+'を制圧');showToast('🎉 '+p.name+' を平定！',4000);}
 state.koku+=reward;state.unification=Math.min(100,state.unification+uniGain);bActiveWarriors.forEach(w=>{w.stats.power=clamp(w.stats.power+rnd(3,7),1,99);w.stats.hp=Math.min(w.stats.maxHp,w.stats.hp+rnd(8,15));});$('bres-title-text').textContent='勝利！';$('bres-detail-text').textContent='石高 +'+reward.toLocaleString()+'\n統一度 +'+uniGain.toFixed(1)+'%'+extraMsg;addLog('合戦勝利(報酬'+reward+'石)');addCastleExp(50);}else{
 const loss=rnd(400,700);state.koku=Math.max(0,state.koku-loss);bActiveWarriors.forEach(w=>{w.stats.hp=Math.max(1,w.stats.hp-rnd(15,25));});$('bres-title-text').textContent='敗北…';$('bres-detail-text').textContent='石高 -'+loss.toLocaleString()+'\n武将が負傷した';addLog('合戦敗北(損失'+loss+'石)');addCastleExp(10);}
-currentEnemy=null;$('battle-result-panel').classList.add('show');updateStatusUI();updatePartyRow();}
+currentEnemy=null;$('battle-result-panel').classList.add('show');pushBattleResultAd();updateStatusUI();updatePartyRow();}
 
 function bGameLoop(){
 bTickCount++;if(bGameState==='battle'&&bGenerals&&bSoldiers){

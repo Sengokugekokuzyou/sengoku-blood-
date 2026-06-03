@@ -1,0 +1,27 @@
+.game-ad-slot {
+  width: min(92vw, 728px);
+  min-height: 100px;
+  max-height: 180px;
+  margin: 24px auto 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(200, 150, 12, 0.22);
+  border-radius: 8px;
+  background: rgba(8, 4, 0, 0.72);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.game-ad-slot p {
+  margin: 0 0 8px;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-align: center;
+  color: rgba(245, 232, 200, 0.62);
+}
+
+@media (max-height: 620px) {
+  .game-ad-slot {
+    display: none;
+  }
+}
