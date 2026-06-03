@@ -4,6 +4,16 @@
 let idleTimer=null,ageTickCounter=0;
 let retireTarget=null,retireQueue=[];
 let selectedForBattle=[];
+let homeAdPushed=false;
+
+function pushHomeAd(){
+if(homeAdPushed)return;
+if(window.matchMedia&&window.matchMedia('(max-height: 760px)').matches)return;
+const ad=document.querySelector('#home-ad-slot .adsbygoogle');
+if(!ad)return;
+if(!window.adsbygoogle){setTimeout(pushHomeAd,800);return;}
+try{(window.adsbygoogle=window.adsbygoogle||[]).push({});homeAdPushed=true;}catch(e){console.warn('AdSense home push skipped',e);}
+}
 
 
 function performIdleTick(){
@@ -28,6 +38,6 @@ function devSetUnification(){state.unification=Math.min(100,state.unification+30
 function devAddWarrior(){const g=Math.random()<.5?'male':'female';const jd=generateJob(g);const w=new IsoWarrior(randName(g),jd,rnd(35,65),0,2+Math.random()*3,g,rnd(18,28));gWarriors.push(w);updatePartyRow();showToast('新武将「'+w.name+'」が参陣！',2000);}
 
 function init(){
-spawnStars();spawnPetals();const initData=[{name:'織田信長',gender:'male',age:28,power:72,bl:0},{name:'明智光秀',gender:'male',age:35,power:58,bl:6},{name:'お市',gender:'female',age:22,power:44,bl:10}];initData.forEach(d=>{const jd=generateJob(d.gender);const w=new IsoWarrior(d.name,jd,d.power,0,2.5+Math.random()*2,d.gender,d.age,d.bl);gWarriors.push(w);});updateStatusUI();updatePartyRow();updateCastleUI();addLog('戦国血脈 v6 開始。尾張より天下へ！');idleTimer=setInterval(performIdleTick,3800);drawIsoCanvas();}
+spawnStars();spawnPetals();const initData=[{name:'織田信長',gender:'male',age:28,power:72,bl:0},{name:'明智光秀',gender:'male',age:35,power:58,bl:6},{name:'お市',gender:'female',age:22,power:44,bl:10}];initData.forEach(d=>{const jd=generateJob(d.gender);const w=new IsoWarrior(d.name,jd,d.power,0,2.5+Math.random()*2,d.gender,d.age,d.bl);gWarriors.push(w);});updateStatusUI();updatePartyRow();updateCastleUI();addLog('戦国血脈 v6 開始。尾張より天下へ！');idleTimer=setInterval(performIdleTick,3800);drawIsoCanvas();pushHomeAd();}
 
 window.addEventListener('DOMContentLoaded', init);
