@@ -100,7 +100,8 @@ function pushBattleResultAd(){
 if(bAdPushed)return;
 if(window.matchMedia&&window.matchMedia('(max-height: 620px)').matches)return;
 const ad=document.querySelector('#battle-result-panel .adsbygoogle');
-if(!ad||!window.adsbygoogle)return;
+if(!ad)return;
+if(!window.adsbygoogle){setTimeout(pushBattleResultAd,800);return;}
 try{(window.adsbygoogle=window.adsbygoogle||[]).push({});bAdPushed=true;}catch(e){console.warn('AdSense push skipped',e);}
 }
 
